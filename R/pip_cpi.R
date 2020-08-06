@@ -136,8 +136,10 @@ pip_cpi_update <- function(cpidir, dlwdir){
 pip_clean_cpi <- function(x) {
   data.table::setDT(x)
 
-  keep_vars <- country_code year ref_year cpi2011 ppp2011
+  # vars to keep
+  keep_vars <- c("country_code", "year", "ref_year", "cpi2011", "ppp2011")
 
+  # modifications to the database
   x[,
     c("country_code", "cur_adj", "ccf", "ppp2011")
     := {
@@ -149,8 +151,15 @@ pip_clean_cpi <- function(x) {
       list(country_code, cur_adj, ccf, ppp2011)
       }
     ]
+  x <- x[
+        ,
+        ..keep_vars
+       ]
 
   # Label variables
+  attr(x$ccf, "label")      <- "Currency conversion factor"
+  attr(x$ppp2011, "label")  <- "PPP values, 2011 round"
+
 
 
 }
