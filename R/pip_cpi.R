@@ -1,3 +1,14 @@
+#' PIP CPI data. Load and update
+#'
+#' @param action
+#' @param maindir
+#' @param dlwdir
+#'
+#' @return
+#' @export
+#' @import data.table
+#'
+#' @examples
 pip_cpi <- function(action  = "load",
                     maindir = NULL,
                     dlwdir  = NULL
@@ -85,7 +96,8 @@ pip_cpi_update <- function(cpidir, dlwdir){
   dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
   cpidlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Final_CPI_PPP_to_be_used.dta")
 
-  cpi        <- haven::read_dta(cpidlw_dir)
+  cpidlw     <- haven::read_dta(cpidlw_dir)
+  cpi        <- pip_clean_cpi(cpidlw)
 
   # Note: clean CPI data file and then create datasignature
   ds_dlw <- digest::digest(cpi,  algo = "xxhash64") # Data signature of file
@@ -133,24 +145,25 @@ pip_cpi_update <- function(cpidir, dlwdir){
 
 #--------- clear cpi file ---------
 
-pip_clean_cpi <- function(x) {
-  data.table::setDT(x)
+pip_clean_cpi <- function(y) {
+  x <- data.table::as.data.table(y)
 
   # vars to keep
-  keep_vars <- c("country_code", "year", "ref_year", "cpi2011", "ppp2011")
+  keep_vars <- c("country_code", "year", "ref_year", "cpi2011", "ccf", "datalevel")
 
   # modifications to the database
   x[,
-    c("country_code", "cur_adj", "ccf", "ppp2011")
+    c("country_code", "cur_adj", "ccf")
     := {
 
       country_code <-  code
       cur_adj      <-  ifelse(is.na(cur_adj), 1, cur_adj)
       ccf          <-  1/cur_adj
-      ppp2011      <-  icp2011
-      list(country_code, cur_adj, ccf, ppp2011)
+      list(country_code, cur_adj, ccf)
       }
     ]
+
+  # keep final vars
   x <- x[
         ,
         ..keep_vars
@@ -158,8 +171,8 @@ pip_clean_cpi <- function(x) {
 
   # Label variables
   attr(x$ccf, "label")      <- "Currency conversion factor"
-  attr(x$ppp2011, "label")  <- "PPP values, 2011 round"
 
-
-
+  return(x)
 }
+
+

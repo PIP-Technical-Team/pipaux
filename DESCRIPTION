@@ -20,4 +20,5 @@ Imports:
     haven,
     digest,
     fst,
-    readr
+    readr,
+    data.table
