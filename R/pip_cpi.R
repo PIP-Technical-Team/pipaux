@@ -1,5 +1,6 @@
-pip_cpi <- function(action = "load",
-                    maindir = "//w1wbgencifs01/pip/PIP-Data/",
+pip_cpi <- function(action  = "load",
+                    maindir = NULL,
+                    dlwdir  = NULL
                     ){
 
 
@@ -24,6 +25,14 @@ pip_cpi <- function(action = "load",
   #----------------------------------------------------------
   #   define parameters
   #----------------------------------------------------------
+
+  # Always call common values
+  com_values <- pip_aux_values()
+
+  if (is.null(maindir)) {
+    maindir <- com_values$maindir
+  }
+
   cpidir <- paste0(maindir, "_aux/cpi/")
 
   #----------------------------------------------------------
@@ -38,7 +47,12 @@ pip_cpi <- function(action = "load",
 
   #--------- update ---------
   if (action == "update"){
-    #
+    if (is.null(dlwdir)) {
+      dlwdir <- com_values$dlwdir
+    }
+
+    pip_cpi_update(cpidir = cpidir,
+                   dlwdir = dlwdir)
   }
 
 }
@@ -52,25 +66,28 @@ pip_cpi_load <- function(cpidir){
 
   # check file exists
   if(file.exists(paste0(cpidir, "cpi.fst"))){
+
     df <- fst::read_fst(paste0(cpidir, "cpi.fst"))
+
   } else {
+
     stop("file `cpi.fst` does not exist. check your connection or data availability")
+
   }
   return(df)
 }
 
 #--------- update ---------
 
-pip_cpi_update <- function(cpidir,
-                           dlwdir = "//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/"
-                           ){
+pip_cpi_update <- function(cpidir, dlwdir){
 
   # check for last version in dlw
-  cpidlw <- paste0(dlwdir, "Support_2005_CPI_v04_M/Data/Stata/Final_CPI_PPP_to_be_used.dta")
+  dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
+  cpidlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Final_CPI_PPP_to_be_used.dta")
 
-  cpi    <- haven::read_dta(cpidlw)
+  cpi        <- haven::read_dta(cpidlw_dir)
 
-  # Note clean CPI data file and then create datasignature
+  # Note: clean CPI data file and then create datasignature
   ds_dlw <- digest::digest(cpi,  algo = "xxhash64") # Data signature of file
 
   # check signature of current fst file
@@ -78,14 +95,17 @@ pip_cpi_update <- function(cpidir,
 
 
   if (file.exists(ds_production_path)) {
+
     # read data signature in production
     ds_production <- readr::read_lines(ds_production_path)
 
   } else {
-    ds_production <- "0000" # fake signature
+
+    # fake signature
+    ds_production <- "0000"
   }
 
-  #--------- if Signature from dlw is differnet from the one in production ---------
+  #--------- if Signature from dlw is different from the one in production ---------
 
   if (ds_dlw != ds_production) {
 
@@ -101,7 +121,7 @@ pip_cpi_update <- function(cpidir,
 
     readr::write_lines(x = ds_dlw,
                        path = ds_production_path)
-    print("Data signature was not found, so cpi.fst has been updated")
+    print("Data signature has changed or was not found. `cpi.fst` has been updated")
     return(invisible(TRUE))
   } else {
     print("Data signature is up to date. No update performed")
@@ -109,5 +129,28 @@ pip_cpi_update <- function(cpidir,
   }
 }
 
-#--------- Find latest dlw ---------
 
+
+#--------- clear cpi file ---------
+
+pip_clean_cpi <- function(x) {
+  data.table::setDT(x)
+
+  keep_vars <- country_code year ref_year cpi2011 ppp2011
+
+  x[,
+    c("country_code", "cur_adj", "ccf", "ppp2011")
+    := {
+
+      country_code <-  code
+      cur_adj      <-  ifelse(is.na(cur_adj), 1, cur_adj)
+      ccf          <-  1/cur_adj
+      ppp2011      <-  icp2011
+      list(country_code, cur_adj, ccf, ppp2011)
+      }
+    ]
+
+  # Label variables
+
+
+}
