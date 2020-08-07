@@ -23,13 +23,28 @@ pip_cpi <- function(action  = "load",
 
   # Proper length
   if (length(action) != 1) {
-    stop(paste0("`action` should be length 1, not ", length(action)))
+    rlang::abort(c(
+                  "`action` should be length 1",
+                  x = paste0("`action` is length ", length(action))
+                ),
+      class = "pipaux_error")
+
   }
 
   # proper options
   action_options <- c("load", "update")
+
   if (!(action  %in% action_options)) {
-    stop(cat("`action` should be one of ", action_options))
+    action_options <- paste("`", action_options, "`", sep = "")
+    msg <- paste("`action` should be", last_item(action_options, "or"))
+
+    rlang::abort(c(
+                  msg,
+                  x = paste0("`action` is ", action)
+                ),
+                class = "pipaux_error"
+                )
+
   }
 
 
@@ -81,8 +96,12 @@ pip_cpi_load <- function(cpidir){
     df <- fst::read_fst(paste0(cpidir, "cpi.fst"))
 
   } else {
-
-    stop("file `cpi.fst` does not exist. check your connection or data availability")
+    rlang::abort(c(
+                  "file `cpi.fst` does not exist.",
+                  i = "check your connection or data availability"
+                  ),
+                  class = "error_class"
+                  )
 
   }
   return(df)
