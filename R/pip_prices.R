@@ -73,6 +73,8 @@ pip_prices <- function(measure  = NULL,
   if (action == "load") {
     df <- pip_aux_load(msrdir  = msrdir,
                        measure = measure)
+    df <- pip_aux_labels(df,
+                         measure = measure)
     return(df)
   }
 

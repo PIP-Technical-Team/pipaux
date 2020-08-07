@@ -1,6 +1,6 @@
-#' Title
+#' Clean CPI data from datalibweb to meet PIP protocols
 #'
-#' @param y
+#' @param y dataset with CPI data from datalibweb. loaded in `pip_prices()`
 #'
 #' @return
 #' @export
@@ -38,13 +38,6 @@ pip_cpi_clean <- function(y) {
     ,
     ..keep_vars
   ]
-
-  # Label variables
-  attr(x$ccf, "label")            <- "Currency conversion factor"
-  attr(x$reference_year, "label") <- "Proportion of first year of survey"
-  attr(x$datalevel, "label")      <- "Data level to join with microdata"
-  attr(x$surveyid_year, "label")  <- "Survey ID year"
-
   return(x)
 }
 
