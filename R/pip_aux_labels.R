@@ -16,6 +16,8 @@ pip_aux_labels <- function(x, measure) {
     attr(x$datalevel,      "label") <- "Data level to join with microdata"
     attr(x$surveyid_year,  "label") <- "Survey ID year"
     return(x)
+  } else {
+    return(x)
   }
 
 }
