@@ -1,15 +1,17 @@
 #' PIP Prices data. Works with either CPI or PPP data
 #'
+#' @param measure
 #' @param action
 #' @param maindir
 #' @param dlwdir
+#' @param force
 #'
 #' @return
 #' @export
 #' @import data.table
 #'
 #' @examples
-pip_prices <- function(measure  = "cpi",
+pip_prices <- function(measure  = NULL,
                        action   = "update",
                        maindir = NULL,
                        dlwdir  = NULL,

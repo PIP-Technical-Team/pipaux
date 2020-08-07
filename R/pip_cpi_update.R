@@ -53,7 +53,11 @@ pip_cpi_update <- function(msrdir, dlwdir, force){
 
     readr::write_lines(x = ds_dlw,
                        path = ds_production_path)
-    rlang::inform("Data signature has changed, was not found. or update was forced.\n`cpi.fst` has been updated")
+
+    infmsg <- paste("Data signature has changed, it was not found,",
+                    "or update was forced.\n",
+                    "`cpi.fst` has been updated")
+    rlang::inform(infmsg)
     return(invisible(TRUE))
   } else {
     rlang::inform("Data signature is up to date.\nNo update performed")

@@ -4,7 +4,7 @@
 \alias{pip_cpi}
 \title{PIP CPI data. Load and update}
 \usage{
-pip_cpi(action = "load", maindir = NULL, dlwdir = NULL)
+pip_cpi(action = "update", maindir = NULL, dlwdir = NULL, force = FALSE)
 }
 \arguments{
 \item{dlwdir}{}
