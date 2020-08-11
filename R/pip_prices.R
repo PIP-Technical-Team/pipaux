@@ -1,10 +1,12 @@
 #' PIP Prices data. Works with either CPI or PPP data
 #'
-#' @param measure
-#' @param action
-#' @param maindir
-#' @param dlwdir
-#' @param force
+#' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
+#' @param action character: Either "load" or "update". Default is "update". If
+#' "update" `measure` data will be updated in system. If "load" `measure` data is loaded in memory
+#' @param maindir character: main directory of project. Default available
+#' in `pip_aux_values()`
+#' @param dlwdir character: Datalibweb directory available in `pip_aux_values()`
+#' @param force logical: If TRUE `measure` data will be updated.
 #'
 #' @return
 #' @export

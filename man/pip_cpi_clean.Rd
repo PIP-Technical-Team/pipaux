@@ -2,16 +2,19 @@
 % Please edit documentation in R/pip_cpi_clean.R
 \name{pip_cpi_clean}
 \alias{pip_cpi_clean}
-\title{Title}
+\title{Clean CPI data from datalibweb to meet PIP protocols}
 \usage{
-pip_cpi_clean(y)
+pip_cpi_clean(y, cpivar = "cpi2011")
 }
 \arguments{
-\item{y}{}
+\item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}
+
+\item{cpivar}{character: CPI variable to be used as default. Currently it is
+"cpi2011".}
 }
 \value{
 
 }
 \description{
-Title
+Clean CPI data from datalibweb to meet PIP protocols
 }

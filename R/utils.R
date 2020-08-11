@@ -1,4 +1,11 @@
 
+#--------- To delete. Just for testing purposes ---------
+
+cpidlw_load <- function() {
+  cpid <<- haven::read_dta("//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/Support_2005_CPI_v04_M/Data/Stata/Final_CPI_PPP_to_be_used.dta")
+}
+
+
 #--------- common value ---------
 
 pip_aux_values <- function(){

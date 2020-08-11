@@ -13,7 +13,17 @@ pip_prices(
 )
 }
 \arguments{
-\item{dlwdir}{}
+\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
+
+\item{action}{character: Either "load" or "update". Default is "update". If
+"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
+
+\item{maindir}{character: main directory of project. Default available
+in \code{pip_aux_values()}}
+
+\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
+
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

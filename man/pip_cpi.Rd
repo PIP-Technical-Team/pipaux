@@ -7,7 +7,15 @@
 pip_cpi(action = "update", maindir = NULL, dlwdir = NULL, force = FALSE)
 }
 \arguments{
-\item{dlwdir}{}
+\item{action}{character: Either "load" or "update". Default is "update". If
+"update" CPI data will be updated in system. If "load" CPI data is loaded in memory}
+
+\item{maindir}{character: main directory of project. Default available
+in \code{pip_aux_values()}}
+
+\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
+
+\item{force}{logical: If TRUE CPI data will be updated.}
 }
 \value{
 

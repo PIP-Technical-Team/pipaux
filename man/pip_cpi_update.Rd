@@ -2,16 +2,20 @@
 % Please edit documentation in R/pip_cpi_update.R
 \name{pip_cpi_update}
 \alias{pip_cpi_update}
-\title{Title}
+\title{update CPI dataframe}
 \usage{
 pip_cpi_update(msrdir, dlwdir, force)
 }
 \arguments{
-\item{force}{}
+\item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
+
+\item{dlwdir}{character: datalibweb directory. available in \code{pip_prices()}}
+
+\item{force}{logical: if TRUE force update of CPI data}
 }
 \value{
 
 }
 \description{
-Title
+update CPI dataframe
 }

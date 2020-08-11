@@ -1,9 +1,11 @@
 #' PIP PPP data. Load and update
 #'
-#' @param action
-#' @param maindir
-#' @param dlwdir
-#' @param force
+#' @param action character: Either "load" or "update". Default is "update". If
+#' "update" PPP data will be updated in system. If "load" PPP data is loaded in memory
+#' @param maindir character: main directory of project. Default available
+#' in `pip_aux_values()`
+#' @param dlwdir character: Datalibweb directory available in `pip_aux_values()`
+#' @param force logical: If TRUE PPP data will be updated.
 #'
 #' @return
 #' @export

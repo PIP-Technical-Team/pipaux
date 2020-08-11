@@ -1,8 +1,8 @@
 #' Update PPP data frame
 #'
-#' @param msrdir
-#' @param dlwdir
-#' @param force
+#' @param msrdir character: measure (PPP) directory. created on `pip_prices()`.
+#' @param dlwdir character: datalibweb directory. available in `pip_prices()`
+#' @param force  logical: if TRUE force update of PPP data
 #'
 #' @return
 #' @export

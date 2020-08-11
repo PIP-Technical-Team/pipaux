@@ -7,7 +7,9 @@
 pip_aux_load(msrdir, measure)
 }
 \arguments{
-\item{measure}{}
+\item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
+
+\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 }
 \value{
 
