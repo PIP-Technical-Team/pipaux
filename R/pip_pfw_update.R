@@ -8,19 +8,18 @@
 #' @export
 #'
 #' @examples
-pip_cpi_update <- function(msrdir, dlwdir, force){
+pip_pfw_update <- function(msrdir, dlwdir, force){
 
   # check for last version in dlw
   dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
-  cpidlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Final_CPI_PPP_to_be_used.dta")
+  pfwdlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Survey_price_framework.dta")
 
-  cpidlw     <- haven::read_dta(cpidlw_dir)
-  cpi        <- pip_cpi_clean(cpidlw)
+  pfwdlw     <- haven::read_dta(pfwdlw_dir)
+  pfw        <- pip_pfw_clean(pfwdlw)
 
-  pip_sign_save(x       = cpi,
-                measure = "cpi",
+  pip_sign_save(x       = pfw,
+                measure = "pfw",
                 msrdir  = msrdir,
                 force   = force)
 
 }
-

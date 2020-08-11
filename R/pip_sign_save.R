@@ -34,6 +34,12 @@ pip_sign_save <- function(x, measure, msrdir, force) {
 
   if (ds_dlw != ds_production || force == TRUE) {
 
+    # make sure directory exists
+    wholedir <- paste0(msrdir, "_vintage/")
+    if (!(dir.exists(wholedir))) {
+      dir.create(wholedir, recursive = TRUE)
+    }
+
     # re-write x in production if data signature is not found
     fst::write_fst(x = x,
                    path = paste0(msrdir, measure, ".fst")
@@ -60,5 +66,5 @@ pip_sign_save <- function(x, measure, msrdir, force) {
     return(invisible(FALSE))
   }
 
-
 }
+

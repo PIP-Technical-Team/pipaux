@@ -2,7 +2,12 @@
 #--------- To delete. Just for testing purposes ---------
 
 cpidlw_load <- function() {
-  cpid <<- haven::read_dta("//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/Support_2005_CPI_v04_M/Data/Stata/Final_CPI_PPP_to_be_used.dta")
+  dlwdir <- "//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/Support_2005_CPI_v04_M/Data/Stata/"
+
+  cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
+  pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
+
+
 }
 
 
