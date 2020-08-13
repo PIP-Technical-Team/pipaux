@@ -8,32 +8,67 @@
 #' @export
 #'
 #' @examples
-pip_ppp_clean <- function(y, pppvar = "icp2011") {
+pip_ppp_clean <- function(y, pdefault_year = 2011) {
   x <- data.table::as.data.table(y)
 
-  # vars to keep
-  keep_vars <- c("country_code", "surveyid_year", "reference_year",
-                 "ppp", "ppp_domain", "ppp_data_level")
 
-  # modifications to the database
-  x[
+  #--------- Tidy data ---------
+  y <- melt(x,
+            id.vars       = "code",
+            measure.vars  = patterns("^ppp_[0-9]{4}.+"),
+            variable.name = "ver",
+            value.name    = "ppp"
+  )
+  y[
     ,
+    c("p", "ppp_year", "rel_ver", "adap_ver") := tstrsplit(ver, "_")
+  ][,
     `:=`(
-      country_code   = code,
-      surveyid_year  = year,
-      reference_year = ref_year,
-      ppp            = get(pppvar)
+      p = NULL,
+      ver = NULL
     )
   ]
 
-  # keep final vars
-  x <- x[
-    ,
-    ..keep_vars
+  y[
+    x,
+    on = .(code),
+    `:=`(
+      ppp_domain     = i.ppp_domain,
+      ppp_data_level = as.character(i.datalevel),
+      ppp_year       = as.numeric(ppp_year)
+    )
   ]
 
-  x <- unique(x)  # remove duplicates
-  return(x)
+  setorder(y, code, ppp_year, rel_ver, adap_ver)
+
+  #--------- Get defatul version ---------
+
+  y[ # Find Max release version
+    ,
+    d1 := rel_ver == max(rel_ver),
+    by = .(code, ppp_year)
+
+  ][
+    # Find max adaptation version of the max release
+    d1 == TRUE,
+    d2 := adap_ver == max(adap_ver),
+    by = .(code, ppp_year)
+
+  ][
+    , # get intersection
+    ppp_default := (d1 == TRUE & d2 == TRUE & ppp_year == (default_year))
+  ][
+    # Remove unnecessary variables
+    ,
+    `:=`(
+      d1 = NULL,
+      d2 = NULL
+    )
+  ]
+
+
+  y <- unique(y)  # remove duplicates
+  return(y)
 }
 
 
