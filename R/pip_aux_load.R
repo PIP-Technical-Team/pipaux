@@ -24,5 +24,7 @@ pip_aux_load <- function(msrdir, measure){
     )
 
   }
+  df <- pip_aux_labels(df,
+                       measure = measure)
   return(df)
 }

@@ -5,6 +5,7 @@
 #'
 #' @return
 #' @export
+#' @import data.table
 #'
 #' @examples
 pip_maddison <- function(action = "update",
@@ -17,7 +18,14 @@ pip_maddison <- function(action = "update",
   if (action == "update") {
 
     mpd <- haven::read_dta("https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2018.dta")
-    pip_sign_save(x       = mdp,
+
+    setDT(mpd)
+    setnames(mpd,
+             old = c("countrycode", "country", "rgdpnapc"),
+             new = c("country_code", "country_name", "mdp_gdp")
+             )
+
+    pip_sign_save(x       = mpd,
                   measure = measure,
                   msrdir  = msrdir,
                   force   = force)

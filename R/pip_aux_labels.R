@@ -19,7 +19,6 @@ pip_aux_labels <- function(x, measure) {
     attr(x$ccf,            "label") <- "Currency conversion factor"
     attr(x$cpi,            "label") <- "Consumer Price Index (Based on 2011)."
 
-    return(x)
   }  else if (measure == "ppp") {
 
     ppp_year <- unique(x[x$ppp_default == TRUE, "ppp_year"])
@@ -34,14 +33,24 @@ pip_aux_labels <- function(x, measure) {
     attr(x$adaptation_version, "label") <- "Adaptation version of release"
     attr(x$ppp_default,        "label") <- "PPP version used by default"
 
-    return(x)
+
+  } else if (measure == "maddison") {
+
+    # Label Variables
+      attr(x$country_name, "label")  <- "Country name"
+      attr(x$country_code, "label")  <- "Country code"
+      attr(x$year,         "label")  <- "Year"
+      attr(x$cgdppc,       "label")  <- "Real GDP per capita in 2011US$, multiple benchmarks"
+      attr(x$mdp_gdp,      "label")  <- "GDP per capita in 2011US$, 2011 benchmark"
+      attr(x$pop,          "label")  <- "Population, mid-year (thousands)"
+      attr(x$i_cig,        "label")  <- "0/1/2: observation is extrapolated (0), benchmark (1), or interpolated (2)"
+      attr(x$i_bm,         "label")  <- "1-5: type of benchmark estimate, see note i_bm"
 
   } else {
-
-    return(x)
-
+    rlang::inform(paste0("no labels available for measure `", measure, "`"))
   }
 
+  return(x)
 }
 
 
