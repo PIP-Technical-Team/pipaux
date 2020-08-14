@@ -21,4 +21,5 @@ Imports:
     fst,
     readr,
     data.table,
-    rlang
+    rlang,
+    wbstats
