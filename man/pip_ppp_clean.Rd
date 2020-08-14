@@ -4,7 +4,7 @@
 \alias{pip_ppp_clean}
 \title{Clean PPP data from datalibweb to meet PIP protocols}
 \usage{
-pip_ppp_clean(y, pdefault_year = 2011)
+pip_ppp_clean(y, default_year = 2011)
 }
 \arguments{
 \item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}

@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-pip_ppp_clean <- function(y, pdefault_year = 2011) {
+pip_ppp_clean <- function(y, default_year = 2011) {
   x <- data.table::as.data.table(y)
 
 
@@ -20,7 +20,7 @@ pip_ppp_clean <- function(y, pdefault_year = 2011) {
   )
   y[
     ,
-    c("p", "ppp_year", "rel_ver", "adap_ver") := tstrsplit(ver, "_")
+    c("p", "ppp_year", "release_version", "adaptation_version") := tstrsplit(ver, "_")
   ][,
     `:=`(
       p = NULL,
@@ -38,33 +38,52 @@ pip_ppp_clean <- function(y, pdefault_year = 2011) {
     )
   ]
 
-  setorder(y, code, ppp_year, rel_ver, adap_ver)
+  setorder(y, code, ppp_year, release_version, adaptation_version)
 
-  #--------- Get defatul version ---------
+  #--------- Get default version ---------
 
   y[ # Find Max release version
     ,
-    d1 := rel_ver == max(rel_ver),
+    d1 := release_version == max(release_version),
     by = .(code, ppp_year)
 
   ][
     # Find max adaptation version of the max release
     d1 == TRUE,
-    d2 := adap_ver == max(adap_ver),
+    d2 := adaptation_version == max(adaptation_version),
     by = .(code, ppp_year)
 
   ][
     , # get intersection
-    ppp_default := (d1 == TRUE & d2 == TRUE & ppp_year == (default_year))
+    `:=`(
+      ppp_default         = (d1 == TRUE & d2 == TRUE & ppp_year == (default_year)),
+      ppp_default_by_year = (d1 == TRUE & d2 == TRUE),
+      country_code        = code
+      )
+
   ][
     # Remove unnecessary variables
     ,
     `:=`(
-      d1 = NULL,
-      d2 = NULL
+      d1   = NULL,
+      d2   = NULL,
+      code = NULL
     )
   ]
 
+  setcolorder(y,
+              c(
+                "country_code",
+                "ppp_year",
+                "release_version",
+                "adaptation_version",
+                "ppp",
+                "ppp_default",
+                "ppp_default_by_year",
+                "ppp_domain",
+                "ppp_data_level"
+              )
+            )
 
   y <- unique(y)  # remove duplicates
   return(y)
