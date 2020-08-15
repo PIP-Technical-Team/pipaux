@@ -12,75 +12,55 @@ pip_gdp <- function(action          = "update",
                     force           = FALSE) {
 
 
-  # update Maddision Project Data
+  measure   <- "gdp"
+  r         <- pip_aux_values()
+  # update Maddison Project Data
   if (maddison_action == "update") {
     pip_maddison(force = force)
   }
 
-
   if (action == "update") {
 
-    madd <- pip_maddison("load")
-    wgdp <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD")
-    setDT(madd)
-    setDT(wgdp)
+    pip_gdp_update(force = force)
 
-    #--------- clean GDP from WDI ---------
-
-    # rename vars
-    setnames(wgdp,
-             old = c("iso3c", "date", "NY.GDP.PCAP.KD"),
-             new = c("country_code", "year", "wdi_gdp")
-             )
-
-    # keep relevant variables
-    gdp <- wgdp[,
-              .(country_code, year, wdi_gdp)
-              ]
-
-    # Join Maddison and WDI
-    gdp[
-        madd,
-        on      = .(country_code, year),
-        mdp_gdp := i.mdp_gdp
-        ]
-
-    # data now used in Maddison
-    gdp[
-      year >= 2000,
-      mpd_gdp := NA
-      ]
-
-    # Special cases for IND, IDN, and CHN
-    sp <- gdp[country_code %chin% c("IND", "IDN", "CHN")]
-
-    # Expand three time these cases using cross-join.
-    sp <- sp[CJ(gdp_data_level = c(0, 1),
-                country_code = country_code,
-                year = year,
-                unique = TRUE),
-             on = .(country_code, year)
-            ]
-
-    gdp[,gdp_data_level := 2]
-
-    # append
-    gdp <- rbindlist(list(gdp, sp))
-
-    setorder(gdp, country_code, year, gdp_data_level)
-
-
-
-
+  } else if (action == "load") {
+    msrdir    <- paste0(r$maindir, "_aux/", measure, "/")  # measure dir
+    pip_aux_load(msrdir = msrdir,
+                 measure = measure)
 
   }  # End of update
 
 
-
-
-
-
-
-
 } # end of pip_gdp
+
+
+
+
+
+
+
+# DT = data.table(year=2010:2014, v1=runif(5), v2=1:5, v3=letters[1:5])
+# DT[, shift(.SD, 1:2, NA, "lead", TRUE), .SDcols=2:4]
+#
+# DT[,
+#    lag_1 := shift(v2, n = -1, type = "lag")
+#    ][
+#      ,
+#      lead_1 := shift(v2, n = -1, type = "lead")
+#    ][,
+#      lag1 := shift(v2, n = 1, type = "lag") # default
+#    ][
+#      ,
+#      lead1 := shift(v2, n = 1, type = "lead")
+#    ]
+
+
+
+
+
+
+
+
+
+
 

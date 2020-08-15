@@ -22,7 +22,7 @@ pip_maddison <- function(action = "update",
     setDT(mpd)
     setnames(mpd,
              old = c("countrycode", "country", "rgdpnapc"),
-             new = c("country_code", "country_name", "mdp_gdp")
+             new = c("country_code", "country_name", "mpd_gdp")
              )
 
     pip_sign_save(x       = mpd,

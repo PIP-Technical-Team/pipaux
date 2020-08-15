@@ -41,10 +41,18 @@ pip_aux_labels <- function(x, measure) {
       attr(x$country_code, "label")  <- "Country code"
       attr(x$year,         "label")  <- "Year"
       attr(x$cgdppc,       "label")  <- "Real GDP per capita in 2011US$, multiple benchmarks"
-      attr(x$mdp_gdp,      "label")  <- "GDP per capita in 2011US$, 2011 benchmark"
+      attr(x$mpd_gdp,      "label")  <- "GDP per capita in 2011US$, 2011 benchmark (Maddison)"
       attr(x$pop,          "label")  <- "Population, mid-year (thousands)"
       attr(x$i_cig,        "label")  <- "0/1/2: observation is extrapolated (0), benchmark (1), or interpolated (2)"
       attr(x$i_bm,         "label")  <- "1-5: type of benchmark estimate, see note i_bm"
+
+  } else if (measure == "gdp") {
+    # Label Variables
+    attr(x$country_code,   "label")  <- "Country code"
+    attr(x$year,           "label")  <- "Year"
+    attr(x$gdp_data_level, "label")  <- "Values to use as keys to join with gdp_domain_var"
+    attr(x$gdp,            "label")  <- "GDP per capita (constant 2010 US$)"
+    attr(x$gdp_domain,     "label")  <- "GDP domain to join with microdata"
 
   } else {
     rlang::inform(paste0("no labels available for measure `", measure, "`"))
