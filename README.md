@@ -1,7 +1,7 @@
 # pipaux
 Fetch auxiliary information and organizing data (substitute of master file)
 
-## Data Bases Available
+## Datasets Available
 
 * cpi:           Consumer Price Index
 * ppp:           Purchasing Power Parity (ICP) 
