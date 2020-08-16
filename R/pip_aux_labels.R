@@ -54,6 +54,21 @@ pip_aux_labels <- function(x, measure) {
     attr(x$gdp,            "label")  <- "GDP per capita (constant 2010 US$)"
     attr(x$gdp_domain,     "label")  <- "GDP domain to join with microdata"
 
+  } else if (measure == "pce") {
+
+    attr(x$country_code,   "label")  <- "Country code"
+    attr(x$year,           "label")  <- "Year"
+    attr(x$pce_data_level, "label")  <- "Values to use as keys to join with \n pce_domain_var in microdata"
+    attr(x$pce,            "label")  <- "Households and NPISHs Final consumption expenditure per capita (constant 2010 US$)"
+
+
+  } else if (measure == "pop") {
+
+    attr(x$country_code,   "label")  <- "Country code"
+    attr(x$year,           "label")  <- "Year"
+    attr(x$pop_data_level, "label")  <- "Values to use as keys to join with pop_domain_var"
+    attr(x$pop,            "label")  <- "Population"
+
   } else {
     rlang::inform(paste0("no labels available for measure `", measure, "`"))
   }

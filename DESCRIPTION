@@ -22,4 +22,5 @@ Imports:
     readr,
     data.table,
     rlang,
-    wbstats
+    wbstats,
+    purrr

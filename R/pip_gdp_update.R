@@ -49,73 +49,8 @@ pip_gdp_update <- function(force){
     mpd_gdp := NA
   ]
 
-  # Special cases for IND, IDN, and CHN
-  sp <- gdp[country_code %chin% c("IND", "IDN", "CHN")]
-
-  # Expand three time these cases using cross-join.
-  sp <- sp[CJ(gdp_data_level = c(0, 1),
-              country_code = country_code,
-              year = year,
-              unique = TRUE),
-           on = .(country_code, year)
-  ]
-
-  gdp[,gdp_data_level := 2]
-
-  # append
-  gdp <- rbindlist(list(gdp, sp))
-
-  setorder(gdp, country_code, year, gdp_data_level)
-
-  #--------- Load National Accounts Special cases ---------
-  #Note: we could add a function to convert csv in fst format... for other time
-  measure   <- "sna"
-  msrdir    <- paste0(r$maindir, "_aux/", measure, "/")  # measure dir
-  # most recent file
-  sna_file  <- max(list.files(msrdir,
-                              pattern = "^NAS.+csv$",
-                              full.names = TRUE)
-  )
-
-  sna <- suppressMessages(readr::read_csv(sna_file))
-  sna <- janitor::clean_names(sna)
-  setDT(sna)
-  setnames(sna,
-           old = c("countryname", "countrycode", "gdp", "pce"),
-           new = c("country_name", "country_code", "sna_gdp", "sna_pce")
-  )
-  sna[
-    ,
-    coverage := tolower(coverage)
-  ][
-    ,
-    gdp_data_level := fcase(
-      coverage == "national", 2,
-      coverage == "urban",    1,
-      coverage == "rural",    0
-    )
-  ]
-
-  #--------- Join SNA with GDP data ---------
-  gdp$master <- 1
-  sna$using  <- 2
-
-  gdp[sna,
-      on = .(country_code, year, gdp_data_level),
-      `:=`(
-        sna_gdp = i.sna_gdp,
-        sna_pce = i.sna_pce,
-        using   = i.using
-      )
-  ][
-    ,
-    `:=`(
-      master = fifelse(is.na(master), 0, master),
-      using = fifelse(is.na(using), 0, using)
-    )
-  ][,
-    merge := master + using # reseambles STata merge
-  ]
+  # Join with Special National Accounts data.
+  gdp <- pip_join_sna(gdp, measure = "gdp")
 
   #--------- replicate Espen's code ---------
   setorder(gdp, country_code, gdp_data_level, year)
