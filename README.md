@@ -10,6 +10,7 @@ Fetch auxiliary information and organizing data (substitute of master file)
 * sna:           Special National Account cases
 * pfw:           Price Framework
 * pce:           Private consumption
+* pop:           Population
 * country_list:  List of countries and metadata at country level
 
 
