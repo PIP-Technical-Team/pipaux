@@ -11,7 +11,6 @@ pip_pce <- function(action = "update",
                     force  = FALSE) {
 
   measure <- "pce"
-  r       <- pip_aux_values()
   msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
 
   if (action == "update") {

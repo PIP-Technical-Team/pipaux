@@ -4,7 +4,7 @@
 #' "update" CPI data will be updated in system. If "load" CPI data is loaded in memory
 #' @param maindir character: main directory of project. Default available
 #' in `pip_aux_values()`
-#' @param dlwdir character: Datalibweb directory available in `pip_aux_values()`
+#' @param dlwdir character: Datalibweb directory available in getOptions("pipaux.dlwdir")
 #' @param force logical: If TRUE CPI data will be updated.
 #'
 #' @return

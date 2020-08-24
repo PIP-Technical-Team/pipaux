@@ -14,7 +14,6 @@ pip_pop <- function(action = "update",
                     src    = "wdi"){
 
   measure <- "pop"
-  r       <- pip_aux_values()
   msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
   src     <- tolower(src)
 

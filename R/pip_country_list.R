@@ -2,7 +2,6 @@ pip_country_list <- function(action = "update",
                              force  = FALSE) {
 
   measure <- "country_list"
-  r       <- pip_aux_values()
   msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
 
   if (action == "update") {

@@ -13,7 +13,6 @@ pip_gdp <- function(action          = "update",
 
 
   measure   <- "gdp"
-  r         <- pip_aux_values()
   # update Maddison Project Data
   if (maddison_action == "update") {
     pip_maddison(force = force)

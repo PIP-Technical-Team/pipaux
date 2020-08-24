@@ -15,9 +15,9 @@
 #' @examples
 pip_prices <- function(measure  = NULL,
                        action   = "update",
-                       maindir = NULL,
-                       getOption("pipaux.dlwdir"),
-                       force   = FALSE
+                       maindir  = getOption("pipaux.maindir"),
+                       dlwdir   = getOption("pipaux.dlwdir"),
+                       force    = FALSE
               ){
 
 
@@ -59,12 +59,6 @@ pip_prices <- function(measure  = NULL,
   #----------------------------------------------------------
 
   # Always call common values
-  com_values <- pip_aux_values()
-
-  if (is.null(maindir)) {
-    maindir <- com_values$maindir
-  }
-
   msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
 
   #----------------------------------------------------------
