@@ -14,7 +14,7 @@
 #' @examples
 pip_ppp <- function(action  = "update",
                     maindir = NULL,
-                    dlwdir  = NULL,
+                    getOption("pipaux.dlwdir"),
                     force   = FALSE
 ){
 

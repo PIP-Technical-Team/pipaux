@@ -16,7 +16,7 @@
 pip_prices <- function(measure  = NULL,
                        action   = "update",
                        maindir = NULL,
-                       dlwdir  = NULL,
+                       getOption("pipaux.dlwdir"),
                        force   = FALSE
               ){
 

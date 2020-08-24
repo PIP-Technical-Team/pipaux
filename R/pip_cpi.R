@@ -14,7 +14,7 @@
 #' @examples
 pip_cpi <- function(action  = "update",
                     maindir = NULL,
-                    dlwdir  = NULL,
+                    dlwdir  = getOption("pipaux.dlwdir"),
                     force   = FALSE
                     ){
 
