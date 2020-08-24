@@ -9,9 +9,9 @@ pip_cpi_update(msrdir, dlwdir, force)
 \arguments{
 \item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
 
-\item{dlwdir}{character: datalibweb directory. available in \code{pip_prices()}}
+\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
 
-\item{force}{logical: if TRUE force update of CPI data}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

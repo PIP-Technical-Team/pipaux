@@ -4,18 +4,23 @@
 \alias{pip_ppp}
 \title{PIP PPP data. Load and update}
 \usage{
-pip_ppp(action = "update", maindir = NULL, dlwdir = NULL, force = FALSE)
+pip_ppp(
+  action = "update",
+  maindir = getOption("pipaux.maindir"),
+  dlwdir = getOption("pipaux.dlwdir"),
+  force = FALSE
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
-"update" PPP data will be updated in system. If "load" PPP data is loaded in memory}
+"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
 
 \item{maindir}{character: main directory of project. Default available
 in \code{pip_aux_values()}}
 
 \item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
 
-\item{force}{logical: If TRUE PPP data will be updated.}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

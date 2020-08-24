@@ -1,5 +1,5 @@
 Package: pipaux
-Title:  Management of auxiliary data in PIP workflow
+Title: Management of auxiliary data in PIP workflow
 Version: 0.0.0.9000
 Authors@R: c(
             person(given = "R.Andres",
@@ -8,11 +8,11 @@ Authors@R: c(
                    email = "acastanedaa@worldbank.org"),
             person(given = "Tony",
                    family = "Fujs",
-                   role = c("aut", "cre"),
+                   role = c("aut"),
                    email = "tfujs@worldbank.org"),
             person(given = "R.Aleksander",
                    family = "Eilertsen",
-                   role = c("aut", "cre"),
+                   role = c("aut"),
                    email = "aeilertsen@worldbank.org")
             )
 Description: pipaux manages the auxiliary data used in the PIP workflow. It basically
@@ -34,4 +34,5 @@ Imports:
     data.table,
     rlang,
     wbstats,
-    purrr
+    purrr,
+    janitor

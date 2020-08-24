@@ -1,6 +1,7 @@
 #' Update and load GDP data in PIP Auxiliary data structure
 #'
-#' @param action
+#' @inheritParams pip_prices
+#' @param maddison_action character: Either "load" or "update". Default is "update".
 #'
 #' @return
 #' @export

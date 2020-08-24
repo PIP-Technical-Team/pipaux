@@ -7,8 +7,8 @@
 pip_prices(
   measure = NULL,
   action = "update",
-  maindir = NULL,
-  dlwdir = NULL,
+  maindir = getOption("pipaux.maindir"),
+  dlwdir = getOption("pipaux.dlwdir"),
   force = FALSE
 )
 }

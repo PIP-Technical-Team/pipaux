@@ -1,7 +1,7 @@
 #' Clean PPP data from datalibweb to meet PIP protocols
 #'
-#' @param pdefault_year numeric: default PPP year to be used.
 #' @param y dataset with PPP data from datalibweb. loaded in `pip_prices()`.
+#' @param default_year numeric: ICP round year. Default is 2011
 #'
 #' @return
 #' @export

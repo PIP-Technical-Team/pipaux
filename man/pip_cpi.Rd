@@ -4,18 +4,23 @@
 \alias{pip_cpi}
 \title{PIP CPI data. Load and update}
 \usage{
-pip_cpi(action = "update", maindir = NULL, dlwdir = NULL, force = FALSE)
+pip_cpi(
+  action = "update",
+  maindir = getOption("pipaux.maindir"),
+  dlwdir = getOption("pipaux.dlwdir"),
+  force = FALSE
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
-"update" CPI data will be updated in system. If "load" CPI data is loaded in memory}
+"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
 
 \item{maindir}{character: main directory of project. Default available
 in \code{pip_aux_values()}}
 
 \item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
 
-\item{force}{logical: If TRUE CPI data will be updated.}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 
