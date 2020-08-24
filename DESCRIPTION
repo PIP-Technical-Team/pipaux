@@ -1,11 +1,20 @@
 Package: pipaux
 Title:  Management of auxiliary data in PIP workflow
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "R.Andres",
-           family = "Castaneda",
-           role = c("aut", "cre"),
-           email = "acastanedaa@worldbank.org")
+Authors@R: c(
+            person(given = "R.Andres",
+                   family = "Castaneda",
+                   role = c("aut", "cre"),
+                   email = "acastanedaa@worldbank.org"),
+            person(given = "Tony",
+                   family = "Fujs",
+                   role = c("aut", "cre"),
+                   email = "tfujs@worldbank.org"),
+            person(given = "R.Aleksander",
+                   family = "Eilertsen",
+                   role = c("aut", "cre"),
+                   email = "aeilertsen@worldbank.org")
+            )
 Description: pipaux manages the auxiliary data used in the PIP workflow. It basically
     does two things. [1] It updates the auxiliary data and makes sure to keep 
     it unchanged when it the raw data has not been modified. [2] it loads the 
