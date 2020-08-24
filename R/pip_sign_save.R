@@ -43,7 +43,11 @@ pip_sign_save <- function(x, measure, msrdir, force) {
     # re-write x in production if data signature is not found
     fst::write_fst(x = x,
                    path = paste0(msrdir, measure, ".fst")
-    )
+                  )
+
+    haven::write_dta(data = x,
+                     path = paste0(msrdir, measure, ".dta")
+                    )
     # Vintage
     time <- format(Sys.time(), "%Y%m%d%H%M%S") # find a way to account for time zones
     fst::write_fst(x = x,
