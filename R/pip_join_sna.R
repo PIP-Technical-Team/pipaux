@@ -29,7 +29,7 @@ pip_join_sna <- function(x, measure) {
 
   #--------- Load National Accounts Special cases ---------
   #Note: we could add a function to convert csv in fst format... for other time
-  msrdir    <- paste0(r$maindir, "_aux/sna/")  # measure dir
+  msrdir    <- paste0(getOption("pipaux.maindir"), "_aux/sna/")  # measure dir
   # most recent file
   sna_file  <- max(list.files(msrdir,
                               pattern = "^NAS.+csv$",

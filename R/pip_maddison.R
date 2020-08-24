@@ -13,7 +13,7 @@ pip_maddison <- function(action = "update",
 
   measure <- "maddison"
   r       <- pip_aux_values()
-  msrdir  <- paste0(r$maindir, "_aux/", measure, "/") # measure dir
+  msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/") # measure dir
 
   if (action == "update") {
 

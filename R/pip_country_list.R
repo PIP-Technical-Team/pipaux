@@ -3,7 +3,7 @@ pip_country_list <- function(action = "update",
 
   measure <- "country_list"
   r       <- pip_aux_values()
-  msrdir  <- paste0(r$maindir, "_aux/", measure, "/")  # measure dir
+  msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
 
   if (action == "update") {
 

@@ -133,7 +133,7 @@ pip_gdp_update <- function(force){
   #   Save and data signature
   #----------------------------------------------------------
   measure   <- "gdp"
-  msrdir    <- paste0(r$maindir, "_aux/", measure, "/")  # measure dir
+  msrdir    <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
 
   pip_sign_save(x       = gdp,
                 measure = "gdp",
