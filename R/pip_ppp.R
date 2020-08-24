@@ -13,7 +13,7 @@
 #'
 #' @examples
 pip_ppp <- function(action  = "update",
-                    maindir = NULL,
+                    maindir = getOption("pipaux.maindir"),
                     dlwdir  = getOption("pipaux.dlwdir"),
                     force   = FALSE
 ){
