@@ -1,8 +1,7 @@
 #' update CPI dataframe
 #'
 #' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
-#' @param dlwdir character: datalibweb directory. available in `pip_prices()`
-#' @param force  logical: if TRUE force update of CPI data
+#' @inheritParams pip_prices
 #'
 #' @return
 #' @export

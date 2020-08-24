@@ -1,6 +1,6 @@
 #' Update pce data using WDI, Maddison and Special cases.
 #'
-#' @param force logical: If TRUE force update of pce data
+#' @inheritParams pip_pce
 #'
 #' @return
 #' @export

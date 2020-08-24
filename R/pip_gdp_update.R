@@ -1,6 +1,6 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
-#' @param force logical: If TRUE force update of GDP data
+#' @inheritParams pip_gdp
 #'
 #' @return
 #' @export
