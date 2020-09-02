@@ -1,19 +1,39 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # pipaux
-Fetch auxiliary information and organizing data (substitute of master file)
 
-## Datasets Available
+<!-- badges: start -->
 
-* cpi:           Consumer Price Index
-* ppp:           Purchasing Power Parity (ICP) 
-* gdp:           Gross Domestic Product
-* maddison:      Madisson Project Data
-* sna:           Special National Account cases
-* pfw:           Price Framework
-* pce:           Private consumption
-* pop:           Population
-* country_list:  List of countries and metadata at country level
+<!-- badges: end -->
 
+`pipaux` manages the auxiliary data used in the PIP workflow. It
+basically does two things. \[1\] It updates the auxiliary data and makes
+sure to keep it unchanged when it the raw data has not been modified.
+\[2\] it loads the data into memory.
 
-## INSTRUCTIONS.
-1. Folder sna (Special National Account cases) should be modified manually. 
-2. country_list.csv must be updated manually, but name should NOT be changed! vintage control is done internally in pip_country_list("update") in the _vintage folder using .fst files. 
+## Installation
+
+You can install the development version from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("PIP-Technical-Team/pipaux")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(pipaux)
+# Load gdp data
+df <- pip_gdp("load")
+
+# Load CPI data
+df <- pip_cpi("load")
+
+# Load population data
+df <- pip_pop("load")
+```
