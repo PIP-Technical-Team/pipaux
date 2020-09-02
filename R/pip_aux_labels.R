@@ -60,6 +60,7 @@ pip_aux_labels <- function(x, measure) {
     attr(x$year,           "label")  <- "Year"
     attr(x$pce_data_level, "label")  <- "Values to use as keys to join with \n pce_domain_var in microdata"
     attr(x$pce,            "label")  <- "Households and NPISHs Final consumption expenditure per capita (constant 2010 US$)"
+    attr(x$pce_domain,     "label")  <- "PCE domain to join with microdata"
 
 
   } else if (measure == "pop") {
@@ -68,6 +69,7 @@ pip_aux_labels <- function(x, measure) {
     attr(x$year,           "label")  <- "Year"
     attr(x$pop_data_level, "label")  <- "Values to use as keys to join with pop_domain_var"
     attr(x$pop,            "label")  <- "Population"
+    attr(x$pop_domain,     "label")  <- "Population domain to join with microdata"
 
   } else {
     rlang::inform(paste0("no labels available for measure `", measure, "`"))

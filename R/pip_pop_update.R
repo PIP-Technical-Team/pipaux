@@ -48,7 +48,10 @@ pip_pop_update <- function(force, src, msrdir) {
     )
   }
 
-    pop <- pop[, c("country_code", "year", "pop_data_level", "pop")]
+    pop <- pop[, c("country_code", "year", "pop_data_level", "pop")
+               ][,
+                 pop_domain := fifelse(pop_data_level == 2, 1, 2)
+                 ]
 
     pip_sign_save(x       = pop,
                   measure = "pop",
