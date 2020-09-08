@@ -9,12 +9,14 @@
 #' @export
 #'
 #' @examples
-pip_pop <- function(action = "update",
-                    force  = FALSE,
-                    src    = "wdi"){
+pip_pop <- function(action  = "update",
+                    force   = FALSE,
+                    src     = "wdi",
+                    maindir = getOption("pipaux.maindir"),
+                    ...){
 
   measure <- "pop"
-  msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
+  msrdir  <- paste0(maindir, "_aux/", measure, "/")  # measure dir
   src     <- tolower(src)
 
   if (action == "update") {
@@ -25,7 +27,7 @@ pip_pop <- function(action = "update",
 
   } else if (action == "load") {
 
-    df <- pip_aux_load(msrdir  = msrdir,
+    df <- load_aux(msrdir  = msrdir,
                        measure = measure)
     return(df)
 

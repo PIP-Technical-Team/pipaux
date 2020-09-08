@@ -7,7 +7,23 @@
 #' @export
 #'
 #' @examples
-pip_aux_load <- function(msrdir, measure){
+load_aux <- function(measure = NULL,
+                         msrdir = paste0(getOption("pipaux.maindir"),
+                                         "_aux/",
+                                         measure, "/")
+                         ){
+
+  if (is.null(measure)) {
+
+    rlang::abort(c(
+                  "`measure` must be defined, as it does not have default value",
+                  i = "make sure `measure` is not NULL."
+                  ),
+                  class = "pipaux_error"
+                  )
+
+
+  }
 
   # check file exists
   if(file.exists(paste0(msrdir, measure ,".fst"))){

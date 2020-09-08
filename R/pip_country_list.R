@@ -19,7 +19,7 @@ pip_country_list <- function(action = "update",
                   force   = force)
 
   } else if (action == "load") {
-    df <- pip_aux_load(msrdir  = msrdir,
+    df <- load_aux(msrdir  = msrdir,
                        measure = measure)
     return(df)
 
