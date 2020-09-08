@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^pipaux\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
