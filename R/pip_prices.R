@@ -67,7 +67,7 @@ pip_prices <- function(measure  = NULL,
 
   #--------- load ---------
   if (action == "load") {
-    df <- pip_aux_load(msrdir  = msrdir,
+    df <- load_aux(msrdir  = msrdir,
                        measure = measure)
     return(df)
   }
@@ -100,7 +100,7 @@ pip_prices <- function(measure  = NULL,
                     i = "you can use `cpi`, `ppp`, or `pfw`", # update this message automatically
                     x = paste("you selected", measure)
                     ),
-                    class = "error_class"
+                    class = "pipaux_error"
                     )
     }
 
