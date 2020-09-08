@@ -1,9 +1,7 @@
 #' Update Auxiliary data. Wrapper of measure-specific functions.
 #'
-#' @param measure
-#' @param maindir
-#' @param dlwdir
-#' @param force
+#' @inheritParams pip_prices
+#' @param ... Arguments of any of the pip_* functions for updating data.
 #'
 #' @return
 #' @export
