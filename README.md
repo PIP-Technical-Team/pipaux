@@ -27,8 +27,9 @@ library(pipaux)
 ```
 
 Even though `pipaux` has more than 20 functions, most of its features
-can be executed by using only the `pipaux::load_aux` and
-`pipaux::update_aux` functions.
+can be executed by only using functions `pipaux::load_aux` and
+`pipaux::update_aux`, which wrappers of other measure-specific
+functions.
 
 ## Loading data
 
