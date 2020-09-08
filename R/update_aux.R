@@ -1,0 +1,44 @@
+#' Update Auxiliary data. Wrapper of measure-specific functions.
+#'
+#' @param measure
+#' @param maindir
+#' @param dlwdir
+#' @param force
+#'
+#' @return
+#' @export
+#'
+#' @examples
+update_aux <- function(measure  = NULL,
+                      ...
+                      ){
+
+  # verify measure is provided
+  if (is.null(measure)) {
+
+    rlang::abort(c(
+      "`measure` must be defined, as it does not have default value",
+      i = "make sure `measure` is not NULL."
+    ),
+    class = "pipaux_error"
+    )
+
+  }
+
+  # check arguments
+  al <- list(...)  # Arguments List
+  an <- names(al)  # arguments names
+
+  if (!any(an == "maindir")) {
+    al["maindir"] <- getOption("pipaux.maindir")
+  }
+
+
+  # build function name
+  fun_name <- get(paste0("pip_", measure))
+
+  do.call(fun_name, c(action = "update", al))
+  return(invisible(TRUE))
+
+}
+
