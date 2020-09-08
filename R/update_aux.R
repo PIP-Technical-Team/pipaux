@@ -35,8 +35,8 @@ update_aux <- function(measure  = NULL,
   # build function name
   fun_name <- get(paste0("pip_", measure))
 
-  do.call(fun_name, c(action = "update", al))
-  return(invisible(TRUE))
+  rs <- do.call(fun_name, c(action = "update", al))
+  return(invisible(rs))
 
 }
 

@@ -4,7 +4,13 @@
 \alias{pip_pop}
 \title{Load or Update population data}
 \usage{
-pip_pop(action = "update", force = FALSE, src = "wdi")
+pip_pop(
+  action = "update",
+  force = FALSE,
+  src = "wdi",
+  maindir = getOption("pipaux.maindir"),
+  ...
+)
 }
 \arguments{
 \item{action}{character: Whether to update or load. Default \code{update}}
