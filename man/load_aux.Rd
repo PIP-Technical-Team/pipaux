@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_aux.R
 \name{load_aux}
 \alias{load_aux}
-\title{Title}
+\title{Load any auxiliary data}
 \usage{
 load_aux(
   measure = NULL,
@@ -18,5 +18,5 @@ load_aux(
 
 }
 \description{
-Title
+Load any auxiliary data
 }
