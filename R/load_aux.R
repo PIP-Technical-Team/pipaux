@@ -1,4 +1,4 @@
-#' Title
+#' Load any auxiliary data
 #'
 #' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
 #' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
