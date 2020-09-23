@@ -34,8 +34,19 @@ pip_cpi_clean <- function(y, cpivar = "cpi2011") {
       reference_year = ref_year,
       cpi            = get(cpivar)
     )
-  ]
+  ][,
+    cpi_domain := as.character(cpi_domain)
 
+    ][,
+      # This part should not exist if the raw data
+      # has been properly created
+      cpi_data_level := fcase(
+        cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "0", "rural",
+        cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "1", "urban",
+        cpi_domain %chin% c("national", "1")  & cpi_data_level %chin% c("2", "", NA_character_) , "national",
+        default =  ""
+      )
+    ]
   # keep final vars
   x <- x[
     ,
