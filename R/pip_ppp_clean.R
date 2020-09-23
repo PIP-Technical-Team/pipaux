@@ -10,32 +10,33 @@
 pip_ppp_clean <- function(y, default_year = 2011) {
   x <- data.table::as.data.table(y)
 
-
-  #--------- Tidy data ---------
   y <- melt(x,
-            id.vars       = "code",
+            id.vars       = c("code", "ppp_domain","datalevel"),
             measure.vars  = patterns("^ppp_[0-9]{4}.+"),
             variable.name = "ver",
             value.name    = "ppp"
   )
+
   y[
     ,
     c("p", "ppp_year", "release_version", "adaptation_version") := tstrsplit(ver, "_")
   ][,
     `:=`(
-      p = NULL,
-      ver = NULL
+      ppp_year   = as.numeric(ppp_year),
+      ppp_domain = as.character(ppp_domain),
+      datalevel  = as.character(datalevel)
     )
-  ]
-
-  y[
-    x,
-    on = .(code),
-    `:=`(
-      ppp_domain     = i.ppp_domain,
-      ppp_data_level = as.character(i.datalevel),
-      ppp_year       = as.numeric(ppp_year)
+  ][,
+    # This part should not exist if the raw data
+    # has been properly created
+    ppp_data_level := fcase(
+      ppp_domain %chin% c("urban/rural", "2") & datalevel == "0", "rural",
+      ppp_domain %chin% c("urban/rural", "2") & datalevel == "1", "urban",
+      ppp_domain %chin% c("national", "1")  & datalevel %chin% c("2", "", NA_character_) , "national",
+      default =  ""
     )
+  ][,
+    c("p", "ver", "datalevel") := NULL
   ]
 
   setorder(y, code, ppp_year, release_version, adaptation_version)
@@ -53,22 +54,17 @@ pip_ppp_clean <- function(y, default_year = 2011) {
     d2 := adaptation_version == max(adaptation_version),
     by = .(code, ppp_year)
 
-  ][
-    , # get intersection
+  ][,
+    # get intersection
     `:=`(
       ppp_default         = (d1 == TRUE & d2 == TRUE & ppp_year == (default_year)),
       ppp_default_by_year = (d1 == TRUE & d2 == TRUE),
       country_code        = code
-      )
-
-  ][
-    # Remove unnecessary variables
-    ,
-    `:=`(
-      d1   = NULL,
-      d2   = NULL,
-      code = NULL
     )
+
+  ][,
+    # Remove unnecessary variables
+    c("d1", "d2", "code") := NULL
   ]
 
   setcolorder(y,
@@ -83,7 +79,7 @@ pip_ppp_clean <- function(y, default_year = 2011) {
                 "ppp_domain",
                 "ppp_data_level"
               )
-            )
+  )
 
   y <- unique(y)  # remove duplicates
   return(y)
