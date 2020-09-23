@@ -14,7 +14,7 @@ pip_cpi_clean <- function(y, cpivar = "cpi2011") {
 
   # vars to keep
   keep_vars <- c("country_code", "surveyid_year", "reference_year",
-                 "cpi", "ccf", "cpi_domain", "cpi_data_level")
+                 "cpi", "ccf", "cpi_domain", "cpi_data_level", "survey_acronym")
 
   # modifications to the database
   x[,
@@ -32,7 +32,8 @@ pip_cpi_clean <- function(y, cpivar = "cpi2011") {
       country_code   = code,
       surveyid_year  = year,
       reference_year = ref_year,
-      cpi            = get(cpivar)
+      cpi            = get(cpivar),
+      survey_acronym = survname
     )
   ][,
     cpi_domain := as.character(cpi_domain)
