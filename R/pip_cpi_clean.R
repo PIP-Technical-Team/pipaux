@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-pip_cpi_clean <- function(y, cpivar = "cpi2011") {
+pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
 
   x <- data.table::as.data.table(y)
 

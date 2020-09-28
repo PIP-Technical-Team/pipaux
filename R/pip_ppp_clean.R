@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-pip_ppp_clean <- function(y, default_year = 2011) {
+pip_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
   x <- data.table::as.data.table(y)
 
   y <- melt(x,

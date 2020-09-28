@@ -1,6 +1,11 @@
 pipuax_default_options <- list(
   pipaux.dlwdir  = "//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/",
-  pipaux.maindir = "//w1wbgencifs01/pip/PIP-Data/"
+  pipaux.maindir = "//w1wbgencifs01/pip/PIP-Data/",
+  pipaux.cpivar  = "cpi2011",
+  pipaux.pppvar  = "icp2011",
+  pipaux.pppyear = 2011,
+  pipaux.popsrc  = "wdi"
+
 )
 
 .onLoad <- function(libname, pkgname) {

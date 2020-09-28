@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-pip_pfw_clean <- function(y, pppvar = "icp2011") {
+pip_pfw_clean <- function(y, pppvar = getOption("pipaux.pppvar")) {
   x <- data.table::as.data.table(y)
 
   old_var <- c("region", "code", "year", "ref_year", "survname")
