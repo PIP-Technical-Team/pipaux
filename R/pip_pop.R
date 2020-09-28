@@ -11,7 +11,7 @@
 #' @examples
 pip_pop <- function(action  = "update",
                     force   = FALSE,
-                    src     = "wdi",
+                    src     = getOption("pipaux.popsrc"),
                     maindir = getOption("pipaux.maindir"),
                     ...){
 

@@ -4,7 +4,7 @@
 \alias{pip_cpi_clean}
 \title{Clean CPI data from datalibweb to meet PIP protocols}
 \usage{
-pip_cpi_clean(y, cpivar = "cpi2011")
+pip_cpi_clean(y, cpivar = getOption("pipaux.cpivar"))
 }
 \arguments{
 \item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}

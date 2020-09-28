@@ -8,13 +8,13 @@
 #' @export
 #'
 #' @examples
-pip_cpi_clean <- function(y, cpivar = "cpi2011") {
+pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
 
   x <- data.table::as.data.table(y)
 
   # vars to keep
   keep_vars <- c("country_code", "surveyid_year", "reference_year",
-                 "cpi", "ccf", "cpi_domain", "cpi_data_level")
+                 "cpi", "ccf", "survey_acronym", grep("^cpi", names(x), value = TRUE))
 
   # modifications to the database
   x[,
@@ -32,10 +32,22 @@ pip_cpi_clean <- function(y, cpivar = "cpi2011") {
       country_code   = code,
       surveyid_year  = year,
       reference_year = ref_year,
-      cpi            = get(cpivar)
+      cpi            = get(cpivar),
+      survey_acronym = survname
     )
-  ]
+  ][,
+    cpi_domain := as.character(cpi_domain)
 
+    ][,
+      # This part should not exist if the raw data
+      # has been properly created
+      cpi_data_level := fcase(
+        cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "0", "rural",
+        cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "1", "urban",
+        cpi_domain %chin% c("national", "1")  & cpi_data_level %chin% c("2", "", NA_character_) , "national",
+        default =  ""
+      )
+    ]
   # keep final vars
   x <- x[
     ,
