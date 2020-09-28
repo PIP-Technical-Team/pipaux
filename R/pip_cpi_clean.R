@@ -14,7 +14,7 @@ pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
 
   # vars to keep
   keep_vars <- c("country_code", "surveyid_year", "reference_year",
-                 "cpi", "ccf", "cpi_domain", "cpi_data_level", "survey_acronym")
+                 "cpi", "ccf", "survey_acronym", grep("^cpi", names(x), value = TRUE))
 
   # modifications to the database
   x[,
