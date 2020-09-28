@@ -4,6 +4,8 @@
 #' @param force logical: if TRUE Pop data will be updated. Required `action = "update"`
 #' @param src character: Source fo Population data. Default is `wdi`. Other
 #' option is `emi`
+#' @param maindir character: Directory path of main folder. Default `getOption("pipaux.maindir")`
+#' @param ...
 #'
 #' @return
 #' @export
