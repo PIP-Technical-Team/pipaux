@@ -4,7 +4,7 @@
 \alias{pip_pfw_clean}
 \title{Clean PPP data from datalibweb to meet PIP protocols}
 \usage{
-pip_pfw_clean(y, pppvar = "icp2011")
+pip_pfw_clean(y, pppvar = getOption("pipaux.pppvar"))
 }
 \arguments{
 \item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}
