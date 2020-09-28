@@ -5,7 +5,7 @@
 #' @param src character: Source fo Population data. Default is `wdi`. Other
 #' option is `emi`
 #' @param maindir character: Directory path of main folder. Default `getOption("pipaux.maindir")`
-#' @param ...
+#' @param ... character: Additional parameters
 #'
 #' @return
 #' @export

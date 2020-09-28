@@ -19,6 +19,10 @@ pip_pop(
 
 \item{src}{character: Source fo Population data. Default is \code{wdi}. Other
 option is \code{emi}}
+
+\item{maindir}{character: Directory path of main folder. Default \code{getOption("pipaux.maindir")}}
+
+\item{...}{}
 }
 \value{
 

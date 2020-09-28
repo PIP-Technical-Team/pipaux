@@ -4,10 +4,9 @@
 pip_dlw_load <- function() {
   dlwdir <- getOption("pipaux.dlwdir")
 
-  cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
-  pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
-  pppd <<- haven::read_dta(paste0(dlwdir, "pppdata_allvintages.dta"))
-
+  # cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
+  # pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
+  # pppd <<- haven::read_dta(paste0(dlwdir, "pppdata_allvintages.dta"))
 }
 
 

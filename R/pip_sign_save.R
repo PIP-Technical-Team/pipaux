@@ -68,11 +68,15 @@ pip_sign_save <- function(x, measure, msrdir, force) {
                     "or update was forced.\n",
                     paste0("`", measure, ".fst` has been updated")
     )
+
     rlang::inform(infmsg)
     return(invisible(TRUE))
+
   } else {
+
     rlang::inform("Data signature is up to date.\nNo update performed")
     return(invisible(FALSE))
+
   }
 
 }
