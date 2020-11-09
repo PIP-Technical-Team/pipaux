@@ -11,7 +11,7 @@ pip_cpi_update <- function(msrdir, dlwdir, force){
 
   # check for last version in dlw
   dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
-  cpidlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Final_CPI_PPP_to_be_used.dta")
+  cpidlw_dir <- paste0(dlwdir, dlwdir_l, "/", dlwdir_l, "_CPIICP.dta")
 
   cpidlw     <- haven::read_dta(cpidlw_dir)
   cpi        <- pip_cpi_clean(cpidlw)

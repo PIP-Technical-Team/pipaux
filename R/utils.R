@@ -13,8 +13,37 @@ pip_dlw_load <- function() {
 #--------- Find latest dlw directory ---------
 
 latest_dlw_dir <- function(dlwdir){
-  dlw_dirs <- dir(dlwdir)
-  latest   <- max(dlw_dirs)
+  dlw_dirs <- dir(getOption("pipaux.dlwdir"))
+  dt <- data.table(orig = dlw_dirs)
+
+  cnames <-
+    c(
+      "country_code",
+      "year",
+      "survey_acronym",
+      "vermast",
+      "M",
+      "veralt",
+      "A",
+      "collection"
+    )
+
+  latest <-
+    dt[,
+       # Name sections of filename into variables
+       (cnames) := tstrsplit(orig, "_",
+                             fixed=TRUE)
+    ][!is.na(vermast) & !is.na(veralt)
+    ][,
+      maxmast := vermast == max(vermast)
+    ][maxmast == TRUE
+    ][,
+      maxalt := veralt == max(veralt)
+    ][maxalt == TRUE
+    ][,
+      orig
+    ]
+
   return(latest)
 }
 
