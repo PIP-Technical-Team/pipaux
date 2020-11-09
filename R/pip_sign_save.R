@@ -55,6 +55,9 @@ pip_sign_save <- function(x, measure, msrdir, force) {
     fst::write_fst(x = x,
                    path = paste0(msrdir, "_vintage/", measure, "_", time,".fst")
     )
+    haven::write_dta(data = x,
+                     path = paste0(msrdir, "_vintage/", measure, "_", time,".dta")
+    )
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
 
@@ -65,11 +68,15 @@ pip_sign_save <- function(x, measure, msrdir, force) {
                     "or update was forced.\n",
                     paste0("`", measure, ".fst` has been updated")
     )
+
     rlang::inform(infmsg)
     return(invisible(TRUE))
+
   } else {
+
     rlang::inform("Data signature is up to date.\nNo update performed")
     return(invisible(FALSE))
+
   }
 
 }

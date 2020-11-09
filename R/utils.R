@@ -4,18 +4,46 @@
 pip_dlw_load <- function() {
   dlwdir <- getOption("pipaux.dlwdir")
 
-  cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
-  pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
-  pppd <<- haven::read_dta(paste0(dlwdir, "pppdata_allvintages.dta"))
-
+  # cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
+  # pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
+  # pppd <<- haven::read_dta(paste0(dlwdir, "pppdata_allvintages.dta"))
 }
 
 
 #--------- Find latest dlw directory ---------
 
 latest_dlw_dir <- function(dlwdir){
-  dlw_dirs <- dir(dlwdir)
-  latest   <- max(dlw_dirs)
+  dlw_dirs <- dir(getOption("pipaux.dlwdir"))
+  dt <- data.table(orig = dlw_dirs)
+
+  cnames <-
+    c(
+      "country_code",
+      "year",
+      "survey_acronym",
+      "vermast",
+      "M",
+      "veralt",
+      "A",
+      "collection"
+    )
+
+  latest <-
+    dt[,
+       # Name sections of filename into variables
+       (cnames) := tstrsplit(orig, "_",
+                             fixed=TRUE)
+    ][!is.na(vermast) & !is.na(veralt)
+    ][,
+      maxmast := vermast == max(vermast)
+    ][maxmast == TRUE
+    ][,
+      maxalt := veralt == max(veralt)
+    ][maxalt == TRUE
+    ][,
+      orig
+    ]
+
   return(latest)
 }
 
