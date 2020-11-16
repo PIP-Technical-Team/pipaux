@@ -8,13 +8,16 @@
 #' @export
 #'
 #' @examples
-pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
+pip_cpi_clean <- function(y,
+                          cpi_id,
+                          cpivar = getOption("pipaux.cpivar")) {
 
   x <- data.table::as.data.table(y)
 
   # vars to keep
   keep_vars <- c("country_code", "surveyid_year", "reference_year",
-                 "cpi", "ccf", "survey_acronym", grep("^cpi", names(x), value = TRUE))
+                 "cpi", "ccf", "survey_acronym",
+                 grep("^cpi", names(x), value = TRUE), "cpi_id")
 
   # modifications to the database
   x[,
@@ -33,20 +36,18 @@ pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
       surveyid_year  = year,
       reference_year = ref_year,
       cpi            = get(cpivar),
-      survey_acronym = survname
+      survey_acronym = survname,
+      cpi_id         = (cpi_id),
+      cpi_domain     = as.character(cpi_domain)
     )
   ][,
-    cpi_domain := as.character(cpi_domain)
-
-    ][,
       # This part should not exist if the raw data
       # has been properly created
       cpi_data_level := fcase(
         cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "0", "rural",
         cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "1", "urban",
-        cpi_domain %chin% c("national", "1")  & cpi_data_level %chin% c("2", "", NA_character_) , "national",
-        default =  ""
-      )
+        cpi_domain %chin% c("national", "1")    & cpi_data_level %chin% c("2", "", NA_character_),
+        "national", default =  "")
     ]
   # keep final vars
   x <- x[
@@ -57,5 +58,4 @@ pip_cpi_clean <- function(y, cpivar = getOption("pipaux.cpivar")) {
   x <- unique(x)  # remove duplicates
   return(x)
 }
-
 

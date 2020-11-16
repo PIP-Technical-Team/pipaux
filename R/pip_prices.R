@@ -83,6 +83,7 @@ pip_prices <- function(measure  = NULL,
     pip_cpi_update(msrdir = msrdir,
                    dlwdir = dlwdir,
                    force  = force)
+
     } else if (measure == "ppp") {
 
     pip_ppp_update(msrdir = msrdir,
@@ -104,6 +105,7 @@ pip_prices <- function(measure  = NULL,
                     )
     }
 
+    return(invisible(TRUE))
   }
 
 }

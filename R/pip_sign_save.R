@@ -10,7 +10,10 @@
 #' @export
 #'
 #' @examples
-pip_sign_save <- function(x, measure, msrdir, force) {
+pip_sign_save <- function(x,
+                          measure,
+                          msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
+                          force) {
 
   # Note: clean CPI data file and then create data signature
   ds_dlw <- digest::digest(x,  algo = "xxhash64") # Data signature of file
@@ -61,8 +64,8 @@ pip_sign_save <- function(x, measure, msrdir, force) {
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
 
-    readr::write_lines(x = ds_dlw,
-                       path = ds_production_path)
+    readr::write_lines(x    = ds_dlw,
+                       file = ds_production_path)
 
     infmsg <- paste("Data signature has changed, it was not found,",
                     "or update was forced.\n",

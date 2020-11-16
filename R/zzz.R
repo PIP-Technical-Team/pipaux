@@ -5,7 +5,6 @@ pipuax_default_options <- list(
   pipaux.pppvar  = "icp2011",
   pipaux.pppyear = 2011,
   pipaux.popsrc  = "wdi"
-
 )
 
 .onLoad <- function(libname, pkgname) {
