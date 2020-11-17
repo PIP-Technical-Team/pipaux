@@ -22,7 +22,7 @@ option is \code{emi}}
 
 \item{maindir}{character: Directory path of main folder. Default \code{getOption("pipaux.maindir")}}
 
-\item{...}{}
+\item{...}{character: Additional parameters}
 }
 \value{
 

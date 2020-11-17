@@ -33,8 +33,11 @@ pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cp
     dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
     cpidlw_dir <- paste0(dlwdir, dlwdir_l, "/", dlwdir_l, "_CPIICP.dta")
 
+    cpi_ppp_id    <- gsub("(Support_2005_)([^/]+)", "\\2", dlwdir_l)
+
+
     cpidlw     <- haven::read_dta(cpidlw_dir)
-    cpi        <- pip_cpi_clean(cpidlw, cpi_id = dlwdir_l)
+    cpi        <- pip_cpi_clean(cpidlw, cpi_ppp_id = cpi_ppp_id)
 
     pip_sign_save(x       = cpi,
                   measure = "cpi",

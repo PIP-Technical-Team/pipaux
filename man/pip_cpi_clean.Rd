@@ -4,10 +4,12 @@
 \alias{pip_cpi_clean}
 \title{Clean CPI data from datalibweb to meet PIP protocols}
 \usage{
-pip_cpi_clean(y, cpivar = getOption("pipaux.cpivar"))
+pip_cpi_clean(y, cpi_ppp_id, cpivar = getOption("pipaux.cpivar"))
 }
 \arguments{
 \item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}
+
+\item{cpi_ppp_id}{character: CPI and PPP ID. Extracted from \code{pip_cpi_update()}}
 
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}

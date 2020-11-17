@@ -1,9 +1,6 @@
-#' Title
+#' Check Vintage level 2
 #'
-#' @param measure
-#' @param msrdir
-#' @param dlwdir
-#' @param force
+#' @inheritParams vintage_level_1
 #'
 #' @return
 #' @export
@@ -123,7 +120,7 @@ vintage_level_2 <- function(measure,
 #' @examples
 load_cpi <- function(x) {
   cpi_ppp_id    <- gsub("(.*/Support_2005_)([^/]+)(_CPIICP\\.dta$)", "\\2", x)
-  df        <- haven::read_dta(x)
+  df            <- haven::read_dta(x)
   df$cpi_ppp_id <- cpi_ppp_id
   return(df)
 }
