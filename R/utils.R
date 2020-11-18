@@ -33,13 +33,16 @@ latest_dlw_dir <- function(dlwdir){
        # Name sections of filename into variables
        (cnames) := tstrsplit(orig, "_",
                              fixed=TRUE)
-    ][!is.na(vermast) & !is.na(veralt)
+    ][
+      !is.na(vermast) & !is.na(veralt)
     ][,
       maxmast := vermast == max(vermast)
-    ][maxmast == TRUE
+    ][
+      maxmast == TRUE
     ][,
       maxalt := veralt == max(veralt)
-    ][maxalt == TRUE
+    ][
+      maxalt == TRUE
     ][,
       orig
     ]

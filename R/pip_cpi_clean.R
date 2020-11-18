@@ -39,7 +39,8 @@ pip_cpi_clean <- function(y,
       cpi            = get(cpivar),
       survey_acronym = survname,
       cpi_ppp_id     = (cpi_ppp_id),
-      cpi_domain     = as.character(cpi_domain)
+      cpi_domain     = as.character(cpi_domain),
+      cpi_data_level = as.character(cpi_data_level)
     )
   ][,
       # This part should not exist if the raw data

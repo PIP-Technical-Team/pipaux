@@ -11,32 +11,24 @@ pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cp
                            dlwdir = getOption("pipaux.dlwdir"),
                            force  = FALSE){
 
-  # check for last version in dlw
-  change_vintage1   <- vintage_level_1("cpi",
-                                msrdir = msrdir,
-                                dlwdir = dlwdir,
-                                force  =  force)
-
-  if (change_vintage1 == TRUE || force == TRUE) {
-
-    change_vintage2   <- vintage_level_2("cpi",
-                                  msrdir = msrdir,
-                                  dlwdir = dlwdir,
-                                  force  =  force)
-  } else {
-    change_vintage2 <- FALSE
-  }
+  vintage <- FALSE
+  vintage <- pip_cpi_vintage(msrdir = msrdir,
+                             dlwdir = dlwdir,
+                             force  =  force)
 
 
-  if (change_vintage2 == TRUE || force == TRUE) {
+  if (vintage == TRUE || force == TRUE) {
 
-    dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
-    cpidlw_dir <- paste0(dlwdir, dlwdir_l, "/", dlwdir_l, "_CPIICP.dta")
+    cpi_files  <- fs::dir_ls(dlwdir,
+                             regexp = "GMD_CPI\\.dta$",
+                             recurse = TRUE,
+                             type = "file")
 
-    cpi_ppp_id    <- gsub("(Support_2005_)([^/]+)", "\\2", dlwdir_l)
+    latest_cpi <- max(cpi_files)
+    cpi_ppp_id <- gsub("(.*/Support_2005_)([^/]+)(_GMD_CPI\\.dta$)", "\\2", latest_cpi)
 
 
-    cpidlw     <- haven::read_dta(cpidlw_dir)
+    cpidlw     <- haven::read_dta(latest_cpi)
     cpi        <- pip_cpi_clean(cpidlw, cpi_ppp_id = cpi_ppp_id)
 
     pip_sign_save(x       = cpi,
@@ -48,4 +40,3 @@ pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cp
   }
 
 }
-
