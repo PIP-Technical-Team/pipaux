@@ -25,11 +25,11 @@ pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cp
                              type = "file")
 
     latest_cpi <- max(cpi_files)
-    cpi_ppp_id <- gsub("(.*/Support_2005_)([^/]+)(_GMD_CPI\\.dta$)", "\\2", latest_cpi)
+    cpi_id     <- gsub("(.*/Support_2005_)([^/]+)(_GMD_CPI\\.dta$)", "\\2", latest_cpi)
 
 
     cpidlw     <- haven::read_dta(latest_cpi)
-    cpi        <- pip_cpi_clean(cpidlw, cpi_ppp_id = cpi_ppp_id)
+    cpi        <- pip_cpi_clean(cpidlw, cpi_id = cpi_id)
 
     pip_sign_save(x       = cpi,
                   measure = "cpi",
