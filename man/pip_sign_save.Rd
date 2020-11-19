@@ -4,7 +4,12 @@
 \alias{pip_sign_save}
 \title{Data signature of PIP auxiliary data}
 \usage{
-pip_sign_save(x, measure, msrdir, force)
+pip_sign_save(
+  x,
+  measure,
+  msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
+  force
+)
 }
 \arguments{
 \item{x}{Data frame to be signed and saved}

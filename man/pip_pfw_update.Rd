@@ -4,14 +4,18 @@
 \alias{pip_pfw_update}
 \title{update CPI dataframe}
 \usage{
-pip_pfw_update(msrdir, dlwdir, force)
+pip_pfw_update(
+  msrdir = paste0(getOption("pipaux.maindir"), "_aux/pfw/"),
+  dlwdir = getOption("pipaux.dlwdir"),
+  force = FALSE
+)
 }
 \arguments{
-\item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
+\item{msrdir}{character: measure (PFW) directory. created on \code{pip_prices()}.}
 
-\item{dlwdir}{character: datalibweb directory. available in \code{pip_prices()}}
+\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
 
-\item{force}{logical: if TRUE force update of CPI data}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

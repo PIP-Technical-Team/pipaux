@@ -1,21 +1,28 @@
 #' update CPI dataframe
 #'
-#' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
-#' @param dlwdir character: datalibweb directory. available in `pip_prices()`
-#' @param force  logical: if TRUE force update of CPI data
+#' @param msrdir character: measure (PFW) directory. created on `pip_prices()`.
+#' @inheritParams pip_prices
 #'
 #' @return
 #' @export
 #'
 #' @examples
-pip_pfw_update <- function(msrdir, dlwdir, force){
+pip_pfw_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/pfw/"),
+                           dlwdir = getOption("pipaux.dlwdir"),
+                           force  = FALSE){
 
   # check for last version in dlw
-  dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
-  pfwdlw_dir <- paste0(dlwdir, dlwdir_l,"/Data/Stata/Survey_price_framework.dta")
 
-  pfwdlw     <- haven::read_dta(pfwdlw_dir)
-  pfw        <- pip_pfw_clean(pfwdlw)
+  pfw_files  <- fs::dir_ls(dlwdir,
+                           regexp = "Survey_price_framework\\.dta$",
+                           recurse = TRUE,
+                           type = "file")
+
+  latest_pfw <- max(pfw_files)
+  pfw_id <- gsub("(.*/Support_2005_)([^/]+)(/Data.*)", "\\2", latest_pfw)
+
+  pfwdlw     <- haven::read_dta(latest_pfw)
+  pfw        <- pip_pfw_clean(pfwdlw, pfw_id = pfw_id)
 
   pip_sign_save(x       = pfw,
                 measure = "pfw",

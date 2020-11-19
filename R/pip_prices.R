@@ -74,20 +74,18 @@ pip_prices <- function(measure  = NULL,
 
   #--------- update ---------
   if (action == "update"){
-    if (is.null(dlwdir)) {
-      dlwdir <- com_values$dlwdir
-    }
 
     if (measure == "cpi") {
 
-    pip_cpi_update(msrdir = msrdir,
-                   dlwdir = dlwdir,
-                   force  = force)
+      pip_cpi_update(msrdir = msrdir,
+                     dlwdir = dlwdir,
+                     force  = force)
+
     } else if (measure == "ppp") {
 
-    pip_ppp_update(msrdir = msrdir,
-                   dlwdir = dlwdir,
-                   force  = force)
+      pip_ppp_update(msrdir = msrdir,
+                     dlwdir = dlwdir,
+                     force  = force)
 
     } else if (measure == "pfw") {
 
@@ -96,15 +94,14 @@ pip_prices <- function(measure  = NULL,
                      force  = force)
     } else {
       rlang::abort(c(
-                    "The measure selected is not a valid name",
-                    i = "you can use `cpi`, `ppp`, or `pfw`", # update this message automatically
-                    x = paste("you selected", measure)
-                    ),
-                    class = "pipaux_error"
-                    )
+        "The measure selected is not a valid name",
+        i = "you can use `cpi`, `ppp`, or `pfw`", # update this message automatically
+        x = paste("you selected", measure)
+      ),
+      class = "pipaux_error"
+      )
     }
+  } # end of update
 
-  }
-
-}
+} # end of pip_prices function
 

@@ -4,12 +4,12 @@
 \alias{pip_pfw_clean}
 \title{Clean PPP data from datalibweb to meet PIP protocols}
 \usage{
-pip_pfw_clean(y, pppvar = getOption("pipaux.pppvar"))
+pip_pfw_clean(y, pfw_id)
 }
 \arguments{
 \item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}
 
-\item{pppvar}{character: PPP variable to be used as default. Currently it is
+\item{pfw_id}{character: CPI and PPP ID. Extracted from \code{pip_cpi_update()}
 "icp2011".}
 }
 \value{

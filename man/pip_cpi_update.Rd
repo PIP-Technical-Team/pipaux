@@ -4,7 +4,11 @@
 \alias{pip_cpi_update}
 \title{update CPI dataframe}
 \usage{
-pip_cpi_update(msrdir, dlwdir, force)
+pip_cpi_update(
+  msrdir = paste0(getOption("pipaux.maindir"), "_aux/cpi/"),
+  dlwdir = getOption("pipaux.dlwdir"),
+  force = FALSE
+)
 }
 \arguments{
 \item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}

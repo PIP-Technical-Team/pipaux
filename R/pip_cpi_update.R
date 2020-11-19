@@ -7,19 +7,37 @@
 #' @export
 #'
 #' @examples
-pip_cpi_update <- function(msrdir, dlwdir, force){
+pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cpi/"),
+                           dlwdir = getOption("pipaux.dlwdir"),
+                           force  = FALSE){
 
-  # check for last version in dlw
-  dlwdir_l   <- latest_dlw_dir(dlwdir = dlwdir) # from utils.R
-  cpidlw_dir <- paste0(dlwdir, dlwdir_l, "/", dlwdir_l, "_CPIICP.dta")
+  vintage <- FALSE
+  vintage <- pip_cpi_vintage(msrdir = msrdir,
+                             dlwdir = dlwdir,
+                             force  =  force)
 
-  cpidlw     <- haven::read_dta(cpidlw_dir)
-  cpi        <- pip_cpi_clean(cpidlw)
 
-  pip_sign_save(x       = cpi,
-                measure = "cpi",
-                msrdir  = msrdir,
-                force   = force)
+  if (vintage == TRUE || force == TRUE) {
+
+    cpi_files  <- fs::dir_ls(dlwdir,
+                             regexp = "GMD_CPI\\.dta$",
+                             recurse = TRUE,
+                             type = "file")
+
+    latest_cpi <- max(cpi_files)
+    cpi_id     <- gsub("(.*/Support_2005_)([^/]+)(_GMD_CPI\\.dta$)", "\\2", latest_cpi)
+
+
+    cpidlw     <- haven::read_dta(latest_cpi)
+    cpi        <- pip_cpi_clean(cpidlw, cpi_id = cpi_id)
+
+    pip_sign_save(x       = cpi,
+                  measure = "cpi",
+                  msrdir  = msrdir,
+                  force   = force)
+  } else {
+    cli::cli_alert_success("cpi data is up to date")
+    return(invisible(FALSE))
+  }
 
 }
-
