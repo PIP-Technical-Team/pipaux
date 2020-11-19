@@ -4,14 +4,18 @@
 \alias{pip_ppp_update}
 \title{Update PPP data frame}
 \usage{
-pip_ppp_update(msrdir, dlwdir, force)
+pip_ppp_update(
+  msrdir = paste0(getOption("pipaux.maindir"), "_aux/ppp/"),
+  dlwdir = getOption("pipaux.dlwdir"),
+  force = FALSE
+)
 }
 \arguments{
 \item{msrdir}{character: measure (PPP) directory. created on \code{pip_prices()}.}
 
-\item{dlwdir}{character: datalibweb directory. available in \code{pip_prices()}}
+\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
 
-\item{force}{logical: if TRUE force update of PPP data}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

@@ -101,8 +101,6 @@ pip_prices <- function(measure  = NULL,
       class = "pipaux_error"
       )
     }
-
-    return(invisible(TRUE))
   } # end of update
 
 } # end of pip_prices function

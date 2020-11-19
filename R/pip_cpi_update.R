@@ -37,6 +37,7 @@ pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cp
                   force   = force)
   } else {
     cli::cli_alert_success("cpi data is up to date")
+    return(invisible(FALSE))
   }
 
 }
