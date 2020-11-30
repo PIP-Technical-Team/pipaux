@@ -53,6 +53,26 @@ pip_pop_update <- function(force, src, msrdir) {
                  pop_domain := fifelse(pop_data_level == 2, 1, 2)
                  ]
 
+    # recode domain and data_level variables
+    cols <- c("pop_domain", "pop_data_level")
+    pop[,
+        (cols) := lapply(.SD, as.character),
+        .SDcols = cols
+    ][,# recode domain
+      pop_domain := fcase(
+        pop_domain == "1", "national",
+        pop_domain == "2", "urban/rural",
+        pop_domain == "3", "subnational region"
+      )
+    ][   # Recode data_level only for those that are national or urban/rural
+      pop_domain %in% c("national", "urban/rural"),
+      pop_data_level := fcase(
+        pop_data_level == "0", "rural",
+        pop_data_level == "1", "urban",
+        pop_data_level == "2", "national"
+      )
+    ]
+
     pip_sign_save(x       = pop,
                   measure = "pop",
                   msrdir  = msrdir,
