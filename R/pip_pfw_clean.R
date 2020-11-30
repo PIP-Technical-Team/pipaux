@@ -11,9 +11,9 @@
 pip_pfw_clean <- function(y, pfw_id) {
   x <- data.table::as.data.table(y)
 
-  old_var <- c("region", "code", "year", "ref_year", "survname")
+  old_var <- c("region", "code", "ref_year", "survname")
 
-  new_var <- c("region_code", "country_code", "surveyid_year", "reference_year", "survey_name")
+  new_var <- c("region_code", "country_code", "reference_year", "survey_name")
 
   setnames(x,
            old = old_var,
