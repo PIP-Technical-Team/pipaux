@@ -51,6 +51,26 @@ pip_pce_update <- function(force){
   ]
 
 
+  # recode domain and data_level variables
+  cols <- c("pce_domain", "pce_data_level")
+  pce[,
+      (cols) := lapply(.SD, as.character),
+      .SDcols = cols
+      ][,# recode domain
+        pce_domain := fcase(
+          pce_domain == "1", "national",
+          pce_domain == "2", "urban/rural",
+          pce_domain == "3", "subnational region"
+        )
+      ][   # Recode data_level only for those that are national or urban/rural
+        pce_domain %in% c("national", "urban/rural"),
+        pce_data_level := fcase(
+          pce_data_level == "0", "rural",
+          pce_data_level == "1", "urban",
+          pce_data_level == "2", "national"
+        )
+      ]
+
   #----------------------------------------------------------
   #   Save and data signature
   #----------------------------------------------------------
