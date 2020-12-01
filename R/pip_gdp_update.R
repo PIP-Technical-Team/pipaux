@@ -127,6 +127,27 @@ pip_gdp_update <- function(force){
     gdp_domain := fifelse(gdp_data_level == 2, 1, 2)
   ]
 
+  # recode domain and data_level variables
+  cols <- c("gdp_domain", "gdp_data_level")
+  gdp[,
+      (cols) := lapply(.SD, as.character),
+      .SDcols = cols
+      ][,# recode domain
+        gdp_domain := fcase(
+          gdp_domain == "1", "national",
+          gdp_domain == "2", "urban/rural",
+          gdp_domain == "3", "subnational region"
+        )
+      ][   # Recode data_level only for those that are national or urban/rural
+        gdp_domain %in% c("national", "urban/rural"),
+        gdp_data_level := fcase(
+          gdp_data_level == "0", "rural",
+          gdp_data_level == "1", "urban",
+          gdp_data_level == "2", "national"
+        )
+      ]
+
+
 
   #----------------------------------------------------------
   #   Save and data signature
