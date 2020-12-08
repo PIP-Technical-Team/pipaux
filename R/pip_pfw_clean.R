@@ -12,7 +12,7 @@ pip_pfw_clean <- function(y, pfw_id) {
   x <- data.table::as.data.table(y)
 
   # get just inpovcal data
-  x <- x[inpovcal == 1]
+
 
   # change variable names
   old_var <-
