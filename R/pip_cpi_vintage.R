@@ -63,7 +63,11 @@ pip_cpi_vintage <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/"
     cfile               <- readr::read_rds(sfile)
     attr(cfile, "time") <- NULL # remove attributes
     attr(cfile, "user") <- NULL # remove attributes
-    equal_vintage       <- all.equal(cfile, vintage)
+    cf_vt               <- all.equal(cfile, vintage)
+
+    if (inherits(cf_vt, "character")) {
+      equal_vintage <- FALSE
+    }
 
   } else {
 
