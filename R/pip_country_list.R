@@ -1,5 +1,14 @@
+#' List of countries
+#'
+#' @inheritParams pip_prices
+#'
+#' @return
+#' @export
+#'
+#' @examples
 pip_country_list <- function(action = "update",
-                             force  = FALSE) {
+                             force  = FALSE,
+                             maindir  = getOption("pipaux.maindir")) {
 
   measure <- "country_list"
   msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir

@@ -7,7 +7,7 @@
 pip_pce_update(force)
 }
 \arguments{
-\item{force}{logical: if TRUE force update of PCE.}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
 }
 \value{
 

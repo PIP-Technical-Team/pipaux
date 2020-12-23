@@ -1,17 +1,16 @@
 #' Load or update PCE Auxiliary data.
 #'
-#' @param action character: either `update` or `load`
-#' @param force logical: if TRUE force update of PCE.
-#'
+#' @inheritParams pip_prices
 #' @return
 #' @export
 #'
 #' @examples
 pip_pce <- function(action = "update",
-                    force  = FALSE) {
+                    force  = FALSE,
+                    maindir = getOption("pipaux.maindir")) {
 
   measure <- "pce"
-  msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
+  msrdir  <- paste0(maindir, "_aux/", measure, "/")  # measure dir
 
   if (action == "update") {
 

@@ -1,18 +1,17 @@
 #' Maddison Project Data
 #'
-#' @param action character: either `load` or `update`
-#' @param force logical: if TRUE force update database
-#'
+#' @inheritParams pip_prices
 #' @return
 #' @export
 #' @import data.table
 #'
 #' @examples
 pip_maddison <- function(action = "update",
-                         force  = FALSE) {
+                         force  = FALSE,
+                         maindir = getOption("pipaux.maindir")) {
 
   measure <- "maddison"
-  msrdir  <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/") # measure dir
+  msrdir  <- paste0(maindir, "_aux/", measure, "/") # measure dir
 
   if (action == "update") {
 
