@@ -34,7 +34,7 @@ pip_pop_update <- function(force, src, msrdir) {
         ]
     setnames(pop,
              old = c("iso3c", "date"),
-             new = c("country_code", "year"))
+             new = c("country_code", "surveyid_year"))
 
   } else if (src == "emi") {
 
@@ -48,7 +48,7 @@ pip_pop_update <- function(force, src, msrdir) {
     )
   }
 
-    pop <- pop[, c("country_code", "year", "pop_data_level", "pop")
+    pop <- pop[, c("country_code", "surveyid_year", "pop_data_level", "pop")
                ][,
                  pop_domain := fifelse(pop_data_level == 2, 1, 2)
                  ]
