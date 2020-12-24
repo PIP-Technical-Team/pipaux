@@ -66,6 +66,7 @@ pip_pfw_clean <- function(y, pfw_id) {
     pfw_id := (pfw_id)
     ]
   x <- unique(x)  # remove duplicates
+  data.table::setDT(x)
   return(x)
 }
 
