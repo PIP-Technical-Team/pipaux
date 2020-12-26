@@ -4,12 +4,20 @@
 \alias{pip_maddison}
 \title{Maddison Project Data}
 \usage{
-pip_maddison(action = "update", force = FALSE)
+pip_maddison(
+  action = "update",
+  force = FALSE,
+  maindir = getOption("pipaux.maindir")
+)
 }
 \arguments{
-\item{action}{character: either \code{load} or \code{update}}
+\item{action}{character: Either "load" or "update". Default is "update". If
+"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
 
-\item{force}{logical: if TRUE force update database}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
+
+\item{maindir}{character: main directory of project. Default available
+in \code{pip_aux_values()}}
 }
 \value{
 

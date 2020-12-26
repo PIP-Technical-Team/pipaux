@@ -4,12 +4,20 @@
 \alias{pip_pce}
 \title{Load or update PCE Auxiliary data.}
 \usage{
-pip_pce(action = "update", force = FALSE)
+pip_pce(
+  action = "update",
+  force = FALSE,
+  maindir = getOption("pipaux.maindir")
+)
 }
 \arguments{
-\item{action}{character: either \code{update} or \code{load}}
+\item{action}{character: Either "load" or "update". Default is "update". If
+"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
 
-\item{force}{logical: if TRUE force update of PCE.}
+\item{force}{logical: If TRUE \code{measure} data will be updated.}
+
+\item{maindir}{character: main directory of project. Default available
+in \code{pip_aux_values()}}
 }
 \value{
 

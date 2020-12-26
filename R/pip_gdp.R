@@ -10,7 +10,8 @@
 #' @examples
 pip_gdp <- function(action          = "update",
                     maddison_action = "load",
-                    force           = FALSE) {
+                    force           = FALSE,
+                    maindir = getOption("pipaux.maindir")) {
 
 
   measure   <- "gdp"
@@ -24,9 +25,9 @@ pip_gdp <- function(action          = "update",
     pip_gdp_update(force = force)
 
   } else if (action == "load") {
-    msrdir    <- paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")  # measure dir
+    msrdir    <- paste0(maindir, "_aux/", measure, "/")  # measure dir
     load_aux(msrdir = msrdir,
-                 measure = measure)
+            measure = measure)
 
   }  # End of update
 
