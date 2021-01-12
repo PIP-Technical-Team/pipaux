@@ -4,13 +4,13 @@
 \alias{pip_pop_update}
 \title{Update population data}
 \usage{
-pip_pop_update(force, src, msrdir)
+pip_pop_update(force, src = c("emi", "wdi"), msrdir)
 }
 \arguments{
 \item{force}{logical: If TRUE Force update of population data}
 
-\item{src}{character: Source fo Population data. Default is \code{wdi}. Other
-option is \code{emi}}
+\item{src}{character: Source for Population data. Default is \code{emi}. Alternative
+option is \code{wdi}.}
 
 \item{msrdir}{character: Directory path of measure. Comes from \code{pip_pop()}}
 }
