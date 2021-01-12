@@ -38,5 +38,7 @@ Imports:
     wbstats,
     purrr,
     janitor,
-    fs
+    fs,
+    magrittr,
+    readxl
 VignetteBuilder: knitr
