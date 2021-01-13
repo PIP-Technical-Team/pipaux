@@ -91,6 +91,7 @@ pip_pop_update <- function(force, src = c("emi", "wdi"), msrdir) {
 
     # Merge datasets
     pop_merge <- rbind(pop_long, pop_special)
+    pop_merge$Year <- as.numeric(pop_merge$Year)
     setDT(pop_merge)
 
     # Create data_level column
