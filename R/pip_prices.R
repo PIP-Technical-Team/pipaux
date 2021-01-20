@@ -2,17 +2,13 @@
 #'
 #' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
 #' @param action character: Either "load" or "update". Default is "update". If
-#' "update" `measure` data will be updated in system. If "load" `measure` data is loaded in memory
-#' @param maindir character: main directory of project. Default available
-#' in `pip_aux_values()`
-#' @param dlwdir character: Datalibweb directory available in `pip_aux_values()`
-#' @param force logical: If TRUE `measure` data will be updated.
+#' "update" data will be updated on the system. If "load" data is loaded in memory.
+#' @param maindir character: Main directory of project.
+#' @param dlwdir character: Datalibweb directory.
+#' @param force logical: IIf TRUE data will be overwritten.
 #'
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_prices <- function(measure  = NULL,
                        action   = "update",
                        maindir  = getOption("pipaux.maindir"),

@@ -11,9 +11,6 @@ pip_ppp_clean(y, default_year = getOption("pipaux.pppyear"))
 
 \item{default_year}{numeric: ICP round year. Default is 2011}
 }
-\value{
-
-}
 \description{
 Clean PPP data from datalibweb to meet PIP protocols
 }

@@ -1,12 +1,8 @@
 #' PIP PPP data. Load and update
 #'
 #' @inheritParams pip_prices
-#'
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_ppp <- function(action  = "update",
                     maindir = getOption("pipaux.maindir"),
                     dlwdir  = getOption("pipaux.dlwdir"),

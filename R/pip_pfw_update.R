@@ -3,10 +3,7 @@
 #' @param msrdir character: measure (PFW) directory. created on `pip_prices()`.
 #' @inheritParams pip_prices
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_pfw_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/pfw/"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force  = FALSE){

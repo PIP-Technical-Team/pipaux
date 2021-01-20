@@ -4,10 +4,7 @@
 #' @param dlwdir character: Datalibweb directory
 #' @param force logical: If TRUE force update of veintage level 1.
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_cpi_vintage <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
                             dlwdir = getOption("pipaux.dlwdir"),
                             force  = FALSE) {
@@ -90,12 +87,8 @@ pip_cpi_vintage <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/"
 } # end of vintage_level_2
 
 #' Load cpi files and create CPI ID variable
-#'
 #' @param x character: cpi file name
-#'
 #' @return data frame
-#'
-#' @examples
 load_cpi <- function(x) {
   cpi_ppp_id    <- gsub("(.*/Support_2005_)([^/]+)(_CPI\\.dta$)", "\\2", x)
   df            <- haven::read_dta(x)

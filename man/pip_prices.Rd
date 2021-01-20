@@ -16,17 +16,13 @@ pip_prices(
 \item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 
 \item{action}{character: Either "load" or "update". Default is "update". If
-"update" \code{measure} data will be updated in system. If "load" \code{measure} data is loaded in memory}
+"update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{maindir}{character: main directory of project. Default available
-in \code{pip_aux_values()}}
+\item{maindir}{character: Main directory of project.}
 
-\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
+\item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: If TRUE \code{measure} data will be updated.}
-}
-\value{
-
+\item{force}{logical: IIf TRUE data will be overwritten.}
 }
 \description{
 PIP Prices data. Works with either CPI or PPP data

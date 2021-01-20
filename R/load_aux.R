@@ -2,11 +2,7 @@
 #'
 #' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
 #' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
-#'
-#' @return
 #' @export
-#'
-#' @examples
 load_aux <- function(measure = NULL,
                          msrdir = paste0(getOption("pipaux.maindir"),
                                          "_aux/",
@@ -24,9 +20,8 @@ load_aux <- function(measure = NULL,
 
 
   }
-
   # check file exists
-  if(file.exists(paste0(msrdir, measure ,".fst"))){
+  if (file.exists(paste0(msrdir, measure ,".fst"))){
 
     df <- fst::read_fst(paste0(msrdir, measure ,".fst"))
 

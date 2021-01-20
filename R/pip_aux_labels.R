@@ -1,12 +1,9 @@
-#' Title
+#' pip_aux_labels
 #'
 #' @param x Data frame to be labeled.
 #' @param measure type of data frame, e.g., "cpi" or "PPP".
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_aux_labels <- function(x, measure) {
 
   if (measure == "cpi") {
@@ -40,11 +37,11 @@ pip_aux_labels <- function(x, measure) {
       attr(x$country_name, "label")  <- "Country name"
       attr(x$country_code, "label")  <- "Country code"
       attr(x$year,         "label")  <- "Year"
-      attr(x$cgdppc,       "label")  <- "Real GDP per capita in 2011US$, multiple benchmarks"
+      #attr(x$cgdppc,       "label")  <- "Real GDP per capita in 2011US$, multiple benchmarks"
       attr(x$mpd_gdp,      "label")  <- "GDP per capita in 2011US$, 2011 benchmark (Maddison)"
       attr(x$pop,          "label")  <- "Population, mid-year (thousands)"
-      attr(x$i_cig,        "label")  <- "0/1/2: observation is extrapolated (0), benchmark (1), or interpolated (2)"
-      attr(x$i_bm,         "label")  <- "1-5: type of benchmark estimate, see note i_bm"
+      #attr(x$i_cig,        "label")  <- "0/1/2: observation is extrapolated (0), benchmark (1), or interpolated (2)"
+      #attr(x$i_bm,         "label")  <- "1-5: type of benchmark estimate, see note i_bm"
 
   } else if (measure == "gdp") {
     # Label Variables

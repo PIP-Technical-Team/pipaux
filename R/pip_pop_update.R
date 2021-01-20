@@ -1,16 +1,10 @@
 #' Update population data
 #'
-#' @param src character: Source for Population data. Default is `emi`. Alternative
-#' option is `wdi`.
-#' @param msrdir character: Directory path of measure. Comes from `pip_pop()`
-#' @param force logical: If TRUE Force update of population data
-#'
-#' @return
+#' @param src character: Source for population data.
+#' @inheritParams pip_prices
 #' @export
 #' @import data.table
-#'
-#' @examples
-pip_pop_update <- function(force, src = c("emi", "wdi"), msrdir) {
+pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
 
   src <- match.arg(src)
 
@@ -148,6 +142,9 @@ pip_pop_update <- function(force, src = c("emi", "wdi"), msrdir) {
       pop_data_level == "2", "national"
     )
   ]
+
+  measure <- "pop"
+  msrdir  <- paste0(maindir, "_aux/", measure, "/")
 
   pip_sign_save(x       = pop,
                 measure = "pop",

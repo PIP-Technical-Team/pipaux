@@ -2,11 +2,7 @@
 #'
 #' @inheritParams pip_prices
 #' @param ... Arguments of any of the pip_* functions for updating data.
-#'
-#' @return
 #' @export
-#'
-#' @examples
 update_aux <- function(measure  = NULL,
                       ...
                       ){

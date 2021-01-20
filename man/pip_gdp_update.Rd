@@ -4,13 +4,12 @@
 \alias{pip_gdp_update}
 \title{Update GDP data using WDI, Maddison and Special cases.}
 \usage{
-pip_gdp_update(force)
+pip_gdp_update(force, maindir = getOption("pipaux.maindir"))
 }
 \arguments{
-\item{force}{logical: If TRUE \code{measure} data will be updated.}
-}
-\value{
+\item{force}{logical: IIf TRUE data will be overwritten.}
 
+\item{maindir}{character: Main directory of project.}
 }
 \description{
 Update GDP data using WDI, Maddison and Special cases.

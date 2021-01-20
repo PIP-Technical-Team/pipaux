@@ -1,11 +1,7 @@
 #' Update all auxiliary data at once
 #'
 #' @inheritParams pip_prices
-#'
-#' @return
 #' @export
-#'
-#' @examples
 pip_update_all_aux <- function(force = FALSE,
                                maindir = getOption("pipaux.maindir")) {
   pip_pfw(force = force, maindir = maindir)

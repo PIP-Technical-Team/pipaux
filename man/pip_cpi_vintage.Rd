@@ -17,9 +17,6 @@ pip_cpi_vintage(
 
 \item{force}{logical: If TRUE force update of veintage level 1.}
 }
-\value{
-
-}
 \description{
 Check CPI Vintage
 }

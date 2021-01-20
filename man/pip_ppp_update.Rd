@@ -13,12 +13,9 @@ pip_ppp_update(
 \arguments{
 \item{msrdir}{character: measure (PPP) directory. created on \code{pip_prices()}.}
 
-\item{dlwdir}{character: Datalibweb directory available in \code{pip_aux_values()}}
+\item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: If TRUE \code{measure} data will be updated.}
-}
-\value{
-
+\item{force}{logical: IIf TRUE data will be overwritten.}
 }
 \description{
 Update PPP data frame

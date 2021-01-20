@@ -1,11 +1,8 @@
 #' Maddison Project Data
 #'
 #' @inheritParams pip_prices
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_maddison <- function(action = "update",
                          force  = FALSE,
                          maindir = getOption("pipaux.maindir")) {
@@ -15,11 +12,12 @@ pip_maddison <- function(action = "update",
 
   if (action == "update") {
 
-    mpd <- haven::read_dta("https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2018.dta")
+    mpd <- haven::read_dta(getOption("pipaux.madsrc"))
+    mpd <- mpd[mpd$year >= 1960, ] # Historical data is not needed
 
     setDT(mpd)
     setnames(mpd,
-             old = c("countrycode", "country", "rgdpnapc"),
+             old = c("countrycode", "country", "gdppc"),
              new = c("country_code", "country_name", "mpd_gdp")
              )
 
