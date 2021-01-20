@@ -4,7 +4,8 @@ pipuax_default_options <- list(
   pipaux.cpivar  = "cpi2011",
   pipaux.pppvar  = "icp2011",
   pipaux.pppyear = 2011,
-  pipaux.popsrc  = "emi"
+  pipaux.popsrc  = "emi",
+  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta"
 )
 
 .onLoad <- function(libname, pkgname) {
