@@ -4,12 +4,9 @@
 #' @param measure type of data frame so it could be saved properly
 #' @param msrdir  directory where data signature would be saved.
 #' Created in `pip_prices()`
-#' @param force logical value. If TRUE data will be overwritten
+#' @param force logical: If TRUE data will be overwritten.
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_sign_save <- function(x,
                           measure,
                           msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),

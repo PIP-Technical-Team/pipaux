@@ -5,10 +5,7 @@
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_cpi_clean <- function(y,
                           cpi_id,
                           cpivar = getOption("pipaux.cpivar")) {

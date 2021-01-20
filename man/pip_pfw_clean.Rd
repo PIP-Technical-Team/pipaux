@@ -12,9 +12,6 @@ pip_pfw_clean(y, pfw_id)
 \item{pfw_id}{character: CPI and PPP ID. Extracted from \code{pip_cpi_update()}
 "icp2011".}
 }
-\value{
-
-}
 \description{
 Clean PPP data from datalibweb to meet PIP protocols
 }

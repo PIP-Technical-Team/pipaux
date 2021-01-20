@@ -11,9 +11,6 @@ update_aux(measure = NULL, ...)
 
 \item{...}{Arguments of any of the pip_* functions for updating data.}
 }
-\value{
-
-}
 \description{
 Update Auxiliary data. Wrapper of measure-specific functions.
 }

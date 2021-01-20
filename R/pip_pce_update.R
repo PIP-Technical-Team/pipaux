@@ -1,11 +1,7 @@
 #' Update PCE data using WDI and Special cases.
 #'
-#' @inheritParams pip_gdp
-#'
-#' @return
+#' @inheritParams pip_prices
 #' @export
-#'
-#' @examples
 pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
 
   # ---- Load data ----

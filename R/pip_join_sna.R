@@ -1,12 +1,10 @@
-#' Title
+#' pip_join_sna
 #'
 #' @param x data frame, either gdp or pce
 #' @param measure character: either "gdp" or "pce"
 #'
-#' @return
+#' @return data.table
 #' @export
-#'
-#' @examples
 pip_join_sna <- function(x, measure) {
 
   # Special cases for IND, IDN, and CHN
@@ -20,7 +18,7 @@ pip_join_sna <- function(x, measure) {
            on = .(country_code, year)
           ]
 
-  x[,data_level := 2]
+  x[, data_level := 2]
 
   # append
   x <- rbindlist(list(x, sp))

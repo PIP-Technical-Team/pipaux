@@ -3,11 +3,8 @@
 #' @inheritParams pip_prices
 #' @param maddison_action character: Either "load" or "update". Default is "update".
 #'
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_gdp <- function(action          = "update",
                     maddison_action = "load",
                     force           = FALSE,

@@ -2,11 +2,8 @@
 #'
 #' @inheritParams pip_prices
 #'
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_cpi <- function(action  = "update",
                     maindir = getOption("pipaux.maindir"),
                     dlwdir  = getOption("pipaux.dlwdir"),

@@ -3,10 +3,7 @@
 #' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
 #' @inheritParams pip_prices
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_cpi_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/cpi/"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force  = FALSE){

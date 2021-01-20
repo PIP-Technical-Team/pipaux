@@ -14,9 +14,6 @@ load_aux(
 
 \item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
 }
-\value{
-
-}
 \description{
 Load any auxiliary data
 }

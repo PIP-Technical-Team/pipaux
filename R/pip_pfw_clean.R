@@ -4,10 +4,7 @@
 #' @param pfw_id character: CPI and PPP ID. Extracted from `pip_cpi_update()`
 #' "icp2011".
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_pfw_clean <- function(y, pfw_id) {
   x <- data.table::as.data.table(y)
 

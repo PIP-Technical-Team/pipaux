@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_aux_labels.R
 \name{pip_aux_labels}
 \alias{pip_aux_labels}
-\title{Title}
+\title{pip_aux_labels}
 \usage{
 pip_aux_labels(x, measure)
 }
@@ -11,9 +11,6 @@ pip_aux_labels(x, measure)
 
 \item{measure}{type of data frame, e.g., "cpi" or "PPP".}
 }
-\value{
-
-}
 \description{
-Title
+pip_aux_labels
 }

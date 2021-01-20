@@ -1,12 +1,9 @@
-#' Title
+#' pip_aux_labels
 #'
 #' @param x Data frame to be labeled.
 #' @param measure type of data frame, e.g., "cpi" or "PPP".
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_aux_labels <- function(x, measure) {
 
   if (measure == "cpi") {

@@ -1,11 +1,8 @@
 #' List of countries
 #'
 #' @inheritParams pip_prices
-#'
-#' @return
 #' @export
 #'
-#' @examples
 pip_country_list <- function(action = "update",
                              force  = FALSE,
                              maindir  = getOption("pipaux.maindir")) {

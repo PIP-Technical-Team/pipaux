@@ -3,10 +3,7 @@
 #' @param y dataset with PPP data from datalibweb. loaded in `pip_prices()`.
 #' @param default_year numeric: ICP round year. Default is 2011
 #'
-#' @return
 #' @export
-#'
-#' @examples
 pip_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
   x <- data.table::as.data.table(y)
 

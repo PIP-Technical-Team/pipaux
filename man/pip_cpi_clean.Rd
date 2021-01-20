@@ -14,9 +14,6 @@ pip_cpi_clean(y, cpi_id, cpivar = getOption("pipaux.cpivar"))
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}
 }
-\value{
-
-}
 \description{
 Clean CPI data from datalibweb to meet PIP protocols
 }

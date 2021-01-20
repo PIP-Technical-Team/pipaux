@@ -2,11 +2,7 @@
 #'
 #' @param msrdir character: measure (PPP) directory. created on `pip_prices()`.
 #' @inheritParams pip_prices
-#'
-#' @return
 #' @export
-#'
-#' @examples
 pip_ppp_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/ppp/"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force  = FALSE){

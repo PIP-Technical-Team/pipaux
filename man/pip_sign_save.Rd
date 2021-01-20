@@ -19,10 +19,7 @@ pip_sign_save(
 \item{msrdir}{directory where data signature would be saved.
 Created in \code{pip_prices()}}
 
-\item{force}{logical value. If TRUE data will be overwritten}
-}
-\value{
-
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
 Data signature of PIP auxiliary data

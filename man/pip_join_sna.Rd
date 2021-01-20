@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_join_sna.R
 \name{pip_join_sna}
 \alias{pip_join_sna}
-\title{Title}
+\title{pip_join_sna}
 \usage{
 pip_join_sna(x, measure)
 }
@@ -12,8 +12,8 @@ pip_join_sna(x, measure)
 \item{measure}{character: either "gdp" or "pce"}
 }
 \value{
-
+data.table
 }
 \description{
-Title
+pip_join_sna
 }

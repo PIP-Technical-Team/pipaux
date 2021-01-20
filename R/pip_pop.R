@@ -1,21 +1,13 @@
 #' Load or Update population data
 #'
-#' @param action character: Whether to update or load. Default `update`
-#' @param force logical: if TRUE Pop data will be updated. Required `action = "update"`
-#' @param src character: Source fo Population data. Default is `wdi`. Other
-#' option is `emi`
-#' @param maindir character: Directory path of main folder. Default `getOption("pipaux.maindir")`
-#' @param ... character: Additional parameters
-#'
-#' @return
+#' @inheritParams pip_prices
+#' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export
-#'
-#' @examples
 pip_pop <- function(action  = "update",
                     force   = FALSE,
                     src     = getOption("pipaux.popsrc"),
-                    maindir = getOption("pipaux.maindir"),
-                    ...){
+                    maindir = getOption("pipaux.maindir")
+                    ){
 
   measure <- "pop"
   msrdir  <- paste0(maindir, "_aux/", measure, "/")  # measure dir

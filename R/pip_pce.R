@@ -1,10 +1,7 @@
 #' Load or update PCE Auxiliary data.
 #'
 #' @inheritParams pip_prices
-#' @return
 #' @export
-#'
-#' @examples
 pip_pce <- function(action = "update",
                     force  = FALSE,
                     maindir = getOption("pipaux.maindir")) {

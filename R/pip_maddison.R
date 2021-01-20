@@ -1,11 +1,8 @@
 #' Maddison Project Data
 #'
 #' @inheritParams pip_prices
-#' @return
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_maddison <- function(action = "update",
                          force  = FALSE,
                          maindir = getOption("pipaux.maindir")) {

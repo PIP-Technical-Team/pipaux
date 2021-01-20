@@ -1,15 +1,9 @@
 #' Update population data
 #'
-#' @param src character: Source for Population data. Default is `emi`. Alternative
-#' option is `wdi`.
-#' @param maindir character: Path to main directory.
-#' @param force logical: If TRUE force update.
-#'
-#' @return
+#' @param src character: Source for population data.
+#' @inheritParams pip_prices
 #' @export
 #' @import data.table
-#'
-#' @examples
 pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
 
   src <- match.arg(src)

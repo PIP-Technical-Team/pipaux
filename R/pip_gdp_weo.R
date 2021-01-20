@@ -10,7 +10,6 @@
 #' that's not really xls.
 #'
 #' @inheritParams pip_prices
-#' @return data.table
 #' @export
 pip_gdp_weo <- function(action = "update",
                         force  = FALSE,
