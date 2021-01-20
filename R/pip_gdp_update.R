@@ -269,11 +269,8 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
 
   # Add domain column
   gdp[,
-      gdp_domain := fcase(
-        gdp_data_level == "2", 1,
-        gdp_data_level == "0", 2,
-        gdp_data_level == "1", 2
-      )]
+      gdp_domain := fifelse(gdp_data_level == 2, 1, 2)
+  ]
 
   # Sort
   setorder(gdp, country_code, year, gdp_data_level)

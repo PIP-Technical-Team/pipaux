@@ -2,16 +2,19 @@
 % Please edit documentation in R/pip_pce_update.R
 \name{pip_pce_update}
 \alias{pip_pce_update}
-\title{Update pce data using WDI, Maddison and Special cases.}
+\title{Update PCE data using WDI and Special cases.}
 \usage{
-pip_pce_update(force)
+pip_pce_update(force, maindir = getOption("pipaux.maindir"))
 }
 \arguments{
 \item{force}{logical: If TRUE \code{measure} data will be updated.}
+
+\item{maindir}{character: main directory of project. Default available
+in \code{pip_aux_values()}}
 }
 \value{
 
 }
 \description{
-Update pce data using WDI, Maddison and Special cases.
+Update PCE data using WDI and Special cases.
 }
