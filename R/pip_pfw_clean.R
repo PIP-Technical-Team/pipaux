@@ -53,7 +53,7 @@ pip_pfw_clean <- function(y, pfw_id) {
         grepl("[Cc]", welfare_type), "consumption",
         default = ""
       ),
-      surveyid_year  = as.character(surveyid_year)
+      surveyid_year  = as.integer(surveyid_year)
     )
   ]
 
