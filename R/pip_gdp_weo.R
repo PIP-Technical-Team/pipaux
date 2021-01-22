@@ -30,7 +30,7 @@ pip_gdp_weo <- function(action = "update",
       as.POSIXlt() %>%
       max() %>%
       as.character() %>%
-      sprintf("%sWEO_%s.xls", maindir, . )
+      sprintf("%s_aux/weo/WEO_%s.xls", maindir, . )
 
     # Read data
     dt <- readxl::read_xls(
@@ -77,7 +77,7 @@ pip_gdp_weo <- function(action = "update",
 
     # Convert year and GDP to numeric
     dt$year <- sub('x', '', dt$year) %>% as.numeric()
-    dt$weo_gdp <- as.numeric(dt$weo_gdp)
+    dt$weo_gdp <- suppressWarnings(as.numeric(dt$weo_gdp))
 
     # Remove rows w/ missing GDP
     dt <- dt[!is.na(dt$weo_gdp)]
