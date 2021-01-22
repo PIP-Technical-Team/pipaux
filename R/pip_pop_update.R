@@ -98,15 +98,22 @@ pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pi
           )
     ]
 
+    # Set colnames
     setnames(
       pop_merge,
       old = c("Country", "Year", "Population"),
       new = c("country_code", "year", "pop"))
-
     pop_merge$Series <- NULL
     pop <- pop_merge
+
+    # Remove years prior to 1960
+    pop <- pop[year >= 1960]
+
+    # Remove years after 2020
     pop <- pop[year <= 2020]
 
+    # Remove rows w/ missing pop values
+    pop <- pop[!is.na(pop)]
 
   } else {
     msg <- paste("src `", src,"` is not a valid source.")
