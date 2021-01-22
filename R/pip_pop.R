@@ -17,12 +17,12 @@ pip_pop <- function(action  = "update",
 
     pip_pop_update(force  = force,
                    src    = src,
-                   msrdir = msrdir)
+                   maindir = maindir)
 
   } else if (action == "load") {
 
     df <- load_aux(msrdir  = msrdir,
-                       measure = measure)
+                   measure = measure)
     return(df)
 
 
