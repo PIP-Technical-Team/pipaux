@@ -1,3 +1,6 @@
+#' @importFrom magrittr %>%
+NULL
+
 #' Update population data
 #'
 #' @param src character: Source for population data.
