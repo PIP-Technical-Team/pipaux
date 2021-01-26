@@ -29,6 +29,14 @@ pip_ppp_update <- function(maindir = getOption("pipaux.maindir"),
   # Remove any non-WDI countries
   ppp <- ppp[country_code %in% cl$country_code]
 
+  # Hardcode domain / data_level fix for NRU
+  ppp$ppp_domain <-
+    ifelse(ppp$country_code == 'NRU' & is.na(ppp$ppp_domain),
+           1, ppp$ppp_domain)
+  ppp$ppp_data_level <-
+    ifelse(ppp$country_code == 'NRU' & ppp$ppp_data_level == '',
+           'national', ppp$ppp_data_level)
+
   # Save
   pip_sign_save(x       = ppp,
                 measure = "ppp",
