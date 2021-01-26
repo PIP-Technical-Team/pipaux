@@ -1,3 +1,5 @@
+#' Update GDP
+#'
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
@@ -12,10 +14,13 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
   weo <- pip_gdp_weo("load", maindir = maindir)
   wgdp <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
   sna <- readxl::read_xlsx(sprintf('%s_aux/sna/NAS special_2021-01-14.xlsx', maindir))
+  cl <- pip_country_list("load", maindir = maindir)
+
   setDT(madd)
   setDT(wgdp)
   setDT(weo)
   setDT(sna)
+  setDT(cl)
 
   #--------- Clean GDP from WDI ---------
 
@@ -34,19 +39,17 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
               .(country_code, year, wdi_gdp)
   ]
 
-  # Join Maddison and WDI
-  gdp[
-    madd,
-    on      = .(country_code, year),
-    mpd_gdp := i.mpd_gdp
-  ]
+  # Merge Maddison and WDI (full join)
+  gdp <- data.table::merge.data.table(
+    gdp, madd, by = c('country_code', 'year'),
+    all = TRUE
+  )
 
-  # Join WDI and WEO
-  gdp[
-    weo,
-    on      = .(country_code, year),
-    weo_gdp := i.weo_gdp
-  ]
+  # Merge WEO and WDI (full join)
+  gdp <- data.table::merge.data.table(
+    gdp, weo, by = c('country_code', 'year'),
+    all = TRUE
+  )
 
   # Data now used in Maddison
   gdp[
@@ -295,6 +298,9 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
           gdp_data_level == "2", "national"
         )
       ]
+
+  # Remove any non-WDI countries
+  gdp <- gdp[country_code %in% cl$country_code]
 
   # ---- Save and sign ----
 

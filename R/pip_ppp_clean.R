@@ -5,6 +5,7 @@
 #'
 #' @export
 pip_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
+
   x <- data.table::as.data.table(y)
 
   y <- melt(x,
@@ -79,6 +80,13 @@ pip_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
   )
 
   y <- unique(y)  # remove duplicates
+
+  # Remove non WDI countries
+  non_wdi <- c('BES', 'EGZ', 'RUT', 'SDO')
+  if (any(y$country_code %in% non_wdi)) {
+   y <- y[!(country_code %in% non_wdi)]
+  }
+
   return(y)
 }
 

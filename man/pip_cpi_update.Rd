@@ -2,21 +2,21 @@
 % Please edit documentation in R/pip_cpi_update.R
 \name{pip_cpi_update}
 \alias{pip_cpi_update}
-\title{update CPI dataframe}
+\title{Update CPI}
 \usage{
 pip_cpi_update(
-  msrdir = paste0(getOption("pipaux.maindir"), "_aux/cpi/"),
+  maindir = getOption("pipaux.maindir"),
   dlwdir = getOption("pipaux.dlwdir"),
   force = FALSE
 )
 }
 \arguments{
-\item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
+\item{maindir}{character: Main directory of project.}
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-update CPI dataframe
+Update CPI
 }

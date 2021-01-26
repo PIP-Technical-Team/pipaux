@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_cpi_clean.R
 \name{pip_cpi_clean}
 \alias{pip_cpi_clean}
-\title{Clean CPI data from datalibweb to meet PIP protocols}
+\title{Clean CPI data}
 \usage{
 pip_cpi_clean(y, cpi_id, cpivar = getOption("pipaux.cpivar"))
 }
@@ -15,5 +15,5 @@ pip_cpi_clean(y, cpi_id, cpivar = getOption("pipaux.cpivar"))
 "cpi2011".}
 }
 \description{
-Clean CPI data from datalibweb to meet PIP protocols
+Clean CPI data from Datalibweb to meet PIP protocols.
 }

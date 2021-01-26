@@ -1,4 +1,6 @@
-#' Clean PPP data from datalibweb to meet PIP protocols
+#' Clean PFW
+#'
+#' Clean PFW data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with PPP data from datalibweb. loaded in `pip_prices()`.
 #' @param pfw_id character: CPI and PPP ID. Extracted from `pip_cpi_update()`

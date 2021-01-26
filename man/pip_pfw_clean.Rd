@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_pfw_clean.R
 \name{pip_pfw_clean}
 \alias{pip_pfw_clean}
-\title{Clean PPP data from datalibweb to meet PIP protocols}
+\title{Clean PFW}
 \usage{
 pip_pfw_clean(y, pfw_id)
 }
@@ -13,5 +13,5 @@ pip_pfw_clean(y, pfw_id)
 "icp2011".}
 }
 \description{
-Clean PPP data from datalibweb to meet PIP protocols
+Clean PFW data from Datalibweb to meet PIP protocols.
 }

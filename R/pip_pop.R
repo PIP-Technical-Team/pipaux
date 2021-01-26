@@ -1,4 +1,6 @@
-#' Load or Update population data
+#' PIP POP
+#'
+#' Load or update population data.
 #'
 #' @inheritParams pip_prices
 #' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.

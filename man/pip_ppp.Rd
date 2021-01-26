@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_ppp.R
 \name{pip_ppp}
 \alias{pip_ppp}
-\title{PIP PPP data. Load and update}
+\title{PIP PPP}
 \usage{
 pip_ppp(
   action = "update",
@@ -19,8 +19,8 @@ pip_ppp(
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-PIP PPP data. Load and update
+Load or update PPP data.
 }

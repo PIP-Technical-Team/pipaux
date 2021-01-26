@@ -1,15 +1,15 @@
-#' Data signature of PIP auxiliary data
+#' Save PIP auxiliary data
 #'
-#' @param x Data frame to be signed and saved
-#' @param measure type of data frame so it could be saved properly
-#' @param msrdir  directory where data signature would be saved.
-#' Created in `pip_prices()`
-#' @param force logical: If TRUE data will be overwritten.
+#' Save PIP auxiliary data with data signature.
+
+#' @param x data.frame Data frame to be signed and saved.
+#' @inheritParams pip_prices
+#' @param msrdir character: Directory where the data and data signature will be saved.
 #'
 #' @export
 pip_sign_save <- function(x,
                           measure,
-                          msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
+                          msrdir,
                           force) {
 
   # Note: clean CPI data file and then create data signature
@@ -17,7 +17,6 @@ pip_sign_save <- function(x,
 
   # check signature of current fst file
   ds_production_path <- paste0(msrdir, measure, "_datasignature.txt")  # data signature in production
-
 
   if (file.exists(ds_production_path)) {
 

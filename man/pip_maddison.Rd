@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_maddison.R
 \name{pip_maddison}
 \alias{pip_maddison}
-\title{Maddison Project Data}
+\title{Maddison data}
 \usage{
 pip_maddison(
   action = "update",
@@ -14,10 +14,10 @@ pip_maddison(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Maddison Project Data
+Load or update data from the Maddison project.
 }

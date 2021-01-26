@@ -4,10 +4,14 @@
 \alias{pip_update_all_aux}
 \title{Update all auxiliary data at once}
 \usage{
-pip_update_all_aux(force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_update_all_aux(
+  force = FALSE,
+  popsrc = getOption("pipaux.popsrc"),
+  maindir = getOption("pipaux.maindir")
+)
 }
 \arguments{
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }

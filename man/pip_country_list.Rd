@@ -14,10 +14,10 @@ pip_country_list(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-List of countries
+Load or update dataset with WDI countries.
 }

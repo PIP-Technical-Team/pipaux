@@ -1,4 +1,6 @@
-#' Clean CPI data from datalibweb to meet PIP protocols
+#' Clean CPI data
+#'
+#' Clean CPI data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with CPI data from datalibweb. loaded in `pip_prices()`.
 #' @param cpi_id character: CPI ID. Extracted from `pip_cpi_update()`

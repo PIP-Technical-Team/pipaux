@@ -1,7 +1,8 @@
-#' PIP CPI data. Load and update
+#' PIP CPI
+#'
+#' Load or update PIP CPI data.
 #'
 #' @inheritParams pip_prices
-#'
 #' @export
 #' @import data.table
 pip_cpi <- function(action  = "update",

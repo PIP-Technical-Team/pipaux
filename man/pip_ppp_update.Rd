@@ -2,21 +2,21 @@
 % Please edit documentation in R/pip_ppp_update.R
 \name{pip_ppp_update}
 \alias{pip_ppp_update}
-\title{Update PPP data frame}
+\title{Update PPP}
 \usage{
 pip_ppp_update(
-  msrdir = paste0(getOption("pipaux.maindir"), "_aux/ppp/"),
+  maindir = getOption("pipaux.maindir"),
   dlwdir = getOption("pipaux.dlwdir"),
   force = FALSE
 )
 }
 \arguments{
-\item{msrdir}{character: measure (PPP) directory. created on \code{pip_prices()}.}
+\item{maindir}{character: Main directory of project.}
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-Update PPP data frame
+Update PPP
 }

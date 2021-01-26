@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_prices.R
 \name{pip_prices}
 \alias{pip_prices}
-\title{PIP Prices data. Works with either CPI or PPP data}
+\title{PIP Prices}
 \usage{
 pip_prices(
   measure = NULL,
@@ -22,8 +22,8 @@ pip_prices(
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-PIP Prices data. Works with either CPI or PPP data
+Works with either CPI, PPP or PFW.
 }

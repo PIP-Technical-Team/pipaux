@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_pfw.R
 \name{pip_pfw}
 \alias{pip_pfw}
-\title{Price framework Data. Load and update}
+\title{PIP PFW}
 \usage{
 pip_pfw(
   action = "update",
@@ -19,8 +19,8 @@ pip_pfw(
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-Price framework Data. Load and update
+Load or update PIP Price Framework data.
 }

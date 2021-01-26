@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_pce.R
 \name{pip_pce}
 \alias{pip_pce}
-\title{Load or update PCE Auxiliary data.}
+\title{PIP PCE}
 \usage{
 pip_pce(
   action = "update",
@@ -14,10 +14,10 @@ pip_pce(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Load or update PCE Auxiliary data.
+Load or update PCE data.
 }

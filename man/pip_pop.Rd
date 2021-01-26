@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_pop.R
 \name{pip_pop}
 \alias{pip_pop}
-\title{Load or Update population data}
+\title{PIP POP}
 \usage{
 pip_pop(
   action = "update",
@@ -15,12 +15,12 @@ pip_pop(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{src}{character: Source for population data. Defaults to \code{getOption("pipaux.popsrc")}.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Load or Update population data
+Load or update population data.
 }

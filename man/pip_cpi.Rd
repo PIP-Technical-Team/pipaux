@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_cpi.R
 \name{pip_cpi}
 \alias{pip_cpi}
-\title{PIP CPI data. Load and update}
+\title{PIP CPI}
 \usage{
 pip_cpi(
   action = "update",
@@ -19,8 +19,8 @@ pip_cpi(
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-PIP CPI data. Load and update
+Load or update PIP CPI data.
 }

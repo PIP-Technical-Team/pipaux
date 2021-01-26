@@ -1,3 +1,5 @@
+#' Update PCE
+#'
 #' Update PCE data using WDI and Special cases.
 #'
 #' @inheritParams pip_prices
@@ -8,8 +10,11 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
 
   wpce <- wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
   sna <- readxl::read_xlsx(sprintf('%s_aux/sna/NAS special_2021-01-14.xlsx', maindir))
+  cl <- pip_country_list("load", maindir = maindir)
+
   setDT(wpce)
   setDT(sna)
+  setDT(cl)
 
   # ---- Clean PCE from WDI ----
 
@@ -100,6 +105,9 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
       pce_data_level == "2", "national"
     )
   ]
+
+  # Remove any non-WDI countries
+  pce <- pce[country_code %in% cl$country_code]
 
   # ---- Sign and save ----
 
