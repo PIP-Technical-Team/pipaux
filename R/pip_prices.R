@@ -65,7 +65,7 @@ pip_prices <- function(measure  = NULL,
 
   #--------- load ---------
   if (action == "load") {
-    df <- load_aux(msrdir  = msrdir,
+    df <- load_aux(maindir  = maindir,
                    measure = measure)
     return(df)
   }
