@@ -1,25 +1,32 @@
-#' update CPI dataframe
+#' Update PFW
 #'
-#' @param msrdir character: measure (PFW) directory. created on `pip_prices()`.
 #' @inheritParams pip_prices
-#'
 #' @export
-pip_pfw_update <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/pfw/"),
+pip_pfw_update <- function(maindir = getOption("pipaux.maindir"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force  = FALSE){
 
-  # check for last version in dlw
+  measure <- "pfw"
+  msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
+  cl <- pip_country_list("load", maindir = maindir)
+  setDT(cl)
 
+  # Check for last version in dlw
   pfw_files  <- fs::dir_ls(dlwdir,
                            regexp = "Survey_price_framework\\.dta$",
                            recurse = TRUE,
                            type = "file")
-
   latest_pfw <- max(pfw_files)
   pfw_id <- gsub("(.*/Support_2005_)([^/]+)(/Data.*)", "\\2", latest_pfw)
 
-  pfwdlw     <- haven::read_dta(latest_pfw)
-  pfw        <- pip_pfw_clean(pfwdlw, pfw_id = pfw_id)
+  # Read data
+  pfwdlw <- haven::read_dta(latest_pfw)
+
+  # Clean data
+  pfw <- pip_pfw_clean(pfwdlw, pfw_id = pfw_id)
+
+  # Remove any non-WDI countries
+  pfw <- pfw[country_code %in% cl$country_code]
 
   pip_sign_save(x       = pfw,
                 measure = "pfw",

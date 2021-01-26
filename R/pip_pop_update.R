@@ -1,13 +1,16 @@
 #' @importFrom magrittr %>%
 NULL
 
-#' Update population data
+#' Update POP
 #'
 #' @param src character: Source for population data.
 #' @inheritParams pip_prices
 #' @export
 #' @import data.table
 pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
+
+  cl <- pip_country_list("load", maindir = maindir)
+  setDT(cl)
 
   src <- match.arg(src)
 
@@ -152,6 +155,9 @@ pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pi
       pop_data_level == "2", "national"
     )
   ]
+
+  # Remove any non-WDI countries
+  pop <- pop[country_code %in% cl$country_code]
 
   measure <- "pop"
   msrdir  <- paste0(maindir, "_aux/", measure, "/")

@@ -1,13 +1,11 @@
 #' Load any auxiliary data
 #'
-#' @param msrdir character: measure (CPI) directory. created on `pip_prices()`.
-#' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
+#' @inheritParams pip_prices
 #' @export
 load_aux <- function(measure = NULL,
-                         msrdir = paste0(getOption("pipaux.maindir"),
-                                         "_aux/",
-                                         measure, "/")
-                         ){
+                     maindir = getOption("pipaux.maindir")) {
+
+  msrdir <- paste0(maindir, "_aux/",  measure, "/")
 
   if (is.null(measure)) {
 
@@ -21,7 +19,7 @@ load_aux <- function(measure = NULL,
 
   }
   # check file exists
-  if (file.exists(paste0(msrdir, measure ,".fst"))){
+  if (file.exists(paste0(msrdir, measure ,".fst"))) {
 
     df <- fst::read_fst(paste0(msrdir, measure ,".fst"))
 
@@ -35,7 +33,6 @@ load_aux <- function(measure = NULL,
     )
 
   }
-  df <- pip_aux_labels(df,
-                       measure = measure)
+  df <- pip_aux_labels(df, measure = measure)
   return(df)
 }

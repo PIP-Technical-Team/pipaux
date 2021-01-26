@@ -1,4 +1,6 @@
-#' Price framework Data. Load and update
+#' PIP PFW
+#'
+#' Load or update PIP Price Framework data.
 #'
 #' @inheritParams pip_prices
 #' @export

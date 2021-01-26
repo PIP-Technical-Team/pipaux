@@ -2,25 +2,19 @@
 % Please edit documentation in R/pip_sign_save.R
 \name{pip_sign_save}
 \alias{pip_sign_save}
-\title{Data signature of PIP auxiliary data}
+\title{Save PIP auxiliary data}
 \usage{
-pip_sign_save(
-  x,
-  measure,
-  msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
-  force
-)
+pip_sign_save(x, measure, msrdir, force)
 }
 \arguments{
-\item{x}{Data frame to be signed and saved}
+\item{x}{data.frame Data frame to be signed and saved.}
 
-\item{measure}{type of data frame so it could be saved properly}
+\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 
-\item{msrdir}{directory where data signature would be saved.
-Created in \code{pip_prices()}}
+\item{msrdir}{character: Directory where the data and data signature will be saved.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-Data signature of PIP auxiliary data
+Save PIP auxiliary data with data signature.
 }

@@ -2,12 +2,12 @@
 % Please edit documentation in R/pip_gdp_update.R
 \name{pip_gdp_update}
 \alias{pip_gdp_update}
-\title{Update GDP data using WDI, Maddison and Special cases.}
+\title{Update GDP}
 \usage{
 pip_gdp_update(force, maindir = getOption("pipaux.maindir"))
 }
 \arguments{
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }

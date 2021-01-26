@@ -2,11 +2,12 @@
 % Please edit documentation in R/pip_gdp.R
 \name{pip_gdp}
 \alias{pip_gdp}
-\title{Update and load GDP data in PIP Auxiliary data structure}
+\title{PIP GDP}
 \usage{
 pip_gdp(
   action = "update",
   maddison_action = "load",
+  weo_action = "load",
   force = FALSE,
   maindir = getOption("pipaux.maindir")
 )
@@ -17,10 +18,12 @@ pip_gdp(
 
 \item{maddison_action}{character: Either "load" or "update". Default is "update".}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{weo_action}{character: Either "load" or "update". Default is "update".}
+
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Update and load GDP data in PIP Auxiliary data structure
+Update or load GDP data.
 }

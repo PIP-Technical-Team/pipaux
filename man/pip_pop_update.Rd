@@ -2,7 +2,7 @@
 % Please edit documentation in R/pip_pop_update.R
 \name{pip_pop_update}
 \alias{pip_pop_update}
-\title{Update population data}
+\title{Update POP}
 \usage{
 pip_pop_update(
   force,
@@ -11,12 +11,12 @@ pip_pop_update(
 )
 }
 \arguments{
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{src}{character: Source for population data.}
 
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Update population data
+Update POP
 }

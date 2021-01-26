@@ -2,12 +2,12 @@
 % Please edit documentation in R/pip_pce_update.R
 \name{pip_pce_update}
 \alias{pip_pce_update}
-\title{Update PCE data using WDI and Special cases.}
+\title{Update PCE}
 \usage{
 pip_pce_update(force, maindir = getOption("pipaux.maindir"))
 }
 \arguments{
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
 }

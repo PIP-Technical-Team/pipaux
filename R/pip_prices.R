@@ -1,11 +1,13 @@
-#' PIP Prices data. Works with either CPI or PPP data
+#' PIP Prices
+#'
+#' Works with either CPI, PPP or PFW.
 #'
 #' @param measure character: Measure to be used. e.g., "cpi" or "ppp".
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.
 #' @param dlwdir character: Datalibweb directory.
-#' @param force logical: IIf TRUE data will be overwritten.
+#' @param force logical: If TRUE data will be overwritten.
 #'
 #' @export
 #' @import data.table
@@ -14,7 +16,7 @@ pip_prices <- function(measure  = NULL,
                        maindir  = getOption("pipaux.maindir"),
                        dlwdir   = getOption("pipaux.dlwdir"),
                        force    = FALSE
-              ){
+){
 
 
   #----------------------------------------------------------
@@ -64,28 +66,28 @@ pip_prices <- function(measure  = NULL,
   #--------- load ---------
   if (action == "load") {
     df <- load_aux(msrdir  = msrdir,
-                       measure = measure)
+                   measure = measure)
     return(df)
   }
 
   #--------- update ---------
-  if (action == "update"){
+  if (action == "update") {
 
     if (measure == "cpi") {
 
-      pip_cpi_update(msrdir = msrdir,
+      pip_cpi_update(maindir = maindir,
                      dlwdir = dlwdir,
                      force  = force)
 
     } else if (measure == "ppp") {
 
-      pip_ppp_update(msrdir = msrdir,
+      pip_ppp_update(maindir = maindir,
                      dlwdir = dlwdir,
                      force  = force)
 
     } else if (measure == "pfw") {
 
-      pip_pfw_update(msrdir = msrdir,
+      pip_pfw_update(maindir = maindir,
                      dlwdir = dlwdir,
                      force  = force)
     } else {

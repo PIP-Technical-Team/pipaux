@@ -1,4 +1,6 @@
-#' PIP PPP data. Load and update
+#' PIP PPP
+#'
+#' Load or update PPP data.
 #'
 #' @inheritParams pip_prices
 #' @export

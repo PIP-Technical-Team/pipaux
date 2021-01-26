@@ -1,4 +1,6 @@
-#' Load or update PCE Auxiliary data.
+#' PIP PCE
+#'
+#' Load or update PCE data.
 #'
 #' @inheritParams pip_prices
 #' @export
@@ -11,12 +13,12 @@ pip_pce <- function(action = "update",
 
   if (action == "update") {
 
-    pip_pce_update(force = force)
+    pip_pce_update(force = force, maindir = maindir)
 
   } else if (action == "load") {
 
     df <- load_aux(msrdir  = msrdir,
-                       measure = measure)
+                   measure = measure)
     return(df)
 
 

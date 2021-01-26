@@ -4,15 +4,12 @@
 \alias{load_aux}
 \title{Load any auxiliary data}
 \usage{
-load_aux(
-  measure = NULL,
-  msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/")
-)
+load_aux(measure = NULL, maindir = getOption("pipaux.maindir"))
 }
 \arguments{
 \item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 
-\item{msrdir}{character: measure (CPI) directory. created on \code{pip_prices()}.}
+\item{maindir}{character: Main directory of project.}
 }
 \description{
 Load any auxiliary data

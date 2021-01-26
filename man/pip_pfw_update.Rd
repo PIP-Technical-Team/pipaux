@@ -2,21 +2,21 @@
 % Please edit documentation in R/pip_pfw_update.R
 \name{pip_pfw_update}
 \alias{pip_pfw_update}
-\title{update CPI dataframe}
+\title{Update PFW}
 \usage{
 pip_pfw_update(
-  msrdir = paste0(getOption("pipaux.maindir"), "_aux/pfw/"),
+  maindir = getOption("pipaux.maindir"),
   dlwdir = getOption("pipaux.dlwdir"),
   force = FALSE
 )
 }
 \arguments{
-\item{msrdir}{character: measure (PFW) directory. created on \code{pip_prices()}.}
+\item{maindir}{character: Main directory of project.}
 
 \item{dlwdir}{character: Datalibweb directory.}
 
-\item{force}{logical: IIf TRUE data will be overwritten.}
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
-update CPI dataframe
+Update PFW
 }
