@@ -12,7 +12,6 @@ pip_pop <- function(action  = "update",
                     ){
 
   measure <- "pop"
-  msrdir  <- paste0(maindir, "_aux/", measure, "/")  # measure dir
   src     <- tolower(src)
 
   if (action == "update") {
@@ -23,7 +22,7 @@ pip_pop <- function(action  = "update",
 
   } else if (action == "load") {
 
-    df <- load_aux(msrdir  = msrdir,
+    df <- load_aux(maindir = maindir,
                    measure = measure)
     return(df)
 

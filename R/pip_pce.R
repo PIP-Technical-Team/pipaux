@@ -9,7 +9,6 @@ pip_pce <- function(action = "update",
                     maindir = getOption("pipaux.maindir")) {
 
   measure <- "pce"
-  msrdir  <- paste0(maindir, "_aux/", measure, "/")  # measure dir
 
   if (action == "update") {
 
@@ -17,7 +16,7 @@ pip_pce <- function(action = "update",
 
   } else if (action == "load") {
 
-    df <- load_aux(msrdir  = msrdir,
+    df <- load_aux(maindir  = maindir,
                    measure = measure)
     return(df)
 

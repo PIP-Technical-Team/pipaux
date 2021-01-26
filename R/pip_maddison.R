@@ -37,7 +37,7 @@ pip_maddison <- function(action = "update",
 
   } else if (action == "load") {
 
-    df <- load_aux(msrdir  = msrdir,
+    df <- load_aux(maindir = maindir,
                    measure = measure)
     return(df)
 

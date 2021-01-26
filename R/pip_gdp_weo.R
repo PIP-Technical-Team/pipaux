@@ -202,7 +202,7 @@ pip_gdp_weo <- function(action = "update",
 
   }  else if (action == "load") {
 
-    dt <- load_aux(msrdir  = msrdir,
+    dt <- load_aux(maindir = maindir,
                    measure = measure)
     return(dt)
 

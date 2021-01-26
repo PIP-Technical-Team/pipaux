@@ -31,8 +31,7 @@ pip_gdp <- function(action = "update",
     pip_gdp_update(force = force, maindir = maindir)
 
   } else if (action == "load") {
-    msrdir    <- paste0(maindir, "_aux/", measure, "/")  # measure dir
-    load_aux(msrdir = msrdir,
+    load_aux(maindir = maindir,
              measure = measure)
 
   }  # End of update
