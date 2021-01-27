@@ -51,12 +51,6 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
     all = TRUE
   )
 
-  # Data now used in Maddison
-  gdp[
-    year >= 2000,
-    mpd_gdp := NA
-  ]
-
   # Chain in following order 1) WDI, 2) WEO PPP, 3) WEO LCU, 4) Madd, 5) SNA
 
   # ---- Chain WDI and WEO GDP columns ----
