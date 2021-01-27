@@ -29,31 +29,6 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
               .(country_code, year, wdi_pce)
   ]
 
-  # ---- Hard-coded custom modifications ----
-
-  # Join with Special National Accounts data.
-  sna <- sna[countrycode == 'IND']
-  setnames(sna, "countrycode", "country_code")
-  pce[sna,
-      on = .(country_code, year),
-      `:=`(
-        sna_pce = i.PCE
-      )
-  ]
-
-  # India should be replaced with country specific-sources from 2011
-  pce[,
-      pce := fifelse(country_code == "IND" & year > 2010,
-                     sna_pce,
-                     wdi_pce)
-  ]
-  pce$sna_pce <- NULL
-
-  # Remove observations for Venezuela after 2014
-  pce[,
-      pce := fifelse(country_code == "VEN" & year > 2014, NA_real_, pce)
-  ]
-
   # ---- Expand for special cases with U/R levels ----
 
   # Special cases for IND, IDN, and CHN
@@ -81,10 +56,7 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
   # Sort
   setorder(pce, country_code, year, pce_data_level)
 
-  # ---- Finalize table ----
-
-  # Remove rows with missing GDP
-  pce <- pce[!is.na(pce) & !is.infinite(pce)]
+  # ---- Recode domain and data level ----
 
   # Recode domain and data_level variables
   cols <- c("pce_domain", "pce_data_level")
@@ -105,6 +77,42 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
       pce_data_level == "2", "national"
     )
   ]
+
+
+  # ---- Hard-coded custom modifications ----
+
+  # Join with Special National Accounts data.
+  sna <- sna[countrycode == 'IND']
+  sna$coverage <- tolower(sna$coverage)
+  setnames(sna, c("countrycode", "coverage"),
+          c("country_code", "pce_data_level"))
+  pce[sna,
+      on = .(country_code, year, pce_data_level),
+      `:=`(
+        sna_pce = i.PCE
+      )
+  ]
+
+  # India should be replaced with country specific-sources from 2011
+  pce[,
+      pce := fifelse(country_code == "IND" & year > 2010 &
+                       pce_data_level != 'national',
+                     sna_pce,
+                     wdi_pce)
+  ]
+  pce$sna_pce <- NULL
+
+  # Remove observations for Venezuela after 2014
+  pce[,
+      pce := fifelse(country_code == "VEN" & year > 2014, NA_real_, pce)
+  ]
+
+
+  # ---- Finalize table ----
+
+  # Remove rows with missing GDP
+  pce <- pce[!is.na(pce) & !is.infinite(pce)]
+
 
   # Remove any non-WDI countries
   pce <- pce[country_code %in% cl$country_code]
