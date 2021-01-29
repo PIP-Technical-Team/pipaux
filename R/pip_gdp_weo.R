@@ -112,82 +112,13 @@ pip_gdp_weo <- function(action = "update",
 
     # ---- Chain PPP and LCU GDP columns ----
 
-    # Add column for countries where the entire PPP series is missing
-    all_ppp_na <- dt[, .(all_ppp_na = all(is.na(weo_gdp_ppp2017))),
-                     by = country_code]
-    dt[all_ppp_na,
-       on = .(country_code),
-       `:=`(
-         all_ppp_na = i.all_ppp_na
-       )
-    ]
+    # Chain LCU on PPP column
+    dt <- chain_values(
+      dt, base_var = 'weo_gdp_ppp2017',
+      replacement_var = 'weo_gdp_lcu',
+      new_name = 'weo_gdp',
+      by = 'country_code')
 
-    # Create new GDP variable
-    dt[,
-        weo_gdp := fifelse(all_ppp_na, weo_gdp_lcu, weo_gdp_ppp2017)
-    ][,
-      # Lagged and lead values of new GDP
-      `:=`(
-        weo_gdp_lag  = shift(weo_gdp),
-        weo_gdp_lead = shift(weo_gdp, type = "lead")
-      ),
-      by = .(country_code)
-    ][
-      , # Row ID by country
-      n := rowid(country_code)
-    ]
-
-    # Linking factors
-    dt[,
-        `:=`(
-          # linking factors back
-          bck = (!is.na(weo_gdp)
-                 & !is.na(weo_gdp_lag)
-                 & n != 1) * (weo_gdp / weo_gdp_lcu),
-
-          # linking factors forward
-          fwd = (!is.na(weo_gdp)
-                 & !is.na(weo_gdp_lead)
-                 & n != .N) * (weo_gdp / weo_gdp_lcu)
-        ),
-        by = .(country_code)
-    ][,
-      `:=`(
-        # Max value in linking factor
-        bcki = max(bck, na.rm = TRUE),
-        fwdi = max(fwd, na.rm = TRUE)
-      ),
-      by = .(country_code)
-    ]
-
-    # Apply: create linked value
-    dt[,
-        `:=`(
-          vbck = weo_gdp_lcu * bcki,
-          vfwd = weo_gdp_lcu * fwdi
-        )
-    ]
-
-    # Assess where to apply forward of backward
-    dt[,
-        gapsum := {
-          gap     <- (is.na(weo_gdp) & !is.na(weo_gdp_lag))
-          gap     <- fifelse(n == 1, TRUE, gap)
-          gapsum  <-  sum(gap)
-        },
-        by = .(country_code)
-    ]
-
-    # Replace where missing and indicate source
-    dt[
-      ,
-      dt := {
-        # fwd
-        weo_gdp = fifelse(is.na(weo_gdp) & gapsum == 2, vfwd, weo_gdp)
-        # bck
-        weo_gdp = fifelse(is.na(weo_gdp) & gapsum == 1, vbck, weo_gdp)
-      }
-    ]
 
     # --- Sign and save ----
 

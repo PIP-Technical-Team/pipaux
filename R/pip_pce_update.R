@@ -32,7 +32,7 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
   # ---- Expand for special cases with U/R levels ----
 
   # Special cases for IND, IDN, and CHN
-  sp <- pce[country_code %chin% c("IND", "IDN", "CHN")]
+  sp <- pce[country_code %in% c("IND", "IDN", "CHN")]
 
   # Expand two time these cases using cross-join.
   sp <- sp[CJ(pce_data_level   = c(0, 1),
@@ -101,6 +101,7 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
                      wdi_pce)
   ]
   pce$sna_pce <- NULL
+  pce$wdi_pce <- NULL
 
   # Remove observations for Venezuela after 2014
   pce[,

@@ -51,163 +51,21 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
     all = TRUE
   )
 
-  # Chain in following order 1) WDI, 2) WEO PPP, 3) WEO LCU, 4) Madd, 5) SNA
+  # Chain in following order 1) WDI, 2) WEO, 3) Maddison
 
-  # ---- Chain WDI and WEO GDP columns ----
+  # Chain WEO on WDI
+  gdp <- chain_values(
+    gdp, base_var = 'wdi_gdp',
+    replacement_var = 'weo_gdp',
+    new_name = 'new_gdp',
+    by = 'country_code')
 
-  # Add column for countries where the entire WDI series is missing
-  all_wdi_na <- gdp[, .(all_wdi_na = all(is.na(wdi_gdp))),
-                   by = country_code]
-  gdp[all_wdi_na,
-     on = .(country_code),
-     `:=`(
-       all_wdi_na = i.all_wdi_na
-     )
-  ]
-
-  # Create new GDP variable
-  gdp[,
-      new_gdp := fifelse(all_wdi_na, weo_gdp, wdi_gdp)
-  ][,
-    # Lagged and lead values of new GDP
-    `:=`(
-      new_gdp_lag  = shift(new_gdp),
-      new_gdp_lead = shift(new_gdp, type = "lead")
-    ),
-    by = .(country_code)
-  ][
-    , # Row ID by country
-    n := rowid(country_code)
-  ]
-
-  # Linking factors
-  gdp[,
-      `:=`(
-        # linking factors back
-        bck = (!is.na(new_gdp)
-               & !is.na(new_gdp_lag)
-               & n != 1) * (new_gdp / weo_gdp),
-
-        # linking factors forward
-        fwd = (!is.na(new_gdp)
-               & !is.na(new_gdp_lead)
-               & n != .N) * (new_gdp / weo_gdp)
-      ),
-      by = .(country_code)
-  ][,
-    `:=`(
-      # Max value in linking factor
-      bcki = max(bck, na.rm = TRUE),
-      fwdi = max(fwd, na.rm = TRUE)
-    ),
-    by = .(country_code)
-  ]
-
-  # Apply: create linked value
-  gdp[,
-      `:=`(
-        vbck = weo_gdp * bcki,
-        vfwd = weo_gdp * fwdi
-      )
-  ]
-
-  # Assess where to apply forward of backward
-  gdp[,
-      gapsum := {
-        gap     <- (is.na(new_gdp) & !is.na(new_gdp_lag))
-        gap     <- fifelse(n == 1, TRUE, gap)
-        gapsum  <-  sum(gap)
-      },
-      by = .(country_code)
-  ]
-
-  # Replace where missing and indicate source
-  gdp[,
-    new_gdp := {
-      # fwd
-      new_gdp = fifelse(is.na(new_gdp) & gapsum == 2, vfwd, new_gdp)
-      # bck
-      new_gdp = fifelse(is.na(new_gdp) & gapsum == 1, vbck, new_gdp)
-    }
-  ]
-
-  # ---- Chain new GDP with MDP GDP ----
-
-  # Add column for countries where the entire new series is missing
-  all_new_gdp_na <- gdp[, .(all_new_gdp_na = all(is.na(new_gdp))),
-                    by = country_code]
-  gdp[all_new_gdp_na,
-      on = .(country_code),
-      `:=`(
-        all_new_gdp_na = i.all_new_gdp_na
-      )
-  ]
-
-  # Create new GDP variable
-  gdp[,
-      new_gdp := fifelse(all_new_gdp_na, mpd_gdp, new_gdp)
-  ][,
-    # Lagged and lead values of new GDP
-    `:=`(
-      new_gdp_lag  = shift(new_gdp),
-      new_gdp_lead = shift(new_gdp, type = "lead")
-    ),
-    by = .(country_code)
-  ][
-    , # Row ID by country
-    n := rowid(country_code)
-  ]
-
-  # Linking factors
-  gdp[,
-      `:=`(
-        # linking factors back
-        bck = (!is.na(new_gdp)
-               & !is.na(new_gdp_lag)
-               & n != 1) * (new_gdp / mpd_gdp),
-
-        # linking factors forward
-        fwd = (!is.na(new_gdp)
-               & !is.na(new_gdp_lead)
-               & n != .N) * (new_gdp / mpd_gdp)
-      ),
-      by = .(country_code)
-  ][,
-    `:=`(
-      # Max value in linking factor
-      bcki = max(bck, na.rm = TRUE),
-      fwdi = max(fwd, na.rm = TRUE)
-    ),
-    by = .(country_code)
-  ]
-
-  # Apply: create linked value
-  gdp[,
-      `:=`(
-        vbck = mpd_gdp * bcki,
-        vfwd = mpd_gdp * fwdi
-      )
-  ]
-
-  # Assess where to apply forward of backward
-  gdp[,
-      gapsum := {
-        gap     <- (is.na(new_gdp) & !is.na(new_gdp_lag))
-        gap     <- fifelse(n == 1, TRUE, gap)
-        gapsum  <-  sum(gap)
-      },
-      by = .(country_code)
-  ]
-
-  # Replace where missing and indicate source
-  gdp[,
-    gdp := {
-      # fwd
-      new_gdp = fifelse(is.na(new_gdp) & gapsum == 2, vfwd, new_gdp)
-      # bck
-      new_gdp = fifelse(is.na(new_gdp) & gapsum == 1, vbck, new_gdp)
-    }
-  ]
+  # Chain Maddison on new GDP column
+  gdp <- chain_values(
+    gdp, base_var = 'new_gdp',
+    replacement_var = 'mpd_gdp',
+    new_name = 'gdp',
+    by = 'country_code')
 
   # Select columns
   gdp <- gdp[, c("country_code", "year", "gdp")]
