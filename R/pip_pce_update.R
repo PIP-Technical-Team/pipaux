@@ -48,6 +48,7 @@ pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
                      wdi_pce)
   ]
   pce$sna_pce <- NULL
+  pce$wdi_pce <- NULL
 
   # Remove observations for Venezuela after 2014
   pce[,
