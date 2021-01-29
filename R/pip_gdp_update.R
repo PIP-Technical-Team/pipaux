@@ -51,18 +51,18 @@ pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
     all = TRUE
   )
 
-  # Chain in following order 1) WDI, 2) WEO, 3) Madd
+  # Chain in following order 1) WDI, 2) WEO, 3) Maddison
 
   # Chain WEO on WDI
   gdp <- chain_values(
     gdp, base_var = 'wdi_gdp',
     replacement_var = 'weo_gdp',
-    new_name = 'gdp',
+    new_name = 'new_gdp',
     by = 'country_code')
 
   # Chain Maddison on new GDP column
   gdp <- chain_values(
-    gdp, base_var = 'wdi_gdp',
+    gdp, base_var = 'new_gdp',
     replacement_var = 'mpd_gdp',
     new_name = 'gdp',
     by = 'country_code')
