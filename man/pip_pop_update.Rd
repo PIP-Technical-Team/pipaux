@@ -5,7 +5,7 @@
 \title{Update POP}
 \usage{
 pip_pop_update(
-  force,
+  force = FALSE,
   src = c("emi", "wdi"),
   maindir = getOption("pipaux.maindir")
 )

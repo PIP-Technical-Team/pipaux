@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_gdp
 #' @export
-pip_gdp_update <- function(force, maindir = getOption("pipaux.maindir")){
+pip_gdp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")){
 
   #----------------------------------------------------------
   #   Load data

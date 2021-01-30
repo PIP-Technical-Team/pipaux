@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_prices
 #' @export
-pip_pce_update <- function(force, maindir = getOption("pipaux.maindir")){
+pip_pce_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")){
 
   # ---- Load data ----
 
