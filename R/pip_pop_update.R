@@ -7,7 +7,7 @@ NULL
 #' @inheritParams pip_prices
 #' @export
 #' @import data.table
-pip_pop_update <- function(force, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
+pip_pop_update <- function(force = FALSE, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
 
   cl <- pip_country_list("load", maindir = maindir)
   setDT(cl)
