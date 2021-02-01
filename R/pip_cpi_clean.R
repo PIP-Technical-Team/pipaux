@@ -15,7 +15,7 @@ pip_cpi_clean <- function(y,
   x <- data.table::as.data.table(y)
 
   # vars to keep
-  keep_vars <- c("country_code", "surveyid_year", "reference_year",
+  keep_vars <- c("country_code", "cpi_year", "survey_year",
                  "cpi", "ccf", "survey_acronym", "change_cpi2011",
                  grep("^cpi", names(x), value = TRUE), "cpi_id")
 
@@ -33,11 +33,11 @@ pip_cpi_clean <- function(y,
     ,
     `:=`(
       country_code   = code,
-      surveyid_year  = as.integer(year),
-      reference_year = ref_year,
+      cpi_year       = as.integer(year),
+      survey_year    = ref_year,
       cpi            = get(cpivar),
       survey_acronym = survname,
-      cpi_id     = (cpi_id),
+      cpi_id         = (cpi_id),
       cpi_domain     = as.character(cpi_domain),
       cpi_data_level = as.character(cpi_data_level)
     )
