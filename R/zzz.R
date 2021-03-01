@@ -5,7 +5,8 @@ pipuax_default_options <- list(
   pipaux.pppvar  = "icp2011",
   pipaux.pppyear = 2011,
   pipaux.popsrc  = "emi",
-  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta"
+  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
+  pipaux.pcndir  = "P:/01.PovcalNet/00.Master/02.vintage/"
 )
 
 .onLoad <- function(libname, pkgname) {
