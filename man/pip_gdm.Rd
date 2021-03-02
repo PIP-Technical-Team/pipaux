@@ -22,5 +22,13 @@ pip_gdm(
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Load or update grouped data means dataset from PovcalNet Masterfile.
+Load or update grouped data means dataset from PovcalNet Masterfile. See
+details.
+}
+\details{
+Survey means cannot be automatically calculated for grouped data, so at some
+stage the mean needs to be entered manually. This function reads from the PCN
+Masterfile to ensure that PCN and PIP uses the same data means.
+
+The dependency on the PCN Masterfile should be changed in the future.
 }
