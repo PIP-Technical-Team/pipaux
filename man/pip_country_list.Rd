@@ -7,6 +7,7 @@
 pip_country_list(
   action = "update",
   force = FALSE,
+  pcndir = getOption("pipaux.pcnsrc"),
   maindir = getOption("pipaux.maindir")
 )
 }
@@ -19,5 +20,12 @@ pip_country_list(
 \item{maindir}{character: Main directory of project.}
 }
 \description{
-Load or update dataset with WDI countries.
+Load or update dataset with WDI countries. See details.
+}
+\details{
+This function creates a combined dataset of countries in WDI and their
+respective regional classification by querying \code{wbstats::wb_countries()}, as
+well as reading from the PovcalNet Masterfile to fetch PCN region codes.
+
+The dependency on the PCN Masterfile should be changed in the future.
 }
