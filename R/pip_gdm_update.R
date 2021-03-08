@@ -36,7 +36,8 @@ pip_gdm_update <- function(force = FALSE,
   # ---- Transform dataset ----
 
   # Select for grouped data surveys
-  df <- df[grepl('[.]T0[1,2,5]$', df$DistributionFileName), ]
+  df <- df[grepl('[.]T0[1,2,5]$', df$DistributionFileName,
+                 ignore.case = TRUE), ]
 
   # Select and rename columns
   df <- df[c('CountryCode', 'SurveyTime', 'DataType', 'Coverage',
