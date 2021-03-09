@@ -108,6 +108,12 @@ pip_pce_update <- function(force = FALSE, maindir = getOption("pipaux.maindir"))
       pce := fifelse(country_code == "VEN" & year > 2014, NA_real_, pce)
   ]
 
+  # Remove observations for Belize before 1992
+  # See issue PIP-Technical-Team/pipaux#41
+  pce[,
+      pce := fifelse(country_code == "BLZ" & year < 1992, NA_real_, pce)
+  ]
+
 
   # ---- Finalize table ----
 
