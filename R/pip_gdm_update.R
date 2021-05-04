@@ -115,7 +115,7 @@ pip_gdm_update <- function(force = FALSE,
   df$survey_id <- toupper(df$survey_id)
 
   # Convert LCU means to daily values
-  #df$survey_mean_lcu <- df$survey_mean_lcu * (12/365)
+  df$survey_mean_lcu <- df$survey_mean_lcu * (12/365)
 
   # Convert to data.table
   dt <- data.table::as.data.table(df)
