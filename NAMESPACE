@@ -2,6 +2,7 @@
 
 export(load_aux)
 export(pip_aux_labels)
+export(pip_countries)
 export(pip_country_list)
 export(pip_cp)
 export(pip_cp_update)
