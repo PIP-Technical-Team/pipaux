@@ -40,5 +40,6 @@ Imports:
     janitor,
     fs,
     magrittr,
-    readxl
+    readxl,
+    dplyr
 VignetteBuilder: knitr

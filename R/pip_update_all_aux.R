@@ -26,5 +26,8 @@ pip_update_all_aux <- function(force = FALSE,
   # PCE from WDI (+ a few special cases)
   pip_pce(force = force, maindir = maindir)
 
+  # Country profiles (from Poverty GP)
+  pip_cp(force = force, maindir = maindir)
+
   return(invisible())
 }

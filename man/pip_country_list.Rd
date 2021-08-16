@@ -7,7 +7,7 @@
 pip_country_list(
   action = "update",
   force = FALSE,
-  pcndir = getOption("pipaux.pcnsrc"),
+  pcndir = getOption("pipaux.pcndir"),
   maindir = getOption("pipaux.maindir")
 )
 }

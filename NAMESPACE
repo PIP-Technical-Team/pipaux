@@ -3,6 +3,8 @@
 export(load_aux)
 export(pip_aux_labels)
 export(pip_country_list)
+export(pip_cp)
+export(pip_cp_update)
 export(pip_cpi)
 export(pip_cpi_clean)
 export(pip_cpi_update)

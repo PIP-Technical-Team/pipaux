@@ -7,7 +7,7 @@
 pip_gdm(
   action = "update",
   force = FALSE,
-  pcndir = getOption("pipaux.pcnsrc"),
+  pcndir = getOption("pipaux.pcndir"),
   maindir = getOption("pipaux.maindir")
 )
 }
