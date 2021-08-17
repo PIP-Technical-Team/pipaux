@@ -4,12 +4,18 @@
 \alias{load_aux}
 \title{Load any auxiliary data}
 \usage{
-load_aux(measure = NULL, maindir = getOption("pipaux.maindir"))
+load_aux(
+  measure = NULL,
+  maindir = getOption("pipaux.maindir"),
+  apply_label = TRUE
+)
 }
 \arguments{
 \item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{apply_label}{logical: If TRUE, predefined labels will applied.}
 }
 \description{
 Load any auxiliary data
