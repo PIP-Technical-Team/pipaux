@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
@@ -10,7 +10,7 @@ Authors@R: c(
                    family = "Fujs",
                    role = c("aut"),
                    email = "tfujs@worldbank.org"),
-            person(given = "R.Aleksander",
+            person(given = "Aleksander",
                    family = "Eilertsen",
                    role = c("aut"),
                    email = "aeilertsen@worldbank.org")
@@ -40,5 +40,6 @@ Imports:
     janitor,
     fs,
     magrittr,
-    readxl
+    readxl,
+    dplyr
 VignetteBuilder: knitr

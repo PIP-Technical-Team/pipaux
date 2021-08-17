@@ -5,12 +5,13 @@
 #' @param x data.frame Data frame to be signed and saved.
 #' @inheritParams pip_prices
 #' @param msrdir character: Directory where the data and data signature will be saved.
-#'
+#' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is also saved.
 #' @export
 pip_sign_save <- function(x,
                           measure,
                           msrdir,
-                          force) {
+                          force,
+                          save_dta = TRUE) {
 
   # Note: clean CPI data file and then create data signature
   ds_dlw <- digest::digest(x,  algo = "xxhash64") # Data signature of file
@@ -47,16 +48,21 @@ pip_sign_save <- function(x,
     fst::write_fst(x = x,
                    path = paste0(msrdir, measure, ".fst")
                   )
+    if (save_dta) {
+      haven::write_dta(data = x,
+                       path = paste0(msrdir, measure, ".dta")
+      )
+    }
 
-    haven::write_dta(data = x,
-                     path = paste0(msrdir, measure, ".dta")
-                    )
     fst::write_fst(x = x,
                    path = paste0(msrdir, "_vintage/", measure, "_", time,".fst")
     )
-    haven::write_dta(data = x,
-                     path = paste0(msrdir, "_vintage/", measure, "_", time,".dta")
-    )
+    if (save_dta) {
+      haven::write_dta(data = x,
+                       path = paste0(msrdir, "_vintage/", measure, "_", time,".dta")
+      )
+    }
+
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
 
