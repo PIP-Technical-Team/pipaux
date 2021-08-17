@@ -1,20 +1,22 @@
 #' Load any auxiliary data
 #'
 #' @inheritParams pip_prices
+#' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @export
 load_aux <- function(measure = NULL,
-                     maindir = getOption("pipaux.maindir")) {
+                     maindir = getOption("pipaux.maindir"),
+                     apply_label = TRUE) {
 
   msrdir <- paste0(maindir, "_aux/",  measure, "/")
 
   if (is.null(measure)) {
 
     rlang::abort(c(
-                  "`measure` must be defined, as it does not have default value",
-                  i = "make sure `measure` is not NULL."
-                  ),
-                  class = "pipaux_error"
-                  )
+      "`measure` must be defined, as it does not have default value",
+      i = "make sure `measure` is not NULL."
+    ),
+    class = "pipaux_error"
+    )
 
 
   }
@@ -38,6 +40,8 @@ load_aux <- function(measure = NULL,
     )
 
   }
-  df <- pip_aux_labels(df, measure = measure)
+  if (apply_label) {
+    df <- pip_aux_labels(df, measure = measure)
+  }
   return(df)
 }
