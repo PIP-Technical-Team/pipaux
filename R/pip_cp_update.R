@@ -155,14 +155,14 @@ pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) 
 
     # Write files
     time <- format(Sys.time(), "%Y%m%d%H%M%S")
-    saveRDS(cp, paste0(maindir, "_aux/cp/country_profiles.rds"))
-    saveRDS(cp, sprintf("%s_aux/cp/_vintage/country_profiles_%s.rds", maindir, time))
+    saveRDS(cp, paste0(maindir, "_aux/cp/cp.rds"))
+    saveRDS(cp, sprintf("%s_aux/cp/_vintage/cp_%s.rds", maindir, time))
     readr::write_lines(hash,  file = paste0(maindir, "_aux/cp/_datasignature.txt"))
 
     # Print msg
     infmsg <- paste("Data signature has changed, it was not found,",
                     "or update was forced.\n",
-                    paste0("`", 'country_profiles', ".rds` has been updated"))
+                    paste0("`", 'cp', ".rds` has been updated"))
     rlang::inform(infmsg)
     return(invisible(TRUE))
 

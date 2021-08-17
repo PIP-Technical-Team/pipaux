@@ -16,7 +16,7 @@ pip_cp <- function(action = "update",
 
   } else if (action == "load") {
 
-    dl <- readRDS(paste0(maindir, '_aux/cp/country_profiles.rds'))
+    dl <- readRDS(paste0(maindir, '_aux/cp/cp.rds'))
 
   }
 
