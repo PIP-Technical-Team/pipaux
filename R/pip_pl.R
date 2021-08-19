@@ -6,6 +6,8 @@
 #' @export
 pip_pl <- function(action = "update",
                    force = FALSE,
+                   pl_default = '1.9',
+                   pl_visible = c('1.9', '3.2', '5.5'),
                    maindir = getOption("pipaux.maindir")) {
 
 
@@ -14,9 +16,19 @@ pip_pl <- function(action = "update",
 
   if (action == "update") {
 
-    df <- suppressMessages(
-      readr::read_csv(paste0(maindir, "_aux/pl/poverty_lines.csv"))
+    pls <- seq(0.05, 6.50, 0.05)
+    df <- data.table::data.table(
+      name = as.character(pls),
+      poverty_line = pls
     )
+    df$is_default <- ifelse(df$name == pl_default, TRUE, FALSE)
+    df$is_visible <- ifelse(df$name %in% pl_visible, TRUE, FALSE)
+
+    # df <- suppressMessages(
+    #   readr::read_csv(paste0(maindir, "_aux/pl/poverty_lines.csv"))
+    # )
+    # df$name <- as.character(df$name)
+
     pip_sign_save(x       = df,
                   measure = measure,
                   msrdir  = msrdir,
