@@ -27,7 +27,7 @@ pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) 
         'survey_coverage','is_interpolated', 'survey_acronym',
         'survey_comparability', 'comparable_spell',
         'poverty_line', 'year_range', 'pop_in_poverty',
-        'population', 'headcount_national', 'gni', 'gdp_growth',
+        'reporting_pop', 'headcount_national', 'gni', 'gdp_growth',
         'gini', 'theil', 'headcount', 'poverty_share_by_group',
         'mpm_education_attainment', 'mpm_education_enrollment',
         'mpm_electricity', 'mpm_sanitation', 'mpm_water',
@@ -62,9 +62,9 @@ pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) 
   key_indicators <- list(
     headcount_national = key_indicators[, c('country_code', 'reporting_year', 'headcount_national')],
     mpm_headcount = key_indicators[, c('country_code', 'reporting_year', 'mpm_headcount')],
-    population = key_indicators[, c('country_code', 'reporting_year', 'population')],
+    reporting_pop = key_indicators[, c('country_code', 'reporting_year', 'reporting_pop')],
     gni = key_indicators[, c('country_code', 'reporting_year', 'gni')],
-    gdp = key_indicators[, c('country_code', 'reporting_year', 'gdp_growth')]
+    gdp_growth = key_indicators[, c('country_code', 'reporting_year', 'gdp_growth')]
   )
   key_indicators[1:3] <- lapply(key_indicators[1:3], function(x){
     x <- x %>%
