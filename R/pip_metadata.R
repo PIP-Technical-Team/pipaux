@@ -16,6 +16,7 @@ pip_metadata <- function(action = "update",
 
     # Load pfw
     pfw <- load_aux('pfw')
+    pfw <- data.table::setDT(pfw)
     pfw$link <- with(pfw,
                      sprintf('%s_%s_%s',
                              country_code,
@@ -32,7 +33,7 @@ pip_metadata <- function(action = "update",
     # Merge datasets (inner join)
     df <-
       merge(df,
-            pfw[c('country_code', 'surveyid_year', 'survey_acronym', 'link')],
+            pfw[, c('country_code', 'surveyid_year', 'survey_acronym', 'link')],
             by = 'link', all = FALSE)
 
     # Recode colnames
