@@ -4,7 +4,13 @@
 \alias{pip_pl}
 \title{Poverty lines}
 \usage{
-pip_pl(action = "update", force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_pl(
+  action = "update",
+  force = FALSE,
+  pl_default = "1.9",
+  pl_visible = c("1.9", "3.2", "5.5"),
+  maindir = getOption("pipaux.maindir")
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If

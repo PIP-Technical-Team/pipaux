@@ -111,10 +111,11 @@ pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) 
   charts <- list(
     ineq_trend =
       dl$chart3[, c('country_code', 'reporting_year',
-                    'welfare_type', 'comparable_spell',
+                    'survey_acronym', 'welfare_type',
+                    'survey_comparability', 'comparable_spell',
                     'gini', 'theil')],
     ineq_bar =
-      dl$chart4[, c('country_code', 'reporting_year',
+      dl$chart4[, c('country_code', 'reporting_year', 'welfare_type',
                     'gender', 'agegroup', 'education',
                     'distribution', 'poverty_share_by_group')],
 
