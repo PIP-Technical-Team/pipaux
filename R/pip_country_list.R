@@ -9,6 +9,7 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_prices
+#' @param pcndir character: PovcalNet directory for the Masterfile.
 #' @export
 pip_country_list <- function(action = "update",
                              force  = FALSE,
