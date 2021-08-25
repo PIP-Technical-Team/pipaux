@@ -1,7 +1,5 @@
-context("Check all aux files are up to date")
-
 test_that("aux data is up to date", {
-
+  skip_on_ci()
   lf <- lsf.str("package:pipaux", pattern = "^pip_[a-z]{3}$")
   lf <- as.character(lf)
 
