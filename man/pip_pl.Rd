@@ -18,6 +18,10 @@ pip_pl(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{pl_default}{character: Default poverty line}
+
+\item{pl_visible}{character: Visible poverty lines}
+
 \item{maindir}{character: Main directory of project.}
 }
 \description{

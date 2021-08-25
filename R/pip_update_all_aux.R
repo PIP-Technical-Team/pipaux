@@ -1,7 +1,7 @@
 #' Update all auxiliary data at once
 #'
 #' @inheritParams pip_prices
-#' @inheritParams pip_pop
+#' @param popsrc character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export
 pip_update_all_aux <- function(force = FALSE,
                                popsrc = getOption("pipaux.popsrc"),

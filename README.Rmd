@@ -16,12 +16,13 @@ knitr::opts_chunk$set(
 # pipaux
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/PIP-Technical-Team/pipaux/workflows/R-CMD-check/badge.svg)](https://github.com/PIP-Technical-Team/pipaux/actions?workflow=R-CMD-check)
 <!-- badges: end -->
 
 `pipaux` manages the auxiliary data used in the PIP workflow. It basically
-    does two things. [1] It updates the auxiliary data and makes sure to keep 
-    it unchanged when it the raw data has not been modified. [2] it loads the 
-    data into memory.
+does two things. [1] It updates the auxiliary data and makes sure to keep 
+it unchanged when it the raw data has not been modified. [2] it loads the 
+data into memory.
 
 ## Installation
 
@@ -66,6 +67,7 @@ lf <- lsf.str("package:pipaux", pattern = "^pip_")
   lf <- as.character(lf)
   num_functions <- length(lf)
 ```
+
 Even though `pipaux` has more than `r num_functions` functions, most of its features 
 can be executed by only using functions `pipaux::load_aux` and `pipaux::update_aux`, which wrappers of other measure-specific functions. 
 
@@ -81,10 +83,8 @@ Loading auxiliary data can be done using the function `pipaux::load_aux`, whose
 first argument is the name of the `measure` to be loaded. The measures available
 are **`r last_item(lf)`**. 
 
-
 So, loading the `cpi` database could be done by typing, 
 `load_aux(measure = "cpi")` or `pip_cpi("load")`. 
-
 
 ```{r equal-load, echo=TRUE}
 identical(load_aux(measure = "cpi"), pip_cpi("load"))
@@ -113,7 +113,6 @@ update_aux(measure = "ppp")
 # is equivalent to this, 
 pip_ppp("update")
 ```
-
 
 `pipaux` checks whether the hash of each database has changed and updates the data 
 in case it has changed. If it has not changed, it notifies the user. The user can 
