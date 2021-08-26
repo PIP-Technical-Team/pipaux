@@ -3,7 +3,7 @@
 #' Update PCE data using WDI and Special cases.
 #'
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 pip_pce_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
 
   # ---- Load data ----

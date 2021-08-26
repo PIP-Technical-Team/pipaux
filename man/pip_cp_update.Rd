@@ -14,3 +14,4 @@ pip_cp_update(force = FALSE, maindir = getOption("pipaux.maindir"))
 \description{
 Update a list with country profiles data
 }
+\keyword{internal}

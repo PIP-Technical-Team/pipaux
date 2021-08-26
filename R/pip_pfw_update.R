@@ -1,7 +1,7 @@
 #' Update PFW
 #'
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 pip_pfw_update <- function(maindir = getOption("pipaux.maindir"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force = FALSE) {

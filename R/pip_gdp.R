@@ -6,7 +6,6 @@
 #' @param maddison_action character: Either "load" or "update". Default is "update".
 #' @param weo_action character: Either "load" or "update". Default is "update".
 #' @export
-#' @import data.table
 pip_gdp <- function(action = "update",
                     maddison_action = "load",
                     weo_action = "load",

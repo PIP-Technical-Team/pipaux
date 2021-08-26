@@ -3,7 +3,7 @@
 #' Update a list with country profiles data
 #'
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
   files <- list.files(paste0(maindir, "_aux/cp"),
     pattern = "indicator_values_country",

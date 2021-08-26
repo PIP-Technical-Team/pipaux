@@ -1,17 +1,5 @@
-
-#--------- To delete. Just for testing purposes ---------
-
-pip_dlw_load <- function() {
-  dlwdir <- getOption("pipaux.dlwdir")
-
-  # cpid <<- haven::read_dta(paste0(dlwdir, "Final_CPI_PPP_to_be_used.dta"))
-  # pfwd <<- haven::read_dta(paste0(dlwdir, "Survey_price_framework.dta"))
-  # pppd <<- haven::read_dta(paste0(dlwdir, "pppdata_allvintages.dta"))
-}
-
-
-#--------- Find latest dlw directory ---------
-
+#' Find latest dlw directory
+#' @noRd
 latest_dlw_dir <- function(dlwdir) {
   dlw_dirs <- dir(getOption("pipaux.dlwdir"))
   dt <- data.table(orig = dlw_dirs)
@@ -55,8 +43,8 @@ latest_dlw_dir <- function(dlwdir) {
   return(latest)
 }
 
-#--------- Last item in character vector separator ---------
-
+#' Last item in character vector separator
+#' @noRd
 last_item <- function(x, word = "and") {
   if (!(is.character(x))) {
     warning("`x` must be character. coercing to character")
@@ -74,8 +62,6 @@ last_item <- function(x, word = "and") {
   }
   return(y)
 }
-
-
 
 #' Chain values
 #'

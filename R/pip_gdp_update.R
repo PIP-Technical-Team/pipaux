@@ -3,7 +3,7 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
-#' @export
+#' @keywords intenal
 pip_gdp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
 
   #----------------------------------------------------------

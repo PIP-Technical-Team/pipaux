@@ -4,7 +4,6 @@
 #'
 #' @inheritParams pip_prices
 #' @export
-#'
 pip_cp <- function(action = "update",
                    force = FALSE,
                    maindir = getOption("pipaux.maindir")) {

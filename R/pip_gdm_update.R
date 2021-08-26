@@ -3,7 +3,7 @@
 #' Update GDM data using the PovcalNet Masterfile.
 #'
 #' @inheritParams pip_gdm
-#' @export
+#' @keywords internal
 pip_gdm_update <- function(force = FALSE,
                            maindir = getOption("pipaux.maindir"),
                            pcndir = getOption("pipaux.pcndir")) {

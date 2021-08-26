@@ -4,7 +4,7 @@
 #' @param dlwdir character: Datalibweb directory
 #' @param force logical: If TRUE force update of veintage level 1.
 #'
-#' @export
+#' @keywords internal
 pip_cpi_vintage <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
                             dlwdir = getOption("pipaux.dlwdir"),
                             force = FALSE) {

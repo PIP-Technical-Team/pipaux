@@ -5,7 +5,7 @@ NULL
 #'
 #' @param src character: Source for population data.
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 #' @import data.table
 pip_pop_update <- function(force = FALSE, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
   cl <- pip_country_list("load", maindir = maindir)

@@ -1,7 +1,7 @@
 #' Update CPI
 #'
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 pip_cpi_update <- function(maindir = getOption("pipaux.maindir"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force = FALSE) {

@@ -1,7 +1,7 @@
 #' Update PPP
 #'
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 pip_ppp_update <- function(maindir = getOption("pipaux.maindir"),
                            dlwdir = getOption("pipaux.dlwdir"),
                            force = FALSE) {
