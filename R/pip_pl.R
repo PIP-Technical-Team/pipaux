@@ -8,16 +8,13 @@
 #' @export
 pip_pl <- function(action = "update",
                    force = FALSE,
-                   pl_default = '1.9',
-                   pl_visible = c('1.9', '3.2', '5.5'),
+                   pl_default = "1.9",
+                   pl_visible = c("1.9", "3.2", "5.5"),
                    maindir = getOption("pipaux.maindir")) {
-
-
   measure <- "pl"
-  msrdir  <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- paste0(maindir, "_aux/", measure, "/")
 
   if (action == "update") {
-
     pls <- seq(0.05, 6.50, 0.05)
     df <- data.table::data.table(
       name = as.character(pls),
@@ -31,19 +28,20 @@ pip_pl <- function(action = "update",
     # )
     # df$name <- as.character(df$name)
 
-    pip_sign_save(x       = df,
-                  measure = measure,
-                  msrdir  = msrdir,
-                  force   = force)
-
+    pip_sign_save(
+      x = df,
+      measure = measure,
+      msrdir = msrdir,
+      force = force
+    )
   } else if (action == "load") {
-
-    df <- load_aux(maindir  = maindir,
-                   measure = measure)
+    df <- load_aux(
+      maindir = maindir,
+      measure = measure
+    )
     return(df)
-
   } else {
-    msg <- paste("action `", action,"` is not a valid action.")
+    msg <- paste("action `", action, "` is not a valid action.")
     rlang::abort(c(
       msg,
       i = "make sure you select `update` or `load`"
@@ -51,5 +49,4 @@ pip_pl <- function(action = "update",
     class = "pipaux_error"
     )
   }
-
 }

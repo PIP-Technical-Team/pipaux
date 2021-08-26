@@ -12,7 +12,7 @@ pip_dlw_load <- function() {
 
 #--------- Find latest dlw directory ---------
 
-latest_dlw_dir <- function(dlwdir){
+latest_dlw_dir <- function(dlwdir) {
   dlw_dirs <- dir(getOption("pipaux.dlwdir"))
   dt <- data.table(orig = dlw_dirs)
 
@@ -29,21 +29,26 @@ latest_dlw_dir <- function(dlwdir){
     )
 
   latest <-
-    dt[,
-       # Name sections of filename into variables
-       (cnames) := tstrsplit(orig, "_",
-                             fixed=TRUE)
+    dt[
+      ,
+      # Name sections of filename into variables
+      (cnames) := tstrsplit(orig, "_",
+        fixed = TRUE
+      )
     ][
       !is.na(vermast) & !is.na(veralt)
-    ][,
+    ][
+      ,
       maxmast := vermast == max(vermast)
     ][
       maxmast == TRUE
-    ][,
+    ][
+      ,
       maxalt := veralt == max(veralt)
     ][
       maxalt == TRUE
-    ][,
+    ][
+      ,
       orig
     ]
 
@@ -61,12 +66,10 @@ last_item <- function(x, word = "and") {
   lx <- length(x)
   if (lx == 1) {
     y <- x
-  }
-  else if (lx == 2) {
+  } else if (lx == 2) {
     y <- paste(x[1], word, x[2])
-  }
-  else {
-    y <- c(x[1:lx-1], paste(word, x[lx]))
+  } else {
+    y <- c(x[1:lx - 1], paste(word, x[lx]))
     y <- paste(y, collapse = ", ")
   }
   return(y)
@@ -87,7 +90,7 @@ last_item <- function(x, word = "and") {
 #'   'country_code'.
 #'
 #' @keywords internal
-chain_values <- function(dt, base_var, replacement_var, new_name, by = 'country_code'){
+chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_code") {
 
   # anyNA
   anyNA <- function(x) all(is.na(x))
@@ -97,38 +100,41 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = 'country_
 
   # Check if any groups have missing values for
   # all observations of base_var
-  dt_na <- dt[, .SDcols = base_var, by = by,
-              .(all_na = purrr::map_lgl(.SD, anyNA))]
+  dt_na <- dt[,
+    .SDcols = base_var, by = by,
+    .(all_na = purrr::map_lgl(.SD, anyNA))
+  ]
   dt <- data.table::merge.data.table(dt, dt_na, by = by)
 
   # Create new_var (equal to base_var or replacement_var
   # if entire series is missing )
   dt$new_var <- data.table::fifelse(
-    dt$all_na, dt[[replacement_var]], dt[[base_var]])
+    dt$all_na, dt[[replacement_var]], dt[[base_var]]
+  )
 
   # Create lag and lead columns by group
   dt$rep_var <- dt[[replacement_var]]
   dt[,
-     `:=`(
-       rep_var_lag = shift(rep_var),
-       rep_var_lead = shift(rep_var, type = "lead")
-     ),
-     by = by
+    `:=`(
+      rep_var_lag = shift(rep_var),
+      rep_var_lead = shift(rep_var, type = "lead")
+    ),
+    by = by
   ]
 
   # Create linking factors (growth values)
   dt[,
-     `:=`(
-       # linking factors back
-       fwd = (!is.na(rep_var)
-              & !is.na(rep_var_lag)
-              & n != 1) * (rep_var / rep_var_lag),
-       # linking factors forward
-       bck = (!is.na(rep_var)
-              & !is.na(rep_var_lead)
-              & n != .N) * (rep_var / rep_var_lead)
-     ),
-     by = by
+    `:=`(
+      # linking factors back
+      fwd = (!is.na(rep_var) &
+        !is.na(rep_var_lag) &
+        n != 1) * (rep_var / rep_var_lag),
+      # linking factors forward
+      bck = (!is.na(rep_var) &
+        !is.na(rep_var_lead) &
+        n != .N) * (rep_var / rep_var_lead)
+    ),
+    by = by
   ]
 
   # Chain forwards
@@ -138,27 +144,29 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = 'country_
   dt[, new_var := chain_backwards(.SD), by = by]
 
   # Set new name
-  data.table::setnames(dt, 'new_var', new_name)
+  data.table::setnames(dt, "new_var", new_name)
 
   # Remove temporary columns
-  dt <- dt[, !c('fwd', 'bck', 'rep_var', 'rep_var_lag',
-              'rep_var_lead', 'all_na', 'n')]
+  dt <- dt[, !c(
+    "fwd", "bck", "rep_var", "rep_var_lag",
+    "rep_var_lead", "all_na", "n"
+  )]
 
   return(dt)
-
 }
 
 #' chain_forwards
 #' @param dt data.table: A country-level data.table.
 #' @noRd
-chain_forwards <- function(dt){
+chain_forwards <- function(dt) {
   n <- nrow(dt)
   for (i in seq(2, n)) {
     dt$new_var[i] <-
       data.table::fifelse( #
         is.na(dt$new_var[i]) & !is.na(dt$rep_var[i]) & !is.na(dt$fwd[i]),
         dt$new_var[i - 1] * dt$fwd[i],
-        dt$new_var[i])
+        dt$new_var[i]
+      )
   }
   return(dt$new_var)
 }
@@ -166,7 +174,7 @@ chain_forwards <- function(dt){
 #' chain_backwards
 #' @param dt data.table: A country-level data.table.
 #' @noRd
-chain_backwards <- function(dt){
+chain_backwards <- function(dt) {
   n <- nrow(dt)
   data.table::setorder(dt, -year)
   for (i in seq(2, n)) {
@@ -174,10 +182,9 @@ chain_backwards <- function(dt){
       data.table::fifelse(
         is.na(dt$new_var[i]) & !is.na(dt$rep_var[i]) & !is.na(dt$bck[i]),
         dt$new_var[i - 1] * dt$bck[i],
-        dt$new_var[i])
+        dt$new_var[i]
+      )
   }
   data.table::setorder(dt, year)
   return(dt$new_var)
 }
-
-

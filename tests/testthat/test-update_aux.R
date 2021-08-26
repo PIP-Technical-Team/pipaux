@@ -8,5 +8,4 @@ test_that("aux data is up to date", {
     z <- get(lf[i])
     expect_false(suppressWarnings(z(action = "update")))
   }
-
 })
