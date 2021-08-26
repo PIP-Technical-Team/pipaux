@@ -14,3 +14,4 @@ pip_aux_labels(x, measure)
 \description{
 pip_aux_labels
 }
+\keyword{internal}

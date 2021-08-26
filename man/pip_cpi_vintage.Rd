@@ -20,3 +20,4 @@ pip_cpi_vintage(
 \description{
 Check CPI Vintage
 }
+\keyword{internal}

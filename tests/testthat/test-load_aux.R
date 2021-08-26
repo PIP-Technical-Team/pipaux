@@ -10,5 +10,4 @@ test_that("data loads", {
   }
 
   purrr::walk(lf, laux)
-
 })

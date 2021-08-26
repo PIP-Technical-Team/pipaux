@@ -6,7 +6,7 @@
 #' @param pfw_id character: CPI and PPP ID. Extracted from `pip_cpi_update()`
 #' "icp2011".
 #'
-#' @export
+#' @keywords internal
 pip_pfw_clean <- function(y, pfw_id) {
   x <- data.table::as.data.table(y)
 
@@ -15,14 +15,16 @@ pip_pfw_clean <- function(y, pfw_id) {
 
   # change variable names
   old_var <-
-    c("region",
+    c(
+      "region",
       "reg_pcn",
       "code",
       "ref_year",
       "survname",
-      'comparability',
-      'datatype',
-      'rep_year')
+      "comparability",
+      "datatype",
+      "rep_year"
+    )
 
   new_var <-
     c(
@@ -31,18 +33,20 @@ pip_pfw_clean <- function(y, pfw_id) {
       "country_code",
       "survey_year",
       "survey_acronym",
-      'survey_comparability',
-      'welfare_type',
-      'reporting_year'
+      "survey_comparability",
+      "welfare_type",
+      "reporting_year"
     )
 
   setnames(x,
-           old = old_var,
-           new = new_var)
+    old = old_var,
+    new = new_var
+  )
 
   # Recode some variables
 
-  x[,
+  x[
+    ,
     `:=`(
       # Recode survey coverage
       survey_coverage = fcase(
@@ -57,18 +61,17 @@ pip_pfw_clean <- function(y, pfw_id) {
         grepl("[Cc]", welfare_type), "consumption",
         default = ""
       ),
-      surveyid_year  = as.integer(surveyid_year)
+      surveyid_year = as.integer(surveyid_year)
     )
   ]
 
 
   # Create Price Framework ID
-  x[,
+  x[
+    ,
     pfw_id := (pfw_id)
-    ]
-  x <- unique(x)  # remove duplicates
+  ]
+  x <- unique(x) # remove duplicates
   data.table::setDT(x)
   return(x)
 }
-
-

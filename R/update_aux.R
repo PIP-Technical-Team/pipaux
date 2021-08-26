@@ -3,25 +3,22 @@
 #' @inheritParams pip_prices
 #' @param ... Arguments of any of the pip_* functions for updating data.
 #' @export
-update_aux <- function(measure  = NULL,
-                      ...
-                      ){
+update_aux <- function(measure = NULL,
+                       ...) {
 
   # verify measure is provided
   if (is.null(measure)) {
-
     rlang::abort(c(
       "`measure` must be defined, as it does not have default value",
       i = "make sure `measure` is not NULL."
     ),
     class = "pipaux_error"
     )
-
   }
 
   # check arguments
-  al <- list(...)  # Arguments List
-  an <- names(al)  # arguments names
+  al <- list(...) # Arguments List
+  an <- names(al) # arguments names
 
   if (!any(an == "maindir")) {
     al["maindir"] <- getOption("pipaux.maindir")
@@ -33,6 +30,4 @@ update_aux <- function(measure  = NULL,
 
   rs <- do.call(fun_name, c(action = "update", al))
   return(invisible(rs))
-
 }
-

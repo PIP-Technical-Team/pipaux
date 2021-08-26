@@ -20,3 +20,4 @@ pip_pop_update(
 \description{
 Update POP
 }
+\keyword{internal}

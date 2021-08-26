@@ -6,7 +6,7 @@
 #' @inheritParams pip_prices
 #' @param msrdir character: Directory where the data and data signature will be saved.
 #' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is also saved.
-#' @export
+#' @keywords internal
 pip_sign_save <- function(x,
                           measure,
                           msrdir,
@@ -14,16 +14,15 @@ pip_sign_save <- function(x,
                           save_dta = TRUE) {
 
   # Note: clean CPI data file and then create data signature
-  ds_dlw <- digest::digest(x,  algo = "xxhash64") # Data signature of file
+  ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
 
   # check signature of current fst file
-  ds_production_path <- paste0(msrdir, measure, "_datasignature.txt")  # data signature in production
+  ds_production_path <- paste0(msrdir, measure, "_datasignature.txt") # data signature in production
 
   if (file.exists(ds_production_path)) {
 
     # read data signature in production
     ds_production <- readr::read_lines(ds_production_path)[[1]]
-
   } else {
 
     # fake signature
@@ -45,44 +44,46 @@ pip_sign_save <- function(x,
     time <- format(Sys.time(), "%Y%m%d%H%M%S") # find a way to account for time zones
 
     attr(x, "datetime") <- time
-    fst::write_fst(x = x,
-                   path = paste0(msrdir, measure, ".fst")
-                  )
+    fst::write_fst(
+      x = x,
+      path = paste0(msrdir, measure, ".fst")
+    )
     if (save_dta) {
-      haven::write_dta(data = x,
-                       path = paste0(msrdir, measure, ".dta")
+      haven::write_dta(
+        data = x,
+        path = paste0(msrdir, measure, ".dta")
       )
     }
 
-    fst::write_fst(x = x,
-                   path = paste0(msrdir, "_vintage/", measure, "_", time,".fst")
+    fst::write_fst(
+      x = x,
+      path = paste0(msrdir, "_vintage/", measure, "_", time, ".fst")
     )
     if (save_dta) {
-      haven::write_dta(data = x,
-                       path = paste0(msrdir, "_vintage/", measure, "_", time,".dta")
+      haven::write_dta(
+        data = x,
+        path = paste0(msrdir, "_vintage/", measure, "_", time, ".dta")
       )
     }
 
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
 
-    readr::write_lines(x    = ds_dlw,
-                       file = ds_production_path)
+    readr::write_lines(
+      x = ds_dlw,
+      file = ds_production_path
+    )
 
-    infmsg <- paste("Data signature has changed, it was not found,",
-                    "or update was forced.\n",
-                    paste0("`", measure, ".fst` has been updated")
+    infmsg <- paste(
+      "Data signature has changed, it was not found,",
+      "or update was forced.\n",
+      paste0("`", measure, ".fst` has been updated")
     )
 
     rlang::inform(infmsg)
     return(invisible(TRUE))
-
   } else {
-
     rlang::inform("Data signature is up to date.\nNo update performed")
     return(invisible(FALSE))
-
   }
-
 }
-

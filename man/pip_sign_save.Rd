@@ -20,3 +20,4 @@ pip_sign_save(x, measure, msrdir, force, save_dta = TRUE)
 \description{
 Save PIP auxiliary data with data signature.
 }
+\keyword{internal}
