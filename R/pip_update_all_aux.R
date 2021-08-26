@@ -10,6 +10,16 @@ pip_update_all_aux <- function(force = FALSE,
   # List of countries in WDI
   pip_country_list(force = force, maindir = maindir)
 
+  # PIP countries and regions
+  pip_countries(force = force, maindir = maindir)
+  pip_regions(force = force, maindir = maindir)
+
+  # PIP Indicators
+  pip_indicators(force = force, maindir = maindir)
+
+  # Poverty lines
+  pip_pl(force = force, maindir = maindir)
+
   # PFW, CPI and PPP from DLW
   pip_pfw(force = force, maindir = maindir)
   pip_cpi(force = force, maindir = maindir)
@@ -28,6 +38,9 @@ pip_update_all_aux <- function(force = FALSE,
 
   # Country profiles (from Poverty GP)
   pip_cp(force = force, maindir = maindir)
+
+  # Survey metadata (from Poverty GP)
+  pip_metadata(force = force, maindir = maindir)
 
   return(invisible())
 }
