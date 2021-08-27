@@ -2,7 +2,7 @@
 #'
 #' @inheritParams pip_prices
 #' @keywords internal
-pip_pfw_update <- function(maindir = getOption("pipaux.maindir"),
+pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                            dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                            force = FALSE) {
   measure <- "pfw"

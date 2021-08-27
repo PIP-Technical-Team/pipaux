@@ -10,7 +10,7 @@ pip_gdp <- function(action = "update",
                     maddison_action = "load",
                     weo_action = "load",
                     force = FALSE,
-                    maindir = getOption("pipaux.maindir")) {
+                    maindir = gls$PIP_DATA_DIR) {
   measure <- "gdp"
 
   # Update Maddison Project Data

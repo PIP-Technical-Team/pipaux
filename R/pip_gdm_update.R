@@ -5,7 +5,7 @@
 #' @inheritParams pip_gdm
 #' @keywords internal
 pip_gdm_update <- function(force = FALSE,
-                           maindir = getOption("pipaux.maindir"),
+                           maindir = gls$PIP_DATA_DIR,
                            pcndir = getOption("pipaux.pcndir")) {
 
   # ---- Load needed datasets ----

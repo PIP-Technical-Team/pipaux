@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_prices
 #' @keywords internal
-pip_cp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
+pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   files <- list.files(paste0(maindir, "_aux/cp"),
     pattern = "indicator_values_country",
     full.names = TRUE

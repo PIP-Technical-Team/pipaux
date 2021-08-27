@@ -9,7 +9,7 @@ NULL
 #' @import data.table
 pip_pop_update <-  function(force   = FALSE,
                             src     = c("emi", "wdi"),
-                            maindir = getOption("pipaux.maindir")) {
+                            maindir = gls$PIP_DATA_DIR) {
 
     cl <- pip_country_list("load", maindir = maindir)
 

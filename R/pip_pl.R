@@ -10,7 +10,7 @@ pip_pl <- function(action = "update",
                    force = FALSE,
                    pl_default = "1.9",
                    pl_visible = c("1.9", "3.2", "5.5"),
-                   maindir = getOption("pipaux.maindir")) {
+                   maindir = gls$PIP_DATA_DIR) {
   measure <- "pl"
   msrdir <- paste0(maindir, "_aux/", measure, "/")
 

@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_gdp
 #' @keywords intenal
-pip_gdp_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
+pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   #----------------------------------------------------------
   #   Load data

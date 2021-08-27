@@ -4,7 +4,7 @@
 #' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @export
 load_aux <- function(measure = NULL,
-                     maindir = getOption("pipaux.maindir"),
+                     maindir = gls$PIP_DATA_DIR,
                      apply_label = TRUE) {
   msrdir <- paste0(maindir, "_aux/", measure, "/")
 

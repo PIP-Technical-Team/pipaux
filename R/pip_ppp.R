@@ -6,7 +6,7 @@
 #' @export
 #' @import data.table
 pip_ppp <- function(action = "update",
-                    maindir = getOption("pipaux.maindir"),
+                    maindir = gls$PIP_DATA_DIR,
                     dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                     force = FALSE) {
   pip_prices(

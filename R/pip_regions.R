@@ -6,7 +6,7 @@
 #' @export
 pip_regions <- function(action = "update",
                         force = FALSE,
-                        maindir = getOption("pipaux.maindir")) {
+                        maindir = gls$PIP_DATA_DIR) {
   measure <- "regions"
   msrdir <- paste0(maindir, "_aux/", measure, "/")
 

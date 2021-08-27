@@ -13,7 +13,7 @@
 #' @import data.table
 pip_prices <- function(measure = NULL,
                        action = "update",
-                       maindir = getOption("pipaux.maindir"),
+                       maindir = gls$PIP_DATA_DIR,
                        dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                        force = FALSE) {
 

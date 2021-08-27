@@ -5,7 +5,7 @@
 #' @export
 pip_update_all_aux <- function(force = FALSE,
                                popsrc = getOption("pipaux.popsrc"),
-                               maindir = getOption("pipaux.maindir")) {
+                               maindir = gls$PIP_DATA_DIR) {
 
   # List of countries in WDI
   pip_country_list(force = force, maindir = maindir)
