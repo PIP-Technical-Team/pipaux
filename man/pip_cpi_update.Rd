@@ -20,3 +20,4 @@ pip_cpi_update(
 \description{
 Update CPI
 }
+\keyword{internal}

@@ -7,7 +7,7 @@
 pip_country_list(
   action = "update",
   force = FALSE,
-  pcndir = getOption("pipaux.pcnsrc"),
+  pcndir = getOption("pipaux.pcndir"),
   maindir = getOption("pipaux.maindir")
 )
 }
@@ -16,6 +16,8 @@ pip_country_list(
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
+
+\item{pcndir}{character: PovcalNet directory for the Masterfile.}
 
 \item{maindir}{character: Main directory of project.}
 }

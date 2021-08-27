@@ -10,7 +10,7 @@ Authors@R: c(
                    family = "Fujs",
                    role = c("aut"),
                    email = "tfujs@worldbank.org"),
-            person(given = "R.Aleksander",
+            person(given = "Aleksander",
                    family = "Eilertsen",
                    role = c("aut"),
                    email = "aeilertsen@worldbank.org")
@@ -40,5 +40,7 @@ Imports:
     janitor,
     fs,
     magrittr,
-    readxl
+    readxl,
+    dplyr,
+    cli
 VignetteBuilder: knitr

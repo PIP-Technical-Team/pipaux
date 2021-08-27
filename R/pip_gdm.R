@@ -13,25 +13,21 @@
 #' @param pcndir character: PovcalNet Masterfile directory.
 #' @export
 pip_gdm <- function(action = "update",
-                    force  = FALSE,
+                    force = FALSE,
                     pcndir = getOption("pipaux.pcndir"),
                     maindir = getOption("pipaux.maindir")) {
-
   measure <- "gdm"
 
   if (action == "update") {
-
     pip_gdm_update(force = force, maindir = maindir, pcndir = pcndir)
-
   } else if (action == "load") {
-
-    df <- load_aux(maindir  = maindir,
-                   measure = measure)
+    df <- load_aux(
+      maindir = maindir,
+      measure = measure
+    )
     return(df)
-
-
   } else {
-    msg <- paste("action `", action,"` is not a valid action.")
+    msg <- paste("action `", action, "` is not a valid action.")
     rlang::abort(c(
       msg,
       i = "make sure you select `update` or `load`"
@@ -39,5 +35,4 @@ pip_gdm <- function(action = "update",
     class = "pipaux_error"
     )
   }
-
 }

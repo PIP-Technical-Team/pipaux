@@ -4,7 +4,7 @@
 # pipaux
 
 <!-- badges: start -->
-
+[![R-CMD-check](https://github.com/PIP-Technical-Team/pipaux/workflows/R-CMD-check/badge.svg)](https://github.com/PIP-Technical-Team/pipaux/actions?workflow=R-CMD-check)
 <!-- badges: end -->
 
 `pipaux` manages the auxiliary data used in the PIP workflow. It

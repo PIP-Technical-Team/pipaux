@@ -1,7 +1,5 @@
-context("all datasets load fine")
-
 test_that("data loads", {
-
+  skip_on_ci()
   lf <- lsf.str("package:pipaux", pattern = "^pip_[a-z]{3}$")
   lf <- as.character(lf)
 
@@ -12,5 +10,4 @@ test_that("data loads", {
   }
 
   purrr::walk(lf, laux)
-
 })

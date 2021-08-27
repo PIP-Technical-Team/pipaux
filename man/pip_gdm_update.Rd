@@ -20,3 +20,4 @@ pip_gdm_update(
 \description{
 Update GDM data using the PovcalNet Masterfile.
 }
+\keyword{internal}

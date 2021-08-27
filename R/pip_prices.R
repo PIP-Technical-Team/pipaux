@@ -11,12 +11,11 @@
 #'
 #' @export
 #' @import data.table
-pip_prices <- function(measure  = NULL,
-                       action   = "update",
-                       maindir  = getOption("pipaux.maindir"),
-                       dlwdir   = getOption("pipaux.dlwdir"),
-                       force    = FALSE
-){
+pip_prices <- function(measure = NULL,
+                       action = "update",
+                       maindir = getOption("pipaux.maindir"),
+                       dlwdir = getOption("pipaux.dlwdir"),
+                       force = FALSE) {
 
 
   #----------------------------------------------------------
@@ -31,14 +30,14 @@ pip_prices <- function(measure  = NULL,
       "`action` should be length 1",
       x = paste0("`action` is length ", length(action))
     ),
-    class = "pipaux_error")
-
+    class = "pipaux_error"
+    )
   }
 
   # proper options
   action_options <- c("load", "update")
 
-  if (!(action  %in% action_options)) {
+  if (!(action %in% action_options)) {
     action_options <- paste("`", action_options, "`", sep = "")
     msg <- paste("`action` should be", last_item(action_options, "or"))
 
@@ -48,7 +47,6 @@ pip_prices <- function(measure  = NULL,
     ),
     class = "pipaux_error"
     )
-
   }
 
 
@@ -65,31 +63,33 @@ pip_prices <- function(measure  = NULL,
 
   #--------- load ---------
   if (action == "load") {
-    df <- load_aux(maindir  = maindir,
-                   measure = measure)
+    df <- load_aux(
+      maindir = maindir,
+      measure = measure
+    )
     return(df)
   }
 
   #--------- update ---------
   if (action == "update") {
-
     if (measure == "cpi") {
-
-      pip_cpi_update(maindir = maindir,
-                     dlwdir = dlwdir,
-                     force  = force)
-
+      pip_cpi_update(
+        maindir = maindir,
+        dlwdir = dlwdir,
+        force = force
+      )
     } else if (measure == "ppp") {
-
-      pip_ppp_update(maindir = maindir,
-                     dlwdir = dlwdir,
-                     force  = force)
-
+      pip_ppp_update(
+        maindir = maindir,
+        dlwdir = dlwdir,
+        force = force
+      )
     } else if (measure == "pfw") {
-
-      pip_pfw_update(maindir = maindir,
-                     dlwdir = dlwdir,
-                     force  = force)
+      pip_pfw_update(
+        maindir = maindir,
+        dlwdir = dlwdir,
+        force = force
+      )
     } else {
       rlang::abort(c(
         "The measure selected is not a valid name",
@@ -100,6 +100,4 @@ pip_prices <- function(measure  = NULL,
       )
     }
   } # end of update
-
 } # end of pip_prices function
-

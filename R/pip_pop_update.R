@@ -5,12 +5,10 @@ NULL
 #'
 #' @param src character: Source for population data.
 #' @inheritParams pip_prices
-#' @export
+#' @keywords internal
 #' @import data.table
-pip_pop_update <- function(force = FALSE,
-                           src = c("emi", "wdi", "internal", "decdg"),
-                           maindir = getOption("pipaux.maindir")
-                           ) {
+pip_pop_update <- function(force = FALSE, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
+  cl <- pip_country_list("load", maindir = maindir)
 
   # Check arguments
   src <- match.arg(src)
@@ -24,10 +22,7 @@ pip_pop_update <- function(force = FALSE,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   if (src == "wdi") {
-
-    codes <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
-    pop <- purrr::map_df(codes, ~{
-
+    pop <- purrr::map_df(codes, ~ {
       df <- wbstats::wb_data(indicator = .x, lang = "en")
       colnames(df)[colnames(df) == .x] <- "pop"
       df$coverage <- .x
@@ -38,24 +33,20 @@ pip_pop_update <- function(force = FALSE,
     setDT(pop)
 
     # data level
-    pop[,
-        pop_data_level :=
-          fcase(
-            grepl("POP", coverage), 2,
-            grepl("RUR", coverage), 0,
-            grepl("URB", coverage), 1
-          )
+    pop[
+      ,
+      pop_data_level :=
+        fcase(
+          grepl("POP", coverage), 2,
+          grepl("RUR", coverage), 0,
+          grepl("URB", coverage), 1
+        )
     ]
     setnames(pop,
-             old = c("iso3c", "date"),
-             new = c("country_code", "year"))
-
-  } else if (src %in% c("emi", "internal", "decdg")) {
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# From Internal DECDG   ---------
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+      old = c("iso3c", "date"),
+      new = c("country_code", "year")
+    )
+  } else if (src == "emi") {
 
     # Load main data file from Emi
 
@@ -100,9 +91,9 @@ pip_pop_update <- function(force = FALSE,
     pop_path <- paste0(pip_pop_dir, pop_latest)
 
     # Load data
-    pop_main             <- suppressMessages(
-                            readxl::read_xlsx(pop_path, sheet = "Sheet1")
-                            )
+    pop_main <- suppressMessages(
+      readxl::read_xlsx(pop_path, sheet = "Sheet1")
+    )
     names(pop_main)[1:4] <- as.character(pop_main[2, 1:4])
     pop_main             <- pop_main[-c(1:2), ]
     year_vars            <- names(pop_main[, 6:ncol(pop_main)])
@@ -110,21 +101,16 @@ pip_pop_update <- function(force = FALSE,
     pop_main$Time_Name   <- NULL
 
     # Reshape to long format
-    data.table::setDT(pop_main)
-
-    pop_long <-
-      data.table::melt(data          = pop_main,
-                       id.vars       = c("Country", "Series"),
-                       measure.vars  = year_vars,
-                       variable.name = "Year",
-                       value.name    = "Population")
-    pop_long[,
-             `:=`(
-                 Year       = as.character(Year),
-                 Population = as.numeric(Population)
-               )
-             ]
-
+    pop_long <- pop_main %>%
+      data.table::setDT() %>%
+      data.table::melt(
+        id.vars = c("Country", "Series"),
+        measure.vars = year_vars,
+        variable.name = "Year",
+        value.name = "Population"
+      )
+    pop_long$Year <- as.character(pop_long$Year)
+    pop_long$Population <- as.numeric(pop_long$Population)
 
     # Merge with special country data
     # Note for PSE, KWT and SXM, some years of population data are missing in Emi's
@@ -158,20 +144,22 @@ pip_pop_update <- function(force = FALSE,
     data.table::setDT(pop_merge)
 
     # Create data_level column
-    pop_merge[,
-        pop_data_level :=
-          fcase(
-            grepl("POP", Series), 2,
-            grepl("RUR", Series), 0,
-            grepl("URB", Series), 1
-          )
+    pop_merge[
+      ,
+      pop_data_level :=
+        fcase(
+          grepl("POP", Series), 2,
+          grepl("RUR", Series), 0,
+          grepl("URB", Series), 1
+        )
     ]
 
     # Set colnames
     setnames(
       pop_merge,
       old = c("Country", "Year", "Population"),
-      new = c("country_code", "year", "pop"))
+      new = c("country_code", "year", "pop")
+    )
     pop_merge$Series <- NULL
     pop <- pop_merge
 
@@ -183,9 +171,8 @@ pip_pop_update <- function(force = FALSE,
 
     # Remove rows w/ missing pop values
     pop <- pop[!is.na(pop)]
-
   } else {
-    msg <- paste("src `", src,"` is not a valid source.")
+    msg <- paste("src `", src, "` is not a valid source.")
     rlang::abort(c(
       msg,
       i = "make sure you select `wdi` or `emi`"
@@ -206,15 +193,16 @@ pip_pop_update <- function(force = FALSE,
   # recode domain and data_level variables
   cols <- c("pop_domain", "pop_data_level")
   pop[,
-      (cols) := lapply(.SD, as.character),
-      .SDcols = cols
-  ][,# recode domain
+    (cols) := lapply(.SD, as.character),
+    .SDcols = cols
+  ][
+    , # recode domain
     pop_domain := fcase(
       pop_domain == "1", "national",
       pop_domain == "2", "urban/rural",
       pop_domain == "3", "subnational region"
     )
-  ][   # Recode data_level only for those that are national or urban/rural
+  ][ # Recode data_level only for those that are national or urban/rural
     pop_domain %in% c("national", "urban/rural"),
     pop_data_level := fcase(
       pop_data_level == "0", "rural",
@@ -237,4 +225,4 @@ pip_pop_update <- function(force = FALSE,
                 msrdir  = msrdir,
                 force   = force)
 }
-
+}

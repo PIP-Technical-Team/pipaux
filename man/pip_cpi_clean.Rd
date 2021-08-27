@@ -17,3 +17,4 @@ pip_cpi_clean(y, cpi_id, cpivar = getOption("pipaux.cpivar"))
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.
 }
+\keyword{internal}

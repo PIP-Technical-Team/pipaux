@@ -15,3 +15,4 @@ pip_pfw_clean(y, pfw_id)
 \description{
 Clean PFW data from Datalibweb to meet PIP protocols.
 }
+\keyword{internal}

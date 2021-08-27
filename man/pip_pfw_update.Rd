@@ -20,3 +20,4 @@ pip_pfw_update(
 \description{
 Update PFW
 }
+\keyword{internal}
