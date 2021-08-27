@@ -7,7 +7,7 @@
 #' @import data.table
 pip_pfw <- function(action = "update",
                     maindir = getOption("pipaux.maindir"),
-                    dlwdir = getOption("pipaux.dlwdir"),
+                    dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                     force = FALSE) {
   pip_prices(
     measure = "pfw",

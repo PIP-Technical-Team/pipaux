@@ -3,7 +3,7 @@
 #' @inheritParams pip_prices
 #' @keywords internal
 pip_ppp_update <- function(maindir = getOption("pipaux.maindir"),
-                           dlwdir = getOption("pipaux.dlwdir"),
+                           dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                            force = FALSE) {
   measure <- "ppp"
   msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
