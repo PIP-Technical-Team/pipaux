@@ -1,3 +1,14 @@
+
+
+root_dir  = Sys.getenv("PIP_ROOT_DIR")
+if (root_dir != "") {
+  # globals
+  gls <- pipload::pip_create_globals(root_dir)
+} else {
+  delayedAssign("gls", pipload::pip_create_globals(root_dir))
+}
+
+
 pipuax_default_options <- list(
   pipaux.dlwdir  = "//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/",
   pipaux.maindir = "//w1wbgencifs01/pip/PIP-Data_QA/",
@@ -14,5 +25,9 @@ pipuax_default_options <- list(
   toset <- !(names(pipuax_default_options) %in% names(op))
   if (any(toset)) options(pipuax_default_options[toset])
 
+  assign('gls', gls, envir = topenv())
+
   invisible()
 }
+
+# maindir          = pip_create_globals(root_dir)$PIP_DATA_DIR

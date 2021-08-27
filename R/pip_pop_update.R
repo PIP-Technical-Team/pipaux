@@ -7,8 +7,11 @@ NULL
 #' @inheritParams pip_prices
 #' @keywords internal
 #' @import data.table
-pip_pop_update <- function(force = FALSE, src = c("emi", "wdi"), maindir = getOption("pipaux.maindir")) {
-  cl <- pip_country_list("load", maindir = maindir)
+pip_pop_update <-  function(force   = FALSE,
+                            src     = c("emi", "wdi"),
+                            maindir = getOption("pipaux.maindir")) {
+
+    cl <- pip_country_list("load", maindir = maindir)
 
   # Check arguments
   src <- match.arg(src)
@@ -224,5 +227,4 @@ pip_pop_update <- function(force = FALSE, src = c("emi", "wdi"), maindir = getOp
                 measure = "pop",
                 msrdir  = msrdir,
                 force   = force)
-}
 }

@@ -42,5 +42,6 @@ Imports:
     magrittr,
     readxl,
     dplyr,
-    cli
+    cli,
+    pipload
 VignetteBuilder: knitr
