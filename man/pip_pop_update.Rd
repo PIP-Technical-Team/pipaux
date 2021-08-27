@@ -7,7 +7,7 @@
 pip_pop_update(
   force = FALSE,
   src = c("emi", "wdi"),
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

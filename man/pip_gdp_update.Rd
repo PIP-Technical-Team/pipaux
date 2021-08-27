@@ -4,7 +4,7 @@
 \alias{pip_gdp_update}
 \title{Update GDP}
 \usage{
-pip_gdp_update(force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_gdp_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}

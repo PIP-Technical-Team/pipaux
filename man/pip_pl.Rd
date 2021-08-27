@@ -9,7 +9,7 @@ pip_pl(
   force = FALSE,
   pl_default = "1.9",
   pl_visible = c("1.9", "3.2", "5.5"),
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

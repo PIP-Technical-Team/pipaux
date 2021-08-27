@@ -4,7 +4,7 @@
 \alias{pip_cp}
 \title{Country Profiles}
 \usage{
-pip_cp(action = "update", force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_cp(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If

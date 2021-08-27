@@ -8,7 +8,7 @@ pip_country_list(
   action = "update",
   force = FALSE,
   pcndir = getOption("pipaux.pcndir"),
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

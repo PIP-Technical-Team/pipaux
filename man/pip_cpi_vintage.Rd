@@ -6,7 +6,7 @@
 \usage{
 pip_cpi_vintage(
   msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
-  dlwdir = getOption("pipaux.dlwdir"),
+  dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
   force = FALSE
 )
 }
