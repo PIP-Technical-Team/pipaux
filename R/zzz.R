@@ -18,14 +18,11 @@ if (root_dir != "") {
 
 
 pipuax_default_options <- list(
-  pipaux.dlwdir  = "//wbgfscifs01/GPWG-GMD/Datalib/GMD-DLW/Support/Support_2005_CPI/",
-  pipaux.maindir = "//w1wbgencifs01/pip/PIP-Data_QA/",
   pipaux.cpivar  = "cpi2011",
   pipaux.pppvar  = "icp2011",
   pipaux.pppyear = 2011,
   pipaux.popsrc  = "emi",
-  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
-  pipaux.pcndir  = "//wbntpcifs/povcalnet/01.PovcalNet/00.Master/02.vintage/"
+  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta"
 )
 
 .onLoad <- function(libname, pkgname) {
@@ -38,4 +35,4 @@ pipuax_default_options <- list(
   invisible()
 }
 
-# maindir          = pip_create_globals(root_dir)$PIP_DATA_DIR
+
