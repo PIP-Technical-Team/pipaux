@@ -6,8 +6,8 @@
 \usage{
 pip_cpi(
   action = "update",
-  maindir = getOption("pipaux.maindir"),
-  dlwdir = getOption("pipaux.dlwdir"),
+  maindir = gls$PIP_DATA_DIR,
+  dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
   force = FALSE
 )
 }

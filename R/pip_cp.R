@@ -6,7 +6,7 @@
 #' @export
 pip_cp <- function(action = "update",
                    force = FALSE,
-                   maindir = getOption("pipaux.maindir")) {
+                   maindir = gls$PIP_DATA_DIR) {
   if (action == "update") {
     pip_cp_update(force = force, maindir = maindir)
   } else if (action == "load") {

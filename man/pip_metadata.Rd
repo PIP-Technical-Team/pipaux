@@ -4,11 +4,7 @@
 \alias{pip_metadata}
 \title{PIP Survey Metadata}
 \usage{
-pip_metadata(
-  action = "update",
-  force = FALSE,
-  maindir = getOption("pipaux.maindir")
-)
+pip_metadata(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If

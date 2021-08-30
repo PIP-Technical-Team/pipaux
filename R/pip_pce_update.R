@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_prices
 #' @keywords internal
-pip_pce_update <- function(force = FALSE, maindir = getOption("pipaux.maindir")) {
+pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   # ---- Load data ----
 

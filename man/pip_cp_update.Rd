@@ -4,7 +4,7 @@
 \alias{pip_cp_update}
 \title{Update Country Profiles}
 \usage{
-pip_cp_update(force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_cp_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}

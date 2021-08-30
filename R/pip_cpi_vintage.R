@@ -5,8 +5,8 @@
 #' @param force logical: If TRUE force update of veintage level 1.
 #'
 #' @keywords internal
-pip_cpi_vintage <- function(msrdir = paste0(getOption("pipaux.maindir"), "_aux/", measure, "/"),
-                            dlwdir = getOption("pipaux.dlwdir"),
+pip_cpi_vintage <- function(msrdir = paste0(gls$PIP_DATA_DIR, "_aux/", measure, "/"),
+                            dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                             force = FALSE) {
   time <- format(Sys.time(), "%Y%m%d%H%M%S") # find a way to account for time zones
   measure <- "cpi"

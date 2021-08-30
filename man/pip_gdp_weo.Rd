@@ -4,11 +4,7 @@
 \alias{pip_gdp_weo}
 \title{Fetch GDP data from WEO}
 \usage{
-pip_gdp_weo(
-  action = "update",
-  force = FALSE,
-  maindir = getOption("pipaux.maindir")
-)
+pip_gdp_weo(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If

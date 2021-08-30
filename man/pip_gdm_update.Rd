@@ -6,7 +6,7 @@
 \usage{
 pip_gdm_update(
   force = FALSE,
-  maindir = getOption("pipaux.maindir"),
+  maindir = gls$PIP_DATA_DIR,
   pcndir = getOption("pipaux.pcndir")
 )
 }

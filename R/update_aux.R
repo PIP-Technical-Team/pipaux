@@ -21,7 +21,7 @@ update_aux <- function(measure = NULL,
   an <- names(al) # arguments names
 
   if (!any(an == "maindir")) {
-    al["maindir"] <- getOption("pipaux.maindir")
+    al["maindir"] <- gls$PIP_DATA_DIR
   }
 
 

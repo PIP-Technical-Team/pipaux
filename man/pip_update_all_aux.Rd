@@ -7,7 +7,7 @@
 pip_update_all_aux(
   force = FALSE,
   popsrc = getOption("pipaux.popsrc"),
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

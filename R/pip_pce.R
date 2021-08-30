@@ -6,7 +6,7 @@
 #' @export
 pip_pce <- function(action = "update",
                     force = FALSE,
-                    maindir = getOption("pipaux.maindir")) {
+                    maindir = gls$PIP_DATA_DIR) {
   measure <- "pce"
 
   if (action == "update") {

@@ -9,7 +9,7 @@ pip_gdp(
   maddison_action = "load",
   weo_action = "load",
   force = FALSE,
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

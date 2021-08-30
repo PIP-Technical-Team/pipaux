@@ -2,8 +2,8 @@
 #'
 #' @inheritParams pip_prices
 #' @keywords internal
-pip_cpi_update <- function(maindir = getOption("pipaux.maindir"),
-                           dlwdir = getOption("pipaux.dlwdir"),
+pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
+                           dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                            force = FALSE) {
   measure <- "cpi"
   msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir

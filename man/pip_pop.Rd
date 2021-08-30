@@ -8,7 +8,7 @@ pip_pop(
   action = "update",
   force = FALSE,
   src = getOption("pipaux.popsrc"),
-  maindir = getOption("pipaux.maindir")
+  maindir = gls$PIP_DATA_DIR
 )
 }
 \arguments{

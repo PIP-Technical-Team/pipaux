@@ -4,7 +4,7 @@
 \alias{pip_pce_update}
 \title{Update PCE}
 \usage{
-pip_pce_update(force = FALSE, maindir = getOption("pipaux.maindir"))
+pip_pce_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}
