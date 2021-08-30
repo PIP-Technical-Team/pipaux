@@ -6,7 +6,7 @@
 #' @keywords internal
 pip_gdm_update <- function(force = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           pcndir = getOption("pipaux.pcndir")) {
+                           pcndir = gls$PCN_MASTER) {
 
   # ---- Load needed datasets ----
 

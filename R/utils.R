@@ -1,7 +1,7 @@
 #' Find latest dlw directory
 #' @noRd
 latest_dlw_dir <- function(dlwdir) {
-  dlw_dirs <- dir(getOption("pipaux.dlwdir"))
+  dlw_dirs <- dir(Sys.getenv("PIP_DLW_ROOT_DIR"))
   dt <- data.table(orig = dlw_dirs)
 
   cnames <-

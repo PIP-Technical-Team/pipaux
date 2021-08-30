@@ -13,7 +13,7 @@
 #' @export
 pip_country_list <- function(action = "update",
                              force = FALSE,
-                             pcndir = getOption("pipaux.pcndir"),
+                             pcndir = gls$PCN_MASTER,
                              maindir = gls$PIP_DATA_DIR) {
   measure <- "country_list"
   msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
