@@ -19,6 +19,12 @@ pipuax_default_options <- list(
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## defined values --------
+  # if you don't the official value in `Sys.getenv("PIP_ROOT_DIR")` you can
+  # provide the object `root_dir  <- "<you directory>"` before executing the first
+  # fucntion pipaux. In this way, object `gls`, which is a promise, will be
+  # created using with you `root_dir`. Otherwise, you can especify the complete
+  # directory path for each function.
+
 
   # current objects
   obj <-  ls(pos = ".GlobalEnv")
@@ -54,16 +60,6 @@ pipuax_default_options <- list(
                   eval.env = globalenv())
   }
 
-  # if you don't the official value in `Sys.getenv("PIP_ROOT_DIR")` you can
-  # provide the object `root_dir  <- "<you directory>"` before executing the first
-  # fucntion pipaux. In this way, object `gls`, which is a promise, will be
-  # created using with you `root_dir`. Otherwise, you can especify the complete
-  # directory path for each function.
-
-
-
-
-  # delayedAssign("gls", gls, assign.env = topenv())
 
   invisible()
 }
