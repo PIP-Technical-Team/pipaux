@@ -36,7 +36,8 @@ pipuax_default_options <- list(
   if (!("root_dir" %in% obj)) {
     root_dir  <-  Sys.getenv("PIP_ROOT_DIR")
     # root_dir  <-  Sys.getenv("PIP_ROOT_DIRfff")
-    assign('root_dir', root_dir, envir = globalenv())
+
+    # assign('root_dir', root_dir, envir = globalenv())
 
   } else {
     cli::cli_alert("object {.envvar root_dir} is already defined in
