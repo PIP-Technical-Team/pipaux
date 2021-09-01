@@ -68,6 +68,3 @@ pipuax_default_options <- list(
   invisible()
 }
 
-# Make sure each time the package is loaded it starts from the the beginning and
-# no object is preloaded
-
