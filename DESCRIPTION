@@ -43,7 +43,7 @@ Imports:
     readxl,
     dplyr,
     cli,
-    pipload (>= 0.1.4.9001)
+    pipload (>= 0.1.4.9002)
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload
