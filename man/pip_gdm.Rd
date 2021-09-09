@@ -7,7 +7,7 @@
 pip_gdm(
   action = "update",
   force = FALSE,
-  pcndir = getOption("pipaux.pcndir"),
+  pcndir = gls$PCN_MASTER,
   maindir = gls$PIP_DATA_DIR
 )
 }
