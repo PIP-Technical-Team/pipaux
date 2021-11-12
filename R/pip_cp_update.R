@@ -134,7 +134,7 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     ineq_bar =
       dl$chart4[, c(
         "country_code", "reporting_year", "welfare_type",
-        "gender", "agegroup", "education",
+        "survey_coverage", "gender", "agegroup", "education",
         "distribution", "poverty_share_by_group"
       )],
     mpm =
