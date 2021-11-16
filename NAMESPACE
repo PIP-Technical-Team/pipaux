@@ -2,6 +2,7 @@
 
 export("%>%")
 export(load_aux)
+export(pip_censoring)
 export(pip_countries)
 export(pip_country_list)
 export(pip_cp)
