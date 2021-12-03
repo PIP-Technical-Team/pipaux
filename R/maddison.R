@@ -52,7 +52,7 @@ transform_maddison <- function(df){
   )
 
   # Keep relevant variables
-  df <- df[c('country_code', 'country_name', 'mpd_gdp')]
+  df <- df[c('country_code', 'country_name', 'year' ,'mpd_gdp')]
 
   return(df)
 }
@@ -66,7 +66,7 @@ transform_maddison <- function(df){
 #' @return data.frame
 verify_output_maddison <- function(df, start_year = 1960, end_year) {
   df %>%
-    assertr::verify(assertr::has_only_names("country_code", "country_name", "mpd_gdp")) %>%
+    assertr::verify(assertr::has_only_names("country_code", "country_name", "mpd_gdp", "year")) %>%
     assertr::verify(assertr::has_class("mpd_gdp", class = "numeric")) %>%
     assertr::verify(assertr::has_class("country_code", "country_name", class = "character")) %>%
     assertr::assert(assertr::within_bounds(0, Inf, include.lower = FALSE, allow.na = FALSE), mpd_gdp) %>%
