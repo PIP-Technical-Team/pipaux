@@ -44,7 +44,8 @@ Imports:
     dplyr,
     cli,
     pipload (>= 0.1.4.9002),
-    tidyfast
+    tidyfast,
+    assertr
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload
