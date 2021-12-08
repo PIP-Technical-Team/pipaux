@@ -52,16 +52,17 @@ pip_metadata <- function(action = "update",
       merge(df,
         pfw[, c("country_code", "surveyid_year", "survey_acronym",
                 "welfare_type", "reporting_year", "distribution_type",
-                "surv_producer",
+                "surv_producer","survey_coverage", "surv_title",
                 "link")],
-        by = "link", all = FALSE
+        by = "link", all.y = TRUE
       )
 
 
     # Recode colnames
     df <- df %>%
-      data.table::setnames(c("title", "surv_producer", "coverage"),
-                           c("survey_title", "survey_conductor", "survey_coverage"))
+      data.table::setnames(c("title", "surv_producer"),
+                           c("survey_title", "survey_conductor"))
+    df$survey_title <- ifelse(is.na(df$survey_title), df$surv_title, df$survey_title)
 
     # Select columns
     df <- df[
