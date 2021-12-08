@@ -22,6 +22,7 @@ pip_pl <- function(action = "update",
     )
     df$is_default <- ifelse(df$name == pl_default, TRUE, FALSE)
     df$is_visible <- ifelse(df$name %in% pl_visible, TRUE, FALSE)
+    df$name <- ifelse(nchar(df$name) == 3, sprintf("%s0", df$name), df$name)
 
     # df <- suppressMessages(
     #   readr::read_csv(paste0(maindir, "_aux/pl/poverty_lines.csv"))
