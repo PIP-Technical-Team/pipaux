@@ -13,7 +13,8 @@ verify_input <- function(df, x){
 #' @noRd
 #' @return data.frame
 select_verify_input <- list(
-  maddison = function(...) verify_input_maddison(...)
+  maddison = function(...) verify_input_maddison(...),
+  censoring = function(...) verify_input_censoring(...)
 )
 
 #' Verify output
@@ -30,5 +31,6 @@ verify_output <- function(df, x){
 #' @noRd
 #' @return data.frame
 select_output_input <- list(
-  maddison = function(...) verify_output_maddison(...)
+  maddison = function(...) verify_output_maddison(...),
+  censoring = function(...) verify_output_censoring(...)
 )
