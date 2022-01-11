@@ -1,7 +1,7 @@
 #' Load raw censoring data
 #'
 #' @param file character: File name.
-#' @param maindir character: Main directory.
+#' @param maindir character: Main directory
 #' @return list
 #' @keywords internal
 load_censoring <- function(file, maindir){
@@ -10,7 +10,7 @@ load_censoring <- function(file, maindir){
                           msg = "File extention must be .xlsx.")
 
   mrsdir <- "censoring"
-  path <- fs::path(maindir, mrsdir, path)
+  path <- fs::path(maindir, mrsdir, file)
 
   sheets <- readxl::excel_sheets(path)
   dl <- vector("list", 2)
@@ -24,7 +24,7 @@ load_censoring <- function(file, maindir){
 
 #' Transform censoring
 #'
-#' @param dl list: Censoring object. Output of `load_censoring()`.
+#' @param dl list: Censoring object.
 #' @return list
 #' @keywords internal
 transform_censoring <- function(dl){
