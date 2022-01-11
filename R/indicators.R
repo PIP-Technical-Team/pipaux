@@ -1,18 +1,12 @@
 #' Load raw indicators data
 #'
-#' @param file character: File name.
-#' @param maindir character: Main directory.
+#' @param path character: Path.
 #' @return list
 #' @keywords internal
-load_indicators <- function(file, maindir){
-
-  assertthat::assert_that(tools::file_ext(file) == "csv",
+load_indicators <- function(path){
+  assertthat::assert_that(tools::file_ext(path) == "csv",
                           msg = "File extention must be .csv.")
-
-  mrsdir <- "indicators"
-  path <- fs::path(maindir, mrsdir, file)
   df <- suppressMessages(readr::read_csv(path))
-
   return(df)
 }
 

@@ -1,17 +1,13 @@
 #' Load raw poverty lines data
 #'
-#' @inheritParams load_raw
+#' @param path character: Path
 #' @return list
 #' @keywords internal
-load_poverty_lines <- function(file, maindir){
-
-  assertthat::assert_that(tools::file_ext(file) == "yaml",
+load_poverty_lines <- function(path){
+  assertthat::assert_that(tools::file_ext(path) == "yaml",
                           msg = "File extention must be .yaml")
-
-  mrsdir <- "pl"
-  path <- fs::path(maindir, mrsdir, file)
-  yaml::read_yaml(path)
-
+  dl <- yaml::read_yaml(path)
+  return(dl)
 }
 
 #' Transform poverty lines

@@ -1,16 +1,12 @@
 #' Load raw censoring data
 #'
-#' @param file character: File name.
-#' @param maindir character: Main directory
+#' @param path character: Path.
 #' @return list
 #' @keywords internal
-load_censoring <- function(file, maindir){
+load_censoring <- function(path){
 
-  assertthat::assert_that(tools::file_ext(file) == "xlsx",
+  assertthat::assert_that(tools::file_ext(path) == "xlsx",
                           msg = "File extention must be .xlsx.")
-
-  mrsdir <- "censoring"
-  path <- fs::path(maindir, mrsdir, file)
 
   sheets <- readxl::excel_sheets(path)
   dl <- vector("list", 2)
