@@ -10,3 +10,4 @@
 ^\.github$
 tmp/
 .vscode/
+^data-raw$
