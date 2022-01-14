@@ -1,12 +1,8 @@
-load_ppp <- function(dir, pattern = "pppdata_allvintages\\.dta$") {
-  # Get list of files
-  files <- fs::dir_ls(dir, regexp = pattern, recurse = TRUE, type = "file")
-  latest <- max(files)
-  df <- haven::read_dta(latest_ppp)
-  return(df)
-}
-
-
+#' Transform PPP
+#'
+#' @param df data.frame: PPP data from Datalibweb.
+#' @return data.table
+#' @keywords internal
 transform_ppp <- function(df) {
 
   dt <- data.table::as.data.table(df)
@@ -97,13 +93,13 @@ transform_ppp <- function(df) {
   #ppp <- ppp[country_code %in% cl$country_code]
 
   # Hardcode domain / data_level fix for NRU
-  ppp$ppp_domain <-
-    ifelse(ppp$country_code == "NRU" & is.na(ppp$ppp_domain),
-           1, ppp$ppp_domain
+  dt$ppp_domain <-
+    ifelse(dt$country_code == "NRU" & is.na(dt$ppp_domain),
+           1, dt$ppp_domain
     )
-  ppp$ppp_data_level <-
-    ifelse(ppp$country_code == "NRU" & ppp$ppp_data_level == "",
-           "national", ppp$ppp_data_level
+  dt$ppp_data_level <-
+    ifelse(dt$country_code == "NRU" & dt$ppp_data_level == "",
+           "national", dt$ppp_data_level
     )
 
 
