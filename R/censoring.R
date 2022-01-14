@@ -43,13 +43,12 @@ transform_censoring <- function(dl){
   return(dl)
 }
 
-
-#' Validate input censoring
+#' Verify input censoring
 #'
 #' @inheritParams transform_censoring
 #' @return list
 #' @keywords internal
-validate_input_censoring <- function(dl){
+verify_input_censoring <- function(dl){
 
   assertthat::assert_that(all(names(dl) == c("countries", "regions")))
 
@@ -72,13 +71,12 @@ validate_input_censoring <- function(dl){
 
 }
 
-
-#' Validate output censoring
+#' Verify output censoring
 #'
 #' @inheritParams transform_censoring
 #' @return list
 #' @keywords internal
-validate_output_censoring <- function(dl){
+verify_output_censoring <- function(dl){
 
   assertthat::assert_that(all(names(dl) == c("countries", "regions")))
 
