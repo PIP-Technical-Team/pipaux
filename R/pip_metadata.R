@@ -15,15 +15,6 @@ pip_metadata <- function(action = "update",
     # Load pfw
     pfw <- load_aux("pfw", maindir = maindir)
     pfw <- data.table::setDT(pfw)
-    pfw$link <- with(
-      pfw,
-      sprintf(
-        "%s_%s_%s",
-        country_code,
-        surveyid_year,
-        survey_acronym
-      )
-    )
 
     # Pick the latest metadata file
     files <- list.files(paste0(maindir, "_aux/metadata/"),
