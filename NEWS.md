@@ -1,3 +1,5 @@
+# pipaux (development version)
+
 # pipaux 0.0.2
 * load global variables in `gls` using `pipload::pip_create_globals()` and `pipload::add_gls_to_env()`
 

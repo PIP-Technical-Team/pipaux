@@ -19,7 +19,7 @@ pip_gdm_update <- function(force = FALSE,
   # Get list of files
   m_files <- list.files(
     pcndir,
-    pattern = "Master_2021[0-9]{10}.xlsx"
+    pattern = "Master_20[0-9]{12}.xlsx"
   )
 
   # Find latest Masterfile
