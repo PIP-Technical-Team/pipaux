@@ -12,8 +12,12 @@ pip_income_groups <- function(action = "update",
 
   if (action == "update") {
     df <- haven::read_dta(paste0(msrdir, "CLASS.dta"))
-    df <- df[c('code', 'year_data', 'incgroup_historical')]
-    names(df)[1] <- 'country_code'
+    df <- df[c('code', 'year_data', 'incgroup_historical',
+               'fcv_historical', 'region_SSA')]
+    names(df) <- c('country_code', 'year_data',
+                   'incgroup_historical',
+                   'fcv_historical',
+                   'ssa_subregion_code')
     pip_sign_save(
       x = df,
       measure = measure,
