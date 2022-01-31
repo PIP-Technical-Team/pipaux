@@ -11,7 +11,8 @@ pip_income_groups <- function(action = "update",
   msrdir <- paste0(maindir, "_aux/", measure, "/")
 
   if (action == "update") {
-    df <- haven::read_dta(paste0(msrdir, "CLASS.dta"))
+    u <- "https://github.com/PovcalNet-Team/Class/blob/master/OutputData/CLASS.dta?raw=true"
+    df <- haven::read_dta(u)
     df <- df[c('code', 'year_data', 'incgroup_historical',
                'fcv_historical', 'region_SSA')]
     names(df) <- c('country_code', 'year_data',
