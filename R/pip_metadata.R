@@ -28,10 +28,11 @@ pip_metadata <- function(action = "update",
     domain_check <- with(pfw, (gdp_domain == 2 | pce_domain == 2 |
                                  pop_domain == 2 | cpi_domain == 2 |
                                  ppp_domain == 2))
-    pfw$distribution_type <- ifelse(pfw$use_imputed == 1,
-                                    "imputed", NA_character_)
     pfw$distribution_type <- ifelse(pfw$use_microdata == 1,
-                                    "micro", pfw$distribution_type)
+                                    "micro", NA_character_)
+    pfw$distribution_type <- ifelse(pfw$use_imputed == 1,
+                                    "micro, imputed",
+                                    pfw$distribution_type)
     pfw$distribution_type <- ifelse(pfw$use_groupdata == 1,
                                     "group",
                                     pfw$distribution_type)
@@ -44,10 +45,9 @@ pip_metadata <- function(action = "update",
         pfw[, c("country_code", "surveyid_year", "survey_acronym",
                 "welfare_type", "reporting_year", "distribution_type",
                 "surv_producer","survey_coverage", "surv_title",
-                "link")],
+                "link", "survey_year")],
         by = "link", all.y = TRUE
       )
-
 
     # Recode colnames
     df <- df %>%
@@ -59,7 +59,7 @@ pip_metadata <- function(action = "update",
     df <- df[
       c(
         "country_code", "reporting_year",
-        "surveyid_year", "survey_acronym",
+        "surveyid_year", "survey_year", "survey_acronym",
         "survey_conductor", "survey_coverage",
         "welfare_type", "distribution_type",
         "survey_title", "year_start", "year_end",
@@ -73,9 +73,9 @@ pip_metadata <- function(action = "update",
     df <- data.table::setDT(df)
 
     # Create nested table
-    df <- tidyfast::dt_nest(df, country_code, reporting_year, survey_title,
-                            survey_conductor, survey_coverage, welfare_type,
-                            distribution_type, .key = "metadata")
+    df <- tidyfast::dt_nest(df, country_code, reporting_year, survey_year,
+                            survey_title, survey_conductor, survey_coverage,
+                            welfare_type, distribution_type, .key = "metadata")
 
     # Check hash
     hash <- digest::digest(df, algo = "xxhash64")
