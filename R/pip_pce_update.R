@@ -10,6 +10,8 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   wpce <- wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
   sna <- readxl::read_xlsx(sprintf("%s_aux/sna/NAS special_2021-01-14.xlsx", maindir))
+  sna_fy <- readxl::read_xlsx(sprintf("%s_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx", maindir),
+                              sheet = "WDI Jan2022")
   cl <- pip_country_list("load", maindir = maindir)
 
   setDT(wpce)
@@ -25,10 +27,45 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   )
 
   # Keep relevant variables
-  pce <- wpce[
-    ,
-    .(country_code, year, wdi_pce)
+  wpce <- wpce[, .(country_code, year, wdi_pce)]
+
+  # ---- Adjust FY to CY ----
+
+  # Merge WDI with special FY cases
+  sna_fy <- sna_fy[c("Code", "Month", "Day")]
+  names(sna_fy) <- c("country_code", "fy_month", "fy_day")
+  wpce <- merge(wpce, sna_fy, by = "country_code", all.x = TRUE)
+
+  # Calculate alpha
+  wpce[, max_days := days_in_month(fy_month, year)]
+  wpce[, month_num := get_month_number(fy_month)]
+  wpce[, alpha := ((month_num - 1) + fy_day / max_days) / 12]
+
+  # Create lead/lag vars
+  wpce[, wdi_pce_lag := dplyr::lag(wdi_pce), by = country_code]
+  wpce[, wdi_pce_lead := dplyr::lead(wdi_pce), by = country_code]
+
+  # Calculate adjusted GDP for calendar year
+  wpce[,
+       wdi_pce_cy := fifelse(!is.na(alpha),
+                             fifelse(alpha < 0.5 ,
+                                     alpha * wdi_pce_lag + (1 - alpha) * wdi_pce,
+                                     alpha * wdi_pce + ( 1 - alpha) *  wdi_pce_lead),
+                             NA_real_)
   ]
+  wpce[,
+       wdi_pce_tmp := fifelse(!is.na(alpha), wdi_pce_cy, wdi_pce)
+  ]
+  wpce[,
+       wdi_pce :=
+         fifelse(country_code == "EGY" & year < 1980, # Egypt should only be adjusted after 1980
+                 wdi_pce, wdi_pce_tmp)
+
+  ]
+
+  # Keep relevant variables
+  pce <- wpce[, .(country_code, year, wdi_pce)]
+
 
   # ---- Expand for special cases with U/R levels ----
 

@@ -14,6 +14,8 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   weo <- pip_gdp_weo("load", maindir = maindir)
   wgdp <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
   sna <- readxl::read_xlsx(sprintf("%s_aux/sna/NAS special_2021-01-14.xlsx", maindir))
+  sna_fy <- readxl::read_xlsx(sprintf("%s_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx", maindir),
+                              sheet = "WDI Jan2022")
   cl <- pip_country_list("load", maindir = maindir)
 
   setDT(madd)
@@ -30,19 +32,55 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     new = c("country_code", "year", "wdi_gdp")
   )
 
-  #----------------------------------------------------------
-  #   Clean GDP data
-  #----------------------------------------------------------
+  # Keep relevant variables
+  wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
+
+  # ---- Adjust FY to CY ----
+
+  # Merge WDI with special FY cases
+  sna_fy <- sna_fy[c("Code", "Month", "Day")]
+  names(sna_fy) <- c("country_code", "fy_month", "fy_day")
+  wgdp <- merge(wgdp, sna_fy, by = "country_code", all.x = TRUE)
+
+  # Calculate alpha
+  wgdp[, max_days := days_in_month(fy_month, year)]
+  wgdp[, month_num := get_month_number(fy_month)]
+  wgdp[, alpha := ((month_num - 1) + fy_day / max_days) / 12]
+
+  # Create lead/lag vars
+  wgdp[, wdi_gdp_lag := dplyr::lag(wdi_gdp), by = country_code]
+  wgdp[, wdi_gdp_lead := dplyr::lead(wdi_gdp), by = country_code]
+
+  # Calculate adjusted GDP for calendar year
+  wgdp[,
+       wdi_gdp_cy := fifelse(!is.na(alpha),
+         fifelse(alpha < 0.5 ,
+                 alpha * wdi_gdp_lag + (1 - alpha) * wdi_gdp,
+                 alpha * wdi_gdp + ( 1 - alpha) *  wdi_gdp_lead),
+         NA_real_)
+  ]
+  wgdp[,
+       wdi_gdp_tmp := fifelse(!is.na(alpha), wdi_gdp_cy, wdi_gdp)
+  ]
+  wgdp[,
+       wdi_gdp :=
+         fifelse(country_code == "EGY" & year < 1980, # Egypt should only be adjusted after 1980
+                 wdi_gdp, wdi_gdp_tmp)
+
+  ]
 
   # Keep relevant variables
-  gdp <- wgdp[
-    ,
-    .(country_code, year, wdi_gdp)
-  ]
+  wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
+
+
+  #----------------------------------------------------------
+  #   Merge WDI GDP data with other sources
+  #----------------------------------------------------------
+
 
   # Merge Maddison and WDI (full join)
   gdp <- data.table::merge.data.table(
-    gdp, madd,
+    wgdp, madd,
     by = c("country_code", "year"),
     all = TRUE
   )
