@@ -49,3 +49,4 @@ Imports:
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload
+URL: https://pip-technical-team.github.io/pipaux/
