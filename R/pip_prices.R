@@ -55,7 +55,7 @@ pip_prices <- function(measure = NULL,
   #----------------------------------------------------------
 
   # Always call common values
-  msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
+  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
   #----------------------------------------------------------
   #   execute selected function

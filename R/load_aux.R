@@ -6,7 +6,7 @@
 load_aux <- function(measure = NULL,
                      maindir = gls$PIP_DATA_DIR,
                      apply_label = TRUE) {
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (is.null(measure)) {
     rlang::abort(c(
@@ -17,10 +17,10 @@ load_aux <- function(measure = NULL,
     )
   }
   # check file exists
-  if (file.exists(paste0(msrdir, measure, ".fst"))) {
-    df <- fst::read_fst(paste0(msrdir, measure, ".fst"), as.data.table = TRUE)
-  } else if (file.exists(paste0(msrdir, measure, ".rds"))) {
-    df <- readRDS(paste0(msrdir, measure, ".rds"))
+  if (file.exists(fs::path(msrdir, measure, ext = "fst"))) {
+    df <- fst::read_fst(fs::path(msrdir, measure, ext = "fst"), as.data.table = TRUE)
+  } else if (file.exists(fs::path(msrdir, measure, ext = "rds"))) {
+    df <- readRDS(fs::path(msrdir, measure, ext = "rds"))
   } else {
     msg <- sprintf("file for measure `%s` does not exist.", measure)
     rlang::abort(c(

@@ -6,7 +6,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
                            force = FALSE) {
   measure <- "cpi"
-  msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
+  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
   cl <- pip_country_list("load", maindir = maindir)
   setDT(cl)
 

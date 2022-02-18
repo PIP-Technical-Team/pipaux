@@ -5,7 +5,7 @@
 \title{Check CPI Vintage}
 \usage{
 pip_cpi_vintage(
-  msrdir = paste0(gls$PIP_DATA_DIR, "_aux/", measure, "/"),
+  msrdir = fs::path(gls$PIP_DATA_DIR, "_aux/", measure),
   dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
   force = FALSE
 )

@@ -8,11 +8,11 @@ pip_regions <- function(action = "update",
                         force = FALSE,
                         maindir = gls$PIP_DATA_DIR) {
   measure <- "regions"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
     df <- suppressMessages(
-      readr::read_csv(paste0(maindir, "_aux/regions/regions.csv"))
+      readr::read_csv(fs::path(maindir, "_aux/regions/regions.csv"))
     )
     pip_sign_save(
       x = df,

@@ -8,11 +8,11 @@ pip_indicators <- function(action = "update",
                            force = FALSE,
                            maindir = gls$PIP_DATA_DIR) {
   measure <- "indicators"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
     df <- suppressMessages(
-      readr::read_csv(paste0(maindir, "_aux/indicators/indicators_master.csv"))
+      readr::read_csv(fs::path(maindir, "_aux/indicators/indicators_master.csv"))
     )
     pip_sign_save(
       x = df,

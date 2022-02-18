@@ -17,7 +17,7 @@ pip_sign_save <- function(x,
   ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
 
   # check signature of current fst file
-  ds_production_path <- paste0(msrdir, measure, "_datasignature.txt") # data signature in production
+  ds_production_path <- fs::path(msrdir, paste0(measure, "_datasignature.txt")) # data signature in production
 
   if (file.exists(ds_production_path)) {
 
@@ -34,7 +34,7 @@ pip_sign_save <- function(x,
   if (ds_dlw != ds_production || force == TRUE) {
 
     # make sure directory exists
-    wholedir <- paste0(msrdir, "_vintage/")
+    wholedir <- fs::path(msrdir, "_vintage/")
     if (!(dir.exists(wholedir))) {
       dir.create(wholedir, recursive = TRUE)
     }
@@ -46,23 +46,23 @@ pip_sign_save <- function(x,
     attr(x, "datetime") <- time
     fst::write_fst(
       x = x,
-      path = paste0(msrdir, measure, ".fst")
+      path = fs::path(msrdir, measure, ext = "fst")
     )
     if (save_dta) {
       haven::write_dta(
         data = x,
-        path = paste0(msrdir, measure, ".dta")
+        path = fs::path(msrdir, measure, ext = "dta")
       )
     }
 
     fst::write_fst(
       x = x,
-      path = paste0(msrdir, "_vintage/", measure, "_", time, ".fst")
+      path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "fst")
     )
     if (save_dta) {
       haven::write_dta(
         data = x,
-        path = paste0(msrdir, "_vintage/", measure, "_", time, ".dta")
+        path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "dta")
       )
     }
 

@@ -12,7 +12,7 @@ pip_gdm_update <- function(force = FALSE,
 
   cl <- pip_country_list("load", maindir = maindir)
   pfw <- pip_pfw("load", maindir = maindir)
-  inv <- fst::read_fst(paste0(maindir, "_inventory/inventory.fst"))
+  inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"))
 
   # ---- Read PCN Masterfile ----
 
@@ -158,7 +158,7 @@ pip_gdm_update <- function(force = FALSE,
   # ---- Save and sign ----
 
   measure <- "gdm"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   pip_sign_save(
     x = dt,

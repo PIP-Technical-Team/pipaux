@@ -3,13 +3,17 @@
 \docType{package}
 \name{pipaux}
 \alias{pipaux}
+\alias{.datatable.aware}
 \title{pipaux: A package for computating the notorious bar statistic}
-\description{
-The pipaux package provides three categories of important functions:
-pipaux, bar and baz.
+\format{
+An object of class \code{logical} of length 1.
+}
+\usage{
+.datatable.aware
 }
 \section{pipaux functions}{
 
 The pipaux functions ...
 }
 
+\keyword{datasets}
