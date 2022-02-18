@@ -8,7 +8,7 @@ pip_metadata <- function(action = "update",
                          force = FALSE,
                          maindir = getOption("pipaux.maindir")) {
   measure <- "metadata"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
 
@@ -17,7 +17,7 @@ pip_metadata <- function(action = "update",
     pfw <- data.table::setDT(pfw)
 
     # Pick the latest metadata file
-    files <- list.files(paste0(maindir, "_aux/metadata/"),
+    files <- list.files(fs::path(maindir, "_aux/metadata/"),
       pattern = "metadata_to_update",
       full.names = TRUE
     )
@@ -80,7 +80,7 @@ pip_metadata <- function(action = "update",
     # Check hash
     hash <- digest::digest(df, algo = "xxhash64")
     current_hash <- tryCatch(
-      readr::read_lines(paste0(maindir, "_aux/metadata/metadata_datasignature.txt")),
+      readr::read_lines(fs::path(maindir, "_aux/metadata/metadata_datasignature.txt")),
       error = function(e) NULL
     )
 
@@ -88,16 +88,16 @@ pip_metadata <- function(action = "update",
     if (hash != current_hash || force || is.null(current_hash)) {
 
       # Create vintage folder
-      wholedir <- paste0(maindir, "_aux/metadata/_vintage/")
+      wholedir <- fs::path(maindir, "_aux/metadata/_vintage/")
       if (!(dir.exists(wholedir))) {
         dir.create(wholedir, recursive = TRUE)
       }
 
       # Write files
       time <- format(Sys.time(), "%Y%m%d%H%M%S")
-      saveRDS(df, paste0(maindir, "_aux/metadata/metadata.rds"))
+      saveRDS(df, fs::path(maindir, "_aux/metadata/metadata.rds"))
       saveRDS(df, sprintf("%s_aux/metadata/_vintage/metadata_%s.rds", maindir, time))
-      readr::write_lines(hash, file = paste0(maindir, "_aux/metadata/metadata_datasignature.txt"))
+      readr::write_lines(hash, file = fs::path(maindir, "_aux/metadata/metadata_datasignature.txt"))
 
       # Print msg
       infmsg <- paste(
@@ -113,7 +113,7 @@ pip_metadata <- function(action = "update",
     }
 
   } else if (action == "load") {
-    df <- readRDS(paste0(maindir, "_aux/metadata/metadata.rds"))
+    df <- readRDS(fs::path(maindir, "_aux/metadata/metadata.rds"))
     return(df)
   } else {
     msg <- paste("action `", action, "` is not a valid action.")

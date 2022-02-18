@@ -8,7 +8,7 @@ pip_countries <- function(action = "update",
                           force = FALSE,
                           maindir = gls$PIP_DATA_DIR) {
   measure <- "countries"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
     wdi_countries <- wbstats::wb_countries(lang = "en")

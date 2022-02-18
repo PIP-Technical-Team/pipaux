@@ -10,6 +10,6 @@ pip_cp <- function(action = "update",
   if (action == "update") {
     pip_cp_update(force = force, maindir = maindir)
   } else if (action == "load") {
-    dl <- readRDS(paste0(maindir, "_aux/cp/cp.rds"))
+    dl <- readRDS(fs::path(maindir, "_aux/cp/cp.rds"))
   }
 }

@@ -10,10 +10,10 @@ pip_pl <- function(action = "update",
                    force = FALSE,
                    maindir = gls$PIP_DATA_DIR) {
   measure <- "pl"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
-    dl <- yaml::read_yaml(paste0(msrdir, "poverty-lines.yaml"))
+    dl <- yaml::read_yaml(fs::path(msrdir, "poverty-lines.yaml"))
     pls <- seq(dl$min, dl$max, dl$increment)
     df <- data.table::data.table(
       name = as.character(pls),

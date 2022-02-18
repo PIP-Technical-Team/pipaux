@@ -210,7 +210,7 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # ---- Save and sign ----
 
   measure <- "gdp"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  msrdir <- fs::path(maindir, "_aux/", measure)
 
   pip_sign_save(
     x = gdp,

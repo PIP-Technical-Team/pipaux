@@ -9,14 +9,14 @@ pip_censoring  <- function(action = "update",
                            force = FALSE,
                            maindir = gls$PIP_DATA_DIR) {
   measure <- "censoring"
-  msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
+  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
   if (action == "update") {
 
-    sheets <- readxl::excel_sheets(paste0(msrdir, "censored.xlsx"))
+    sheets <- readxl::excel_sheets(fs::path(msrdir, "censored.xlsx"))
     dl <- vector("list", 2)
     for (i in seq_along(sheets)) {
-      dl[[i]] <- readxl::read_xlsx(paste0(msrdir, "censored.xlsx"), sheet = sheets[i])
+      dl[[i]] <- readxl::read_xlsx(fs::path(msrdir, "censored.xlsx"), sheet = sheets[i])
     }
     names(dl) <- sheets
 
@@ -38,7 +38,7 @@ pip_censoring  <- function(action = "update",
     # Check hash
     hash <- digest::digest(dl, algo = "xxhash64")
     current_hash <- tryCatch(
-      readr::read_lines(paste0(msrdir, "_datasignature.txt")),
+      readr::read_lines(fs::path(msrdir, "_datasignature.txt")),
       error = function(e) NULL
     )
 
@@ -46,16 +46,16 @@ pip_censoring  <- function(action = "update",
     if (hash != current_hash || force || is.null(current_hash)) {
 
       # Create vintage folder
-      wholedir <- paste0(msrdir, "_vintage/")
+      wholedir <- fs::path(msrdir, "_vintage/")
       if (!(dir.exists(wholedir))) {
         dir.create(wholedir, recursive = TRUE)
       }
 
       # Write files
       time <- format(Sys.time(), "%Y%m%d%H%M%S")
-      saveRDS(dl, paste0(maindir, "_aux/censoring/censoring.rds"))
+      saveRDS(dl, fs::path(maindir, "_aux/censoring/censoring.rds"))
       saveRDS(dl, sprintf("%s_vintage/censoring_%s.rds", msrdir, time))
-      readr::write_lines(hash, file = paste0(maindir, "_aux/censoring/_datasignature.txt"))
+      readr::write_lines(hash, file = fs::path(maindir, "_aux/censoring/_datasignature.txt"))
 
       # Print msg
       infmsg <- paste(

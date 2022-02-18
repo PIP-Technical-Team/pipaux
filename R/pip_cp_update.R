@@ -5,7 +5,7 @@
 #' @inheritParams pip_prices
 #' @keywords internal
 pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
-  files <- list.files(paste0(maindir, "_aux/cp"),
+  files <- list.files(fs::path(maindir, "_aux/cp"),
     pattern = "indicator_values_country",
     full.names = TRUE
   )
@@ -161,7 +161,7 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # Check hash
   hash <- digest::digest(cp, algo = "xxhash64")
   current_hash <- tryCatch(
-    readr::read_lines(paste0(maindir, "_aux/cp/_datasignature.txt")),
+    readr::read_lines(fs::path(maindir, "_aux/cp/_datasignature.txt")),
     error = function(e) NULL
   )
 
@@ -169,16 +169,16 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   if (hash != current_hash || force || is.null(current_hash)) {
 
     # Create vintage folder
-    wholedir <- paste0(maindir, "_aux/cp/_vintage/")
+    wholedir <- fs::path(maindir, "_aux/cp/_vintage/")
     if (!(dir.exists(wholedir))) {
       dir.create(wholedir, recursive = TRUE)
     }
 
     # Write files
     time <- format(Sys.time(), "%Y%m%d%H%M%S")
-    saveRDS(cp, paste0(maindir, "_aux/cp/cp.rds"))
+    saveRDS(cp, fs::path(maindir, "_aux/cp/cp.rds"))
     saveRDS(cp, sprintf("%s_aux/cp/_vintage/cp_%s.rds", maindir, time))
-    readr::write_lines(hash, file = paste0(maindir, "_aux/cp/_datasignature.txt"))
+    readr::write_lines(hash, file = fs::path(maindir, "_aux/cp/_datasignature.txt"))
 
     # Print msg
     infmsg <- paste(

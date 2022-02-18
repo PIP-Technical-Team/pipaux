@@ -16,7 +16,7 @@ pip_country_list <- function(action = "update",
                              pcndir = gls$PCN_MASTER,
                              maindir = gls$PIP_DATA_DIR) {
   measure <- "country_list"
-  msrdir <- paste0(maindir, "_aux/", measure, "/") # measure dir
+  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
   if (action == "update") {
 

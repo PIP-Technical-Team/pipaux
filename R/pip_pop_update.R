@@ -18,7 +18,7 @@ pip_pop_update <-  function(force   = FALSE,
 
   # Directories
   measure <- "pop"
-  msrdir  <- paste0(maindir, "_aux/", measure, "/")
+  msrdir  <- fs::path(maindir, "_aux/", measure)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # From WDI   ---------
@@ -63,7 +63,7 @@ pip_pop_update <-  function(force   = FALSE,
       pcn_pop_files <- NULL
     }
 
-    pip_pop_dir   <- paste0(msrdir, "raw_data/")
+    pip_pop_dir   <- fs::path(msrdir, "raw_data/")
     pip_pop_files <- list.files(pip_pop_dir)
 
     miss_pop_files <- pcn_pop_files[!(pcn_pop_files %in% pip_pop_files)]
