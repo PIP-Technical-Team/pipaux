@@ -16,7 +16,8 @@ pip_censoring  <- function(action = "update",
     sheets <- readxl::excel_sheets(fs::path(msrdir, "censored.xlsx"))
     dl <- vector("list", 2)
     for (i in seq_along(sheets)) {
-      dl[[i]] <- readxl::read_xlsx(fs::path(msrdir, "censored.xlsx"), sheet = sheets[i])
+      x       <- readxl::read_xlsx(paste0(msrdir, "censored.xlsx"), sheet = sheets[i])
+      dl[[i]] <- data.table::as.data.table(x)
     }
     names(dl) <- sheets
 
