@@ -1,8 +1,12 @@
 # pipaux 0.0.4
 
-# pipaux 0.0.3.9000
+* fix bugs on installation
 
-## New features
+* fix bugs from `devtools::check()`
+
+* change all directory paths from `paste0()` to `fs::path()`
+
+# pipaux 0.0.3
 
 ## Enhancements
 
