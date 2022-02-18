@@ -8,11 +8,20 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   # ---- Load data ----
 
-  wpce <- wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
-  sna <- readxl::read_xlsx(sprintf("%s_aux/sna/NAS special_2021-01-14.xlsx", maindir))
-  sna_fy <- readxl::read_xlsx(sprintf("%s_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx", maindir),
-                              sheet = "WDI Jan2022")
-  cl <- pip_country_list("load", maindir = maindir)
+
+  wpce   <-
+    wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
+  sna    <-
+    readxl::read_xlsx(fs::path(maindir, "_aux/sna/NAS special_2021-01-14.xlsx"))
+  sna_fy <-
+    readxl::read_xlsx(
+      fs::path(
+        maindir,
+        "_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx"
+      ),
+      sheet = "WDI Jan2022"
+    )
+  cl     <- pip_country_list("load", maindir = maindir)
 
   setDT(wpce)
   setDT(sna)

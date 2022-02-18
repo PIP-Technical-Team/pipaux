@@ -13,10 +13,6 @@ pip_pl(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
-
-\item{pl_default}{character: Default poverty line}
-
-\item{pl_visible}{character: Visible poverty lines}
 }
 \description{
 Update or load a dataset with poverty lines.

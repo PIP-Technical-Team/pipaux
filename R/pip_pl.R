@@ -3,8 +3,6 @@
 #' Update or load a dataset with poverty lines.
 #'
 #' @inheritParams pip_prices
-#' @param pl_default character: Default poverty line
-#' @param pl_visible character: Visible poverty lines
 #' @export
 pip_pl <- function(action = "update",
                    force = FALSE,

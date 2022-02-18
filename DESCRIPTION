@@ -48,5 +48,5 @@ Imports:
     yaml
 VignetteBuilder: knitr
 Remotes: 
-    github::PIP-Technical-Team/pipload
+    github::PIP-Technical-Team/pipload@development
 URL: https://pip-technical-team.github.io/pipaux/

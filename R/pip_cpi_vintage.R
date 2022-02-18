@@ -54,7 +54,7 @@ pip_cpi_vintage <- function(msrdir = fs::path(gls$PIP_DATA_DIR, "_aux/", measure
 
 
   # save file
-  sfile <- fs::path(msrdir, measure, "cpi_vintage.rds")
+  sfile <- fs::path(msrdir, "cpi_vintage.rds")
 
   equal_vintage <- TRUE
   if (fs::file_exists(sfile)) {

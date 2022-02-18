@@ -6,6 +6,7 @@ test_that("aux data is up to date", {
   for (i in seq_along(lf)) {
     # print(lf[i])
     z <- get(lf[i])
-    expect_false(suppressWarnings(z(action = "update")))
+    expect_false(suppressWarnings(z(action = "update")), label = lf[i])
   }
-})
+}
+)

@@ -6,7 +6,7 @@ test_that("data loads", {
   laux <- function(x) {
     y <- gsub("pip_", "", x)
     z <- get(x)
-    expect_equal(z("load"), pipaux::load_aux(y))
+    expect_equal(z("load"), load_aux(y))
   }
 
   purrr::walk(lf, laux)

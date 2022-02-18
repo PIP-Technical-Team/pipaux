@@ -17,7 +17,7 @@ pip_sign_save <- function(x,
   ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
 
   # check signature of current fst file
-  ds_production_path <- fs::path(msrdir, measure, "_datasignature.txt") # data signature in production
+  ds_production_path <- fs::path(msrdir, paste0(measure, "_datasignature.txt")) # data signature in production
 
   if (file.exists(ds_production_path)) {
 
@@ -57,12 +57,12 @@ pip_sign_save <- function(x,
 
     fst::write_fst(
       x = x,
-      path = fs::path(msrdir, "_vintage/", measure, "_", time,  ext = "fst")
+      path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "fst")
     )
     if (save_dta) {
       haven::write_dta(
         data = x,
-        path = fs::path(msrdir, "_vintage/", measure, "_", time,  ext = "dta")
+        path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "dta")
       )
     }
 

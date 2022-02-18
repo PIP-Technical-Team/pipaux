@@ -91,7 +91,7 @@ pip_pop_update <-  function(force   = FALSE,
       as.character() %>%
       sprintf("population_country_%s.xlsx", .)
 
-    pop_path <- paste0(pip_pop_dir, pop_latest)
+    pop_path <- fs::path(pip_pop_dir, pop_latest)
 
     # Load data
     pop_main <- suppressMessages(
@@ -133,7 +133,7 @@ pip_pop_update <-  function(force   = FALSE,
       as.character() %>%
       sprintf("population_missing_%s.xlsx", .)
 
-    pop_special_path        <- paste0(pip_pop_dir, pop_special_file)
+    pop_special_path        <- fs::path(pip_pop_dir, pop_special_file)
     pop_special             <- suppressMessages(readxl::read_xlsx(pop_special_path,
                                                                   sheet = "Long")
                                                 )

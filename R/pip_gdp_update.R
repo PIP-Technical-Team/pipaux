@@ -10,11 +10,11 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   #   Load data
   #----------------------------------------------------------
 
-  madd <- pip_maddison("load", maindir = maindir)
-  weo <- pip_gdp_weo("load", maindir = maindir)
-  wgdp <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
-  sna <- readxl::read_xlsx(sprintf("%s_aux/sna/NAS special_2021-01-14.xlsx", maindir))
-  sna_fy <- readxl::read_xlsx(sprintf("%s_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx", maindir),
+  madd   <- pip_maddison("load", maindir = maindir)
+  weo    <- pip_gdp_weo("load", maindir = maindir)
+  wgdp   <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
+  sna    <- readxl::read_xlsx(fs::path(maindir, "_aux/sna/NAS special_2021-01-14.xlsx"))
+  sna_fy <- readxl::read_xlsx(fs::path(maindir, "_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx"),
                               sheet = "WDI Jan2022")
   cl <- pip_country_list("load", maindir = maindir)
 
