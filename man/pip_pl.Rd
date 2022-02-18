@@ -4,13 +4,7 @@
 \alias{pip_pl}
 \title{Poverty lines}
 \usage{
-pip_pl(
-  action = "update",
-  force = FALSE,
-  pl_default = "1.9",
-  pl_visible = c("1.9", "3.2", "5.5"),
-  maindir = gls$PIP_DATA_DIR
-)
+pip_pl(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
@@ -18,11 +12,11 @@ pip_pl(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{maindir}{character: Main directory of project.}
+
 \item{pl_default}{character: Default poverty line}
 
 \item{pl_visible}{character: Visible poverty lines}
-
-\item{maindir}{character: Main directory of project.}
 }
 \description{
 Update or load a dataset with poverty lines.
