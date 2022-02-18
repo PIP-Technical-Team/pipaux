@@ -1,3 +1,5 @@
+# pipaux 0.0.4
+
 # pipaux 0.0.3.9000
 
 ## New features
