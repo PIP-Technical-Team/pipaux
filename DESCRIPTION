@@ -45,7 +45,8 @@ Imports:
     cli,
     pipload (>= 0.1.4.9002),
     tidyfast,
-    yaml
+    yaml,
+    qs
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@development
