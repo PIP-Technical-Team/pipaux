@@ -7,6 +7,7 @@
 #' @param msrdir character: Directory where the data and data signature will be saved.
 #' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is also saved.
 #' @keywords internal
+#' @export
 pip_sign_save <- function(x,
                           measure,
                           msrdir,
