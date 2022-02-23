@@ -11,7 +11,7 @@
 pip_sign_save <- function(x,
                           measure,
                           msrdir,
-                          force,
+                          force = FALSE,
                           save_dta = TRUE) {
 
   # Note: clean CPI data file and then create data signature
@@ -39,6 +39,8 @@ pip_sign_save <- function(x,
 
   if (ds_dlw != ds_production) {
     ms_status <- "changed"
+  } else {
+    ms_status <- "unchanged"
   }
 
   if (ms_status %in% c("forced", "changed")) {

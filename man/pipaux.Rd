@@ -11,6 +11,9 @@ An object of class \code{logical} of length 1.
 \usage{
 .datatable.aware
 }
+\description{
+Description bla blab
+}
 \section{pipaux functions}{
 
 The pipaux functions ...
