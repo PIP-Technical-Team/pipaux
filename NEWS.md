@@ -1,4 +1,4 @@
-# pipaux (development version)
+# pipaux 0.0.5
 
 # pipaux 0.0.4
 
