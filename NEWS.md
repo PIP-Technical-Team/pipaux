@@ -1,4 +1,5 @@
 # pipaux 0.0.5
+* update `pip_sign_save()` funciton to make it work with the RSconnect server.
 
 # pipaux 0.0.4
 
