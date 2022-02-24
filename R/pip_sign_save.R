@@ -7,10 +7,11 @@
 #' @param msrdir character: Directory where the data and data signature will be saved.
 #' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is also saved.
 #' @keywords internal
+#' @export
 pip_sign_save <- function(x,
                           measure,
                           msrdir,
-                          force,
+                          force = FALSE,
                           save_dta = TRUE) {
 
   # Note: clean CPI data file and then create data signature
@@ -19,7 +20,7 @@ pip_sign_save <- function(x,
   # check signature of current fst file
   ds_production_path <- fs::path(msrdir, paste0(measure, "_datasignature.txt")) # data signature in production
 
-  if (file.exists(ds_production_path)) {
+  if (fs::file_exists(ds_production_path)) {
 
     # read data signature in production
     ds_production <- readr::read_lines(ds_production_path)[[1]]
@@ -27,16 +28,27 @@ pip_sign_save <- function(x,
 
     # fake signature
     ds_production <- "0000"
+    ms_status <- "new"
   }
 
   #--------- if Signature from dlw is different from the one in production ---------
 
-  if (ds_dlw != ds_production || force == TRUE) {
+  if (force == TRUE) {
+    ms_status <- "forced"
+  }
+
+  if (ds_dlw != ds_production) {
+    ms_status <- "changed"
+  } else {
+    ms_status <- "unchanged"
+  }
+
+  if (ms_status %in% c("forced", "changed")) {
 
     # make sure directory exists
     wholedir <- fs::path(msrdir, "_vintage/")
-    if (!(dir.exists(wholedir))) {
-      dir.create(wholedir, recursive = TRUE)
+    if (!(fs::dir_exists(wholedir))) {
+      fs::dir_delete(wholedir)
     }
 
     # re-write x in production if data signature is not found
@@ -48,6 +60,12 @@ pip_sign_save <- function(x,
       x = x,
       path = fs::path(msrdir, measure, ext = "fst")
     )
+
+    qs::qsave(
+      x = x,
+      file = fs::path(msrdir, measure, ext = "qs")
+    )
+
     if (save_dta) {
       haven::write_dta(
         data = x,
@@ -58,6 +76,10 @@ pip_sign_save <- function(x,
     fst::write_fst(
       x = x,
       path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "fst")
+    )
+    qs::qsave(
+      x = x,
+      file = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "qs")
     )
     if (save_dta) {
       haven::write_dta(
@@ -74,16 +96,22 @@ pip_sign_save <- function(x,
       file = ds_production_path
     )
 
-    infmsg <- paste(
-      "Data signature has changed, it was not found,",
-      "or update was forced.\n",
-      paste0("`", measure, ".fst` has been updated")
-    )
 
-    rlang::inform(infmsg)
+    fillintext <- fcase(ms_status == "new", "was not found",
+          ms_status == "forced", "has been changed forcefully",
+          ms_status == "changed", "has changed",
+          default = "")
+
+
+    infmsg <-
+      "Data signature {fillintext}
+      {.file {measure}.fst} has been updated"
+
+    cli::cli_alert_warning(infmsg)
     return(invisible(TRUE))
   } else {
-    rlang::inform("Data signature is up to date.\nNo update performed")
+    cli::cli_alert_info("Data signature is up to date.
+                        {cli::col_blue('No update performed')}")
     return(invisible(FALSE))
   }
 }

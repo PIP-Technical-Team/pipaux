@@ -1,5 +1,6 @@
 test_that("aux data is up to date", {
   skip_on_ci()
+  skip('skip')
   lf <- lsf.str("package:pipaux", pattern = "^pip_[a-z]{3}$")
   lf <- as.character(lf)
 

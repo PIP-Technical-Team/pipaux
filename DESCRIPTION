@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.0.4
+Version: 0.0.4.9001
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
@@ -45,7 +45,8 @@ Imports:
     cli,
     pipload (>= 0.1.4.9002),
     tidyfast,
-    yaml
+    yaml,
+    qs
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@development

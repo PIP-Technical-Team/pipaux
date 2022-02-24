@@ -1,5 +1,7 @@
 #' pipaux: A package for computating the notorious bar statistic
 #'
+#' Description bla blab
+#'
 #' @section pipaux functions:
 #' The pipaux functions ...
 #'
