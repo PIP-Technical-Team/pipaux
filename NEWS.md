@@ -1,13 +1,25 @@
+# pipaux 0.0.6
+
+## Enhancements
+
+* Add handling of more poverty lines and mulitiple increments to `pip_pl()`
+
 # pipaux 0.0.5
+
+## Enhancements
+
 * update `pip_sign_save()` funciton to make it work with the RSconnect server.
 
 # pipaux 0.0.4
 
-* fix bugs on installation
-
-* fix bugs from `devtools::check()`
+## Enhancements
 
 * change all directory paths from `paste0()` to `fs::path()`
+
+## Bug fixes
+
+* fix bugs on installation
+* fix bugs from `devtools::check()`
 
 # pipaux 0.0.3
 

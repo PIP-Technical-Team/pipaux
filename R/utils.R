@@ -55,6 +55,18 @@ days_in_month <- function(month, year) {
 
 }
 
+#' Get number of decimals
+#' @param x A numeric vector
+#' @noRd
+n_decimals <- function(x) {
+  vapply(x, function(x) {
+    if (abs(x - round(x)) > .Machine$double.eps^0.5) {
+      nchar(strsplit(sub('0+$', '', as.character(x)), ".", fixed = TRUE)[[1]][[2]])
+    } else {
+      return(0)
+    }
+  }, FUN.VALUE = numeric(1))
+}
 
 #' Find latest dlw directory
 #' @noRd
