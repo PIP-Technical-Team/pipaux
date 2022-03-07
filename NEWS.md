@@ -4,6 +4,10 @@
 
 * Add handling of more poverty lines and mulitiple increments to `pip_pl()`
 
+## Bug fixes 
+
+* Add various bug fixes for `pip_pop_update()`
+
 # pipaux 0.0.5
 
 ## Enhancements
