@@ -4,9 +4,10 @@
 
 * Add handling of more poverty lines and mulitiple increments to `pip_pl()`
 
-## Bug fixes 
+## Bug fixes
 
 * Add various bug fixes for `pip_pop_update()`
+* Add reporting level column to CP charts datasets 
 
 # pipaux 0.0.5
 

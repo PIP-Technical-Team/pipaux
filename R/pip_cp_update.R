@@ -52,6 +52,8 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
           default = ""
         )
       )]
+      x$reporting_level <- ifelse(x$survey_coverage == "", "national",
+                                  x$survey_coverage)
     }
     return(x)
   })
@@ -123,19 +125,27 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # Create list of charts datasets
   mpm_cols <- grep("mpm_", names(dl$chart5), value = TRUE)
 
+  # TEMP FIX for reporting level for chart 5
+  dl$chart5 <-
+    merge(dl$chart5, dl$chart3[, c('country_code', 'reporting_year', 'reporting_level')])
+  # dl$chart6_KI4 <-
+  #   merge(dl$chart6_KI4, unique(dl$chart3[, c('country_code', 'reporting_level')]),
+  #         by = 'country_code', all.x = TRUE)
+  # TEMP FIX END
+
   charts <- list(
     ineq_trend =
       dl$chart3[, c(
         "country_code", "reporting_year",
         "survey_acronym", "welfare_type",
         "survey_comparability", "comparable_spell",
-        "gini", "theil"
+        "gini", "theil", "reporting_level"
       )],
     ineq_bar =
       dl$chart4[, c(
         "country_code", "reporting_year", "welfare_type",
         "survey_coverage", "gender", "agegroup", "education",
-        "distribution", "poverty_share_by_group"
+        "distribution", "poverty_share_by_group", "reporting_level"
       )],
     mpm =
       dl$chart5[, c(
@@ -147,13 +157,14 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
         "mpm_sanitation",
         "mpm_water",
         "mpm_monetary",
-        "mpm_headcount"
+        "mpm_headcount",
+        "reporting_level"
       )],
     sp =
       dl$chart6_KI4[, c(
         "country_code", "year_range",
         "welfare_type", "distribution",
-        "shared_prosperity"
+        "shared_prosperity", "reporting_level"
       )]
   )
   cp <- list(key_indicators = key_indicators, charts = charts)
