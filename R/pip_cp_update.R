@@ -125,14 +125,6 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # Create list of charts datasets
   mpm_cols <- grep("mpm_", names(dl$chart5), value = TRUE)
 
-  # TEMP FIX for reporting level for chart 5
-  dl$chart5 <-
-    merge(dl$chart5, dl$chart3[, c('country_code', 'reporting_year', 'reporting_level')])
-  # dl$chart6_KI4 <-
-  #   merge(dl$chart6_KI4, unique(dl$chart3[, c('country_code', 'reporting_level')]),
-  #         by = 'country_code', all.x = TRUE)
-  # TEMP FIX END
-
   charts <- list(
     ineq_trend =
       dl$chart3[, c(
