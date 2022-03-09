@@ -112,7 +112,7 @@ pip_pop_update <-  function(force   = FALSE,
         variable.name = "Year",
         value.name = "Population"
       )
-    pop_long$Year <- as.character(pop_long$Year)
+    pop_long$Year <- as.numeric(as.character(pop_long$Year))
     pop_long$Population <- as.numeric(pop_long$Population)
 
     # Merge with special country data
