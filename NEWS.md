@@ -1,4 +1,5 @@
 # pipaux (development version)
+* Add `ppp_vintage` database when `ppp` is updated. 
 
 # pipaux 0.0.6
 
