@@ -28,6 +28,8 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   sna_vintages <- as.Date(sna_vintages, "%Y-%m-%d")
   sna_last     <- which(sna_vintages == max(sna_vintages))
 
+  cli::cli_alert_info("SNA file used: {.file {sna_vintages[sna_last]}}")
+
   sna_touse    <- sna_files[sna_last]
 
   sna    <- readxl::read_xlsx(sna_touse)
