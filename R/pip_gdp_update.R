@@ -13,7 +13,24 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   madd   <- pip_maddison("load", maindir = maindir)
   weo    <- pip_gdp_weo("load", maindir = maindir)
   wgdp   <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
-  sna    <- readxl::read_xlsx(fs::path(maindir, "_aux/sna/NAS special_2021-01-14.xlsx"))
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Special national accounts --------
+
+  sna_files <- fs::dir_ls(fs::path(maindir, "_aux/sna"),
+                          type = "file",
+                          regexp = "^NAS special_.*xlsx")
+
+  sna_files <- fs::dir_ls(fs::path(maindir, "_aux/sna"),
+                          regexp = "NAS special_.*")
+
+  sna_vintages <- gsub("(.*NAS special_)(.*)(\\.xlsx)", "\\2", sna_files)
+  sna_vintages <- as.Date(sna_vintages, "%Y-%m-%d")
+  sna_last     <- which(sna_vintages == max(sna_vintages))
+
+  sna_touse    <- sna_files[sna_last]
+
+  sna    <- readxl::read_xlsx(sna_touse)
   sna_fy <- readxl::read_xlsx(fs::path(maindir, "_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx"),
                               sheet = "WDI Jan2022")
   cl <- pip_country_list("load", maindir = maindir)
