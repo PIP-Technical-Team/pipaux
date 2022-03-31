@@ -3,6 +3,7 @@
 ## Enhancements
 
 * Add handling of more poverty lines and mulitiple increments to `pip_pl()`
+* Add `pip_dictionary()` to handle a dictionary of all PIP API response columns
 
 ## Bug fixes
 
