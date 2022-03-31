@@ -22,14 +22,8 @@ pip_gdp_weo <- function(action = "update",
     # ---- Load data from disk ----
 
     # Get latest version of file (in case there are more)
-    dir <- sprintf("%s_aux/weo/", maindir)
-    weo_files <- list.files(dir, pattern = "WEO_.*[.]xls")
-    weo_latest <- weo_files %>%
-      gsub("WEO_|.xls", "", .) %>%
-      as.POSIXlt() %>%
-      max() %>%
-      as.character() %>%
-      sprintf("%s_aux/weo/WEO_%s.xls", maindir, .)
+    weo_files <- fs::dir_ls(msrdir, regexp = "WEO_.*[.]xls")
+    weo_latest <- max(weo_files)
 
     # Read data
     dt <- readxl::read_xls(
