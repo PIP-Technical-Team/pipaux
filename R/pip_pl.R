@@ -16,7 +16,10 @@ pip_pl <- function(action = "update",
 
     # Create vector with poverty lines
     tmp <- vector("list", length = length(dl$min))
-    for (i in seq_along(dl$min)) tmp[[i]] <- seq(dl$min[i], dl$max[i], dl$increment[i])
+    for (i in seq_along(dl$min)) {
+
+      tmp[[i]] <- seq(dl$min[i], dl$max[i], dl$increment[i])
+    }
     pls <- unlist(tmp)
 
     # Create data frame
