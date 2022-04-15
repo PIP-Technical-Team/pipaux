@@ -9,20 +9,20 @@
 
 ## Enhancements
 
--   Add handling of more poverty lines and mulitiple increments to `pip_pl()`
+-   Add handling of more poverty lines and multiple increments to `pip_pl()`
 -   Add `pip_dictionary()` to handle a dictionary of all PIP API response
     columns
 
 ## Bug fixes
 
 -   Add various bug fixes for `pip_pop_update()`
--   Add reporting level column to CP charts datasets
+-   Add reporting level column to CP charts databases
 
 # pipaux 0.0.5
 
 ## Enhancements
 
--   update `pip_sign_save()` funciton to make it work with the RSconnect server.
+-   update `pip_sign_save()` function to make it work with the RSconnect server.
 
 # pipaux 0.0.4
 
