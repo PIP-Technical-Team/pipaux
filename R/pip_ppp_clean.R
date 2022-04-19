@@ -9,7 +9,7 @@ pip_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 
   y <- melt(x,
     id.vars       = c("code", "ppp_domain", "datalevel"),
-    measure.vars  = patterns("^ppp_[0-9]{4}.+"),
+    measure.vars  = patterns("^ppp_[0-9]{4}_[Vv][0-9]_[Vv][0-9]$"),
     variable.name = "ver",
     value.name    = "ppp"
   )
