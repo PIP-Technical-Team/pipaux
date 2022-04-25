@@ -40,7 +40,7 @@ pip_gdp_weo <- function(action = "update",
 
     # Select rows w/ data on real gdp per capita
     dt <- dt[weo_subject_code %in%
-      c("NGDPRPC", "NGDPRPPPPC", "NGDP_R")]
+      c("NGDPRPC", "NGDPRPPPPC")]
 
     # Fix country codes
     dt[
@@ -61,8 +61,7 @@ pip_gdp_weo <- function(action = "update",
       ,
       subject_code := fcase(
         weo_subject_code == "NGDPRPC", "weo_gdp_lcu",
-        weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017",
-        weo_subject_code == "NGDP_R", "weo_gdp_lcu_notpc"
+        weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017"
       )
     ]
 
@@ -104,15 +103,6 @@ pip_gdp_weo <- function(action = "update",
         pop = i.pop
       )
     ]
-
-    # Calculate per capita value for NGDP_R
-    dt[
-      ,
-      weo_gdp_lcu := fifelse(
-        is.na(weo_gdp_lcu), weo_gdp_lcu_notpc / pop, weo_gdp_lcu
-      )
-    ]
-
 
     # ---- Chain PPP and LCU GDP columns ----
 
