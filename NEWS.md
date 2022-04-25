@@ -1,4 +1,4 @@
-# pipaux (development version)
+# pipaux 0.0.7
 
 -   Add `ppp_vintage` database when `ppp` is updated.
 -   Use use [Github repo](https://github.com/PIP-Technical-Team/pip-metadata) to
