@@ -1,8 +1,10 @@
 # pipaux 0.0.7
 
 -   Add `ppp_vintage` database when `ppp` is updated.
--   Use use [Github repo](https://github.com/PIP-Technical-Team/pip-metadata) to
+-   Use [Github repo](https://github.com/PIP-Technical-Team/pip-metadata) to
     retrieve metadata rather than internal folder
+-   Use Github to retrieve special national accounts data
+-   Make sure WEO is updated each time gdp data is updated
 -   Slightly modify loading of options in `zzz.R`
 
 # pipaux 0.0.6
