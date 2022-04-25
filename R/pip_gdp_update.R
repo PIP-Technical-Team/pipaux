@@ -11,7 +11,10 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   #----------------------------------------------------------
 
   madd   <- pip_maddison("load", maindir = maindir)
-  weo    <- pip_gdp_weo("load", maindir = maindir)
+
+  pip_gdp_weo("update", maindir = maindir)
+  weo    <- pipload::pip_load_aux("weo", maindir = maindir)
+
   wgdp   <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

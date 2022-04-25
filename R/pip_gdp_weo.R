@@ -39,8 +39,7 @@ pip_gdp_weo <- function(action = "update",
     # ---- Data transformations ----
 
     # Select rows w/ data on real gdp per capita
-    dt <- dt[weo_subject_code %in%
-      c("NGDPRPC", "NGDPRPPPPC")]
+    dt <- dt[weo_subject_code %in% c("NGDPRPC", "NGDPRPPPPC")]
 
     # Fix country codes
     dt[
