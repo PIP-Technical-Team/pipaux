@@ -16,25 +16,16 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
+  usna <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna.csv"
+  umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
+  sna <- suppressMessages(
+    readr::read_csv(usna)
+  )
 
-  sna_files <- fs::dir_ls(fs::path(maindir, "_aux/sna"),
-                          type = "file",
-                          regexp = "^NAS special_.*xlsx")
+  sna_fy <- suppressMessages(
+    readr::read_csv(umet)
+  )
 
-  sna_files <- fs::dir_ls(fs::path(maindir, "_aux/sna"),
-                          regexp = "NAS special_.*")
-
-  sna_vintages <- gsub("(.*NAS special_)(.*)(\\.xlsx)", "\\2", sna_files)
-  sna_vintages <- as.Date(sna_vintages, "%Y-%m-%d")
-  sna_last     <- which(sna_vintages == max(sna_vintages))
-
-  cli::cli_alert_info("SNA file used: {.file {sna_vintages[sna_last]}}")
-
-  sna_touse    <- sna_files[sna_last]
-
-  sna    <- readxl::read_xlsx(sna_touse)
-  sna_fy <- readxl::read_xlsx(fs::path(maindir, "_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx"),
-                              sheet = "WDI Jan2022")
   cl <- pip_country_list("load", maindir = maindir)
 
   setDT(madd)
