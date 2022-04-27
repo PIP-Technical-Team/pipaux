@@ -5,12 +5,14 @@
 #' @inheritParams pip_prices
 #' @param maddison_action character: Either "load" or "update". Default is "update".
 #' @param weo_action character: Either "load" or "update". Default is "update".
+#' @param  sna_tag character: release tag of pip-sna file needed. Default is "main"
 #' @export
 pip_gdp <- function(action = "update",
                     maddison_action = "load",
                     weo_action = "load",
                     force = FALSE,
-                    maindir = gls$PIP_DATA_DIR) {
+                    maindir = gls$PIP_DATA_DIR,
+                    sna_tag = "main") {
   measure <- "gdp"
 
   # Update Maddison Project Data
@@ -24,7 +26,9 @@ pip_gdp <- function(action = "update",
   }
 
   if (action == "update") {
-    pip_gdp_update(force = force, maindir = maindir)
+    pip_gdp_update(force   = force,
+                   maindir = maindir,
+                   sna_tag = sna_tag)
   } else if (action == "load") {
     load_aux(
       maindir = maindir,

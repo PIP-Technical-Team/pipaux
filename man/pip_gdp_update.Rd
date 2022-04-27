@@ -4,12 +4,14 @@
 \alias{pip_gdp_update}
 \title{Update GDP}
 \usage{
-pip_gdp_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_gdp_update(force = FALSE, maindir = gls$PIP_DATA_DIR, sna_tag = "main")
 }
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{sna_tag}{character: release tag of pip-sna file needed. Default is "main"}
 }
 \description{
 Update GDP data using WDI, Maddison and Special cases.

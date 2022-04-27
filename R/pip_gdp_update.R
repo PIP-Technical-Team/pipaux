@@ -4,7 +4,9 @@
 #'
 #' @inheritParams pip_gdp
 #' @keywords intenal
-pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
+pip_gdp_update <- function(force = FALSE,
+                           maindir = gls$PIP_DATA_DIR,
+                           sna_tag = "main") {
 
   #----------------------------------------------------------
   #   Load data
@@ -19,11 +21,40 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna.csv"
+  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_tag}/sna.csv")
   umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
-  sna <- suppressMessages(
-    readr::read_csv(usna)
-  )
+
+  tryCatch(
+    expr = {
+      # Your code...
+      sna <- suppressMessages(
+        readr::read_csv(usna)
+      )
+    }, # end of expr section
+
+    error = function(e) {
+      owner <-  "pip-technical-team"
+      repo  <-  "pip-sna"
+      tags  <- c("main", get_gh_tags(owner, repo))
+
+
+      if (! (sna_tag  %in% tags)) {
+        msg     <- c(
+          "{.field sna_tag} specified ({sna_tag}) does not exist in repo
+          {.file {owner}/{repo}}",
+          "i" = "Select one among {.field {tags}}"
+          )
+        cli::cli_abort(msg, class = "pipaux_error")
+
+      } else {
+        msg     <- c("Could not load sna from Github repo:
+                     {e$message}")
+        cli::cli_abort(msg,class = "pipaux_error")
+
+      }
+    } # end of finally section
+
+  ) # End of trycatch
 
   sna_fy <- suppressMessages(
     readr::read_csv(umet)

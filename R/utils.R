@@ -244,3 +244,49 @@ chain_backwards <- function(dt) {
   data.table::setorder(dt, year)
   return(dt$new_var)
 }
+
+
+
+#' Get tags from specific Github repo
+#'
+#' @param owner character: Github username that owns the repo
+#' @param repo character: Github repository name
+#'
+#' @return character vector with tags
+#' @export
+#'
+#' @examples
+#' owner <- "pip-technical-team"
+#' repo  <- "pip-sna"
+#' get_gh_tags(owner, repo)
+get_gh_tags <- function(owner, repo) {
+
+  # on.exit ------------
+  on.exit({
+
+  })
+
+  # Defenses -----------
+  stopifnot( exprs = {
+
+    }
+  )
+
+  # Early returns ------
+  if (FALSE) {
+    return()
+  }
+
+  # Computations -------
+  tags <-
+    gh::gh("/repos/{owner}/{repo}/tags",
+           owner = owner,
+           repo = repo,
+           .limit = Inf)  |>
+    purrr::map_chr("name")
+
+
+  # Return -------------
+  return(tags)
+
+}
