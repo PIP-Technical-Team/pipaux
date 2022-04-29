@@ -4,7 +4,12 @@
 \alias{pip_pce}
 \title{PIP PCE}
 \usage{
-pip_pce(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_pce(
+  action = "update",
+  force = FALSE,
+  maindir = gls$PIP_DATA_DIR,
+  sna_tag = "main"
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
@@ -13,6 +18,8 @@ pip_pce(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{sna_tag}{character: release tag of pip-sna file needed. Default is "main"}
 }
 \description{
 Load or update PCE data.
