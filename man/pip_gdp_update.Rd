@@ -16,4 +16,4 @@ pip_gdp_update(force = FALSE, maindir = gls$PIP_DATA_DIR, sna_tag = "main")
 \description{
 Update GDP data using WDI, Maddison and Special cases.
 }
-\keyword{intenal}
+\keyword{internal}
