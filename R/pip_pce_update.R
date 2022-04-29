@@ -3,16 +3,20 @@
 #' Update PCE data using WDI and Special cases.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams pip_wdi_update
 #' @keywords internal
 pip_pce_update <- function(force = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           sna_tag = "main") {
+                           sna_tag = "main",
+                           from    = "file") {
 
   # ---- Load data ----
-
-
-  wpce   <-
-    wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
+  if (force) {
+    pip_wdi_update(maindir = maindir,
+                   from    = from)
+  }
+  wpce   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
@@ -57,18 +61,10 @@ pip_pce_update <- function(force = FALSE,
 
   cl     <- pip_country_list("load", maindir = maindir)
 
-  setDT(wpce)
   setDT(sna)
   setDT(cl)
 
   # ---- Clean PCE from WDI ----
-
-  # Rename vars
-  setnames(wpce,
-    old = c("iso3c", "date", "NE.CON.PRVT.PC.KD"),
-    new = c("country_code", "year", "wdi_pce")
-  )
-
   # Keep relevant variables
   wpce <- wpce[, .(country_code, year, wdi_pce)]
 

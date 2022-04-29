@@ -4,12 +4,19 @@
 \alias{pip_pce_update}
 \title{Update PCE}
 \usage{
-pip_pce_update(force = FALSE, maindir = gls$PIP_DATA_DIR, sna_tag = "main")
+pip_pce_update(
+  force = FALSE,
+  maindir = gls$PIP_DATA_DIR,
+  sna_tag = "main",
+  from = "file"
+)
 }
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{from}{character: Either "file" or "api". Default is file.}
 }
 \description{
 Update PCE data using WDI and Special cases.

@@ -48,7 +48,7 @@ pip_sign_save <- function(x,
     # make sure directory exists
     wholedir <- fs::path(msrdir, "_vintage/")
     if (!(fs::dir_exists(wholedir))) {
-      fs::dir_delete(wholedir)
+      fs::dir_create(wholedir, recurse = TRUE)
     }
 
     # re-write x in production if data signature is not found

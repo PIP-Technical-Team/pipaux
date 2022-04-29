@@ -3,10 +3,12 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
+#' @inheritParams pip_wdi_update
 #' @keywords internal
 pip_gdp_update <- function(force = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           sna_tag = "main") {
+                           sna_tag = "main",
+                           from    = "file") {
 
   #----------------------------------------------------------
   #   Load data
@@ -17,7 +19,12 @@ pip_gdp_update <- function(force = FALSE,
   pip_gdp_weo("update", maindir = maindir)
   weo    <- pipload::pip_load_aux("weo", maindir = maindir)
 
-  wgdp   <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
+  if (force) {
+    pip_wdi_update(maindir = maindir,
+                   from    = from)
+  }
+  wgdp   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  setnames(wgdp, "NY.GDP.PCAP.KD", "wdi_gdp")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
@@ -63,19 +70,11 @@ pip_gdp_update <- function(force = FALSE,
   cl <- pip_country_list("load", maindir = maindir)
 
   setDT(madd)
-  setDT(wgdp)
   setDT(weo)
   setDT(sna)
   setDT(cl)
 
   #--------- Clean GDP from WDI ---------
-
-  # Rename columns
-  setnames(wgdp,
-    old = c("iso3c", "date", "NY.GDP.PCAP.KD"),
-    new = c("country_code", "year", "wdi_gdp")
-  )
-
   # Keep relevant variables
   wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
 
