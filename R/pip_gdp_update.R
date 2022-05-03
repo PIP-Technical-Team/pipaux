@@ -169,27 +169,29 @@ pip_gdp_update <- function(force = FALSE,
   # Syria should be replaced with country specific-sources from 2010
 
   # Merge with sna
-  sna <- sna[countrycode == "SYR"]
-  setnames(sna, "countrycode", "country_code")
-  gdp[sna,
-    on = .(country_code, year),
-    `:=`(
-      chain_factor = i.GDP
-    )
-  ]
+  sna <- sna[!is.na(GDP)]
 
-  # Modify observations for Syria after 2010
-  syr_2010 <- gdp[country_code == "SYR" & year == 2010]$gdp
-  gdp[
-    ,
-    gdp := fifelse(
-      country_code == "SYR" & year > 2010,
-      syr_2010 * chain_factor,
-      gdp
-    )
-  ]
-  gdp$chain_factor <- NULL
+  # If there are special countries
+  if (nrow(sna) > 0) {
+    # Join with Special National Accounts data.
+    setnames(sna, "countrycode", "country_code")
 
+    gdp[sna,
+        on = .(country_code, year),
+        `:=`(
+          chain_factor = i.GDP
+        )
+    ]
+
+    syr_2010 <- gdp[country_code == "SYR" & year == 2010,
+                    gdp]
+    gdp[,
+        gdp := fifelse(is.na(chain_factor),gdp, syr_2010 * chain_factor)
+    ]
+    # remove extra variables
+    gdp[,
+        chain_factor := NULL]
+  }
 
   # ---- Expand for special cases with U/R levels ----
 

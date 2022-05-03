@@ -10,7 +10,10 @@ pip_pce_update <- function(force = FALSE,
                            sna_tag = "main",
                            from    = "file") {
 
-  # ---- Load data ----
+
+#   ____________________________________________________________________________
+#   Load data                                                               ####
+
   if (force) {
     pip_wdi_update(maindir = maindir,
                    from    = from)
@@ -64,11 +67,14 @@ pip_pce_update <- function(force = FALSE,
   setDT(sna)
   setDT(cl)
 
-  # ---- Clean PCE from WDI ----
+
+#   ____________________________________________________________________________
+#   Clean PCE from WDI                                                      ####
+
   # Keep relevant variables
   wpce <- wpce[, .(country_code, year, wdi_pce)]
 
-  # ---- Adjust FY to CY ----
+  ## ---- Adjust FY to CY ----
 
   # Merge WDI with special FY cases
   sna_fy <- sna_fy[c("Code", "Month", "Day")]
@@ -106,7 +112,10 @@ pip_pce_update <- function(force = FALSE,
   pce <- wpce[, .(country_code, year, wdi_pce)]
 
 
-  # ---- Expand for special cases with U/R levels ----
+#   ____________________________________________________________________________
+#   Special cases                                                           ####
+
+  ## ---- Expand for special cases with U/R levels ----
 
   # Special cases for IND, IDN, and CHN
   sp <- pce[country_code %in% c("IND", "IDN", "CHN")]
@@ -128,15 +137,14 @@ pip_pce_update <- function(force = FALSE,
   pce <- rbindlist(list(pce, sp))
 
   # Add domain column
-  pce[
-    ,
-    pce_domain := fifelse(pce_data_level == 2, 1, 2)
-  ]
+  pce[,
+      pce_domain := fifelse(pce_data_level == 2, 1, 2)
+      ]
 
   # Sort
   setorder(pce, country_code, year, pce_data_level)
 
-  # ---- Recode domain and data level ----
+  ## ---- Recode domain and data level ----
 
   # Recode domain and data_level variables
   cols <- c("pce_domain", "pce_data_level")
@@ -160,34 +168,43 @@ pip_pce_update <- function(force = FALSE,
   ]
 
 
-  # ---- Hard-coded custom modifications ----
+  ## ---- Hard-coded custom modifications ----
+  # get survey years where only PCE is present
+  sna <- sna[!is.na(PCE)
+             ][, # lower case coverage
+               coverage := tolower(coverage)
+               ]
 
-  # Join with Special National Accounts data.
-  sna <- sna[countrycode == "IND"]
-  sna$coverage <- tolower(sna$coverage)
-  setnames(
-    sna, c("countrycode", "coverage"),
-    c("country_code", "pce_data_level")
-  )
-  pce[sna,
-    on = .(country_code, year, pce_data_level),
-    `:=`(
-      sna_pce = i.PCE
-    )
-  ]
+  # If there are special countries
+  if (nrow(sna) > 0) {
+    # Join with Special National Accounts data.
+    setnames(x = sna,
+             old = c("countrycode", "coverage"),
+             new = c("country_code", "pce_data_level")
+             )
 
-  # India should be replaced with country specific-sources from 2011
-  pce[
-    ,
-    pce := fifelse(
-      country_code == "IND" & year > 2010 &
-        pce_data_level != "national",
-      sna_pce,
-      wdi_pce
-    )
-  ]
-  pce$sna_pce <- NULL
-  pce$wdi_pce <- NULL
+    pce[sna,
+      on = .(country_code, year, pce_data_level),
+      `:=`(
+        sna_pce = i.PCE
+      )
+    ]
+
+    pce[,
+        pce := fifelse(is.na(sna_pce),wdi_pce, sna_pce)
+        ]
+    # remvoe extra variables
+    pce[,
+        c("sna_pce", "wdi_pce") := NULL]
+
+  } else {
+    # If there are no special countries
+    setnames(pce, "wdi_pce", "pce")
+  }
+
+
+#   ____________________________________________________________________________
+#   Hard-coded countries                                                     ####
 
   # Remove observations for Venezuela after 2014
   pce[
@@ -209,7 +226,10 @@ pip_pce_update <- function(force = FALSE,
     pce := fifelse(country_code == "IRQ", NA_real_, pce)
   ]
 
-  # ---- Finalize table ----
+
+#   ____________________________________________________________________________
+#   Finalize table                                                          ####
+
 
   # Remove rows with missing GDP
   pce <- pce[!is.na(pce) & !is.infinite(pce)]
@@ -218,7 +238,7 @@ pip_pce_update <- function(force = FALSE,
   # Remove any non-WDI countries
   pce <- pce[country_code %in% cl$country_code]
 
-  # ---- Sign and save ----
+  ## ---- Sign and save ----
 
   measure <- "pce"
   msrdir <- fs::path(maindir, "_aux/", measure)
