@@ -3,8 +3,12 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
-#' @keywords intenal
-pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
+#' @inheritParams pip_wdi_update
+#' @keywords internal
+pip_gdp_update <- function(force = FALSE,
+                           maindir = gls$PIP_DATA_DIR,
+                           sna_tag = "main",
+                           from    = "file") {
 
   #----------------------------------------------------------
   #   Load data
@@ -15,15 +19,49 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   pip_gdp_weo("update", maindir = maindir)
   weo    <- pipload::pip_load_aux("weo", maindir = maindir)
 
-  wgdp   <- wbstats::wb_data(indicator = "NY.GDP.PCAP.KD", lang = "en")
+  if (force) {
+    pip_wdi_update(maindir = maindir,
+                   from    = from)
+  }
+  wgdp   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  setnames(wgdp, "NY.GDP.PCAP.KD", "wdi_gdp")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna.csv"
+  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_tag}/sna.csv")
   umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
-  sna <- suppressMessages(
-    readr::read_csv(usna)
-  )
+
+  tryCatch(
+    expr = {
+      # Your code...
+      sna <- suppressMessages(
+        readr::read_csv(usna)
+      )
+    }, # end of expr section
+
+    error = function(e) {
+      owner <-  "pip-technical-team"
+      repo  <-  "pip-sna"
+      tags  <- c("main", get_gh_tags(owner, repo))
+
+
+      if (! (sna_tag  %in% tags)) {
+        msg     <- c(
+          "{.field sna_tag} specified ({sna_tag}) does not exist in repo
+          {.file {owner}/{repo}}",
+          "i" = "Select one among {.field {tags}}"
+          )
+        cli::cli_abort(msg, class = "pipaux_error")
+
+      } else {
+        msg     <- c("Could not load sna from Github repo:
+                     {e$message}")
+        cli::cli_abort(msg,class = "pipaux_error")
+
+      }
+    } # end of finally section
+
+  ) # End of trycatch
 
   sna_fy <- suppressMessages(
     readr::read_csv(umet)
@@ -32,19 +70,11 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   cl <- pip_country_list("load", maindir = maindir)
 
   setDT(madd)
-  setDT(wgdp)
   setDT(weo)
   setDT(sna)
   setDT(cl)
 
   #--------- Clean GDP from WDI ---------
-
-  # Rename columns
-  setnames(wgdp,
-    old = c("iso3c", "date", "NY.GDP.PCAP.KD"),
-    new = c("country_code", "year", "wdi_gdp")
-  )
-
   # Keep relevant variables
   wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
 
@@ -139,27 +169,29 @@ pip_gdp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # Syria should be replaced with country specific-sources from 2010
 
   # Merge with sna
-  sna <- sna[countrycode == "SYR"]
-  setnames(sna, "countrycode", "country_code")
-  gdp[sna,
-    on = .(country_code, year),
-    `:=`(
-      chain_factor = i.GDP
-    )
-  ]
+  sna <- sna[!is.na(GDP)]
 
-  # Modify observations for Syria after 2010
-  syr_2010 <- gdp[country_code == "SYR" & year == 2010]$gdp
-  gdp[
-    ,
-    gdp := fifelse(
-      country_code == "SYR" & year > 2010,
-      syr_2010 * chain_factor,
-      gdp
-    )
-  ]
-  gdp$chain_factor <- NULL
+  # If there are special countries
+  if (nrow(sna) > 0) {
+    # Join with Special National Accounts data.
+    setnames(sna, "countrycode", "country_code")
 
+    gdp[sna,
+        on = .(country_code, year),
+        `:=`(
+          chain_factor = i.GDP
+        )
+    ]
+
+    syr_2010 <- gdp[country_code == "SYR" & year == 2010,
+                    gdp]
+    gdp[,
+        gdp := fifelse(is.na(chain_factor),gdp, syr_2010 * chain_factor)
+    ]
+    # remove extra variables
+    gdp[,
+        chain_factor := NULL]
+  }
 
   # ---- Expand for special cases with U/R levels ----
 

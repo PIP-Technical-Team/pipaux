@@ -3,14 +3,18 @@
 #' Load or update PCE data.
 #'
 #' @inheritParams pip_prices
+#' @param  sna_tag character: release tag of pip-sna file needed. Default is "main"
 #' @export
 pip_pce <- function(action = "update",
                     force = FALSE,
-                    maindir = gls$PIP_DATA_DIR) {
+                    maindir = gls$PIP_DATA_DIR,
+                    sna_tag = "main") {
   measure <- "pce"
 
   if (action == "update") {
-    pip_pce_update(force = force, maindir = maindir)
+    pip_pce_update(force = force,
+                   maindir = maindir,
+                   sna_tag = sna_tag)
   } else if (action == "load") {
     df <- load_aux(
       maindir = maindir,

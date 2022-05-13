@@ -1,3 +1,11 @@
+# pipaux (development version)
+
+-   Retrieve SNA data from github repo, not from drive anymore
+
+-   Store WDI in drive to avoid unexpected changes
+
+-   Update chain factor in GDP update
+
 # pipaux 0.0.7
 
 -   Add `ppp_vintage` database when `ppp` is updated.

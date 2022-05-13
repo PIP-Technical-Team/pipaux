@@ -3,42 +3,78 @@
 #' Update PCE data using WDI and Special cases.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams pip_wdi_update
 #' @keywords internal
-pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
+pip_pce_update <- function(force = FALSE,
+                           maindir = gls$PIP_DATA_DIR,
+                           sna_tag = "main",
+                           from    = "file") {
 
-  # ---- Load data ----
+
+#   ____________________________________________________________________________
+#   Load data                                                               ####
+
+  if (force) {
+    pip_wdi_update(maindir = maindir,
+                   from    = from)
+  }
+  wpce   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Special national accounts --------
+  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_tag}/sna.csv")
+  umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
+
+  tryCatch(
+    expr = {
+      # Your code...
+      sna <- suppressMessages(
+        readr::read_csv(usna)
+      )
+    }, # end of expr section
+
+    error = function(e) {
+      owner <-  "pip-technical-team"
+      repo  <-  "pip-sna"
+      tags  <- c("main", get_gh_tags(owner, repo))
 
 
-  wpce   <-
-    wbstats::wb_data(indicator = "NE.CON.PRVT.PC.KD", lang = "en")
-  sna    <-
-    readxl::read_xlsx(fs::path(maindir, "_aux/sna/NAS special_2021-01-14.xlsx"))
-  sna_fy <-
-    readxl::read_xlsx(
-      fs::path(
-        maindir,
-        "_aux/sna/National_Accounts_Fiscal_Years_Metadata.xlsx"
-      ),
-      sheet = "WDI Jan2022"
-    )
+      if (! (sna_tag  %in% tags)) {
+        msg     <- c(
+          "{.field sna_tag} specified ({sna_tag}) does not exist in repo
+          {.file {owner}/{repo}}",
+          "i" = "Select one among {.field {tags}}"
+        )
+        cli::cli_abort(msg, class = "pipaux_error")
+
+      } else {
+        msg     <- c("Could not load sna from Github repo:
+                     {e$message}")
+        cli::cli_abort(msg,class = "pipaux_error")
+
+      }
+    } # end of finally section
+
+  ) # End of trycatch
+
+  sna_fy <- suppressMessages(
+    readr::read_csv(umet)
+  )
+
   cl     <- pip_country_list("load", maindir = maindir)
 
-  setDT(wpce)
   setDT(sna)
   setDT(cl)
 
-  # ---- Clean PCE from WDI ----
 
-  # Rename vars
-  setnames(wpce,
-    old = c("iso3c", "date", "NE.CON.PRVT.PC.KD"),
-    new = c("country_code", "year", "wdi_pce")
-  )
+#   ____________________________________________________________________________
+#   Clean PCE from WDI                                                      ####
 
   # Keep relevant variables
   wpce <- wpce[, .(country_code, year, wdi_pce)]
 
-  # ---- Adjust FY to CY ----
+  ## ---- Adjust FY to CY ----
 
   # Merge WDI with special FY cases
   sna_fy <- sna_fy[c("Code", "Month", "Day")]
@@ -76,7 +112,10 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   pce <- wpce[, .(country_code, year, wdi_pce)]
 
 
-  # ---- Expand for special cases with U/R levels ----
+#   ____________________________________________________________________________
+#   Special cases                                                           ####
+
+  ## ---- Expand for special cases with U/R levels ----
 
   # Special cases for IND, IDN, and CHN
   sp <- pce[country_code %in% c("IND", "IDN", "CHN")]
@@ -98,15 +137,14 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   pce <- rbindlist(list(pce, sp))
 
   # Add domain column
-  pce[
-    ,
-    pce_domain := fifelse(pce_data_level == 2, 1, 2)
-  ]
+  pce[,
+      pce_domain := fifelse(pce_data_level == 2, 1, 2)
+      ]
 
   # Sort
   setorder(pce, country_code, year, pce_data_level)
 
-  # ---- Recode domain and data level ----
+  ## ---- Recode domain and data level ----
 
   # Recode domain and data_level variables
   cols <- c("pce_domain", "pce_data_level")
@@ -130,34 +168,43 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   ]
 
 
-  # ---- Hard-coded custom modifications ----
+  ## ---- Hard-coded custom modifications ----
+  # get survey years where only PCE is present
+  sna <- sna[!is.na(PCE)
+             ][, # lower case coverage
+               coverage := tolower(coverage)
+               ]
 
-  # Join with Special National Accounts data.
-  sna <- sna[countrycode == "IND"]
-  sna$coverage <- tolower(sna$coverage)
-  setnames(
-    sna, c("countrycode", "coverage"),
-    c("country_code", "pce_data_level")
-  )
-  pce[sna,
-    on = .(country_code, year, pce_data_level),
-    `:=`(
-      sna_pce = i.PCE
-    )
-  ]
+  # If there are special countries
+  if (nrow(sna) > 0) {
+    # Join with Special National Accounts data.
+    setnames(x = sna,
+             old = c("countrycode", "coverage"),
+             new = c("country_code", "pce_data_level")
+             )
 
-  # India should be replaced with country specific-sources from 2011
-  pce[
-    ,
-    pce := fifelse(
-      country_code == "IND" & year > 2010 &
-        pce_data_level != "national",
-      sna_pce,
-      wdi_pce
-    )
-  ]
-  pce$sna_pce <- NULL
-  pce$wdi_pce <- NULL
+    pce[sna,
+      on = .(country_code, year, pce_data_level),
+      `:=`(
+        sna_pce = i.PCE
+      )
+    ]
+
+    pce[,
+        pce := fifelse(is.na(sna_pce),wdi_pce, sna_pce)
+        ]
+    # remvoe extra variables
+    pce[,
+        c("sna_pce", "wdi_pce") := NULL]
+
+  } else {
+    # If there are no special countries
+    setnames(pce, "wdi_pce", "pce")
+  }
+
+
+#   ____________________________________________________________________________
+#   Hard-coded countries                                                     ####
 
   # Remove observations for Venezuela after 2014
   pce[
@@ -179,7 +226,10 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     pce := fifelse(country_code == "IRQ", NA_real_, pce)
   ]
 
-  # ---- Finalize table ----
+
+#   ____________________________________________________________________________
+#   Finalize table                                                          ####
+
 
   # Remove rows with missing GDP
   pce <- pce[!is.na(pce) & !is.infinite(pce)]
@@ -188,7 +238,7 @@ pip_pce_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   # Remove any non-WDI countries
   pce <- pce[country_code %in% cl$country_code]
 
-  # ---- Sign and save ----
+  ## ---- Sign and save ----
 
   measure <- "pce"
   msrdir <- fs::path(maindir, "_aux/", measure)
