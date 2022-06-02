@@ -7,7 +7,7 @@
 pip_gdp_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_tag = "main",
+  sna_branch = "main",
   from = "file"
 )
 }
@@ -16,7 +16,7 @@ pip_gdp_update(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{sna_tag}{character: release tag of pip-sna file needed. Default is "main"}
+\item{sna_branch}{character: release tag of pip-sna file needed. Default is "main"}
 
 \item{from}{character: Either "file" or "api". Default is file.}
 }

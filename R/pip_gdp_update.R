@@ -7,7 +7,7 @@
 #' @keywords internal
 pip_gdp_update <- function(force = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           sna_tag = "main",
+                           sna_branch = "main",
                            from    = "file") {
 
   #----------------------------------------------------------
@@ -28,7 +28,7 @@ pip_gdp_update <- function(force = FALSE,
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_tag}/sna.csv")
+  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
   umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
 
   tryCatch(
@@ -45,9 +45,9 @@ pip_gdp_update <- function(force = FALSE,
       tags  <- c("main", get_gh_tags(owner, repo))
 
 
-      if (! (sna_tag  %in% tags)) {
+      if (! (sna_branch  %in% tags)) {
         msg     <- c(
-          "{.field sna_tag} specified ({sna_tag}) does not exist in repo
+          "{.field sna_branch} specified ({sna_branch}) does not exist in repo
           {.file {owner}/{repo}}",
           "i" = "Select one among {.field {tags}}"
           )

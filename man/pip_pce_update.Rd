@@ -7,7 +7,7 @@
 pip_pce_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_tag = "main",
+  sna_branch = "main",
   from = "file"
 )
 }

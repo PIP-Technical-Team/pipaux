@@ -17,36 +17,16 @@ pip_cpi_vintage <- function(msrdir = fs::path(gls$PIP_DATA_DIR, "_aux/", measure
 
   # get directories
   cpi_files <- fs::dir_ls(dlwdir, regexp = "GMD_CPI\\.dta$", recurse = TRUE, type = "file")
+
   # load data
-  cpi_list <- purrr::map(
-    .x = cpi_files,
-    .f = load_cpi
-  )
+  last_file <- max(cpi_files)
+  vintage   <- load_cpi(last_file)
 
-  # create one single dataframe
-  cp <- data.table::rbindlist(cpi_list,
-    use.names = TRUE,
-    fill      = TRUE
-  )
+  tokeep    <- names(vintage) |>
+    {\(.) grep("^cpi[0-9]{4}", ., value = TRUE)}() |>
+  c("code", "year", "survname", "cpi_data_level", "cpi_ppp_id")
 
-  # GEt vintage for each c("code", "year", "survname", "datalevel")
-  byvars <- c("code", "year", "survname", "datalevel")
-  changevar <- "change_cpi2011"
-  activevar <- "cpi2011"
-
-  vintage <- cp[ # keep only 1s
-    get(changevar) == 1
-  ][,
-    maxid := cpi_ppp_id == max(cpi_ppp_id),
-    by = c(byvars)
-  ][
-    maxid == TRUE
-  ][,
-    .(unique(get(activevar))),
-    by = c(byvars, "cpi_ppp_id")
-  ]
-
-  setnames(vintage, "V1", activevar)
+  vintage <-  vintage[, ..tokeep]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   #---------   check version and save  ---------
@@ -58,6 +38,7 @@ pip_cpi_vintage <- function(msrdir = fs::path(gls$PIP_DATA_DIR, "_aux/", measure
 
   equal_vintage <- TRUE
   if (fs::file_exists(sfile)) {
+
     cfile <- readr::read_rds(sfile)
     attr(cfile, "time") <- NULL # remove attributes
     attr(cfile, "user") <- NULL # remove attributes
@@ -106,6 +87,6 @@ load_cpi <- function(x) {
     }
   }
 
-
+  data.table::setDT(df)
   return(df)
 }
