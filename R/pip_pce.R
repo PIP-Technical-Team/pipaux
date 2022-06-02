@@ -5,15 +5,17 @@
 #' @inheritParams pip_prices
 #' @param  sna_branch character: release tag of pip-sna file needed. Default is "main"
 #' @export
-pip_pce <- function(action = "update",
-                    force = FALSE,
-                    maindir = gls$PIP_DATA_DIR,
-                    sna_branch = "main") {
+pip_pce <- function(action     = "update",
+                    force      = FALSE,
+                    maindir    = gls$PIP_DATA_DIR,
+                    sna_branch      = c("main", "dev")) {
+
   measure <- "pce"
+  sna_branch <- match.arg(sna_branch)
 
   if (action == "update") {
-    pip_pce_update(force = force,
-                   maindir = maindir,
+    pip_pce_update(force      = force,
+                   maindir    = maindir,
                    sna_branch = sna_branch)
   } else if (action == "load") {
     df <- load_aux(

@@ -10,18 +10,18 @@
 #'
 #' @examples
 #' pip_wdi_update()
-pip_wdi_update <- function(force = FALSE,
+pip_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           from = c("file", "api")) {
+                           from    = c("file", "api")) {
 
-  #   ____________________________________________________________________________
-  #   on.exit                                                                 ####
+  #   _________________________________________________________________
+  #   on.exit                                                 ####
   on.exit({
 
   })
 
-  #   ____________________________________________________________________________
-  #   Defenses                                                                ####
+  #   ____________________________________________________________________
+  #   Defenses                                        ####
   from <- match.arg(from)
   stopifnot( exprs = {
 

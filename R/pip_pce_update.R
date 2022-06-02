@@ -5,12 +5,12 @@
 #' @inheritParams pip_prices
 #' @inheritParams pip_wdi_update
 #' @keywords internal
-pip_pce_update <- function(force = FALSE,
-                           maindir = gls$PIP_DATA_DIR,
-                           sna_branch = "main",
-                           from    = "file") {
+pip_pce_update <- function(force      = FALSE,
+                           maindir    = gls$PIP_DATA_DIR,
+                           sna_branch = c("main", "dev"),
+                           from       = "file") {
 
-
+  sna_branch <- match.arg(sna_branch)
 #   ____________________________________________________________________________
 #   Load data                                                               ####
 

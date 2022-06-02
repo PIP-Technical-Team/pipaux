@@ -8,7 +8,7 @@ pip_pce(
   action = "update",
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_branch = "main"
+  sna_branch = c("main", "dev")
 )
 }
 \arguments{
