@@ -31,7 +31,7 @@ pip_gdp_update <- function(force      = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
   usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
-  umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
+  umet <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna_metadata.csv")
 
   tryCatch(
     expr = {
