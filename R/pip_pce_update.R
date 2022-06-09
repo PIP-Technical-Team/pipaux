@@ -11,8 +11,8 @@ pip_pce_update <- function(force      = FALSE,
                            from       = "file") {
 
   sna_branch <- match.arg(sna_branch)
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+#   ________________________________________________________________
+#   Load data                                             ####
 
   if (force) {
     pip_wdi_update(maindir = maindir,
@@ -24,7 +24,7 @@ pip_pce_update <- function(force      = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
   usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
-  umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
+  umet <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna_metadata.csv")
 
   tryCatch(
     expr = {
@@ -203,8 +203,8 @@ pip_pce_update <- function(force      = FALSE,
   }
 
 
-#   ____________________________________________________________________________
-#   Hard-coded countries                                                     ####
+#   _______________________________________________________________________
+#   Hard-coded countries                                              ####
 
   # Remove observations for Venezuela after 2014
   pce[
@@ -227,8 +227,8 @@ pip_pce_update <- function(force      = FALSE,
   ]
 
 
-#   ____________________________________________________________________________
-#   Finalize table                                                          ####
+#   __________________________________________________________________
+#   Finalize table                                                 ####
 
 
   # Remove rows with missing GDP
