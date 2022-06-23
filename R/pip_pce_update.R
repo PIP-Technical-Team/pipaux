@@ -5,14 +5,14 @@
 #' @inheritParams pip_prices
 #' @inheritParams pip_wdi_update
 #' @keywords internal
-pip_pce_update <- function(force = FALSE,
-                           maindir = gls$PIP_DATA_DIR,
-                           sna_tag = "main",
-                           from    = "file") {
+pip_pce_update <- function(force      = FALSE,
+                           maindir    = gls$PIP_DATA_DIR,
+                           sna_branch = c("main", "dev"),
+                           from       = "file") {
 
-
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+  sna_branch <- match.arg(sna_branch)
+#   ________________________________________________________________
+#   Load data                                             ####
 
   if (force) {
     pip_wdi_update(maindir = maindir,
@@ -23,8 +23,8 @@ pip_pce_update <- function(force = FALSE,
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_tag}/sna.csv")
-  umet <- "https://github.com/PIP-Technical-Team/pip-sna/raw/main/sna_metadata.csv"
+  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
+  umet <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna_metadata.csv")
 
   tryCatch(
     expr = {
@@ -40,9 +40,9 @@ pip_pce_update <- function(force = FALSE,
       tags  <- c("main", get_gh_tags(owner, repo))
 
 
-      if (! (sna_tag  %in% tags)) {
+      if (! (sna_branch  %in% tags)) {
         msg     <- c(
-          "{.field sna_tag} specified ({sna_tag}) does not exist in repo
+          "{.field sna_branch} specified ({sna_branch}) does not exist in repo
           {.file {owner}/{repo}}",
           "i" = "Select one among {.field {tags}}"
         )
@@ -203,8 +203,8 @@ pip_pce_update <- function(force = FALSE,
   }
 
 
-#   ____________________________________________________________________________
-#   Hard-coded countries                                                     ####
+#   _______________________________________________________________________
+#   Hard-coded countries                                              ####
 
   # Remove observations for Venezuela after 2014
   pce[
@@ -227,8 +227,8 @@ pip_pce_update <- function(force = FALSE,
   ]
 
 
-#   ____________________________________________________________________________
-#   Finalize table                                                          ####
+#   __________________________________________________________________
+#   Finalize table                                                 ####
 
 
   # Remove rows with missing GDP

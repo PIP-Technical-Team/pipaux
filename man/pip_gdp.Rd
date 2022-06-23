@@ -10,7 +10,7 @@ pip_gdp(
   weo_action = "load",
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_tag = "main"
+  sna_branch = c("main", "dev")
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ pip_gdp(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{sna_tag}{character: release tag of pip-sna file needed. Default is "main"}
+\item{sna_branch}{character: release branch of pip-sna file needed. Default is "main"}
 }
 \description{
 Update or load GDP data.
