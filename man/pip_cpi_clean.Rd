@@ -4,12 +4,10 @@
 \alias{pip_cpi_clean}
 \title{Clean CPI data}
 \usage{
-pip_cpi_clean(y, cpi_id, cpivar = getOption("pipaux.cpivar"))
+pip_cpi_clean(y, cpivar = getOption("pipaux.cpivar"))
 }
 \arguments{
 \item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}
-
-\item{cpi_id}{character: CPI ID. Extracted from \code{pip_cpi_update()}}
 
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}

@@ -3,13 +3,11 @@
 #' Clean CPI data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with CPI data from datalibweb. loaded in `pip_prices()`.
-#' @param cpi_id character: CPI ID. Extracted from `pip_cpi_update()`
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
 #'
 #' @keywords internal
 pip_cpi_clean <- function(y,
-                          cpi_id,
                           cpivar = getOption("pipaux.cpivar")) {
   x <- data.table::as.data.table(y)
 
@@ -17,7 +15,7 @@ pip_cpi_clean <- function(y,
   keep_vars <- c(
     "country_code", "cpi_year", "survey_year",
     "cpi", "ccf", "survey_acronym", "change_cpi2011",
-    grep("^cpi", names(x), value = TRUE), "cpi_id"
+    grep("^cpi", names(x), value = TRUE)
   )
 
   # modifications to the database
@@ -38,7 +36,6 @@ pip_cpi_clean <- function(y,
       survey_year    = ref_year,
       cpi            = get(cpivar),
       survey_acronym = survname,
-      cpi_id         = (cpi_id),
       cpi_domain     = as.character(cpi_domain),
       cpi_data_level = as.character(cpi_data_level)
     )

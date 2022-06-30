@@ -17,6 +17,9 @@ pip_sign_save(x, measure, msrdir, force = FALSE, save_dta = TRUE)
 
 \item{save_dta}{logical: If TRUE a Stata (.dta) version of the dataset is also saved.}
 }
+\value{
+logical
+}
 \description{
 Save PIP auxiliary data with data signature.
 }

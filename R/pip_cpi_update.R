@@ -1,51 +1,46 @@
 #' Update CPI
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @keywords internal
 pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
-                           dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
-                           force = FALSE) {
+                           force   = FALSE,
+                           owner   = "PIP-Technical-Team",
+                           repo    = "aux_cpi",
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch)) {
   measure <- "cpi"
   msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
   cl <- pip_country_list("load", maindir = maindir)
   setDT(cl)
 
-  vintage <- FALSE
-  vintage <- pip_cpi_vintage(
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Special national accounts --------
+  cpi <- load_raw_aux(
+    measure = measure,
+    owner  = owner,
+    repo   = repo,
+    branch = branch,
+    tag    = tag
+  )
+
+
+  # Clean data
+  cpi <- pip_cpi_clean(cpi)
+
+  # Remove any non-WDI countries
+  cpi <- cpi[country_code %in% cl$country_code]
+  return(cpi)
+
+  # Save
+  saved <- pip_sign_save(
+    x = cpi,
+    measure = "cpi",
     msrdir = msrdir,
-    dlwdir = dlwdir,
     force = force
   )
 
 
-  if (vintage == TRUE || force == TRUE) {
-    cpi_files <- fs::dir_ls(dlwdir,
-      regexp = "GMD_CPI\\.dta$",
-      recurse = TRUE,
-      type = "file"
-    )
-
-    latest_cpi <- max(cpi_files)
-    cpi_id <- gsub("(.*/Support_2005_)([^/]+)(_GMD_CPI\\.dta$)", "\\2", latest_cpi)
-
-    # Read latest dataset from file
-    cpidlw <- haven::read_dta(latest_cpi)
-
-    # Clean data
-    cpi <- pip_cpi_clean(cpidlw, cpi_id = cpi_id)
-
-    # Remove any non-WDI countries
-    cpi <- cpi[country_code %in% cl$country_code]
-
-    # Save
-    pip_sign_save(
-      x = cpi,
-      measure = "cpi",
-      msrdir = msrdir,
-      force = force
-    )
-  } else {
-    cli::cli_alert_success("CPI data is up to date")
-    return(invisible(FALSE))
-  }
+  return(invisible(saved))
 }
+

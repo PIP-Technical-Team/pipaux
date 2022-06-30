@@ -251,15 +251,17 @@ chain_backwards <- function(dt) {
 #'
 #' @param owner character: Github username that owns the repo
 #' @param repo character: Github repository name
+#' @param what character: either "tags" or "branches"
 #'
 #' @return character vector with tags
-#' @export
 #'
 #' @examples
 #' owner <- "pip-technical-team"
 #' repo  <- "pip-sna"
 #' get_gh_tags(owner, repo)
-get_gh_tags <- function(owner, repo) {
+get_gh <- function(owner,
+                   repo,
+                   what = c("tags", "branches")) {
 
   # on.exit ------------
   on.exit({
@@ -267,6 +269,7 @@ get_gh_tags <- function(owner, repo) {
   })
 
   # Defenses -----------
+  what <- match.arg(what)
   stopifnot( exprs = {
 
     }
@@ -278,15 +281,21 @@ get_gh_tags <- function(owner, repo) {
   }
 
   # Computations -------
-  tags <-
-    gh::gh("/repos/{owner}/{repo}/tags",
+
+  rs <-
+    gh::gh("/repos/{owner}/{repo}/{what}",
            owner = owner,
            repo = repo,
+           what = what,
            .limit = Inf)  |>
     purrr::map_chr("name")
 
+  if (what == "tags") {
+    rs <- sort(rs, decreasing = TRUE)
+  }
+
 
   # Return -------------
-  return(tags)
+  return(rs)
 
 }
