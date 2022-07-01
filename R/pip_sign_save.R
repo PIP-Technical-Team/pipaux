@@ -14,8 +14,13 @@ pip_sign_save <- function(x,
                           force = FALSE,
                           save_dta = TRUE) {
 
-  # Note: clean CPI data file and then create data signature
-  ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
+#   ____________________________________________________________________________
+#   Files and directories                                                   ####
+
+  wholedir <- fs::path(msrdir, "_vintage")
+  if (!(fs::dir_exists(wholedir))) {
+    fs::dir_create(wholedir, recurse = TRUE)
+  }
 
   # check signature of current fst file
   ds_production_path <- fs::path(msrdir, paste0(measure, "_datasignature.txt")) # data signature in production
@@ -31,7 +36,15 @@ pip_sign_save <- function(x,
     ms_status <- "new"
   }
 
+
+#   ____________________________________________________________________________
+#   Check signatures                                                        ####
+
   #--------- if Signature from dlw is different from the one in production ---------
+
+  # Note: clean CPI data file and then create data signature
+  ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
+
 
   if (force == TRUE) {
     ms_status <- "forced"
@@ -44,12 +57,6 @@ pip_sign_save <- function(x,
   }
 
   if (ms_status %in% c("forced", "changed")) {
-
-    # make sure directory exists
-    wholedir <- fs::path(msrdir, "_vintage/")
-    if (!(fs::dir_exists(wholedir))) {
-      fs::dir_create(wholedir, recurse = TRUE)
-    }
 
     # re-write x in production if data signature is not found
     # Vintage
@@ -109,7 +116,9 @@ pip_sign_save <- function(x,
 
     cli::cli_alert_warning(infmsg)
     return(invisible(TRUE))
+
   } else {
+
     cli::cli_alert_info("Data signature is up to date.
                         {cli::col_blue('No update performed')}")
     return(invisible(FALSE))

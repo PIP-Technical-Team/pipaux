@@ -8,8 +8,9 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            repo    = "aux_cpi",
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)) {
+
+  branch  <- match.arg(branch)
   measure <- "cpi"
-  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
   cl <- pip_country_list("load", maindir = maindir)
   setDT(cl)
 
@@ -30,16 +31,15 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # Remove any non-WDI countries
   cpi <- cpi[country_code %in% cl$country_code]
-  return(cpi)
 
   # Save
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pip_sign_save(
-    x = cpi,
-    measure = "cpi",
-    msrdir = msrdir,
-    force = force
+    x       = cpi,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force
   )
-
 
   return(invisible(saved))
 }
