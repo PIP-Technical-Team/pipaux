@@ -21,6 +21,7 @@ load_raw_aux <- function(measure,
 
   #   ____________________________________________________________________________
   #   Defenses                                                                ####
+  branch <- match.arg(branch)
   stopifnot(exprs = {
 
   })
@@ -47,7 +48,6 @@ load_raw_aux <- function(measure,
     # end of expr section
 
     error = function(e) {
-      branch <- match.arg(branch)
       if (tag == branch) {
 
         ##  ............................................................................

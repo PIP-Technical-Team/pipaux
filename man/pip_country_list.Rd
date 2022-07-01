@@ -9,7 +9,7 @@ pip_country_list(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = "PIP-Technical-Team",
-  repo = "aux_cpi",
+  repo = "aux_country_list",
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
