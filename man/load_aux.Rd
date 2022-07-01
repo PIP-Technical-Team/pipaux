@@ -4,7 +4,12 @@
 \alias{load_aux}
 \title{Load any auxiliary data}
 \usage{
-load_aux(measure = NULL, maindir = gls$PIP_DATA_DIR, apply_label = TRUE)
+load_aux(
+  measure,
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  apply_label = TRUE
+)
 }
 \arguments{
 \item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}

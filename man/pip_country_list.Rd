@@ -5,21 +5,31 @@
 \title{List of countries}
 \usage{
 pip_country_list(
-  action = "update",
+  action = c("update", "load"),
+  maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  pcndir = gls$PCN_MASTER,
-  maindir = gls$PIP_DATA_DIR
+  owner = "PIP-Technical-Team",
+  repo = "aux_cpi",
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
-"update" data will be updated on the system. If "load" data is loaded in memory.}
+"update" data will be updated on the system. If "load" data is loaded in
+memory.}
+
+\item{maindir}{character: Main directory of project.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{pcndir}{character: PovcalNet directory for the Masterfile.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 
-\item{maindir}{character: Main directory of project.}
+\item{tag}{character: specific release to be used in the update.}
+}
+\value{
+logical if \code{action = "update"} or data.table if \code{action = "load"}
 }
 \description{
 Load or update dataset with WDI countries. See details.

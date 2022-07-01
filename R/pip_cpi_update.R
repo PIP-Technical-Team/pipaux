@@ -11,9 +11,9 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 
   branch  <- match.arg(branch)
   measure <- "cpi"
-  cl <- pip_country_list("load", maindir = maindir)
-  setDT(cl)
-
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
