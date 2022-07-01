@@ -9,14 +9,16 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)) {
 
+#   ____________________________________________________________________________
+#   Set up                                                                  ####
+
   branch  <- match.arg(branch)
   measure <- "cpi"
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
 
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ## Special national accounts --------
+
+#   ____________________________________________________________________________
+#   load raw data                                                           ####
+
   cpi <- load_raw_aux(
     measure = measure,
     owner  = owner,
@@ -26,10 +28,16 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   )
 
 
+#   ____________________________________________________________________________
+#   Cleaning                                                                ####
+
   # Clean data
   cpi <- pip_cpi_clean(cpi)
 
   # Remove any non-WDI countries
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
   cpi <- cpi[country_code %in% cl$country_code]
 
   # Save

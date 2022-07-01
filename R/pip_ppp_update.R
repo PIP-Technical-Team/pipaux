@@ -1,33 +1,51 @@
 #' Update PPP
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @keywords internal
 pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
-                           dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
-                           force = FALSE) {
-  measure <- "ppp"
-  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
-  cl <- pip_country_list("load", maindir = maindir)
-  setDT(cl)
+                           force   = FALSE,
+                           owner   = "PIP-Technical-Team",
+                           repo    = "aux_cpi",
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch)) {
 
-  # Get list of files
-  ppp_files <- fs::dir_ls(dlwdir,
-    regexp = "pppdata_allvintages\\.dta$",
-    recurse = TRUE,
-    type = "file"
+
+#   ____________________________________________________________________________
+#   set up                                                                  ####
+
+  branch  <- match.arg(branch)
+  measure <- "ppp"
+
+
+#   ____________________________________________________________________________
+#   Load raw data                                                           ####
+
+  ppp <- load_raw_aux(
+    measure = measure,
+    owner  = owner,
+    repo   = repo,
+    branch = branch,
+    tag    = tag
   )
 
-  # Latest version
-  latest_ppp <- max(ppp_files)
 
-  # Read data
-  pppdlw <- haven::read_dta(latest_ppp)
+#   ____________________________________________________________________________
+#   cleaning                                                                ####
+
 
   # Clean data
-  ppp <- pip_ppp_clean(pppdlw)
+  ppp <- pip_ppp_clean(ppp)
 
   # Remove any non-WDI countries
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
+
   ppp <- ppp[country_code %in% cl$country_code]
+
+
+##  ............................................................................
+##  Special cases                                                           ####
 
   # Hardcode domain / data_level fix for NRU
   ppp$ppp_domain <-
@@ -39,13 +57,20 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
       "national", ppp$ppp_data_level
     )
 
-  # Save
-  pip_sign_save(
-    x = ppp,
-    measure = "ppp",
-    msrdir = msrdir,
-    force = force
+
+#   ____________________________________________________________________________
+#   Saving                                                                  ####
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  saved <- pip_sign_save(
+    x       = ppp,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force
   )
+
+
+#   ____________________________________________________________________________
+#   PPP vintages data                                                     ####
 
   vars        <- c("ppp_year", "release_version", "adaptation_version")
   ppp_vintage <- unique(ppp[, ..vars], by = vars)
@@ -61,5 +86,5 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     force = force
   )
 
-
+  return(invisible(saved))
 }
