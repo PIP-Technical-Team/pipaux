@@ -3,24 +3,23 @@
 #' @inheritParams pip_prices
 #' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @export
-load_aux <- function(measure = NULL,
+load_aux <- function(measure,
                      maindir = gls$PIP_DATA_DIR,
+                     branch  = c("DEV", "PROD", "main"),
                      apply_label = TRUE) {
-  msrdir <- fs::path(maindir, "_aux/", measure)
 
-  if (is.null(measure)) {
-    rlang::abort(c(
-      "`measure` must be defined, as it does not have default value",
-      i = "make sure `measure` is not NULL."
-    ),
-    class = "pipaux_error"
-    )
-  }
+  branch <- match.arg(branch)
+  msrdir <- fs::path(maindir, "_aux/", branch, measure)
+
   # check file exists
   if (file.exists(fs::path(msrdir, measure, ext = "fst"))) {
+
     df <- fst::read_fst(fs::path(msrdir, measure, ext = "fst"), as.data.table = TRUE)
+
   } else if (file.exists(fs::path(msrdir, measure, ext = "rds"))) {
+
     df <- readRDS(fs::path(msrdir, measure, ext = "rds"))
+
   } else {
     msg <- sprintf("file for measure `%s` does not exist.", measure)
     rlang::abort(c(
