@@ -11,9 +11,14 @@ pip_indicators <- function(action = "update",
   msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
+
+    path <-
+      glue("https://github.com/PIP-Technical-Team/aux_indicators/raw/main/indicators.csv")
+
     df <- suppressMessages(
-      readr::read_csv(fs::path(maindir, "_aux/indicators/indicators_master.csv"))
+      readr::read_csv(path)
     )
+
     pip_sign_save(
       x = df,
       measure = measure,
