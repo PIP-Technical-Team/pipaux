@@ -8,7 +8,6 @@ pip_cpi_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = "PIP-Technical-Team",
-  repo = "aux_cpi",
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )

@@ -5,18 +5,25 @@
 \title{Update GDP}
 \usage{
 pip_gdp_update(
-  force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_branch = c("main", "dev"),
+  force = FALSE,
+  owner = "PIP-Technical-Team",
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch),
   from = "file"
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{maindir}{character: Main directory of project.}
 
-\item{sna_branch}{character: release branch of pip-sna file needed. Default is "main"}
+\item{force}{logical: If TRUE data will be overwritten.}
+
+\item{owner}{character: Github repo owner. Default is "PIP-Technical-Team}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 
 \item{from}{character: Either "file" or "api". Default is file.}
 }

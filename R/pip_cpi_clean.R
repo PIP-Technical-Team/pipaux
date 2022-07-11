@@ -5,10 +5,14 @@
 #' @param y dataset with CPI data from datalibweb. loaded in `pip_prices()`.
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
+#' @inheritParams pip_cpi_update
 #'
 #' @keywords internal
 pip_cpi_clean <- function(y,
-                          cpivar = getOption("pipaux.cpivar")) {
+                          cpivar = getOption("pipaux.cpivar"),
+                          maindir = gls$PIP_DATA_DIR,
+                          branch  = c("DEV", "PROD", "main")) {
+
   x <- data.table::as.data.table(y)
 
   # vars to keep
@@ -58,5 +62,14 @@ pip_cpi_clean <- function(y,
   ]
 
   x <- unique(x) # remove duplicates
+
+  # Remove any non-WDI countries
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
+
+  x <- x[country_code %in% cl$country_code]
+
+
   return(x)
 }

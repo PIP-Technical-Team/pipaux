@@ -1,16 +1,17 @@
 #' Load Raw Auxiliary data
 #'
-#' @param measure
-#' @param owner
-#' @param repo
-#' @param branch
-#' @param tag
+#' @param measure character: measure to be loaded
+#' @param owner character: Github repo owner. Default is "PIP-Technical-Team
+#' @param repo character: name of the repo
+#' @param branch character: either "DEV" or "PROD". Refers to the branch that
+#'   will be used to update either the development server or production.
+#' @param tag character: specific release to be used in the update.
 #'
 #' @return dataset
 #' @keywords internal
 load_raw_aux <- function(measure,
                          owner   = "PIP-Technical-Team",
-                         repo    = paste("aux_", measure),
+                         repo    = paste0("aux_", measure),
                          branch  = c("DEV","PROD","main"),
                          tag     = match.arg(branch)) {
   #   ____________________________________________________________________________

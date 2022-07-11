@@ -4,11 +4,14 @@
 #'
 #' @inheritParams pip_gdp
 #' @inheritParams pip_wdi_update
+#' @inheritParams load_raw_aux
 #' @keywords internal
-pip_gdp_update <- function(force      = FALSE,
-                           maindir    = gls$PIP_DATA_DIR,
-                           sna_branch = c("main", "dev"),
-                           from       = "file") {
+pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
+                           force   = FALSE,
+                           owner   = "PIP-Technical-Team",
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch),
+                           from    = "file") {
 
   sna_branch <- match.arg(sna_branch)
 

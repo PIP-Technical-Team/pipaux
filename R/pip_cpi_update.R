@@ -5,7 +5,6 @@
 pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = "PIP-Technical-Team",
-                           repo    = "aux_cpi",
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)) {
 
@@ -22,7 +21,6 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   cpi <- load_raw_aux(
     measure = measure,
     owner  = owner,
-    repo   = repo,
     branch = branch,
     tag    = tag
   )
@@ -32,13 +30,9 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 #   Cleaning                                                                ####
 
   # Clean data
-  cpi <- pip_cpi_clean(cpi)
-
-  # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
-  cpi <- cpi[country_code %in% cl$country_code]
+  cpi <- pip_cpi_clean(cpi,
+                       maindir = maindir,
+                       branch = branch)
 
   # Save
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir

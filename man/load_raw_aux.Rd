@@ -7,13 +7,22 @@
 load_raw_aux(
   measure,
   owner = "PIP-Technical-Team",
-  repo = paste("aux_", measure),
+  repo = paste0("aux_", measure),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
 }
 \arguments{
-\item{tag}{}
+\item{measure}{character: measure to be loaded}
+
+\item{owner}{character: Github repo owner. Default is "PIP-Technical-Team}
+
+\item{repo}{character: name of the repo}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \value{
 dataset

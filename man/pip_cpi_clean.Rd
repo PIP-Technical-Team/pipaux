@@ -4,13 +4,23 @@
 \alias{pip_cpi_clean}
 \title{Clean CPI data}
 \usage{
-pip_cpi_clean(y, cpivar = getOption("pipaux.cpivar"))
+pip_cpi_clean(
+  y,
+  cpivar = getOption("pipaux.cpivar"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main")
+)
 }
 \arguments{
 \item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}
 
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}
+
+\item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

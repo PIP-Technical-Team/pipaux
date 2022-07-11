@@ -3,16 +3,20 @@
 #' Update or load GDP data.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams load_raw_aux
 #' @param maddison_action character: Either "load" or "update". Default is "update".
 #' @param weo_action character: Either "load" or "update". Default is "update".
-#' @param  sna_branch character: release branch of pip-sna file needed. Default is "main"
 #' @export
 pip_gdp <- function(action          = "update",
                     maddison_action = "load",
                     weo_action      = "load",
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
-                    sna_branch      = c("main", "dev")) {
+                    owner           = "PIP-Technical-Team",
+                    branch          = c("DEV", "PROD", "main"),
+                    tag             = match.arg(branch),
+                    from            = "file") {
+
   measure    <- "gdp"
   sna_branch <- match.arg(sna_branch)
 

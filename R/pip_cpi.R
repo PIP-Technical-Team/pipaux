@@ -6,10 +6,8 @@
 #'   "update" data will be updated on the system. If "load" data is loaded in
 #'   memory.
 #' @param maindir character: Main directory of project.
-#' @param branch character: either "DEV" or "PROD". Refers to the branch that
-#'   will be used to update either the development server or production.
-#' @param tag character: specific release to be used in the update.
 #' @param force logical: If TRUE data will be overwritten.
+#' @inheritParams load_raw_aux
 #'
 #' @export
 #' @import data.table

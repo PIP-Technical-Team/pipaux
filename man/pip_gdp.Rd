@@ -10,7 +10,10 @@ pip_gdp(
   weo_action = "load",
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_branch = c("main", "dev")
+  owner = "PIP-Technical-Team",
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch),
+  from = "file"
 )
 }
 \arguments{
@@ -25,7 +28,12 @@ pip_gdp(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{sna_branch}{character: release branch of pip-sna file needed. Default is "main"}
+\item{owner}{character: Github repo owner. Default is "PIP-Technical-Team}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update or load GDP data.

@@ -8,7 +8,7 @@ pip_ppp_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = "PIP-Technical-Team",
-  repo = "aux_cpi",
+  repo = "aux_ppp",
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
