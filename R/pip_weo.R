@@ -6,26 +6,33 @@
 #' as an .xls file in `<maindir>/_aux/weo/`. The filename should be in the
 #' following structure `WEO_<YYYY-DD-MM>.xls`. Due to potential file corruption
 #' the file must be opened and re-saved before it can be updated with
-#' `pip_gdp_weo()`. Hopefully in the future IMF will stop using an `.xls` file
+#' `pip_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
 #' @inheritParams pip_prices
 #' @export
-pip_gdp_weo <- function(action = "update",
-                        force = FALSE,
-                        maindir = gls$PIP_DATA_DIR) {
+pip_weo <- function(action  = c("update", "load"),
+                    force   = FALSE,
+                    owner   = getOption("pipaux.ghowner"),
+                    maindir = gls$PIP_DATA_DIR,
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch)) {
   measure <- "weo"
-  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
+  branch <- match.arg(branch)
 
   if (action == "update") {
 
     # ---- Load data from disk ----
 
-    # Get latest version of file (in case there are more)
-    weo_files <- fs::dir_ls(msrdir, regexp = "WEO_.*[.]xls")
-    weo_latest <- max(weo_files)
-
     # Read data
+    dt <- load_raw_aux(
+      measure = measure,
+      owner  = owner,
+      branch = branch,
+      tag    = tag
+    )
+    return(dt)
+
     dt <- readxl::read_xls(
       weo_latest,
       sheet = 1, na = "n/a",
@@ -56,8 +63,7 @@ pip_gdp_weo <- function(action = "update",
     ]
 
     # Replace subject codes
-    dt[
-      ,
+    dt[,
       subject_code := fcase(
         weo_subject_code == "NGDPRPC", "weo_gdp_lcu",
         weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017"
@@ -74,19 +80,24 @@ pip_gdp_weo <- function(action = "update",
     setnames(dt, "iso", "country_code")
 
     # Convert year and GDP to numeric
-    dt$year <- sub("x", "", dt$year) %>% as.numeric()
-    dt$weo_gdp <- suppressWarnings(as.numeric(dt$weo_gdp))
+    dt[,
+        year := {
+          x <- sub("x", "", year)
+          as.numeric(x)
+        }]
 
-    # Remove rows w/ missing GDP
-    dt <- dt[!is.na(dt$weo_gdp)]
+    dt[,
+       weo_gdp := suppressWarnings(as.numeric(weo_gdp))]
+
+    # Remove rows w/ missing GDP`
+    dt <- na.omit(dt, cols = "weo_gdp")
 
     # Remove current year and future years
     current_year <- format(Sys.Date(), "%Y")
-    dt <- dt[dt$year < current_year]
+    dt <- dt[year < current_year]
 
     # Reshape to wide for GDP columns
-    dt <- dt %>%
-      dcast(
+    dt <- dcast(dt,
         formula = country_code + year ~ subject_code,
         value.var = "weo_gdp"
       )
@@ -121,6 +132,7 @@ pip_gdp_weo <- function(action = "update",
     dt <- dt[, c("country_code", "year", "weo_gdp")]
 
     # Save dataset
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
     pip_sign_save(
       x = dt,
       measure = measure,

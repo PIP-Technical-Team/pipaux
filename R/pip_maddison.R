@@ -13,7 +13,6 @@ pip_maddison <- function(action = c("update", "load"),
                          tag     = match.arg(branch)) {
   measure <- "maddison"
   action  <- match.arg(action)
-  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
   if (action == "update") {
     mpd <-  load_raw_aux(
@@ -23,21 +22,20 @@ pip_maddison <- function(action = c("update", "load"),
       tag    = tag
     )
 
-    pip_sign_save(
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    saved <- pip_sign_save(
       x = mpd,
       measure = measure,
       msrdir = msrdir,
       force = force
     )
-  } else if (action == "load") {
+    return(invisible(saved))
+
+  } else {
     df <- load_aux(
       maindir = maindir,
       measure = measure
     )
     return(df)
-  } else {
-    rlang::abort(c("`action` must be `update` or `load`",
-      x = paste0("you provided `", action, "`")
-    ))
   }
 }

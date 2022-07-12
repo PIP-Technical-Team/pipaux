@@ -20,7 +20,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # Update WEO data
   if (weo_action == "update") {
-    pip_gdp_weo(force = force, maindir = maindir)
+    pip_weo(force = force, maindir = maindir)
   }
 
   #----------------------------------------------------------
@@ -29,7 +29,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   madd   <- pip_maddison("load", maindir = maindir)
 
-  pip_gdp_weo("update", maindir = maindir)
+  pip_weo("update", maindir = maindir)
   weo    <- pipload::pip_load_aux("weo", maindir = maindir)
 
   if (force) {

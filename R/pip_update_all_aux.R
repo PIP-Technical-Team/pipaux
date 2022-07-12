@@ -29,7 +29,7 @@ pip_update_all_aux <- function(force = FALSE,
   pip_pop(force = force, maindir = maindir, src = popsrc)
 
   # GDP from WEO, Maddison and WDI (+ a few special cases)
-  pip_gdp_weo(force = force, maindir = maindir)
+  pip_weo(force = force, maindir = maindir)
   pip_maddison(force = force, maindir = maindir)
   pip_gdp(force = force, maindir = maindir)
 
