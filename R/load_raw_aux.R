@@ -1,7 +1,7 @@
 #' Load Raw Auxiliary data
 #'
 #' @param measure character: measure to be loaded
-#' @param owner character: Github repo owner. Default is "PIP-Technical-Team
+#' @param owner character: Github repo owner. Default is `getOption("pipaux.ghowner")`
 #' @param repo character: name of the repo
 #' @param branch character: either "DEV" or "PROD". Refers to the branch that
 #'   will be used to update either the development server or production.
@@ -10,7 +10,7 @@
 #' @return dataset
 #' @keywords internal
 load_raw_aux <- function(measure,
-                         owner   = "PIP-Technical-Team",
+                         owner   = getOption("pipaux.ghowner"),
                          repo    = paste0("aux_", measure),
                          branch  = c("DEV","PROD","main"),
                          tag     = match.arg(branch)) {
@@ -35,7 +35,6 @@ load_raw_aux <- function(measure,
 
   #   ____________________________________________________________________________
   #   Computations                                                            ####
-
 
   path <-
     glue("https://github.com/{owner}/{repo}/raw/{tag}/{measure}.csv")

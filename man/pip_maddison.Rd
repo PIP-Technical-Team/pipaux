@@ -4,7 +4,12 @@
 \alias{pip_maddison}
 \title{Maddison data}
 \usage{
-pip_maddison(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_maddison(
+  action = c("update", "load"),
+  owner = getOption("pipaux.ghowner"),
+  force = FALSE,
+  maindir = gls$PIP_DATA_DIR
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If

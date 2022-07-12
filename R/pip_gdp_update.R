@@ -8,12 +8,20 @@
 #' @keywords internal
 pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
-                           owner   = "PIP-Technical-Team",
+                           owner   = getOption("pipaux.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
                            from    = "file") {
 
-  sna_branch <- match.arg(sna_branch)
+  branch <- match.arg(branch)
+
+  # Update Maddison Project Data
+  pip_maddison(force = force, maindir = maindir)
+
+  # Update WEO data
+  if (weo_action == "update") {
+    pip_gdp_weo(force = force, maindir = maindir)
+  }
 
   #----------------------------------------------------------
   #   Load data

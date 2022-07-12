@@ -6,7 +6,8 @@ pipuax_default_options <- list(
   pipaux.pppyear = 2011,
   pipaux.popsrc  = "emi",
   pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
-  pipaux.maindir = gls$PIP_DATA_DIR
+  pipaux.maindir = gls$PIP_DATA_DIR,
+  pipaux.ghowner = "PIP-Technical-Team"
 )
 
 .onLoad <- function(libname, pkgname) {

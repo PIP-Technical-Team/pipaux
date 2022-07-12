@@ -2,31 +2,26 @@
 #'
 #' Load or update data from the Maddison project.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams load_raw_aux
 #' @export
 #' @import data.table
-pip_maddison <- function(action = "update",
+pip_maddison <- function(action = c("update", "load"),
+                         owner   = getOption("pipaux.ghowner"),
                          force = FALSE,
-                         maindir = gls$PIP_DATA_DIR) {
+                         maindir = gls$PIP_DATA_DIR,
+                         branch  = c("DEV", "PROD", "main"),
+                         tag     = match.arg(branch)) {
   measure <- "maddison"
+  action  <- match.arg(action)
   msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
   if (action == "update") {
-    mpd <- haven::read_dta(getOption("pipaux.madsrc"))
-    mpd <- mpd[mpd$year >= 1960, ] # Historical data is not needed
-
-    setDT(mpd)
-
-    # Recode names
-    setnames(mpd,
-      old = c("countrycode", "country", "gdppc"),
-      new = c("country_code", "country_name", "mpd_gdp")
+    mpd <-  load_raw_aux(
+      measure = measure,
+      owner  = owner,
+      branch = branch,
+      tag    = tag
     )
-    # Keep relevant variables
-    mpd <- mpd[
-      ,
-      .(country_code, year, mpd_gdp)
-    ]
 
     pip_sign_save(
       x = mpd,

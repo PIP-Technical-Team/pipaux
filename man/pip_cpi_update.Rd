@@ -7,7 +7,7 @@
 pip_cpi_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  owner = "PIP-Technical-Team",
+  owner = getOption("pipaux.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )

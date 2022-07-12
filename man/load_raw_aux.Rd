@@ -6,7 +6,7 @@
 \usage{
 load_raw_aux(
   measure,
-  owner = "PIP-Technical-Team",
+  owner = getOption("pipaux.ghowner"),
   repo = paste0("aux_", measure),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
@@ -15,7 +15,7 @@ load_raw_aux(
 \arguments{
 \item{measure}{character: measure to be loaded}
 
-\item{owner}{character: Github repo owner. Default is "PIP-Technical-Team}
+\item{owner}{character: Github repo owner. Default is \code{getOption("pipaux.ghowner")}}
 
 \item{repo}{character: name of the repo}
 
