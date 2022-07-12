@@ -194,10 +194,23 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_
   ]
 
   # Chain forwards
-  dt[, new_var := chain_forwards(.SD), by = by]
+  # dt[, new_var := chain_forwards(.SD), by = by]
+  setorderv(dt, c(by, "year"))
+  dt[, new_var :=
+       fifelse(is.na(new_var) & !is.na(rep_var) & !is.na(fwd),
+               shift(new_var) * fwd,
+               new_var
+               ),
+     by = by]
 
   # Chain backwards
-  dt[, new_var := chain_backwards(.SD), by = by]
+  # dt[, new_var := chain_backwards(.SD), by = by]
+  dt[, new_var :=
+       fifelse(is.na(new_var) & !is.na(rep_var) & !is.na(bck),
+               shift(new_var, type = "lead") * bck,
+               new_var
+       ),
+     by = by]
 
   # Set new name
   data.table::setnames(dt, "new_var", new_name)
