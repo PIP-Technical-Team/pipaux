@@ -10,6 +10,8 @@
 #' @param filename character: Name of file name without the ".csv" extension.
 #'   Default is `measure`
 #' @param ext character: Extension of `filename`. Default "csv"
+#' @param ... parameters to be passed to the loading functions depending of the
+#'   extension used
 #'
 #' @return dataset
 #' @keywords internal
@@ -19,7 +21,8 @@ load_raw_aux <- function(measure,
                          branch    = c("DEV","PROD","main"),
                          tag       = match.arg(branch),
                          filename  = measure,
-                         ext       = "csv") {
+                         ext       = "csv",
+                         ...) {
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
   on.exit({
@@ -56,7 +59,7 @@ load_raw_aux <- function(measure,
 
         if (ext == "csv") {
 
-          readr::read_csv(path)
+          readr::read_csv(path, ...)
 
         } else if (ext  %in% c("xls", "xlsx")) {
 
@@ -66,18 +69,19 @@ load_raw_aux <- function(measure,
                     httr::write_disk(path = temp_file))
 
 
-          readxl::read_excel(path = temp_file, sheet = 1)
+          readxl::read_excel(path = temp_file, ...)
 
         } else if (ext == "dta") {
 
-          haven::read_dta(path)
+          haven::read_dta(path, ...)
 
         } else if (ext == "qs") {
-          qs::qread(path)
+
+          qs::qread(path, ...)
 
         } else if (ext == "fst") {
 
-          fst::read_fst(path)
+          fst::read_fst(path, ...)
 
         }
 

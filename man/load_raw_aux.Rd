@@ -11,7 +11,8 @@ load_raw_aux(
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
   filename = measure,
-  ext = "csv"
+  ext = "csv",
+  ...
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ will be used to update either the development server or production.}
 Default is \code{measure}}
 
 \item{ext}{character: Extension of \code{filename}. Default "csv"}
+
+\item{...}{parameters to be passed to the loading functions depending of the
+extension used}
 }
 \value{
 dataset

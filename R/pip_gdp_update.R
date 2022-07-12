@@ -35,8 +35,11 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                      maindir = maindir,
                      branch = branch)
 
-  pip_weo("update", maindir = maindir)
-  weo    <- pipload::pip_load_aux("weo", maindir = maindir)
+
+  weo    <-  load_aux(measure = "weo",
+                      maindir = maindir,
+                      branch = branch)
+
 
   if (force) {
     pip_wdi_update(maindir = maindir,
