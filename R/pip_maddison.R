@@ -13,6 +13,7 @@ pip_maddison <- function(action = c("update", "load"),
                          tag     = match.arg(branch)) {
   measure <- "maddison"
   action  <- match.arg(action)
+  branch  <- match.arg(branch)
 
   if (action == "update") {
     mpd <-  load_raw_aux(

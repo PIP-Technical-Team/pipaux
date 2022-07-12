@@ -16,18 +16,24 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   branch <- match.arg(branch)
 
   # Update Maddison Project Data
-  pip_maddison(force = force, maindir = maindir)
+  pip_maddison(force = force,
+               maindir = maindir,
+               branch = branch)
 
   # Update WEO data
-  if (weo_action == "update") {
-    pip_weo(force = force, maindir = maindir)
-  }
+
+  pip_weo(force = force,
+          maindir = maindir,
+          branch = branch)
+
 
   #----------------------------------------------------------
   #   Load data
   #----------------------------------------------------------
 
-  madd   <- pip_maddison("load", maindir = maindir)
+  madd   <- load_aux(measure = "maddison",
+                     maindir = maindir,
+                     branch = branch)
 
   pip_weo("update", maindir = maindir)
   weo    <- pipload::pip_load_aux("weo", maindir = maindir)
