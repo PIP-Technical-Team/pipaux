@@ -14,20 +14,19 @@ pip_pop_update <-  function(force   = FALSE,
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
 
-  cl <- pip_country_list("load", maindir = maindir)
-
   # Check arguments
-  src <- match.arg(src)
+  src    <- match.arg(src)
+  branch <- match.arg(branch)
 
   # Directories
   measure <- "pop"
-  msrdir  <- fs::path(maindir, "_aux/", measure)
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   if (src == "wdi") {
+
     pop <- purrr::map_df(codes, ~ {
       df <- wbstats::wb_data(indicator = .x, lang = "en")
       colnames(df)[colnames(df) == .x] <- "pop"
@@ -52,26 +51,21 @@ pip_pop_update <-  function(force   = FALSE,
       old = c("iso3c", "date"),
       new = c("country_code", "year")
     )
-  } else if (src == "emi") {
+  } else {
 
 
     # Now Emi's file is uploaded directly to GH. So we get it from there.
 
     # Load data
 
-    dt <- load_raw_aux(
+    pop_main <- load_raw_aux(
       measure = measure,
       owner  = owner,
       branch = branch,
       tag    = tag,
       ext    = "xlsx"
     )
-    return(dt)
 
-
-    pop_main <- suppressMessages(
-      readxl::read_xlsx(pop_path, sheet = "Sheet1")
-    )
     names(pop_main)[1:4] <- as.character(pop_main[2, 1:4])
     pop_main             <- pop_main[-c(1:2), ]
     year_vars            <- names(pop_main[, 6:ncol(pop_main)])
@@ -152,14 +146,6 @@ pip_pop_update <-  function(force   = FALSE,
     # Remove rows w/ missing pop values
     pop <- pop[!is.na(pop)]
 
-  } else {
-    msg <- paste("src `", src, "` is not a valid source.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `wdi` or `emi`"
-    ),
-    class = "pipaux_error"
-    )
   }
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,12 +183,23 @@ pip_pop_update <-  function(force   = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # Remove any non-WDI countries
-  # cl <- pip_country_list("load", maindir = maindir)
-  # setDT(cl)
+  # Remove any non-WDI countries
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
+
+  setDT(cl)
   pop <- pop[country_code %in% cl$country_code]
 
-  pip_sign_save(x       = pop,
-                measure = "pop",
-                msrdir  = msrdir,
-                force   = force)
+  # Save
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  saved <- pip_sign_save(
+    x       = pop,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force
+  )
+
+  return(invisible(saved))
+
 }

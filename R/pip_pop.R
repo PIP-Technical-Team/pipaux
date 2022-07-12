@@ -3,34 +3,35 @@
 #' Load or update population data.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams load_raw_aux
 #' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export
-pip_pop <- function(action = "update",
+pip_pop <- function(action = c("update", "load"),
                     force = FALSE,
                     src = getOption("pipaux.popsrc"),
-                    maindir = gls$PIP_DATA_DIR) {
+                    maindir = gls$PIP_DATA_DIR,
+                    owner   = getOption("pipaux.ghowner"),
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch)) {
   measure <- "pop"
   src <- tolower(src)
+  action <- match.arg(action)
 
   if (action == "update") {
     pip_pop_update(
-      force = force,
-      src = src,
-      maindir = maindir
-    )
-  } else if (action == "load") {
-    df <- load_aux(
+      force   = force,
+      src     = src,
       maindir = maindir,
-      measure = measure
-    )
-    return(df)
+      owner   = owner,
+      branch  = branch,
+      tag     = tag )
+
   } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
+
+    df <- load_aux(maindir = maindir,
+                   measure = measure,
+                   branch = branch)
+
+    return(df)
   }
 }
