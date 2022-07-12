@@ -213,7 +213,7 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_
      by = by]
 
   # Set new name
-  data.table::setnames(dt, "new_var", new_name)
+  setnames(dt, "new_var", new_name)
 
   # Remove temporary columns
   dt <- dt[, !c(

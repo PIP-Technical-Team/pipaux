@@ -5,10 +5,13 @@
 \title{PIP POP}
 \usage{
 pip_pop(
-  action = "update",
+  action = c("update", "load"),
   force = FALSE,
   src = getOption("pipaux.popsrc"),
-  maindir = gls$PIP_DATA_DIR
+  maindir = gls$PIP_DATA_DIR,
+  owner = getOption("pipaux.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
@@ -20,6 +23,14 @@ pip_pop(
 \item{src}{character: Source for population data. Defaults to \code{getOption("pipaux.popsrc")}.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update population data.

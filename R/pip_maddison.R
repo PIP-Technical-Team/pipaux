@@ -34,7 +34,8 @@ pip_maddison <- function(action = c("update", "load"),
   } else {
     df <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
     return(df)
   }
