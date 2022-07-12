@@ -48,7 +48,8 @@ Imports:
     yaml,
     qs,
     glue,
-    gh
+    gh,
+    httr
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@development

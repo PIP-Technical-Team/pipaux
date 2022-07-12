@@ -18,7 +18,8 @@ pip_gdp_update(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{owner}{character: Github repo owner. Default is \code{getOption("pipaux.ghowner")}}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

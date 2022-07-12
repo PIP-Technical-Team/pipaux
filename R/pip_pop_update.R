@@ -9,7 +9,10 @@ NULL
 #' @import data.table
 pip_pop_update <-  function(force   = FALSE,
                             src     = c("emi", "wdi"),
-                            maindir = gls$PIP_DATA_DIR) {
+                            maindir = gls$PIP_DATA_DIR,
+                            owner   = getOption("pipaux.ghowner"),
+                            branch  = c("DEV", "PROD", "main"),
+                            tag     = match.arg(branch)) {
 
   cl <- pip_country_list("load", maindir = maindir)
 
@@ -51,49 +54,21 @@ pip_pop_update <-  function(force   = FALSE,
     )
   } else if (src == "emi") {
 
-    # Load main data file from Emi
 
-    # compare data between PCN and PIP
-    # pcn_pop_dir <- "P:/01.PovcalNet/03.QA/03.Population/data/"
-    #
-    # if (dir.exists(pcn_pop_dir)) {
-    #   pcn_pop_files   <- list.files(pcn_pop_dir,
-    #                                 pattern = "population.*\\.xlsx")
-    # } else {
-    #   pcn_pop_files <- NULL
-    # }
-
-    pip_pop_dir   <- fs::path(msrdir, "raw_data/")
-    pip_pop_files <- list.files(pip_pop_dir)
-
-    # miss_pop_files <- pcn_pop_files[!(pcn_pop_files %in% pip_pop_files)]
-
-    # if (length(miss_pop_files) != 0) {
-    #
-    #   cli::cli_process_start("Copying POP files from PCN folder to PIP folder")
-    #
-    #   file.copy(from      = paste0(pcn_pop_dir, miss_pop_files),
-    #             to        = paste0(pip_pop_dir, miss_pop_files),
-    #             overwrite = FALSE)
-    #
-    #   cli::cli_process_done()
-    # }
-
-    # find only population_country files
-    pip_pop_files <- list.files(pip_pop_dir,
-                                pattern = "population_country.*\\.xlsx")
-
-    # Get latest version of file
-    pop_latest <- pip_pop_files %>%
-      gsub("population_country_|.xlsx", "", .) %>%
-      as.POSIXlt() %>%
-      max() %>%
-      as.character() %>%
-      sprintf("population_country_%s.xlsx", .)
-
-    pop_path <- fs::path(pip_pop_dir, pop_latest)
+    # Now Emi's file is uploaded directly to GH. So we get it from there.
 
     # Load data
+
+    dt <- load_raw_aux(
+      measure = measure,
+      owner  = owner,
+      branch = branch,
+      tag    = tag,
+      ext    = "xlsx"
+    )
+    return(dt)
+
+
     pop_main <- suppressMessages(
       readxl::read_xlsx(pop_path, sheet = "Sheet1")
     )

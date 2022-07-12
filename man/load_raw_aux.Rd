@@ -9,13 +9,16 @@ load_raw_aux(
   owner = getOption("pipaux.ghowner"),
   repo = paste0("aux_", measure),
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  tag = match.arg(branch),
+  filename = measure,
+  ext = "csv"
 )
 }
 \arguments{
 \item{measure}{character: measure to be loaded}
 
-\item{owner}{character: Github repo owner. Default is \code{getOption("pipaux.ghowner")}}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
 
 \item{repo}{character: name of the repo}
 
@@ -23,6 +26,11 @@ load_raw_aux(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{filename}{character: Name of file name without the ".csv" extension.
+Default is \code{measure}}
+
+\item{ext}{character: Extension of \code{filename}. Default "csv"}
 }
 \value{
 dataset

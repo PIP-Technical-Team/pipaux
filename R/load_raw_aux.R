@@ -1,22 +1,32 @@
 #' Load Raw Auxiliary data
 #'
 #' @param measure character: measure to be loaded
-#' @param owner character: Github repo owner. Default is `getOption("pipaux.ghowner")`
+#' @param owner character: Github repo owner. Default is
+#'   `getOption("pipaux.ghowner")`
 #' @param repo character: name of the repo
 #' @param branch character: either "DEV" or "PROD". Refers to the branch that
 #'   will be used to update either the development server or production.
 #' @param tag character: specific release to be used in the update.
+#' @param filename character: Name of file name without the ".csv" extension.
+#'   Default is `measure`
+#' @param ext character: Extension of `filename`. Default "csv"
 #'
 #' @return dataset
 #' @keywords internal
 load_raw_aux <- function(measure,
-                         owner   = getOption("pipaux.ghowner"),
-                         repo    = paste0("aux_", measure),
-                         branch  = c("DEV","PROD","main"),
-                         tag     = match.arg(branch)) {
+                         owner     = getOption("pipaux.ghowner"),
+                         repo      = paste0("aux_", measure),
+                         branch    = c("DEV","PROD","main"),
+                         tag       = match.arg(branch),
+                         filename  = measure,
+                         ext       = "csv") {
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
   on.exit({
+
+    if (fs::file_exists(temp_file)) {
+      unlink(temp_file)
+    }
 
   })
 
@@ -37,12 +47,42 @@ load_raw_aux <- function(measure,
   #   Computations                                                            ####
 
   path <-
-    glue("https://github.com/{owner}/{repo}/raw/{tag}/{measure}.csv")
+    glue("https://github.com/{owner}/{repo}/raw/{tag}/{filename}.{ext}")
 
   tryCatch(
     expr = {
-      # Your code...
-      df <- suppressMessages(readr::read_csv(path))
+      # load depending of the extension
+      df <-  suppressMessages(  # suppress any loading message
+
+        if (ext == "csv") {
+
+          readr::read_csv(path)
+
+        } else if (ext  %in% c("xls", "xlsx")) {
+
+          temp_file <- tempfile(fileext = ext)
+          req <- httr::GET(path,
+                     # write result to disk
+                    httr::write_disk(path = temp_file))
+
+
+          readxl::read_excel(path = temp_file, sheet = 1)
+
+        } else if (ext == "dta") {
+
+          haven::read_dta(path)
+
+        } else if (ext == "qs") {
+          qs::qread(path)
+
+        } else if (ext == "fst") {
+
+          fst::read_fst(path)
+
+        }
+
+      )
+
       setDT(df)
     },
     # end of expr section
@@ -64,7 +104,7 @@ load_raw_aux <- function(measure,
           cli::cli_abort(msg, class = "pipaux_error")
 
         } else {
-          msg     <- c("Could not load {.field {measure}} from Github repo:
+          msg     <- c("Could not load {.file {filename}.{ext}} from Github repo:
                      {e$message}")
           cli::cli_abort(msg, class = "pipaux_error")
 
@@ -86,7 +126,7 @@ load_raw_aux <- function(measure,
           cli::cli_abort(msg, class = "pipaux_error")
 
         } else {
-          msg     <- c("Could not load {.field {measure}} from Github repo:
+          msg     <- c("Could not load {.file {filename}.{ext}} from Github repo:
                      {e$message}")
           cli::cli_abort(msg, class = "pipaux_error")
 

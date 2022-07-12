@@ -4,7 +4,14 @@
 \alias{pip_weo}
 \title{Fetch GDP data from WEO}
 \usage{
-pip_weo(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_weo(
+  action = c("update", "load"),
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
