@@ -38,21 +38,20 @@ pip_weo <- function(action  = c("update", "load"),
 
     # Save dataset
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-    pip_sign_save(
+    saved <- pip_sign_save(
       x       = dt,
       measure = measure,
       msrdir  = msrdir,
       force   = force
     )
-  } else if (action == "load") {
+    return(invisible(saved))
+
+  } else {
     dt <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
     return(dt)
-  } else {
-    rlang::abort(c("`action` must be `update` or `load`",
-      x = paste0("you provided `", action, "`")
-    ))
   }
 }
