@@ -16,7 +16,8 @@ pip_pce_update(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{from}{character: Either "file" or "api". Default is file.}
+\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
+and "gh" are synonymous}
 }
 \description{
 Update PCE data using WDI and Special cases.

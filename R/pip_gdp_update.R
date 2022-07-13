@@ -11,20 +11,27 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipaux.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = "file") {
+                           from    = c("gh", "file", "api")) {
 
   branch <- match.arg(branch)
+  measure <- "gdp"
 
   # Update Maddison Project Data
-  pip_maddison(force = force,
+  pip_maddison(force   = force,
                maindir = maindir,
-               branch = branch)
+               branch  = branch)
 
   # Update WEO data
 
-  pip_weo(force = force,
+  pip_weo(force   = force,
           maindir = maindir,
-          branch = branch)
+          branch  = branch)
+
+  # Update WDI
+  pip_wdi_update(maindir = maindir,
+                 from    = from,
+                 force   = force,
+                 branch  = branch)
 
 
   #----------------------------------------------------------
@@ -41,55 +48,31 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                       branch = branch)
 
 
-  if (force) {
-    pip_wdi_update(maindir = maindir,
-                   from    = from)
-  }
-  wgdp   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  wgdp   <- load_aux(measure = "wdi",
+                     maindir = maindir,
+                     branch = branch)
+
   setnames(wgdp, "NY.GDP.PCAP.KD", "wdi_gdp")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
-  umet <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna_metadata.csv")
-
-  tryCatch(
-    expr = {
-      # Your code...
-      sna <- suppressMessages(
-        readr::read_csv(usna)
-      )
-    }, # end of expr section
-
-    error = function(e) {
-      owner <-  "pip-technical-team"
-      repo  <-  "pip-sna"
-      tags  <- c("main", get_gh_tags(owner, repo))
-
-
-      if (! (sna_branch  %in% tags)) {
-        msg     <- c(
-          "{.field sna_branch} specified ({sna_branch}) does not exist in repo
-          {.file {owner}/{repo}}",
-          "i" = "Select one among {.field {tags}}"
-          )
-        cli::cli_abort(msg, class = "pipaux_error")
-
-      } else {
-        msg     <- c("Could not load sna from Github repo:
-                     {e$message}")
-        cli::cli_abort(msg,class = "pipaux_error")
-
-      }
-    } # end of finally section
-
-  ) # End of trycatch
-
-  sna_fy <- suppressMessages(
-    readr::read_csv(umet)
+  usna <- load_raw_aux(
+    measure = "sna",
+    owner  = owner,
+    branch = branch
   )
 
-  cl <- pip_country_list("load", maindir = maindir)
+  sna_fy <- load_raw_aux(
+    measure = "sna",
+    owner  = owner,
+    branch = branch,
+    filename = "sna_metadata"
+  )
+
+
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
 
   setDT(madd)
   setDT(weo)
@@ -276,13 +259,15 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # ---- Save and sign ----
 
-  measure <- "gdp"
-  msrdir <- fs::path(maindir, "_aux/", measure)
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
-  pip_sign_save(
-    x = gdp,
+  saved <- pip_sign_save(
+    x       = gdp,
     measure = measure,
-    msrdir = msrdir,
-    force = force
+    msrdir  = msrdir,
+    force   = force
   )
+
+  return(invisible(saved))
+
 }

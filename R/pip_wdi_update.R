@@ -3,7 +3,8 @@
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
 #' @inheritParams pip_gdp
-#' @param from character: Either "file" or "api". Default is file.
+#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
+#'   and "gh" are synonymous
 #'
 #' @return data.table with gdp and pce variables
 #' @export
@@ -12,7 +13,14 @@
 #' pip_wdi_update()
 pip_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
-                           from    = c("file", "api")) {
+                           owner   = getOption("pipaux.ghowner"),
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch),
+                           from    = c("gh", "file", "api")) {
+
+
+  from   <- match.arg(from)
+  branch <- match.arg(branch)
 
   #   _________________________________________________________________
   #   on.exit                                                 ####
@@ -44,35 +52,10 @@ pip_wdi_update <- function(force   = FALSE,
   ##  .......................................................................
   ##  From file                                                         ####
 
-  if (from == "file") {
-    wdifile <- fs::path(msrdir, "WDIEXCEL.xlsx")
-
-    # convert dots and spaces to _
-    name_repair <- function(nms) {
-      gsub("[.[:space:]]", "_", nms) |>
-      tolower()
-    }
-
-    orig    <- readxl::read_xlsx(wdifile, sheet = "Data",
-                                 .name_repair = name_repair)
-
-    setDT(orig)
-
-    orig <- orig[indicator_code  %in% c("NY.GDP.PCAP.KD", "NE.CON.PRVT.PC.KD")
-                 ][,
-                   c("indicator_name", "country_name") := NULL]
-
-    df   <- melt(orig,
-                 id.vars         = c("country_code", "indicator_code"),
-                 variable.name   = "year",
-                 variable.factor = FALSE,
-                 value.factor    = FALSE
-                 )
-
-    wdi   <- dcast(df,
-                  country_code + year ~indicator_code)
-    wdi[,
-        year := as.numeric(year)]
+  if (from   %in% c("file", "gh")) {
+    wdi <- load_raw_aux(measure = measure,
+                        owner = owner,
+                        branch = branch)
 
   } else {
   ##  ........................................................................
@@ -94,13 +77,17 @@ pip_wdi_update <- function(force   = FALSE,
 
   #   _________________________________________________________________________
   #   Save and Return                                                     ####
-  pip_sign_save(
-    x        = wdi,
-    measure  = measure,
-    msrdir   = msrdir,
-    force    = force,
+
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  saved <- pip_sign_save(
+    x       = wdi,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force,
     save_dta = FALSE
   )
+
+  return(invisible(saved))
 
 }
 

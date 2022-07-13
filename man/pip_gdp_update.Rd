@@ -10,7 +10,7 @@ pip_gdp_update(
   owner = getOption("pipaux.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
-  from = "file"
+  from = c("gh", "file", "api")
 )
 }
 \arguments{
@@ -26,7 +26,8 @@ will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 
-\item{from}{character: Either "file" or "api". Default is file.}
+\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
+and "gh" are synonymous}
 }
 \description{
 Update GDP data using WDI, Maddison and Special cases.

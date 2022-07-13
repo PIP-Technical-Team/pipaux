@@ -30,6 +30,7 @@ load_raw_aux <- function(measure,
     if (fs::file_exists(temp_file)) {
       unlink(temp_file)
     }
+    # close(path)
 
   })
 
@@ -51,6 +52,7 @@ load_raw_aux <- function(measure,
 
   path <-
     glue("https://github.com/{owner}/{repo}/raw/{tag}/{filename}.{ext}")
+  # path <- file(path)
 
   tryCatch(
     expr = {

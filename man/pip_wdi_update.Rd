@@ -7,7 +7,10 @@
 pip_wdi_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  from = c("file", "api")
+  owner = getOption("pipaux.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch),
+  from = c("gh", "file", "api")
 )
 }
 \arguments{
@@ -15,7 +18,16 @@ pip_wdi_update(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{from}{character: Either "file" or "api". Default is file.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
+
+\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
+and "gh" are synonymous}
 }
 \value{
 data.table with gdp and pce variables
