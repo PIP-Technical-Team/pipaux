@@ -85,11 +85,17 @@ load_raw_aux <- function(measure,
 
           fst::read_fst(path, ...)
 
+        } else if (ext == "yaml") {
+
+          yaml::read_yaml(path, ...)
+
         }
 
       )
 
-      setDT(df)
+      if (is.data.frame(df)) {
+        setDT(df)
+      }
     },
     # end of expr section
 
