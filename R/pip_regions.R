@@ -3,36 +3,43 @@
 #' Update or load a dataset with regions.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams load_raw_aux
 #' @export
-pip_regions <- function(action = "update",
+pip_regions <- function(action  = c("update", "load"),
                         force = FALSE,
-                        maindir = gls$PIP_DATA_DIR) {
+                        owner   = getOption("pipaux.ghowner"),
+                        maindir = gls$PIP_DATA_DIR,
+                        branch  = c("DEV", "PROD", "main"),
+                        tag     = match.arg(branch)) {
+
   measure <- "regions"
-  msrdir <- fs::path(maindir, "_aux/", measure)
+  branch <- match.arg(branch)
+  action <- match.arg(action)
 
   if (action == "update") {
-    df <- suppressMessages(
-      readr::read_csv(fs::path(maindir, "_aux/regions/regions.csv"))
-    )
-    pip_sign_save(
-      x = df,
+    df <- load_raw_aux(
       measure = measure,
-      msrdir = msrdir,
-      force = force
+      owner  = owner,
+      branch = branch,
+      tag    = tag
     )
-  } else if (action == "load") {
+
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    saved <- pip_sign_save(
+      x       = df,
+      measure = measure,
+      msrdir  = msrdir,
+      force   = force
+    )
+    return(invisible(saved))
+
+  } else {
     df <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
     return(df)
-  } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
+
   }
 }

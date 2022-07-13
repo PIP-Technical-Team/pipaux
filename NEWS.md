@@ -1,4 +1,7 @@
 # pipaux 0.1.0
+- All raw auxiliary files are now available in GH. 
+
+- Files are now divided into DEV and PROD branch to do independent updates
 
 # pipaux 0.0.8
 

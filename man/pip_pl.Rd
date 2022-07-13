@@ -5,7 +5,7 @@
 \title{Poverty lines}
 \usage{
 pip_pl(
-  action = "update",
+  action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipaux.ghowner"),
   maindir = gls$PIP_DATA_DIR,
