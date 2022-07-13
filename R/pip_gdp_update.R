@@ -16,6 +16,10 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   branch <- match.arg(branch)
   measure <- "gdp"
 
+
+#   ____________________________________________________________________________
+#   Update data                                                             ####
+
   # Update Maddison Project Data
   pip_maddison(force   = force,
                maindir = maindir,
@@ -34,9 +38,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                  branch  = branch)
 
 
-  #----------------------------------------------------------
-  #   Load data
-  #----------------------------------------------------------
+#   ____________________________________________________________________________
+#   Load Data                                                               ####
 
   madd   <- load_aux(measure = "maddison",
                      maindir = maindir,
@@ -56,7 +59,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- load_raw_aux(
+  sna <- load_raw_aux(
     measure = "sna",
     owner  = owner,
     branch = branch
@@ -74,19 +77,18 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                  measure = "country_list",
                  branch = branch)
 
-  setDT(madd)
-  setDT(weo)
-  setDT(sna)
-  setDT(cl)
 
-  #--------- Clean GDP from WDI ---------
+#   ____________________________________________________________________________
+#   Clean data                                                              ####
+
+##--------- Clean GDP from WDI ---------
   # Keep relevant variables
   wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
 
   # ---- Adjust FY to CY ----
 
   # Merge WDI with special FY cases
-  sna_fy <- sna_fy[c("Code", "Month", "Day")]
+  sna_fy <- sna_fy[, c("Code", "Month", "Day")]
   names(sna_fy) <- c("country_code", "fy_month", "fy_day")
   wgdp <- merge(wgdp, sna_fy, by = "country_code", all.x = TRUE)
 
@@ -96,8 +98,12 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   wgdp[, alpha := ((month_num - 1) + fy_day / max_days) / 12]
 
   # Create lead/lag vars
-  wgdp[, wdi_gdp_lag := dplyr::lag(wdi_gdp), by = country_code]
-  wgdp[, wdi_gdp_lead := dplyr::lead(wdi_gdp), by = country_code]
+  wgdp[,
+       wdi_gdp_lag := shift(wdi_gdp),
+       by = country_code]
+  wgdp[,
+       wdi_gdp_lead := shift(wdi_gdp, type = "lead"),
+       by = country_code]
 
   # Calculate adjusted GDP for calendar year
   wgdp[,
@@ -112,7 +118,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   ]
   wgdp[,
        wdi_gdp :=
-         fifelse(country_code == "EGY" & year < 1980, # Egypt should only be adjusted after 1980
+         # Egypt should only be adjusted after 1980
+         fifelse(country_code == "EGY" & year < 1980,
                  wdi_gdp, wdi_gdp_tmp)
 
   ]
@@ -174,7 +181,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   # Syria should be replaced with country specific-sources from 2010
 
   # Merge with sna
-  sna <- sna[!is.na(GDP)]
+  sna <- na.omit(sna, "GDP")
+
 
   # If there are special countries
   if (nrow(sna) > 0) {

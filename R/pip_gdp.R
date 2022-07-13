@@ -18,9 +18,12 @@ pip_gdp <- function(action          = "update",
 
 
   if (action == "update") {
-    pip_gdp_update(force   = force,
-                   maindir = maindir,
-                   branch  = branch)
+    pip_gdp_update(maindir = maindir,
+                   force   = force,
+                   owner   = owner,
+                   branch  = branch,
+                   tag     = tag,
+                   from    = from)
 
   } else if (action == "load") {
     load_aux(
