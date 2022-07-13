@@ -12,7 +12,7 @@ pip_pl <- function(action = "update",
 
   if (action == "update") {
     # Read yaml file
-    dl <- yaml::read_yaml(fs::path(msrdir, "poverty-lines.yaml"))
+    dl <- yaml::read_yaml(fs::path(msrdir, "pl.yaml"))
 
     # Create vector with poverty lines
     tmp <- vector("list", length = length(dl$min))
