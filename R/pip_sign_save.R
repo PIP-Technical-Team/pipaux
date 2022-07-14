@@ -37,8 +37,8 @@ pip_sign_save <- function(x,
   }
 
 
-#   ____________________________________________________________________________
-#   Check signatures                                                        ####
+#   __________________________________________________________________
+#   Check signature                                         ####
 
   #--------- if Signature from dlw is different from the one in production ---------
 
@@ -56,6 +56,9 @@ pip_sign_save <- function(x,
   }
 
 
+#   ____________________________________________________________________________
+#   if signature changes or force = TRUE                                    ####
+
   if (ms_status %in% c("forced", "changed")) {
 
     # re-write x in production if data signature is not found
@@ -63,37 +66,67 @@ pip_sign_save <- function(x,
     time <- format(Sys.time(), "%Y%m%d%H%M%S") # find a way to account for time zones
 
     attr(x, "datetime") <- time
-    fst::write_fst(
-      x = x,
-      path = fs::path(msrdir, measure, ext = "fst")
-    )
+
+
+##  ............................................................................
+##  Save main file                                                          ####
+
+    if (is.data.frame(x)) {
+      fst::write_fst(
+        x = x,
+        path = fs::path(msrdir, measure, ext = "fst"))
+      if (save_dta) {
+        haven::write_dta(
+          data = x,
+          path = fs::path(msrdir, measure, ext = "dta")
+        )
+      }
+      ext <- "fst"
+    } else {
+      readr::write_rds(x = x,
+                       file = fs::path(msrdir, measure, ext = "rds"))
+      ext <- "rds"
+    }
 
     qs::qsave(
       x = x,
       file = fs::path(msrdir, measure, ext = "qs")
     )
 
-    if (save_dta) {
-      haven::write_dta(
-        data = x,
-        path = fs::path(msrdir, measure, ext = "dta")
-      )
+##  ............................................................................
+##  Save vintages                                                           ####
+
+    if (is.data.frame(x)) {
+      fst::write_fst(
+        x = x,
+        path = fs::path(msrdir, "_vintage/",
+                        paste0(measure, "_", time),  ext = "fst")
+        )
+
+      if (save_dta) {
+        haven::write_dta(
+          data = x,
+          path = fs::path(msrdir, "_vintage/",
+                          paste0(measure, "_", time),  ext = "dta"))
+      }
+
+    } else {
+
+      readr::write_rds(x = x,
+                       file = fs::path(msrdir, "_vintage/",
+                                       paste0(measure, "_", time),
+                                       ext = "rds"))
+
     }
 
-    fst::write_fst(
-      x = x,
-      path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "fst")
-    )
     qs::qsave(
       x = x,
       file = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "qs")
     )
-    if (save_dta) {
-      haven::write_dta(
-        data = x,
-        path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "dta")
-      )
-    }
+
+
+#   ____________________________________________________________________________
+#   Signatures                                                              ####
 
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
@@ -112,9 +145,10 @@ pip_sign_save <- function(x,
 
     infmsg <-
       "Data signature {fillintext}
-      {.file {measure}.fst} has been updated"
+      {.file {measure}.{ext}} has been updated"
 
     cli::cli_alert_warning(infmsg)
+
     return(invisible(TRUE))
 
   } else {
