@@ -3,12 +3,20 @@
 #' Clean PFW data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with PPP data from datalibweb. loaded in `pip_prices()`.
-#' @param pfw_id character: CPI and PPP ID. Extracted from `pip_cpi_update()`
-#' "icp2011".
+#' @inheritParams load_aux
 #'
 #' @keywords internal
-pip_pfw_clean <- function(y, pfw_id) {
-  x <- data.table::as.data.table(y)
+pip_pfw_clean <- function(y,
+                          maindir = gls$PIP_DATA_DIR,
+                          branch  = c("DEV", "PROD", "main")) {
+
+  branch <- match.arg(branch)
+
+  if (!inherits(y, "data.table")) {
+    x <- as.data.table(y)
+  } else {
+    x <- copy(y)
+  }
 
   # get just inpovcal data
 
@@ -65,13 +73,11 @@ pip_pfw_clean <- function(y, pfw_id) {
     )
   ]
 
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
+  x <- x[country_code %in% cl$country_code]
 
-  # Create Price Framework ID
-  x[
-    ,
-    pfw_id := (pfw_id)
-  ]
   x <- unique(x) # remove duplicates
-  data.table::setDT(x)
   return(x)
 }

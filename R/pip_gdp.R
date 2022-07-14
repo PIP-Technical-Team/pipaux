@@ -5,7 +5,7 @@
 #' @inheritParams pip_prices
 #' @inheritParams load_raw_aux
 #' @export
-pip_gdp <- function(action          = "update",
+pip_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = "PIP-Technical-Team",
@@ -25,10 +25,12 @@ pip_gdp <- function(action          = "update",
                    tag     = tag,
                    from    = from)
 
-  } else if (action == "load") {
-    load_aux(
+  } else {
+    dt <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
-  } # End of update
+    return(dt)
+  }
 } # end of pip_gdp

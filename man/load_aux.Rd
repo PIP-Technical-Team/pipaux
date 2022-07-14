@@ -12,9 +12,10 @@ load_aux(
 )
 }
 \arguments{
-\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
+\item{measure}{character: measure to be loaded}
 
-\item{maindir}{character: Main directory of project.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 
 \item{apply_label}{logical: If TRUE, predefined labels will applied.}
 }

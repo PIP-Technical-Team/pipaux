@@ -2,7 +2,8 @@
 #'
 #' Update or load a dataset with poverty lines.
 #'
-#' @inheritParams pip_prices
+#' @param maindir character: Main directory of project.
+#'
 #' @inheritParams load_raw_aux
 #' @export
 pip_pl <- function(action = c("update", "load"),

@@ -4,13 +4,13 @@
 \alias{pip_pfw_clean}
 \title{Clean PFW}
 \usage{
-pip_pfw_clean(y, pfw_id)
+pip_pfw_clean(y, maindir = gls$PIP_DATA_DIR, branch = c("DEV", "PROD", "main"))
 }
 \arguments{
 \item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}
 
-\item{pfw_id}{character: CPI and PPP ID. Extracted from \code{pip_cpi_update()}
-"icp2011".}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 }
 \description{
 Clean PFW data from Datalibweb to meet PIP protocols.

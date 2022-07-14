@@ -2,18 +2,37 @@
 #'
 #' Load or update PIP Price Framework data.
 #'
-#' @inheritParams pip_prices
+#' @param action character: Either "load" or "update". Default is "update". If
+#' "update" data will be updated on the system. If "load" data is loaded in memory.
+#' @param maindir character: Main directory of project.
+#' @param force logical: If TRUE data will be overwritten.
+#' @inheritParams load_raw_aux
 #' @export
 #' @import data.table
-pip_pfw <- function(action = "update",
+pip_pfw <- function(action  = c("update", "load"),
+                    force   = FALSE,
+                    owner   = getOption("pipaux.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
-                    force = FALSE) {
-  pip_prices(
-    measure = "pfw",
-    action = action,
-    maindir = maindir,
-    dlwdir = dlwdir,
-    force = force
-  )
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch)) {
+
+  branch <- match.arg(branch)
+  action <- match.arg(action)
+
+  if (action == "update") {
+    pip_pfw_update(maindir = maindir,
+                   force   = force,
+                   owner   = owner,
+                   branch  = branch,
+                   tag     = tag)
+
+  } else {
+
+    dt <- load_aux(
+      maindir = maindir,
+      measure = "pfw",
+      branch  = branch
+    )
+    return(dt)
+  }
 }

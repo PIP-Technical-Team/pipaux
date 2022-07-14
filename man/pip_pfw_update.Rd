@@ -6,16 +6,24 @@
 \usage{
 pip_pfw_update(
   maindir = gls$PIP_DATA_DIR,
-  dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
-  force = FALSE
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
 \item{maindir}{character: Main directory of project.}
 
-\item{dlwdir}{character: Datalibweb directory.}
-
 \item{force}{logical: If TRUE data will be overwritten.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update PFW

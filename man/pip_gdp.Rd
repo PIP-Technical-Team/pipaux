@@ -5,7 +5,7 @@
 \title{PIP GDP}
 \usage{
 pip_gdp(
-  action = "update",
+  action = c("update", "load"),
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = "PIP-Technical-Team",

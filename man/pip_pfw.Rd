@@ -5,21 +5,29 @@
 \title{PIP PFW}
 \usage{
 pip_pfw(
-  action = "update",
+  action = c("update", "load"),
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
-  force = FALSE
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
+\item{force}{logical: If TRUE data will be overwritten.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
 \item{maindir}{character: Main directory of project.}
 
-\item{dlwdir}{character: Datalibweb directory.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update PIP Price Framework data.

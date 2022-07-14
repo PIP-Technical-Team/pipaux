@@ -25,6 +25,7 @@ pip_cpi <- function(action = c("update", "load"),
 
   #   ____________________________________________________________________________
   #   Defenses                                                                ####
+  measure <- "cpi"
   action <- match.arg(action)
   branch <- match.arg(branch)
 
@@ -49,8 +50,12 @@ pip_cpi <- function(action = c("update", "load"),
     return(TRUE)
   }
   else {
-    # load...
-    return(df)
+    dt <- load_aux(
+      maindir = maindir,
+      measure = measure,
+      branch  = branch
+    )
+    return(dt)
   }
 
 

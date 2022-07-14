@@ -116,9 +116,10 @@ load_raw_aux <- function(measure,
           cli::cli_abort(msg, class = "pipaux_error")
 
         } else {
-          msg     <- c("Could not load {.file {filename}.{ext}} from Github repo:
+          msg     <- c("Problem loading {.file {filename}.{ext}} Correctly:
                      {e$message}")
-          cli::cli_abort(msg, class = "pipaux_error")
+          cli::cli_abort(msg, class = "pipaux_error",
+                         wrap = TRUE)
 
         }
 
