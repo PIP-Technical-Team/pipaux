@@ -21,6 +21,7 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   pfw <- pip_pfw_clean(pfw,
                        maindir = maindir,
                        branch = branch)
+
   # Save dataset
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pip_sign_save(
