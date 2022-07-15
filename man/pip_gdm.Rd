@@ -5,10 +5,12 @@
 \title{PIP GDM}
 \usage{
 pip_gdm(
-  action = "update",
+  action = c("update", "load"),
   force = FALSE,
-  pcndir = gls$PCN_MASTER,
-  maindir = gls$PIP_DATA_DIR
+  owner = getOption("pipaux.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
@@ -17,9 +19,15 @@ pip_gdm(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{pcndir}{character: PovcalNet Masterfile directory.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update grouped data means dataset from PovcalNet Masterfile. See

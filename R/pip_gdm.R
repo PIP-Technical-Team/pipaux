@@ -10,29 +10,33 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_prices
-#' @param pcndir character: PovcalNet Masterfile directory.
+#' @inheritParams load_raw_aux
 #' @export
-pip_gdm <- function(action = "update",
-                    force = FALSE,
-                    pcndir = gls$PCN_MASTER,
-                    maindir = gls$PIP_DATA_DIR) {
+pip_gdm <- function(action  = c("update", "load"),
+                    force   = FALSE,
+                    owner   = getOption("pipaux.ghowner"),
+                    maindir = gls$PIP_DATA_DIR,
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch)) {
+
   measure <- "gdm"
+  branch <- match.arg(branch)
+  action <- match.arg(action)
 
   if (action == "update") {
-    pip_gdm_update(force = force, maindir = maindir, pcndir = pcndir)
-  } else if (action == "load") {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure
-    )
-    return(df)
+
+    pip_gdm_update(force   = force,
+                   maindir = maindir,
+                   owner   = owner,
+                   branch  = branch,
+                   tag     = tag)
+
   } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
+    dt <- load_aux(
+      maindir = maindir,
+      measure = measure,
+      branch  = branch
     )
+    return(dt)
   }
 }

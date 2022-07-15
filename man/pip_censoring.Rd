@@ -4,7 +4,14 @@
 \alias{pip_censoring}
 \title{Censoring data}
 \usage{
-pip_censoring(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_censoring(
+  action = c("update", "load"),
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
@@ -12,7 +19,15 @@ pip_censoring(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
 \item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update censoring data

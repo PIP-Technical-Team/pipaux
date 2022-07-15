@@ -27,8 +27,10 @@ load_raw_aux <- function(measure,
   #   on.exit                                                                 ####
   on.exit({
 
-    if (fs::file_exists(temp_file)) {
-      unlink(temp_file)
+    if (exists("temp_file")) {
+      if (fs::file_exists(temp_file)) {
+        unlink(temp_file)
+      }
     }
     # close(path)
 
