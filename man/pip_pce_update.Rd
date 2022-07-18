@@ -5,16 +5,26 @@
 \title{Update PCE}
 \usage{
 pip_pce_update(
-  force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  sna_branch = c("main", "dev"),
-  from = "file"
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch),
+  from = c("gh", "file", "api")
 )
 }
 \arguments{
+\item{maindir}{character: Main directory of project.}
+
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{maindir}{character: Main directory of project.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 
 \item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
 and "gh" are synonymous}

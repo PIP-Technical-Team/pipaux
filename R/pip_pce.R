@@ -5,31 +5,31 @@
 #' @inheritParams pip_prices
 #' @param  sna_branch character: release tag of pip-sna file needed. Default is "main"
 #' @export
-pip_pce <- function(action     = "update",
-                    force      = FALSE,
-                    maindir    = gls$PIP_DATA_DIR,
-                    sna_branch      = c("main", "dev")) {
-
+pip_pce <- function(action  = c("update", "load"),
+                    force   = FALSE,
+                    owner   = getOption("pipaux.ghowner"),
+                    maindir = gls$PIP_DATA_DIR,
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch),
+                    from    = c("gh", "file", "api")) {
   measure <- "pce"
-  sna_branch <- match.arg(sna_branch)
+  branch <- match.arg(branch)
+  action <- match.arg(action)
 
   if (action == "update") {
-    pip_pce_update(force      = force,
-                   maindir    = maindir,
-                   sna_branch = sna_branch)
-  } else if (action == "load") {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure
-    )
-    return(df)
+    pip_pce_update(maindir = maindir,
+                   force   = force,
+                   owner   = owner,
+                   branch  = branch,
+                   tag     = tag,
+                   from    = from)
+
   } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
+    dt <- load_aux(
+      maindir = maindir,
+      measure = measure,
+      branch  = branch
     )
+    return(dt)
   }
 }

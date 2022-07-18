@@ -3,9 +3,6 @@
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
 #' @inheritParams pip_gdp
-#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
-#'   and "gh" are synonymous
-#'
 #' @return data.table with gdp and pce variables
 #' @export
 #'

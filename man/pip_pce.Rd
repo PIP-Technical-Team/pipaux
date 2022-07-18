@@ -5,10 +5,13 @@
 \title{PIP PCE}
 \usage{
 pip_pce(
-  action = "update",
+  action = c("update", "load"),
   force = FALSE,
+  owner = getOption("pipaux.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  sna_branch = c("main", "dev")
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch),
+  from = c("gh", "file", "api")
 )
 }
 \arguments{

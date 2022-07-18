@@ -15,7 +15,7 @@ pip_pfw <- function(action  = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     branch  = c("DEV", "PROD", "main"),
                     tag     = match.arg(branch)) {
-
+  measure <- "pfw"
   branch <- match.arg(branch)
   action <- match.arg(action)
 
@@ -30,7 +30,7 @@ pip_pfw <- function(action  = c("update", "load"),
 
     dt <- load_aux(
       maindir = maindir,
-      measure = "pfw",
+      measure = measure,
       branch  = branch
     )
     return(dt)

@@ -2,71 +2,48 @@
 #'
 #' Update PCE data using WDI and Special cases.
 #'
-#' @inheritParams pip_prices
-#' @inheritParams pip_wdi_update
+#' @inheritParams pip_gdp
+#' @inheritParams load_raw_aux
 #' @keywords internal
-pip_pce_update <- function(force      = FALSE,
-                           maindir    = gls$PIP_DATA_DIR,
-                           sna_branch = c("main", "dev"),
-                           from       = "file") {
+pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
+                           force = FALSE,
+                           owner   = getOption("pipaux.ghowner"),
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch),
+                           from    = c("gh", "file", "api")) {
+  measure <- "pce"
+  branch <- match.arg(branch)
 
-  sna_branch <- match.arg(sna_branch)
 #   ________________________________________________________________
 #   Load data                                             ####
 
-  if (force) {
-    pip_wdi_update(maindir = maindir,
-                   from    = from)
-  }
-  wpce   <- pipload::pip_load_aux("wdi", maindir = maindir)
+  # Update WDI
+  pip_wdi_update(maindir = maindir,
+                 from    = from,
+                 force   = force,
+                 branch  = branch)
+
+
+  wpce   <- load_aux(measure = "wdi",
+                     maindir = maindir,
+                     branch = branch)
+
   setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  usna <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna.csv")
-  umet <- glue("https://github.com/PIP-Technical-Team/pip-sna/raw/{sna_branch}/sna_metadata.csv")
-
-  tryCatch(
-    expr = {
-      # Your code...
-      sna <- suppressMessages(
-        readr::read_csv(usna)
-      )
-    }, # end of expr section
-
-    error = function(e) {
-      owner <-  "pip-technical-team"
-      repo  <-  "pip-sna"
-      tags  <- c("main", get_gh_tags(owner, repo))
-
-
-      if (! (sna_branch  %in% tags)) {
-        msg     <- c(
-          "{.field sna_branch} specified ({sna_branch}) does not exist in repo
-          {.file {owner}/{repo}}",
-          "i" = "Select one among {.field {tags}}"
-        )
-        cli::cli_abort(msg, class = "pipaux_error")
-
-      } else {
-        msg     <- c("Could not load sna from Github repo:
-                     {e$message}")
-        cli::cli_abort(msg,class = "pipaux_error")
-
-      }
-    } # end of finally section
-
-  ) # End of trycatch
-
-  sna_fy <- suppressMessages(
-    readr::read_csv(umet)
+  sna <- load_raw_aux(
+    measure = "sna",
+    owner  = owner,
+    branch = branch
   )
 
-  cl     <- pip_country_list("load", maindir = maindir)
-
-  setDT(sna)
-  setDT(cl)
-
+  sna_fy <- load_raw_aux(
+    measure = "sna",
+    owner  = owner,
+    branch = branch,
+    filename = "sna_metadata"
+  )
 
 #   ____________________________________________________________________________
 #   Clean PCE from WDI                                                      ####
@@ -77,7 +54,7 @@ pip_pce_update <- function(force      = FALSE,
   ## ---- Adjust FY to CY ----
 
   # Merge WDI with special FY cases
-  sna_fy <- sna_fy[c("Code", "Month", "Day")]
+  sna_fy <- sna_fy[, c("Code", "Month", "Day")]
   names(sna_fy) <- c("country_code", "fy_month", "fy_day")
   wpce <- merge(wpce, sna_fy, by = "country_code", all.x = TRUE)
 
@@ -87,8 +64,8 @@ pip_pce_update <- function(force      = FALSE,
   wpce[, alpha := ((month_num - 1) + fy_day / max_days) / 12]
 
   # Create lead/lag vars
-  wpce[, wdi_pce_lag := dplyr::lag(wdi_pce), by = country_code]
-  wpce[, wdi_pce_lead := dplyr::lead(wdi_pce), by = country_code]
+  wpce[, wdi_pce_lag := shift(wdi_pce), by = country_code]
+  wpce[, wdi_pce_lead := shift(wdi_pce, type = "lead"), by = country_code]
 
   # Calculate adjusted GDP for calendar year
   wpce[,
@@ -231,22 +208,30 @@ pip_pce_update <- function(force      = FALSE,
 #   Finalize table                                                 ####
 
 
-  # Remove rows with missing GDP
-  pce <- pce[!is.na(pce) & !is.infinite(pce)]
+  # Remove rows with missing GDP\
+  pce <- na.omit(pce, "pce")
+  pce <- pce[!is.infinite(pce)]
 
 
   # Remove any non-WDI countries
+  cl <- load_aux(maindir = maindir,
+                 measure = "country_list",
+                 branch = branch)
+
+
   pce <- pce[country_code %in% cl$country_code]
 
   ## ---- Sign and save ----
 
-  measure <- "pce"
-  msrdir <- fs::path(maindir, "_aux/", measure)
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
-  pip_sign_save(
-    x = pce,
+  saved <- pip_sign_save(
+    x       = pce,
     measure = measure,
-    msrdir = msrdir,
-    force = force
+    msrdir  = msrdir,
+    force   = force
   )
+
+  return(invisible(saved))
+
 }

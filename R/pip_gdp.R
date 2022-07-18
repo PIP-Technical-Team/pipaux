@@ -2,8 +2,10 @@
 #'
 #' Update or load GDP data.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
 #' @inheritParams load_raw_aux
+#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
+#'   and "gh" are synonymous
 #' @export
 pip_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,

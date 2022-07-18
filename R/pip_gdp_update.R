@@ -3,7 +3,6 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
-#' @inheritParams pip_wdi_update
 #' @inheritParams load_raw_aux
 #' @keywords internal
 pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,

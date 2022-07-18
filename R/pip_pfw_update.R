@@ -1,6 +1,6 @@
 #' Update PFW
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
 #' @inheritParams load_raw_aux
 #' @keywords internal
 pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
