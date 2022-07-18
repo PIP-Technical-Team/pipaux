@@ -13,6 +13,7 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            from    = c("gh", "file", "api")) {
   measure <- "pce"
   branch <- match.arg(branch)
+  from   <- match.arg(from)
 
 #   ________________________________________________________________
 #   Load data                                             ####

@@ -4,12 +4,18 @@
 \alias{pip_cp_update}
 \title{Update Country Profiles}
 \usage{
-pip_cp_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_cp_update(
+  maindir = gls$PIP_DATA_DIR,
+  force = FALSE,
+  owner = getOption("pipaux.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{maindir}{character: Main directory of project.}
+
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
 Update a list with country profiles data
