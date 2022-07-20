@@ -34,11 +34,11 @@ pip_income_groups <- function(action  = c("update", "load"),
                'incgroup_historical',
                'fcv_historical',
                'region_SSA')]
+    setnames(df, new = c('country_code', 'year_data',
+                         'incgroup_historical',
+                         'fcv_historical',
+                         'ssa_subregion_code'))
 
-    names(df) <- c('country_code', 'year_data',
-                   'incgroup_historical',
-                   'fcv_historical',
-                   'ssa_subregion_code')
 
     # save data
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
