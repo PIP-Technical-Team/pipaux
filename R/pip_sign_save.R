@@ -71,10 +71,14 @@ pip_sign_save <- function(x,
 ##  ............................................................................
 ##  Save main file                                                          ####
 
-    if (is.data.frame(x)) {
+    var_class <- purrr::map(x, class) # variables class
+
+    if (is.data.frame(x) && !("list"  %in% unique(var_class))) {
       fst::write_fst(
         x = x,
-        path = fs::path(msrdir, measure, ext = "fst"))
+        path = fs::path(msrdir, measure, ext = "fst")
+        )
+
       if (save_dta) {
         haven::write_dta(
           data = x,
@@ -96,7 +100,7 @@ pip_sign_save <- function(x,
 ##  ............................................................................
 ##  Save vintages                                                           ####
 
-    if (is.data.frame(x)) {
+    if (is.data.frame(x) && !("list"  %in% unique(var_class))) {
       fst::write_fst(
         x = x,
         path = fs::path(msrdir, "_vintage/",
