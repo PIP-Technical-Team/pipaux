@@ -1,43 +1,62 @@
 #' PIP income groups
 #'
-#' Update or load a dataset with historical income groups
+#' Update or load a dataset with historical income groups. The raw files are not
+#' available in the PIP-Technical-Team group but in the Povcalnet-team group.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
-pip_income_groups <- function(action = "update",
-                              force = FALSE,
-                              maindir = gls$PIP_DATA_DIR) {
+pip_income_groups <- function(action  = c("update", "load"),
+                              force   = FALSE,
+                              owner   = "PovcalNet-Team",
+                              repo    = "Class",
+                              maindir = gls$PIP_DATA_DIR,
+                              branch  = c("DEV", "PROD", "main"),
+                              tag     = match.arg(branch)) {
   measure <- "income_groups"
-  msrdir <- paste0(maindir, "_aux/", measure, "/")
+  branch <- match.arg(branch)
+  action <- match.arg(action)
+
 
   if (action == "update") {
-    u <- "https://github.com/PovcalNet-Team/Class/blob/master/OutputData/CLASS.dta?raw=true"
-    df <- haven::read_dta(u)
-    df <- df[c('code', 'year_data', 'incgroup_historical',
-               'fcv_historical', 'region_SSA')]
+
+    df <- load_raw_aux(measure = measure,
+                       owner   = owner,
+                       repo    = repo,
+                       branch  = branch,
+                       tag     = tag,
+                       filename = "OutputData/CLASS",
+                       ext = "dta")
+
+    df <- df[,
+             c('code',
+               'year_data',
+               'incgroup_historical',
+               'fcv_historical',
+               'region_SSA')]
+
     names(df) <- c('country_code', 'year_data',
                    'incgroup_historical',
                    'fcv_historical',
                    'ssa_subregion_code')
-    pip_sign_save(
-      x = df,
+
+    # save data
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    saved <- pip_sign_save(
+      x       = df,
       measure = measure,
-      msrdir = msrdir,
-      force = force
+      msrdir  = msrdir,
+      force   = force
     )
-  } else if (action == "load") {
-    df <- load_aux(
+    return(invisible(saved))
+
+  } else  {
+
+    load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
-    return(df)
-  } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
+
   }
 }

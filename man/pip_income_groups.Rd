@@ -4,7 +4,15 @@
 \alias{pip_income_groups}
 \title{PIP income groups}
 \usage{
-pip_income_groups(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_income_groups(
+  action = c("update", "load"),
+  force = FALSE,
+  owner = "PovcalNet-Team",
+  repo = "Class",
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
@@ -12,8 +20,19 @@ pip_income_groups(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
+\item{repo}{character: name of the repo}
+
 \item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
-Update or load a dataset with historical income groups
+Update or load a dataset with historical income groups. The raw files are not
+available in the PIP-Technical-Team group but in the Povcalnet-team group.
 }
