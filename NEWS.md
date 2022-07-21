@@ -1,5 +1,8 @@
 # pipaux (development version)
 
+- Files are saved and loaded according the class of its components. If they are purely data frames, without nested cells, they are saved as .fst, .dta, and .qs. If they are list or data frames with nested cells, they are saved as .rds and .qs. They default loading is .fst and .rds, but we should move to .qs as the default loading format. 
+
+
 # pipaux 0.1.0
 - All raw auxiliary files are now available in GH. 
 
