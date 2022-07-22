@@ -1,5 +1,6 @@
 #' Load any auxiliary data
 #'
+#' @inheritParams pip_pfw
 #' @inheritParams load_raw_aux
 #' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @export

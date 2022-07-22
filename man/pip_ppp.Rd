@@ -5,10 +5,11 @@
 \title{PIP PPP}
 \usage{
 pip_ppp(
-  action = "update",
+  action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
-  dlwdir = Sys.getenv("PIP_DLW_ROOT_DIR"),
-  force = FALSE
+  branch = c("DEV", "PROD", "main"),
+  force = FALSE,
+  tag = branch
 )
 }
 \arguments{
@@ -17,9 +18,12 @@ pip_ppp(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{dlwdir}{character: Datalibweb directory.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update PPP data.

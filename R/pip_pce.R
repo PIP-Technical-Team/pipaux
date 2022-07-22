@@ -2,8 +2,9 @@
 #'
 #' Load or update PCE data.
 #'
-#' @inheritParams pip_prices
-#' @param  sna_branch character: release tag of pip-sna file needed. Default is "main"
+#' @inheritParams pip_gdp
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
 pip_pce <- function(action  = c("update", "load"),
                     force   = FALSE,

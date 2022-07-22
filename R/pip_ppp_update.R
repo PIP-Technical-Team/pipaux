@@ -13,8 +13,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   set up                                                                  ####
 
-  branch  <- match.arg(branch)
   measure <- "ppp"
+  branch  <- match.arg(branch)
 
 
 #   ____________________________________________________________________________

@@ -2,6 +2,7 @@
 #'
 #' Load or update data from the Maddison project.
 #'
+#' @inheritParams pip_pfw
 #' @inheritParams load_raw_aux
 #' @export
 #' @import data.table

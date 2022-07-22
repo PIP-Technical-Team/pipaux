@@ -2,18 +2,54 @@
 #'
 #' Load or update PPP data.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
 #' @import data.table
-pip_ppp <- function(action = "update",
+pip_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
-                    dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
-                    force = FALSE) {
-  pip_prices(
-    measure = "ppp",
-    action = action,
-    maindir = maindir,
-    dlwdir = dlwdir,
-    force = force
+                    branch  = c("DEV", "PROD", "main"),
+                    force   = FALSE,
+                    tag     = branch) {
+
+  #   ____________________________________________________________________________
+  #   on.exit                                                                 ####
+  on.exit({
+
+  })
+
+  #   ____________________________________________________________________________
+  #   Defenses                                                                ####
+  measure <- "ppp"
+  action <- match.arg(action)
+  branch <- match.arg(branch)
+
+  stopifnot( exprs = {
+
+  }
   )
+
+  #   ____________________________________________________________________________
+  #   Early returns                                                           ####
+  if (FALSE) {
+    return()
+  }
+
+  #   ____________________________________________________________________________
+  #   Computations                                                            ####
+  if (action == "update") {
+    pip_ppp_update(branch  = branch,
+                   force   = force,
+                   maindir = maindir,
+                   tag     = tag)
+  }
+  else {
+    load_aux(
+      maindir = maindir,
+      measure = measure,
+      branch  = branch
+    )
+  }
+
+
 }

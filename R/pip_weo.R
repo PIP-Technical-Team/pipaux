@@ -9,7 +9,8 @@
 #' `pip_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
 pip_weo <- function(action  = c("update", "load"),
                     force   = FALSE,

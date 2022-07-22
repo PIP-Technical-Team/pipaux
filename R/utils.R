@@ -267,11 +267,6 @@ chain_backwards <- function(dt) {
 #' @param what character: either "tags" or "branches"
 #'
 #' @return character vector with tags
-#'
-#' @examples
-#' owner <- "pip-technical-team"
-#' repo  <- "pip-sna"
-#' get_gh_tags(owner, repo)
 get_gh <- function(owner,
                    repo,
                    what = c("tags", "branches")) {

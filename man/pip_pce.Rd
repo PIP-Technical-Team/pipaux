@@ -20,9 +20,18 @@ pip_pce(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipaux.ghowner")}}
+
 \item{maindir}{character: Main directory of project.}
 
-\item{sna_branch}{character: release tag of pip-sna file needed. Default is "main"}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
+
+\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
+and "gh" are synonymous}
 }
 \description{
 Load or update PCE data.

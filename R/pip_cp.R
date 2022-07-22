@@ -2,7 +2,8 @@
 #'
 #' Update a list with country profiles data
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
 pip_cp <- function(action  = c("update", "load"),
                    force   = FALSE,

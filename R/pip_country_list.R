@@ -8,8 +8,8 @@
 #'
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
-#' @inheritParams pip_cpi
-#' @inheritParams pip_cpi_update
+#' @inheritParams pip_pfw
+#' @inheritParams load_raw_aux
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 pip_country_list <- function(action = c("update", "load"),

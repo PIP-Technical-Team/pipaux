@@ -19,8 +19,3 @@ character vector with tags
 \description{
 Get tags from specific Github repo
 }
-\examples{
-owner <- "pip-technical-team"
-repo  <- "pip-sna"
-get_gh_tags(owner, repo)
-}
