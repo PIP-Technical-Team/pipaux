@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/PIP-Technical-Team/pipaux/workflows/R-CMD-check/badge.svg)](https://github.com/PIP-Technical-Team/pipaux/actions?workflow=R-CMD-check)
+[![Codecov test coverage](https://codecov.io/gh/PIP-Technical-Team/pipaux/branch/master/graph/badge.svg)](https://app.codecov.io/gh/PIP-Technical-Team/pipaux?branch=master)
 <!-- badges: end -->
 
 `pipaux` manages the auxiliary data used in the PIP workflow. It basically
