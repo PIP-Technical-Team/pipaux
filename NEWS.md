@@ -2,6 +2,10 @@
 
 - Read indicators.csv from GH repo aux_indicators. It reads only from main branch. parallel development reads from DEV and PROD branches.
 
+- Include variables with "_label" suffics in inequality chart data of country profiles. Requested by ITS
+
+
+
 # pipaux 0.0.8
 
 -   Retrieve SNA data from github repo, not from drive anymore

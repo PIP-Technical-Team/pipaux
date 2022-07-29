@@ -19,9 +19,9 @@ pip_metadata <- function(action = "update",
     # Pick the latest metadata file
     metadata_dir <- fs::path(maindir, "_aux/metadata/")
 
-    u <- "https://github.com/PIP-Technical-Team/pip-metadata/raw/main/pip_metadata.csv"
+    u <- "https://github.com/PIP-Technical-Team/aux_metadata/raw/main/metadata.csv"
     df <- suppressMessages(
-      readr::read_csv(u)
+      fread(u)
     )
 
 
@@ -43,7 +43,7 @@ pip_metadata <- function(action = "update",
     # Merge datasets (inner join)
     df <-
       merge(df,
-        pfw[, c("country_code", "surveyid_year", "survey_acronym",
+        pfw[, c("country_code", "ctryname", "surveyid_year", "survey_acronym",
                 "welfare_type", "reporting_year", "distribution_type",
                 "surv_producer","survey_coverage", "surv_title",
                 "link", "survey_year")],
@@ -51,15 +51,17 @@ pip_metadata <- function(action = "update",
       )
 
     # Recode colnames
-    df <- df %>%
-      data.table::setnames(c("title", "surv_producer"),
-                           c("survey_title", "survey_conductor"))
+
+    setnames(x = df,
+             old = c("title", "surv_producer", "ctryname"),
+             new = c("survey_title", "survey_conductor", "country_name"))
+
     df$survey_title <- ifelse(is.na(df$survey_title), df$surv_title, df$survey_title)
 
     # Select columns
-    df <- df[
+    df <- df[,
       c(
-        "country_code", "reporting_year",
+        "country_code", "country_name", "reporting_year",
         "surveyid_year", "survey_year", "survey_acronym",
         "survey_conductor", "survey_coverage",
         "welfare_type", "distribution_type",
@@ -71,10 +73,10 @@ pip_metadata <- function(action = "update",
         "coll_situation", "weight", "cleaning_operations"
       )
     ]
-    df <- data.table::setDT(df)
+
 
     # Create nested table
-    df <- tidyfast::dt_nest(df, country_code, reporting_year, survey_year,
+    df <- tidyfast::dt_nest(df, country_code, country_name, reporting_year, survey_year,
                             survey_title, survey_conductor, survey_coverage,
                             welfare_type, distribution_type, .key = "metadata")
 
