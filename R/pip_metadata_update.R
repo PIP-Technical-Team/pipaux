@@ -68,7 +68,7 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   # Merge datasets (inner join)
   df <-
     merge(df,
-          pfw[, c("country_code", "surveyid_year", "survey_acronym",
+          pfw[, c("country_code", "ctryname", "surveyid_year", "survey_acronym",
                   "welfare_type", "reporting_year", "distribution_type",
                   "surv_producer","survey_coverage", "surv_title",
                   "link", "survey_year")],
@@ -76,9 +76,9 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
     )
 
   # Recode colnames
-  df <- setnames(df,
-                 old = c("title", "surv_producer"),
-                 new = c("survey_title", "survey_conductor"))
+  setnames(x = df,
+           old = c("title", "surv_producer", "ctryname"),
+           new = c("survey_title", "survey_conductor", "country_name"))
   df[,
      survey_title := fifelse(is.na(survey_title), surv_title, survey_title)
   ]
@@ -86,7 +86,7 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   # Select columns
   df <- df[,
            c(
-             "country_code", "reporting_year",
+             "country_code",  "country_name", "reporting_year",
              "surveyid_year", "survey_year", "survey_acronym",
              "survey_conductor", "survey_coverage",
              "welfare_type", "distribution_type",
@@ -101,7 +101,7 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # Create nested table
 
-  df <- tidyfast::dt_nest(df, country_code, reporting_year, survey_year,
+  df <- tidyfast::dt_nest(df, country_code, country_name, reporting_year, survey_year,
                           survey_title, survey_conductor, survey_coverage,
                           welfare_type, distribution_type, .key = "metadata")
 
