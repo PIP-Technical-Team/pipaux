@@ -161,7 +161,18 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
         "country_code", "reporting_year", "welfare_type",
         "survey_coverage", "gender", "agegroup", "education",
         "distribution", "poverty_share_by_group", "reporting_level"
-      )],
+      )][,
+         agegroup_label := fcase(
+           agegroup == "0-14", "0 to 14 years old",
+           agegroup == "15-64", "15 to 64 years old",
+           agegroup == ">65", "65 and older",
+           default = ""
+         )][,
+            `:=`(
+              education_label = education,
+              gender_label    = gender
+            )
+         ],
     mpm =
       dl$chart5[, c(
         "country_code",
