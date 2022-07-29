@@ -4,7 +4,7 @@
 
 - Include variables with "_label" suffics in inequality chart data of country profiles. Requested by ITS
 
-
+- Add `country_name` variable to metadata file
 
 # pipaux 0.0.8
 
