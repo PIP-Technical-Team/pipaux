@@ -33,14 +33,15 @@ pip_sign_save <- function(x,
 
   #--------- if Signature from dlw is different from the one in production ---------
 
-  if (force == TRUE) {
-    ms_status <- "forced"
-  }
 
   if (ds_dlw != ds_production) {
     ms_status <- "changed"
   } else {
     ms_status <- "unchanged"
+  }
+
+  if (force == TRUE) {
+    ms_status <- "forced"
   }
 
   if (ms_status %in% c("forced", "changed")) {

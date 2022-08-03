@@ -79,43 +79,19 @@ pip_metadata <- function(action = "update",
     df <- tidyfast::dt_nest(df, country_code, country_name, reporting_year, survey_year,
                             survey_title, survey_conductor, survey_coverage,
                             welfare_type, distribution_type, .key = "metadata")
+    #   _________________________________________________________________________
+    #   Save and Return                                                     ####
 
-    # Check hash
-    hash <- digest::digest(df, algo = "xxhash64")
-    current_hash <- tryCatch(
-      readr::read_lines(fs::path(maindir, "_aux/metadata/metadata_datasignature.txt")),
-      error = function(e) NULL
+    saved <- pip_sign_save(
+      x       = df,
+      measure = measure,
+      msrdir  = msrdir,
+      force   = force,
+      save_dta = FALSE
     )
 
-    # Save data
-    if (hash != current_hash || force || is.null(current_hash)) {
+    return(invisible(saved))
 
-      # Create vintage folder
-      wholedir <- fs::path(maindir, "_aux/metadata/_vintage/")
-      if (!(dir.exists(wholedir))) {
-        dir.create(wholedir, recursive = TRUE)
-      }
-
-      # Write files
-      time <- format(Sys.time(), "%Y%m%d%H%M%S")
-      saveRDS(df, fs::path(maindir, "_aux/metadata/metadata.rds"))
-
-      vint_file <- paste0("metadata_", time)
-      saveRDS(df, fs::path(maindir, "_aux/metadata/_vintage", vint_file, ext = "rds"))
-      readr::write_lines(hash, file = fs::path(maindir, "_aux/metadata/metadata_datasignature.txt"))
-
-      # Print msg
-      infmsg <- paste(
-        "Data signature has changed, it was not found,",
-        "or update was forced.\n",
-        paste0("`", "metadata", ".rds` has been updated")
-      )
-      rlang::inform(infmsg)
-      return(invisible(TRUE))
-    } else {
-      rlang::inform("Data signature is up to date.\nNo update performed")
-      return(invisible(FALSE))
-    }
 
   } else if (action == "load") {
     df <- readRDS(fs::path(maindir, "_aux/metadata/metadata.rds"))

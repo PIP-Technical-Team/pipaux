@@ -4,11 +4,17 @@
 #'
 #' @inheritParams pip_prices
 #' @keywords internal
-pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
-  files <- list.files(fs::path(maindir, "_aux/cp"),
+pip_cp_update <- function(force = FALSE,
+                          maindir = gls$PIP_DATA_DIR) {
+
+
+  measure <- "cp"
+
+  files <-
+    list.files(fs::path(maindir, "_aux/cp"),
     pattern = "indicator_values_country",
-    full.names = TRUE
-  )
+    full.names = TRUE)
+
   dl <- lapply(files, function(x) {
     x <- read.csv(x)
     x <- data.table::setDT(x)
@@ -195,38 +201,18 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
   )
   cp <- list(key_indicators = key_indicators, charts = charts)
 
-  # Check hash
-  hash <- digest::digest(cp, algo = "xxhash64")
-  current_hash <- tryCatch(
-    readr::read_lines(fs::path(maindir, "_aux/cp/_datasignature.txt")),
-    error = function(e) NULL
+  #   _________________________________________________________________________
+  #   Save and Return                                                     ####
+
+  msrdir <- fs::path(maindir, "_aux", measure) # measure dir
+  saved <- pip_sign_save(
+    x       = cp,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force,
+    save_dta = FALSE
   )
 
-  # Save data
-  if (hash != current_hash || force || is.null(current_hash)) {
+  return(invisible(saved))
 
-    # Create vintage folder
-    wholedir <- fs::path(maindir, "_aux/cp/_vintage/")
-    if (!(dir.exists(wholedir))) {
-      dir.create(wholedir, recursive = TRUE)
-    }
-
-    # Write files
-    time <- format(Sys.time(), "%Y%m%d%H%M%S")
-    saveRDS(cp, fs::path(maindir, "_aux/cp/cp.rds"))
-    saveRDS(cp, fs::path(maindir, "_aux/cp/_vintage", paste0("cp_", time), ext = "rds"))
-    readr::write_lines(hash, file = fs::path(maindir, "_aux/cp/_datasignature.txt"))
-
-    # Print msg
-    infmsg <- paste(
-      "Data signature has changed, it was not found,",
-      "or update was forced.\n",
-      paste0("`", "cp", ".rds` has been updated")
-    )
-    rlang::inform(infmsg)
-    return(invisible(TRUE))
-  } else {
-    rlang::inform("Data signature is up to date.\nNo update performed")
-    return(invisible(FALSE))
-  }
 }
