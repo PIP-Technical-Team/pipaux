@@ -56,37 +56,70 @@ pip_sign_save <- function(x,
     time <- format(Sys.time(), "%Y%m%d%H%M%S") # find a way to account for time zones
 
     attr(x, "datetime") <- time
-    fst::write_fst(
-      x = x,
-      path = fs::path(msrdir, measure, ext = "fst")
-    )
+
+
+    ##  ............................................................................
+    ##  Save main file                                                          ####
+
+    var_class <- purrr::map(x, class) # variables class
+
+    if (is.data.frame(x) && !("list"  %in% unique(var_class))) {
+      fst::write_fst(
+        x = x,
+        path = fs::path(msrdir, measure, ext = "fst")
+      )
+
+      if (save_dta) {
+        haven::write_dta(
+          data = x,
+          path = fs::path(msrdir, measure, ext = "dta")
+        )
+      }
+      ext <- "fst"
+    } else {
+      readr::write_rds(x = x,
+                       file = fs::path(msrdir, measure, ext = "rds"))
+      ext <- "rds"
+    }
 
     qs::qsave(
       x = x,
       file = fs::path(msrdir, measure, ext = "qs")
     )
 
-    if (save_dta) {
-      haven::write_dta(
-        data = x,
-        path = fs::path(msrdir, measure, ext = "dta")
+    ##  ............................................................................
+    ##  Save vintages                                                           ####
+
+    if (is.data.frame(x) && !("list"  %in% unique(var_class))) {
+      fst::write_fst(
+        x = x,
+        path = fs::path(msrdir, "_vintage/",
+                        paste0(measure, "_", time),  ext = "fst")
       )
+
+      if (save_dta) {
+        haven::write_dta(
+          data = x,
+          path = fs::path(msrdir, "_vintage/",
+                          paste0(measure, "_", time),  ext = "dta"))
+      }
+
+    } else {
+
+      readr::write_rds(x = x,
+                       file = fs::path(msrdir, "_vintage/",
+                                       paste0(measure, "_", time),
+                                       ext = "rds"))
+
     }
 
-    fst::write_fst(
-      x = x,
-      path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "fst")
-    )
     qs::qsave(
       x = x,
       file = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "qs")
     )
-    if (save_dta) {
-      haven::write_dta(
-        data = x,
-        path = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "dta")
-      )
-    }
+
+    #   ____________________________________________________________________________
+    #   Signatures                                                              ####
 
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
@@ -98,9 +131,9 @@ pip_sign_save <- function(x,
 
 
     fillintext <- fcase(ms_status == "new", "was not found",
-          ms_status == "forced", "has been changed forcefully",
-          ms_status == "changed", "has changed",
-          default = "")
+                        ms_status == "forced", "has been changed forcefully",
+                        ms_status == "changed", "has changed",
+                        default = "")
 
 
     infmsg <-
