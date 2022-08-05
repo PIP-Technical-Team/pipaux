@@ -48,18 +48,14 @@ pip_cpi_clean <- function(y,
     # This part should not exist if the raw data
     # had been created properly
     cpi_data_level := fcase(
-      cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "0", "rural",
-      cpi_domain %chin% c("urban/rural", "2") & cpi_data_level == "1", "urban",
-      cpi_domain %chin% c("national", "1") & cpi_data_level %chin% c("2", "", NA_character_),
-      "national",
+      tolower(cpi_domain) %chin% c("urban/rural", "2") & cpi_data_level == "0", "rural",
+      tolower(cpi_domain) %chin% c("urban/rural", "2") & cpi_data_level == "1", "urban",
+      tolower(cpi_domain) %chin% c("national", "1") & cpi_data_level %chin% c("2", "", NA_character_), "national",
       default = ""
     )
   ]
   # keep final vars
-  x <- x[
-    ,
-    ..keep_vars
-  ]
+  x <- x[, ..keep_vars ]
 
   x <- unique(x) # remove duplicates
 
