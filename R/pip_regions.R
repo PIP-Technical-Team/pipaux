@@ -3,36 +3,96 @@
 #' Update or load a dataset with regions.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams pipfun::load_from_gh
 #' @export
-pip_regions <- function(action = "update",
+pip_regions <- function(action = c("update", "load"),
                         force = FALSE,
-                        maindir = gls$PIP_DATA_DIR) {
+                        maindir = gls$PIP_DATA_DIR,
+                        owner   = getOption("pipfun.ghowner"),
+                        branch  = c("DEV", "PROD", "main"),
+                        tag     = match.arg(branch)
+                        ) {
+
+
   measure <- "regions"
-  msrdir <- fs::path(maindir, "_aux/", measure)
+  action  <- match.arg(action)
+  msrdir  <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
-    df <- suppressMessages(
-      readr::read_csv(fs::path(maindir, "_aux/regions/regions.csv"))
+
+    ##  ............................................................................
+    ##  Load country_list table                                                 ####
+
+    cl <- pipfun::load_from_gh(
+      measure = "country_list",
+      owner   = owner,
+      branch  = branch,
+      tag     = tag
     )
+
+    setnames(cl, "country_code", "id") # to make it work w/o problems
+
+    ##  ............................................................................
+    ##  get code variables                                                      ####
+
+
+    ml <- melt(cl,
+               id.vars         = c("id"),
+               measure.vars    = patterns("code$"),
+               variable.factor = FALSE,
+               value.factor    = FALSE,
+               value.name      = "region_code",
+               variable.name   = "grouping_type")
+
+    ml[,
+       grouping_type := gsub("_code", "", grouping_type)]
+
+    ##  ............................................................................
+    ##  Get label variables                                                     ####
+
+    grs <- ml[, unique(grouping_type) ] |>
+      {\(.) c("id",.) }()
+
+    ml2 <- melt(cl[, ..grs],
+                id.vars         = c("id"),
+                variable.factor = FALSE,
+                value.factor    = FALSE,
+                value.name      = "region",
+                variable.name   = "grouping_type")
+    ##  ............................................................................
+    ##  Merge ml and ml2                                                        ####
+
+    dt <- joyn::merge(ml, ml2,
+                      by         = c("id", "grouping_type"),
+                      match_type = "1:1",
+                      verbose    = FALSE)
+
+    ### . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ..
+    ### Get unique database                                                     ####
+
+    byv <- c("region", "region_code", "grouping_type")
+    dt <- unique(dt[, ..byv], by = byv)
+
+##  ............................................................................
+##  Save data                                                               ####
+
     pip_sign_save(
-      x = df,
+      x       = dt,
       measure = measure,
-      msrdir = msrdir,
-      force = force
+      msrdir  = msrdir,
+      force   = force
     )
-  } else if (action == "load") {
+
+  } else {
     df <- load_aux(
       maindir = maindir,
       measure = measure
     )
     return(df)
-  } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
   }
-}
+
+} # end of function
+
+
+
+
