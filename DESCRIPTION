@@ -48,8 +48,10 @@ Imports:
     yaml,
     qs,
     glue,
-    gh
+    gh,
+    pipfun (>= 0.0.0.9003)
 VignetteBuilder: knitr
-Remotes: 
-    github::PIP-Technical-Team/pipload@development
+Remotes:  
+    github::PIP-Technical-Team/pipload@development,
+    github::PIP-Technical-Team/pipfun
 URL: https://pip-technical-team.github.io/pipaux/
