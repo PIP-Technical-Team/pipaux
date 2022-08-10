@@ -13,6 +13,7 @@
 #' @importFrom glue glue
 
 # Make sure data.table knows we know we're using it
+#' @noRd
 .datatable.aware = TRUE
 
 # Prevent R CMD check from complaining about the use of pipe expressions
@@ -111,7 +112,21 @@ if (getRversion() >= "2.15.1") {
       "weo_subject_code",
       "year2",
       "year_range",
-      "..keep_vars"
+      "..keep_vars",
+      "..byv",
+      "..grs",
+      "..tokeep",
+      "..vars",
+      "GDP",
+      "PCE",
+      "agegroup",
+      "agegroup_label",
+      "country_name",
+      "education",
+      "gender",
+      "grouping_type",
+      "indicator_code",
+      "inpovcal"
     ),
     package = utils::packageName()
   )

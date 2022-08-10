@@ -49,7 +49,8 @@ Imports:
     qs,
     glue,
     gh,
-    pipfun (>= 0.0.0.9003)
+    pipfun (>= 0.0.0.9003),
+    joyn
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@development,
