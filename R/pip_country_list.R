@@ -15,8 +15,7 @@
 pip_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
-                             owner   = "PIP-Technical-Team",
-                             repo    = "aux_country_list",
+                             owner   = getOption("pipaux.ghowner"),
                              branch  = c("DEV", "PROD", "main"),
                              tag     = match.arg(branch)) {
   measure <- "country_list"
@@ -29,7 +28,6 @@ pip_country_list <- function(action = c("update", "load"),
     cl <- load_raw_aux(
       measure = measure,
       owner  = owner,
-      repo   = repo,
       branch = branch,
       tag    = tag
     )
