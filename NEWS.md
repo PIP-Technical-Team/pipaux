@@ -1,10 +1,15 @@
 # pipaux (development version)
 
-- Read indicators.csv from GH repo aux_indicators. It reads only from main branch. parallel development reads from DEV and PROD branches.
+-   Read indicators.csv from GH repo aux_indicators. It reads only from main
+    branch. parallel development reads from DEV and PROD branches.
 
-- Include variables with "_label" suffics in inequality chart data of country profiles. Requested by ITS
+-   Include variables with "\_label" suffics in inequality chart data of country
+    profiles. Requested by ITS
 
-- Add `country_name` variable to metadata file
+-   Add `country_name` variable to metadata file
+
+-   Use new format of country_list.csv. This format will be used in the new
+    pipeline, but it is necessary to use it that way for Sept, 2022 update.
 
 # pipaux 0.0.8
 
@@ -76,3 +81,4 @@ Initial release used in the PIP soft-launch on February 9, 2022 \# pipaux 0.0.2
 -   Add global variables from `pipload::pip_create_globals`
 
 -   Added a `NEWS.md` file to track changes to the package.
+
