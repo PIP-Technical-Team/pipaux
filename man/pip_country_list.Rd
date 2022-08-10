@@ -8,8 +8,7 @@ pip_country_list(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  owner = "PIP-Technical-Team",
-  repo = "aux_country_list",
+  owner = getOption("pipaux.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
@@ -24,8 +23,6 @@ pip_country_list(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipaux.ghowner")}}
-
-\item{repo}{character: name of the repo}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
