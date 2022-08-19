@@ -40,10 +40,24 @@ pip_missing_data <- function(action = c("update", "load"),
 
     # Load data ------
 
-    pipload::pip_load_all_aux(aux = c("gdp", "pce", "pfw", "country_list"),
-                              aux_names = c("gdp", "pce", "pfw", "cl"),
-                              replace = TRUE)
-    ref_years <- pipfun::pip_create_globals()$PIP_REF_YEARS
+    # pipload::pip_load_all_aux(aux = c("gdp", "pce", "pfw", "country_list"),
+    #                           aux_names = c("gdp", "pce", "pfw", "cl"),
+    #                           replace = TRUE)
+
+    gdp <- load_aux(maindir = maindir,
+                    measure = "gdp")
+
+    pce <- load_aux(maindir = maindir,
+                    measure = "pce")
+
+    pfw <- load_aux(maindir = maindir,
+                    measure = "pfw")
+
+    cl <- load_aux(maindir = maindir,
+                    measure = "country_list")
+
+
+    ref_years <- gls$PIP_REF_YEARS
 
     # Prepara NAC data ------
 
@@ -54,8 +68,7 @@ pip_missing_data <- function(action = c("update", "load"),
     nac <- joyn::merge(gdp, pce,
                        by = c(
                          "country_code", "year", "nac_data_level",
-                         "nac_domain"
-                       ),
+                         "nac_domain"),
                        match_type = "1:1",
                        reportvar = FALSE)
 
@@ -135,19 +148,21 @@ pip_missing_data <- function(action = c("update", "load"),
     # Find countries with no GDP or PCE ------------------
     ct_sv <- gr[country_code %in% ctr_with_survey] # countries with survey
 
-    # Join grid of countries with at least one survey in to the NAC data. Those in
-    # the grid that are not in the NAC should be considered as missind data as well
-    # Those that are in NAC but are not ingrid are those without survey, whish we
-    # took care above
+    # Join grid of countries with at least one survey in to the NAC data. Those
+    # in the grid that are not in the NAC should be considered as missind data
+    # as well Those that are in NAC but are not ingrid are those without survey,
+    # which we took care above
 
     ct_nonac <- joyn::merge(ct_sv, nac,
                             by = c("country_code", "year"),
                             match_type = "1:m")
 
 
-    ct_nonac <- ct_nonac[report == "x"
-    ][, c("country_code", "year")
-    ]
+    ct_nonac <-
+      ct_nonac[report == "x"
+               ][,
+                 c("country_code", "year")
+                 ]
 
 
     # Get Countries with missing data ---------
@@ -160,7 +175,7 @@ pip_missing_data <- function(action = c("update", "load"),
     setorder(ct_miss_data, country_code, year)
 
 
-    # benchmark  ------------
+    # benchmark
     # tdirs <- fs::path("P:/02.personal/wb384996/temporal/Stata")
     # sfile <- fs::dir_ls(tdirs, type = "file", regexp = "Missing.*dta$")
     # bmk <-
@@ -173,11 +188,22 @@ pip_missing_data <- function(action = c("update", "load"),
     # # ADd region codes
     #
     #
-    # ## compare ----------
+    # ## compare
     #
     # waldo::compare(bmk, ct_miss_data, ignore_attr = TRUE)
-    ##  ............................................................................
-    ##  Save data                                                               ####
+
+
+# Add region_code -------
+  ct_miss_data <- joyn::merge(ct_miss_data, cl,
+                              by = "country_code",
+                              keep = "left",
+                              match_type = "m:1",
+                              reportvar = FALSE)
+
+
+
+#  .................................................................
+##  Save data                                                    ####
 
     pip_sign_save(
       x       = ct_miss_data,

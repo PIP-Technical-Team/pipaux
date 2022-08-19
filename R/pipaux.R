@@ -1,4 +1,4 @@
-#' pipaux: A package for computating the notorious bar statistic
+#' pipaux: A package for processing Auxiliary data in the PIP process
 #'
 #' Description bla blab
 #'
