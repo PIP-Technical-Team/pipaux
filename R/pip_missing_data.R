@@ -1,0 +1,199 @@
+#' Create table with missing countries
+#'
+#' @inheritParams pip_pfw
+#'
+#' @return if `action = "update"` returns logical. If `action = "load"` returns
+#'   a data.table
+#' @export
+pip_missing_data <- function(action = c("update", "load"),
+                             maindir = gls$PIP_DATA_DIR,
+                             dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
+                             force = FALSE) {
+
+#   ____________________________________________________________________________
+#   on.exit                                                                 ####
+  on.exit({
+
+  })
+
+#   ____________________________________________________________________________
+#   Defenses                                                                ####
+  stopifnot( exprs = {
+
+    }
+  )
+
+#   ____________________________________________________________________________
+#   Early returns                                                           ####
+  if (FALSE) {
+    return()
+  }
+
+#   ____________________________________________________________________________
+#   Computations                                                            ####
+
+  measure <- "missing_data"
+  action  <- match.arg(action)
+  msrdir  <- fs::path(maindir, "_aux/", measure)
+
+  if (action == "update") {
+
+    # Load data ------
+
+    pipload::pip_load_all_aux(aux = c("gdp", "pce", "pfw", "country_list"),
+                              aux_names = c("gdp", "pce", "pfw", "cl"),
+                              replace = TRUE)
+    ref_years <- pipfun::pip_create_globals()$PIP_REF_YEARS
+
+    # Prepara NAC data ------
+
+    # Standardize ^_data_level ^_domain column names
+    setnames(pce, names(pce) ,sub("^pce[_]", "nac_", names(pce)))
+    setnames(gdp, names(gdp) ,sub("^gdp[_]", "nac_", names(gdp)))
+
+    nac <- joyn::merge(gdp, pce,
+                       by = c(
+                         "country_code", "year", "nac_data_level",
+                         "nac_domain"
+                       ),
+                       match_type = "1:1",
+                       reportvar = FALSE)
+
+    nac <-
+      nac[year %in% ref_years
+      ][,
+        nac_domain := NULL]
+
+
+
+    # Prepara Grid of all countries and ref years ---------
+
+    cl <- cl[, c("country_code", "region_code")]
+
+    gr <-
+      expand.grid(country_code = cl$country_code,
+                  year = ref_years,
+                  stringsAsFactors = FALSE) |>
+      as.data.table()
+
+    setorder(gr, country_code, year)
+
+    # Prepare PFW data -------
+
+    # domvar <- grep("domain$", names(pfw), value = TRUE) # all domains
+    domvar <- grep("(gdp|pce)_domain$", names(pfw), value = TRUE) # data_level vars
+    idvars <- c("country_code", "year", "welfare_type")
+    keepv  <- c(idvars, domvar)
+    dom <- pfw[inpovcal == 1
+    ][, ..keepv]
+
+    # pfw[, mdom := max(.SD[, mget(domvar)]), by = .I]  # when 1.14.3 becomes available
+    dom[,
+        #  Create rowo position (must be done in 1.14.2)
+        n := .I
+    ][,
+      # max reporting year per country/year
+      mdom := max(.SD[, mget(domvar)]), by = n
+    ]
+
+    dom <- dom[,
+               .(country_code, year, welfare_type, mdom)]
+
+    ## National data ------------
+    domn <- dom[mdom == 1]
+
+    domn <- domn[,
+                 nac_data_level := "national"]
+
+    ## Urban/Rural data -----------
+    domu <-  dom[mdom == 2]
+    domr <-  dom[mdom == 2]
+
+    domu <- domu[,
+                 nac_data_level := "urban"]
+
+    domr <- domr[,
+                 nac_data_level := "rural"]
+
+    ## append national and urban/rural sections ----
+
+    dom2 <-
+      list(domn, domu, domr)  |>
+      rbindlist()
+
+    dom2 <- unique(dom2[, c("country_code", "year", "nac_data_level")])
+
+
+    ## Survey availability -----------
+    svav <- unique(pfw[, .(country_code, year)])
+
+    ctr_with_survey <- svav[, unique(country_code)] # countries with survey
+
+    # Find countries/years with no survey ------
+    ct_nosv <- gr[!country_code %in% ctr_with_survey]
+
+    # Find countries with no GDP or PCE ------------------
+    ct_sv <- gr[country_code %in% ctr_with_survey] # countries with survey
+
+    # Join grid of countries with at least one survey in to the NAC data. Those in
+    # the grid that are not in the NAC should be considered as missind data as well
+    # Those that are in NAC but are not ingrid are those without survey, whish we
+    # took care above
+
+    ct_nonac <- joyn::merge(ct_sv, nac,
+                            by = c("country_code", "year"),
+                            match_type = "1:m")
+
+
+    ct_nonac <- ct_nonac[report == "x"
+    ][, c("country_code", "year")
+    ]
+
+
+    # Get Countries with missing data ---------
+
+    ct_miss_data <-
+      list(ct_nosv, ct_nonac) |>
+      rbindlist(use.names = TRUE)
+
+
+    setorder(ct_miss_data, country_code, year)
+
+
+    # benchmark  ------------
+    # tdirs <- fs::path("P:/02.personal/wb384996/temporal/Stata")
+    # sfile <- fs::dir_ls(tdirs, type = "file", regexp = "Missing.*dta$")
+    # bmk <-
+    #   haven::read_dta(sfile) |>
+    #   as.data.table()
+    #
+    # setnames(bmk, "code", "country_code")
+    # setorder(bmk, country_code, year)
+    #
+    # # ADd region codes
+    #
+    #
+    # ## compare ----------
+    #
+    # waldo::compare(bmk, ct_miss_data, ignore_attr = TRUE)
+    ##  ............................................................................
+    ##  Save data                                                               ####
+
+    pip_sign_save(
+      x       = ct_miss_data,
+      measure = measure,
+      msrdir  = msrdir,
+      force   = force
+    )
+
+
+
+  } else {
+    df <- load_aux(
+      maindir = maindir,
+      measure = measure
+    )
+    return(df)
+  }
+
+} # end of function pip_missing_data
