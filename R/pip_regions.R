@@ -72,6 +72,8 @@ pip_regions <- function(action = c("update", "load"),
 
     byv <- c("region", "region_code", "grouping_type")
     dt <- unique(dt[, ..byv], by = byv)
+    dt <- dt[grouping_type != "pcn_region"]
+    setorder(dt, grouping_type, region_code)
 
 ##  ............................................................................
 ##  Save data                                                               ####
