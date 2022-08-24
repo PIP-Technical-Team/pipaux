@@ -53,6 +53,9 @@ pip_missing_data <- function(action = c("update", "load"),
     pfw <- load_aux(maindir = maindir,
                     measure = "pfw")
 
+    pop <- load_aux(maindir = maindir,
+                    measure = "pop")
+
     cl <- load_aux(maindir = maindir,
                     measure = "country_list")
 
@@ -201,12 +204,25 @@ pip_missing_data <- function(action = c("update", "load"),
                               reportvar = FALSE)
 
 
+# Join  with pop data -----
+    pop <-
+      pop[pop_data_level == "national"
+      ][,
+        c("pop_domain", "pop_data_level") := NULL
+      ]
+
+    setnames(pop, "pop", "reporting_pop")
+    # Filter pop with missing data countries
+    pop_md <-
+      pop[ct_miss_data,
+          on = c("country_code", "year")]
+
 
 #  .................................................................
 ##  Save data                                                    ####
 
     pip_sign_save(
-      x       = ct_miss_data,
+      x       = pop_md,
       measure = measure,
       msrdir  = msrdir,
       force   = force
