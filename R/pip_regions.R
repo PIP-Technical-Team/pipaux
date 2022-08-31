@@ -14,8 +14,8 @@ pip_regions <- function(action = c("update", "load"),
                         ) {
 
 
-  measure <- "regions"
   action  <- match.arg(action)
+  measure <- "regions"
   msrdir  <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
@@ -74,6 +74,8 @@ pip_regions <- function(action = c("update", "load"),
     dt <- unique(dt[, ..byv], by = byv)
     dt <- dt[grouping_type != "pcn_region" & region_code != ""]
     setorder(dt, grouping_type, region_code)
+
+
 
 ##  ............................................................................
 ##  Save data                                                               ####

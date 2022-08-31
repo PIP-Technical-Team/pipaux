@@ -4,7 +4,14 @@
 \alias{pip_pl}
 \title{Poverty lines}
 \usage{
-pip_pl(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_pl(
+  action = c("update", "load"),
+  force = FALSE,
+  owner = getOption("pipfun.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
