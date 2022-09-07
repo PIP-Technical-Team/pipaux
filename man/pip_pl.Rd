@@ -19,7 +19,15 @@ pip_pl(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
+
 \item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update or load a dataset with poverty lines.

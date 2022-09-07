@@ -4,12 +4,22 @@
 \alias{pip_cp_update}
 \title{Update Country Profiles}
 \usage{
-pip_cp_update(force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_cp_update(
+  maindir = gls$PIP_DATA_DIR,
+  force = FALSE,
+  owner = getOption("pipfun.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
 
-\item{maindir}{character: Main directory of project.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update a list with country profiles data

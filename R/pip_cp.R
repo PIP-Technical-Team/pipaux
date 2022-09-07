@@ -2,11 +2,11 @@
 #'
 #' Update a list with country profiles data
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
-                   owner   = getOption("pipaux.ghowner"),
+                   owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
                    branch  = c("DEV", "PROD", "main"),
                    tag     = match.arg(branch)) {
