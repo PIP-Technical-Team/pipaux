@@ -73,7 +73,8 @@ pip_missing_data <- function(action = c("update", "load"),
                          "country_code", "year", "nac_data_level",
                          "nac_domain"),
                        match_type = "1:1",
-                       reportvar = FALSE)
+                       reportvar = FALSE,
+                       verbose = FALSE)
 
     nac <-
       nac[year %in% ref_years
@@ -158,7 +159,8 @@ pip_missing_data <- function(action = c("update", "load"),
 
     ct_nonac <- joyn::merge(ct_sv, nac,
                             by = c("country_code", "year"),
-                            match_type = "1:m")
+                            match_type = "1:m",
+                            verbose = FALSE)
 
 
     ct_nonac <-
@@ -201,7 +203,8 @@ pip_missing_data <- function(action = c("update", "load"),
                               by = "country_code",
                               keep = "left",
                               match_type = "m:1",
-                              reportvar = FALSE)
+                              reportvar = FALSE,
+                              verbose = FALSE)
 
 
 # Join  with pop data -----
