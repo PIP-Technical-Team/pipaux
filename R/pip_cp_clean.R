@@ -42,10 +42,16 @@ pip_cp_clean <- function(x,
                           by = c("country_code", "reporting_year")
   )
 
-  key_indicators <- merge(key_indicators,
-                          dl$chart5[, c("country_code", "reporting_year", "mpm_headcount")],
-                          all = TRUE,
-                          by = c("country_code", "reporting_year")
+  key_indicators <- merge(
+    x = key_indicators,
+    y = dl$chart5[,
+                  c("country_code",
+                    "reporting_year",
+                    "mpm_headcount",
+                    "ppp_year")
+                  ],
+    all = TRUE,
+    by = c("country_code", "reporting_year")
   )
 
   key_indicators <- list(
@@ -56,7 +62,8 @@ pip_cp_clean <- function(x,
     mpm_headcount = key_indicators[,
                                    c("country_code",
                                      "reporting_year",
-                                     "mpm_headcount")],
+                                     "mpm_headcount",
+                                     "ppp_year")],
 
     reporting_pop = key_indicators[,
                                    c("country_code",
