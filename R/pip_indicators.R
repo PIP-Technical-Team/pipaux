@@ -24,32 +24,18 @@ pip_indicators <- function(action  = c("update", "load"),
         branch = branch
       )
 
-    path <-
-      glue("https://github.com/PIP-Technical-Team/aux_indicators/raw/main/indicators.csv")
-
-    df <- suppressMessages(
-      readr::read_csv(path)
-    )
-
     pip_sign_save(
       x = df,
       measure = measure,
       msrdir = msrdir,
       force = force
     )
-  } else if (action == "load") {
+  } else  {
     df <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
     return(df)
-  } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
   }
 }
