@@ -58,7 +58,8 @@ pip_cp_clean <- function(x,
     headcount_national = key_indicators[,
                                         c("country_code",
                                           "reporting_year",
-                                          "headcount_national")],
+                                          "headcount_national",
+                                          "ppp_year")],
     mpm_headcount = key_indicators[,
                                    c("country_code",
                                      "reporting_year",
@@ -79,14 +80,46 @@ pip_cp_clean <- function(x,
                                     "gdp_growth")]
   )
 
-  key_indicators[1:3] <- lapply(key_indicators[1:3], function(x) {
-    x <- x %>%
-      dplyr::filter(!is.na(x[, 3])) %>%
-      dplyr::group_by(country_code) %>%
-      dplyr::filter(reporting_year == max(reporting_year)) %>%
-      dplyr::ungroup() %>%
-      data.table::as.data.table()
-  })
+  # kg1 <- c("headcount_national", "mpm_headcount", "reporting_pop")
+
+  #
+  # for (i in seq_along(kg1)) {
+  #
+  #   var <- kg1[i]
+  #
+  #   key_indicators[[var]] <-
+  #     key_indicators[[var]] %>%
+  #   # ff <- key_indicators[[var]] %>%
+  #       dplyr::filter(!is.na(.data[[var]])) %>%
+  #       dplyr::group_by(country_code, ppp_year) %>%
+  #       dplyr::filter(reporting_year == max(reporting_year)) %>%
+  #       dplyr::ungroup() %>%
+  #       data.table::as.data.table()
+  #
+  # }
+
+  kg1 <- c("headcount_national", "mpm_headcount")
+  for (i in seq_along(kg1)) {
+
+    var <- kg1[i]
+
+    key_indicators[[var]] <-
+      key_indicators[[var]][
+        !is.na(get(var)) & !is.na(ppp_year)
+      ][,
+        .SD[which.max(reporting_year)],
+        by = c("country_code", "ppp_year")
+        ]
+
+  }
+
+  key_indicators$reporting_pop <-
+    key_indicators[["reporting_pop"]][
+      !is.na(reporting_pop)
+    ][,
+      .SD[which.max(reporting_year)],
+      by = c("country_code")
+    ]
 
   key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
     x <- x %>%
@@ -136,6 +169,7 @@ pip_cp_clean <- function(x,
     dplyr::group_by(country_code, ppp_year) %>%
     dplyr::filter(distribution %in% c("b40", "tot")) %>%
     dplyr::filter(year2 == max(year2)) %>%
+    dplyr::filter(year1 == max(year1)) %>%
     dplyr::ungroup() %>%
     dplyr::select(country_code,
                   year_range,

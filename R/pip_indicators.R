@@ -24,6 +24,20 @@ pip_indicators <- function(action  = c("update", "load"),
         branch = branch
       )
 
+    # Convert empty strings to NA in all character variables
+    chr_df <-
+      sapply(df, is.character) |>
+      which() |>
+      names()
+
+    df[, (chr_df) :=
+         lapply(.SD, \(x) {
+           x <- fifelse(x == "", NA_character_, x)
+         }),
+       .SDcols = chr_df]
+
+
+
     pip_sign_save(
       x = df,
       measure = measure,

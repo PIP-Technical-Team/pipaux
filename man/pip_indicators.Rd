@@ -4,7 +4,14 @@
 \alias{pip_indicators}
 \title{PIP Indicators}
 \usage{
-pip_indicators(action = "update", force = FALSE, maindir = gls$PIP_DATA_DIR)
+pip_indicators(
+  action = c("update", "load"),
+  force = FALSE,
+  owner = getOption("pipfun.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
