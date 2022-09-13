@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.0.8.9012
+Version: 0.0.8.9013
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
