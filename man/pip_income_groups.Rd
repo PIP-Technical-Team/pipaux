@@ -21,7 +21,7 @@ pip_income_groups(
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{owner}{character: Github repo owner. Default is
-\code{getOption("pipaux.ghowner")}}
+\code{getOption("pipfun.ghowner")}}
 
 \item{repo}{character: name of the repo}
 

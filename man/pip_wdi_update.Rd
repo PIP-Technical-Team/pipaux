@@ -7,7 +7,7 @@
 pip_wdi_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  owner = getOption("pipaux.ghowner"),
+  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
   from = c("gh", "file", "api")
@@ -19,7 +19,7 @@ pip_wdi_update(
 \item{maindir}{character: Main directory of project.}
 
 \item{owner}{character: Github repo owner. Default is
-\code{getOption("pipaux.ghowner")}}
+\code{getOption("pipfun.ghowner")}}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

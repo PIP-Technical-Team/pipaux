@@ -8,7 +8,7 @@
 #' @docType package
 #' @name pipaux
 #' @import data.table
-#' @importFrom pipload pip_create_globals add_gls_to_env
+#' @importFrom pipfun pip_create_globals
 #' @importFrom magrittr "%>%" "%<>%"
 #' @importFrom glue glue
 

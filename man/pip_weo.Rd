@@ -7,7 +7,7 @@
 pip_weo(
   action = c("update", "load"),
   force = FALSE,
-  owner = getOption("pipaux.ghowner"),
+  owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
@@ -20,7 +20,7 @@ pip_weo(
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{owner}{character: Github repo owner. Default is
-\code{getOption("pipaux.ghowner")}}
+\code{getOption("pipfun.ghowner")}}
 
 \item{maindir}{character: Main directory of project.}
 

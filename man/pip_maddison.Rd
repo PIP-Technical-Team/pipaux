@@ -6,7 +6,7 @@
 \usage{
 pip_maddison(
   action = c("update", "load"),
-  owner = getOption("pipaux.ghowner"),
+  owner = getOption("pipfun.ghowner"),
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
@@ -18,7 +18,7 @@ pip_maddison(
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
 \item{owner}{character: Github repo owner. Default is
-\code{getOption("pipaux.ghowner")}}
+\code{getOption("pipfun.ghowner")}}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
