@@ -10,7 +10,7 @@ NULL
 pip_pop_update <-  function(force   = FALSE,
                             src     = c("emi", "wdi"),
                             maindir = gls$PIP_DATA_DIR,
-                            owner   = getOption("pipaux.ghowner"),
+                            owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
 

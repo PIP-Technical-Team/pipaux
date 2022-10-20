@@ -6,7 +6,7 @@
 #' @export
 pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
-                                owner   = getOption("pipaux.ghowner"),
+                                owner   = getOption("pipfun.ghowner"),
                                 branch  = c("DEV", "PROD", "main"),
                                 tag     = match.arg(branch)) {
 

@@ -7,7 +7,7 @@
 #' @export
 #' @import data.table
 pip_maddison <- function(action = c("update", "load"),
-                         owner   = getOption("pipaux.ghowner"),
+                         owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
                          branch  = c("DEV", "PROD", "main"),

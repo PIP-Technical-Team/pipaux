@@ -10,7 +10,7 @@ pip_pop <- function(action = c("update", "load"),
                     force = FALSE,
                     src = getOption("pipaux.popsrc"),
                     maindir = gls$PIP_DATA_DIR,
-                    owner   = getOption("pipaux.ghowner"),
+                    owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
                     tag     = match.arg(branch)) {
   measure <- "pop"

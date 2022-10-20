@@ -7,7 +7,7 @@
 #' @export
 pip_regions <- function(action  = c("update", "load"),
                         force = FALSE,
-                        owner   = getOption("pipaux.ghowner"),
+                        owner   = getOption("pipfun.ghowner"),
                         maindir = gls$PIP_DATA_DIR,
                         branch  = c("DEV", "PROD", "main"),
                         tag     = match.arg(branch)) {

@@ -5,7 +5,7 @@
 #' @inheritParams pip_gdm
 #' @keywords internal
 pip_gdm_update <- function(force = FALSE,
-                           owner   = getOption("pipaux.ghowner"),
+                           owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)

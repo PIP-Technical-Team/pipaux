@@ -2,7 +2,7 @@
 #'
 #' @param measure character: measure to be loaded
 #' @param owner character: Github repo owner. Default is
-#'   `getOption("pipaux.ghowner")`
+#'   `getOption("pipfun.ghowner")`
 #' @param repo character: name of the repo
 #' @param branch character: either "DEV" or "PROD". Refers to the branch that
 #'   will be used to update either the development server or production.
@@ -16,7 +16,7 @@
 #' @return dataset
 #' @keywords internal
 load_raw_aux <- function(measure,
-                         owner     = getOption("pipaux.ghowner"),
+                         owner     = getOption("pipfun.ghowner"),
                          repo      = paste0("aux_", measure),
                          branch    = c("DEV","PROD","main"),
                          tag       = match.arg(branch),
