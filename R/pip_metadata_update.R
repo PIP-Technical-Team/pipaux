@@ -101,10 +101,21 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # Create nested table
 
-  df <- tidyfast::dt_nest(df, country_code, country_name, reporting_year, survey_year,
-                          survey_title, survey_conductor, survey_coverage,
-                          welfare_type, distribution_type, .key = "metadata")
+  df <- df[, .(.(.SD)),
+           keyby =  .(
+             country_code,
+             country_name,
+             reporting_year,
+             survey_year,
+             survey_title,
+             survey_conductor,
+             survey_coverage,
+             welfare_type,
+             distribution_type
+           )
+           ]
 
+  setnames(df, old = "V1", new = "metadata")
 
 ##  ............................................................................
 ##  Save                                                                    ####

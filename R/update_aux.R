@@ -8,12 +8,13 @@ update_aux <- function(measure = NULL,
 
   # verify measure is provided
   if (is.null(measure)) {
-    rlang::abort(c(
-      "`measure` must be defined, as it does not have default value",
-      i = "make sure `measure` is not NULL."
-    ),
-    class = "pipaux_error"
-    )
+    msg     <- c(
+      "{.field measure} must be defined, as it does not have default value",
+      "i" = "make sure `measure` is not NULL."
+      )
+    cli::cli_abort(msg,
+                  class = "pipaux_error"
+                  )
   }
 
   # check arguments
