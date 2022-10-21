@@ -1,6 +1,6 @@
 #' Update Auxiliary data. Wrapper of measure-specific functions.
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams pip_aux_labels
 #' @param ... Arguments of any of the pip_* functions for updating data.
 #' @export
 update_aux <- function(measure = NULL,

@@ -7,6 +7,8 @@
 update_aux(measure = NULL, ...)
 }
 \arguments{
+\item{measure}{type of data frame, e.g., "cpi" or "PPP".}
+
 \item{...}{Arguments of any of the pip_* functions for updating data.}
 }
 \description{
