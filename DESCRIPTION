@@ -52,7 +52,8 @@ Imports:
     gh,
     httr,
     pipfun (>= 0.0.0.9007),
-    lifecycle
+    lifecycle,
+    joyn
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@new_pipeline,

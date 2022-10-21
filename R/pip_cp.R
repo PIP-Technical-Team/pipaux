@@ -2,6 +2,7 @@
 #'
 #' Update a list with country profiles data
 #'
+#' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_cp <- function(action  = c("update", "load"),

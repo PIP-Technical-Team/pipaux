@@ -74,7 +74,7 @@ load_raw_aux <- function(measure,
         if (ext == "csv") {
 
           # readr::read_csv(path, ...)
-          data.table::fread(path, ...)
+          readr::read_csv(path, ...)
 
         } else if (ext  %in% c("xls", "xlsx")) {
 

@@ -148,7 +148,14 @@ if (getRversion() >= "2.15.1") {
       "gender",
       "grouping_type",
       "indicator_code",
-      "inpovcal"
+      "inpovcal",
+      "..keepv",
+      "mdom",
+      "nac_data_level",
+      "nac_domain",
+      "report",
+      "reporting_pop",
+      "year1"
     ),
     package = utils::packageName()
   )

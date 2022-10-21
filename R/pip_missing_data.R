@@ -1,14 +1,22 @@
 #' Create table with missing countries
 #'
-#' @inheritParams pip_pfw
+#' @inheritParams pip_cpi
+#' @inheritParams pipfun::load_from_gh
 #'
 #' @return if `action = "update"` returns logical. If `action = "load"` returns
 #'   a data.table
 #' @export
-pip_missing_data <- function(action = c("update", "load"),
+pip_missing_data <- function(action  = c("update", "load"),
+                             force   = FALSE,
+                             owner   = getOption("pipfun.ghowner"),
                              maindir = gls$PIP_DATA_DIR,
-                             dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
-                             force = FALSE) {
+                             branch  = c("DEV", "PROD", "main"),
+                             tag     = match.arg(branch)
+                             ) {
+
+  measure <- "missing_data"
+  branch <- match.arg(branch)
+  action <- match.arg(action)
 
 #   ____________________________________________________________________________
 #   on.exit                                                                 ####
@@ -32,9 +40,6 @@ pip_missing_data <- function(action = c("update", "load"),
 #   ____________________________________________________________________________
 #   Computations                                                            ####
 
-  measure <- "missing_data"
-  action  <- match.arg(action)
-  msrdir  <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
 
@@ -45,18 +50,23 @@ pip_missing_data <- function(action = c("update", "load"),
     #                           replace = TRUE)
 
     gdp <- load_aux(maindir = maindir,
+                    branch  = branch,
                     measure = "gdp")
 
     pce <- load_aux(maindir = maindir,
+                    branch  = branch,
                     measure = "pce")
 
     pfw <- load_aux(maindir = maindir,
+                    branch  = branch,
                     measure = "pfw")
 
     pop <- load_aux(maindir = maindir,
+                    branch  = branch,
                     measure = "pop")
 
     cl <- load_aux(maindir = maindir,
+                   branch  = branch,
                     measure = "country_list")
 
 
@@ -180,24 +190,6 @@ pip_missing_data <- function(action = c("update", "load"),
     setorder(ct_miss_data, country_code, year)
 
 
-    # benchmark
-    # tdirs <- fs::path("P:/02.personal/wb384996/temporal/Stata")
-    # sfile <- fs::dir_ls(tdirs, type = "file", regexp = "Missing.*dta$")
-    # bmk <-
-    #   haven::read_dta(sfile) |>
-    #   as.data.table()
-    #
-    # setnames(bmk, "code", "country_code")
-    # setorder(bmk, country_code, year)
-    #
-    # # ADd region codes
-    #
-    #
-    # ## compare
-    #
-    # waldo::compare(bmk, ct_miss_data, ignore_attr = TRUE)
-
-
 # Add region_code -------
   ct_miss_data <- joyn::merge(ct_miss_data, cl,
                               by = "country_code",
@@ -223,22 +215,24 @@ pip_missing_data <- function(action = c("update", "load"),
 
 #  .................................................................
 ##  Save data                                                    ####
+    msrdir  <- fs::path(maindir, "_aux/", branch, measure)
 
-    pip_sign_save(
+    saved <- pipfun::pip_sign_save(
       x       = pop_md,
       measure = measure,
       msrdir  = msrdir,
       force   = force
     )
 
-
+    return(invisible(saved))
 
   } else {
-    df <- load_aux(
+    dl <- load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
-    return(df)
+    return(dl)
   }
 
 } # end of function pip_missing_data
