@@ -2,7 +2,7 @@
 #'
 #' Update or load a dataset with regions.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_regions <- function(action = c("update", "load"),

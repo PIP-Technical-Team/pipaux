@@ -15,7 +15,8 @@ pip_regions(
 }
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
-"update" data will be updated on the system. If "load" data is loaded in memory.}
+"update" data will be updated on the system. If "load" data is loaded in
+memory.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 

@@ -4,7 +4,7 @@ NULL
 #' Update POP
 #'
 #' @param src character: Source for population data.
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @keywords internal
 #' @import data.table
 pip_pop_update <-  function(force   = FALSE,

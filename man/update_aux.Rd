@@ -7,8 +7,6 @@
 update_aux(measure = NULL, ...)
 }
 \arguments{
-\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
-
 \item{...}{Arguments of any of the pip_* functions for updating data.}
 }
 \description{

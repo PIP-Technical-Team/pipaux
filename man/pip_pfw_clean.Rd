@@ -7,7 +7,7 @@
 pip_pfw_clean(y, maindir = gls$PIP_DATA_DIR, branch = c("DEV", "PROD", "main"))
 }
 \arguments{
-\item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}
+\item{y}{dataset with PPP data from \code{pip_pfw_update()}.}
 
 \item{maindir}{character: Main directory of project.}
 

@@ -5,7 +5,7 @@
 #' This function is deprecated because of the new, more flexible and general
 #' function `pipfun::pip_sign_save()`
 #' @param x data.frame Data frame to be signed and saved.
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @param msrdir character: Directory where the data and data signature will be
 #'   saved.
 #' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is

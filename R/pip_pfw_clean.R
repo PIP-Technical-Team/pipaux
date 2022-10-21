@@ -2,7 +2,7 @@
 #'
 #' Clean PFW data from Datalibweb to meet PIP protocols.
 #'
-#' @param y dataset with PPP data from datalibweb. loaded in `pip_prices()`.
+#' @param y dataset with PPP data from `pip_pfw_update()`.
 #' @inheritParams load_aux
 #'
 #' @keywords internal
