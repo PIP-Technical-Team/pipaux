@@ -5,12 +5,15 @@
 #' @section pipaux functions:
 #' The pipaux functions ...
 #'
+#' @keywords internal
 #' @docType package
 #' @name pipaux
 #' @import data.table
+#' @importFrom lifecycle deprecated
 #' @importFrom pipfun pip_create_globals
 #' @importFrom magrittr "%>%" "%<>%"
 #' @importFrom glue glue
+"_PACKAGE"
 
 # Make sure data.table knows we know we're using it
 .datatable.aware = TRUE

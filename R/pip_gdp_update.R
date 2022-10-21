@@ -268,7 +268,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
-  saved <- pip_sign_save(
+  saved <- pipfun::pip_sign_save(
     x       = gdp,
     measure = measure,
     msrdir  = msrdir,

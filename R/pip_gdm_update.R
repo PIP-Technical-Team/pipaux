@@ -204,7 +204,7 @@ pip_gdm_update <- function(force = FALSE,
   # ---- Save and sign ----
 
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-  saved <- pip_sign_save(
+  saved <- pipfun::pip_sign_save(
     x       = df,
     measure = measure,
     msrdir  = msrdir,

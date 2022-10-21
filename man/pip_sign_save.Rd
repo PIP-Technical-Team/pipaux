@@ -11,16 +11,21 @@ pip_sign_save(x, measure, msrdir, force = FALSE, save_dta = TRUE)
 
 \item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
 
-\item{msrdir}{character: Directory where the data and data signature will be saved.}
+\item{msrdir}{character: Directory where the data and data signature will be
+saved.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{save_dta}{logical: If TRUE a Stata (.dta) version of the dataset is also saved.}
+\item{save_dta}{logical: If TRUE a Stata (.dta) version of the dataset is
+also saved.}
 }
 \value{
 logical
 }
 \description{
-Save PIP auxiliary data with data signature.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+This function is deprecated because of the new, more flexible and general
+function \code{pipfun::pip_sign_save()}
 }
 \keyword{internal}

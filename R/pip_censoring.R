@@ -43,7 +43,7 @@ pip_censoring  <- function(action  = c("update", "load"),
                regions   = regions)
 
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-    saved <- pip_sign_save(
+    saved <- pipfun::pip_sign_save(
       x       = dl,
       measure = measure,
       msrdir  = msrdir,

@@ -61,7 +61,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-  saved <- pip_sign_save(
+  saved <- pipfun::pip_sign_save(
     x       = ppp,
     measure = measure,
     msrdir  = msrdir,
@@ -79,7 +79,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                        old = c("release_version", "adaptation_version"),
                        new = c("ppp_rv", "ppp_av"))
   # Save
-  pip_sign_save(
+  pipfun::pip_sign_save(
     x = ppp_vintage,
     measure = "ppp_vintage",
     msrdir = msrdir,

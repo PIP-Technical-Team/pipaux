@@ -51,9 +51,10 @@ Imports:
     glue,
     gh,
     httr,
-    pipfun (>= 0.0.0.9007)
+    pipfun (>= 0.0.0.9007),
+    lifecycle
 VignetteBuilder: knitr
-Remotes:  
+Remotes: 
     github::PIP-Technical-Team/pipload@new_pipeline,
     github::PIP-Technical-Team/pipfun@ongoing
 URL: https://pip-technical-team.github.io/pipaux/

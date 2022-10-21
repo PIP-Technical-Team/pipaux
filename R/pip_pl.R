@@ -32,7 +32,7 @@ pip_pl <- function(action = c("update", "load"),
 
     # Save
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-    saved <- pip_sign_save(
+    saved <- pipfun::pip_sign_save(
       x       = dt,
       measure = measure,
       msrdir  = msrdir,

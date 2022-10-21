@@ -39,7 +39,7 @@ pip_countries <- function(action = "update",
       "iso2_code"
     )
 
-    pip_sign_save(
+    pipfun::pip_sign_save(
       x = countries,
       measure = measure,
       msrdir = msrdir,

@@ -1,11 +1,15 @@
 #' Save PIP auxiliary data
 #'
-#' Save PIP auxiliary data with data signature.
-
+#' @description `r lifecycle::badge("superseded")`
+#'
+#' This function is deprecated because of the new, more flexible and general
+#' function `pipfun::pip_sign_save()`
 #' @param x data.frame Data frame to be signed and saved.
 #' @inheritParams pip_prices
-#' @param msrdir character: Directory where the data and data signature will be saved.
-#' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is also saved.
+#' @param msrdir character: Directory where the data and data signature will be
+#'   saved.
+#' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is
+#'   also saved.
 #' @keywords internal
 #' @return logical
 pip_sign_save <- function(x,
@@ -13,6 +17,10 @@ pip_sign_save <- function(x,
                           msrdir,
                           force = FALSE,
                           save_dta = TRUE) {
+
+  lifecycle::deprecate_warn("0.1.0.9002",
+                            "pip_sign_save()",
+                            "pipfun::pip_sign_save()")
 
 #   ____________________________________________________________________________
 #   Files and directories                                                   ####

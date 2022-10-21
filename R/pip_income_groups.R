@@ -42,7 +42,7 @@ pip_income_groups <- function(action  = c("update", "load"),
 
     # save data
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-    saved <- pip_sign_save(
+    saved <- pipfun::pip_sign_save(
       x       = df,
       measure = measure,
       msrdir  = msrdir,
