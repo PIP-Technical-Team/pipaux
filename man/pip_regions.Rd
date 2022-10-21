@@ -7,8 +7,8 @@
 pip_regions(
   action = c("update", "load"),
   force = FALSE,
-  owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
+  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
@@ -19,10 +19,10 @@ pip_regions(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{maindir}{character: Main directory of project.}
+
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

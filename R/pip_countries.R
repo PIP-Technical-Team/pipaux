@@ -3,41 +3,43 @@
 #' Update or load a dataset with countries.
 #'
 #' @inheritParams pip_prices
+#' @inheritParams pipfun::load_from_gh
 #' @export
-pip_countries <- function(action = "update",
+pip_countries <- function(action = c("update", "load"),
                           force = FALSE,
-                          maindir = gls$PIP_DATA_DIR) {
+                          maindir = gls$PIP_DATA_DIR,
+                          owner   = getOption("pipfun.ghowner"),
+                          branch  = c("DEV", "PROD", "main"),
+                          tag     = match.arg(branch)
+                          ) {
+
   measure <- "countries"
+  action <- match.arg(action)
   msrdir <- fs::path(maindir, "_aux/", measure)
 
   if (action == "update") {
-    wdi_countries <- wbstats::wb_countries(lang = "en")
-    data.table::setDT(wdi_countries)
-    wdi_countries <- wdi_countries[region != "Aggregates"]
+
+    ## Special national accounts --------
+    cl <- pipfun::load_from_gh(
+      measure = "country_list",
+      owner  = owner,
+      branch = branch,
+      tag    = tag
+    )
 
     pfw <- load_aux("pfw", maindir = maindir)
-    pfw <- pfw[pfw$inpovcal == 1, ]
-    pfw <- pfw[, c("country_code", "pcn_region_code", "wb_region_code")]
-    pfw <- unique(pfw)
 
-    countries <- wdi_countries[wdi_countries$iso3c %in% pfw$country_code, ]
-    countries <- merge(countries, pfw,
-      all.x = TRUE,
-      by.x = "iso3c", by.y = "country_code"
-    )
 
-    countries <- countries[, c(
-      "pcn_region_code", "iso3c",
-      "country", "income_level",
-      "iso2c"
-    )]
-    names(countries) <- c(
-      "pcn_region_code",
-      "country_code",
-      "country_name",
-      "income_group",
-      "iso2_code"
-    )
+    pfw <- pfw[inpovcal == 1,
+               ][,
+                 c("country_code")
+                 ] |>
+      unique()
+
+
+    countries <- cl[country_code %in% pfw$country_code
+                    ][,
+                      c("pcn_region", "pcn_region_code") := NULL]
 
     pipfun::pip_sign_save(
       x = countries,
@@ -45,19 +47,11 @@ pip_countries <- function(action = "update",
       msrdir = msrdir,
       force = force
     )
-  } else if (action == "load") {
+  } else {
     df <- load_aux(
       maindir = maindir,
       measure = measure
     )
     return(df)
-  } else {
-    msg <- paste("action `", action, "` is not a valid action.")
-    rlang::abort(c(
-      msg,
-      i = "make sure you select `update` or `load`"
-    ),
-    class = "pipaux_error"
-    )
   }
 }

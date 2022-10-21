@@ -13,9 +13,13 @@ pip_cp_update(
 )
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
 
-\item{force}{logical: If TRUE data will be overwritten.}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update a list with country profiles data

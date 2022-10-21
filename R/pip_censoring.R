@@ -20,16 +20,16 @@ pip_censoring  <- function(action  = c("update", "load"),
   if (action == "update") {
 
     countries <- pipfun::load_from_gh(measure = measure,
-                              owner = owner,
-                              branch = branch,
-                              ext = "xlsx",
-                              sheet = "countries")
+                                      owner   = owner,
+                                      branch  = branch,
+                                      ext     = "xlsx",
+                                      sheet   = "countries")
 
     regions   <- pipfun::load_from_gh(measure = measure,
-                              owner = owner,
-                              branch = branch,
-                              ext = "xlsx",
-                              sheet = "regions")
+                                      owner   = owner,
+                                      branch  = branch,
+                                      ext     = "xlsx",
+                                      sheet   = "regions")
 
     countries[,
               id := paste(country_code, reporting_year,
