@@ -9,24 +9,37 @@ update_aux <- function(measure,
                        owner   = getOption("pipfun.ghowner"),
                        maindir = gls$PIP_DATA_DIR,
                        branch  = c("DEV", "PROD", "main"),
-                       tag     = match.arg(branch)
+                       tag     = match.arg(branch),
+                       verbose = FALSE
                        ) {
 
   branch <- match.arg(branch)
-  al <- as.list(environment())  # Arguments List
+  al     <- as.list(environment())  # Arguments List
+
+  pipfun_verbose <- getOption("pipfun.verbose")
+  #   ____________________________________________________________________________
+  #   on.exit                                                                 ####
+  on.exit({
+    options(pipfun.verbose = pipfun_verbose)
+  })
+
+  options(pipfun.verbose = verbose)
+
 
 
   # Get all the aux table if measure == "all"
-  if (tolower(measure) == "all") {
+  if ("all" %in% tolower(measure)) {
     measure <-
       lsf.str("package:pipaux",
               pattern = "^pip_[a-z]+$") |>
       as.character() |>
-      {\(.) gsub("^pip_", "", .)}()
+      {\(.) gsub("^pip_", "", .)}() |>
+      sort()
   }
 
   # remove measure
   al$measure <- NULL
+  al$verbose <- NULL
 
   # build function name
   fun_name <- glue("pip_{measure}")
@@ -38,7 +51,7 @@ update_aux <- function(measure,
                    expr = {
 
                      x <- do.call(.x, c(action = "update", al))
-                     x <- ifelse(isTRUE(x), "saved", "not saved")
+                     x <- ifelse(isTRUE(x), "saved", "up to date")
 
                    }, # end of expr section
 
@@ -57,3 +70,4 @@ update_aux <- function(measure,
 
   return(rs)
 }
+

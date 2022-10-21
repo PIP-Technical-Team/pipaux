@@ -1,11 +1,10 @@
 #' Update PPP
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams pipfun::load_from_gh
 #' @keywords internal
 pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
-                           force   = FALSE,
-                           owner   = "PIP-Technical-Team",
-                           repo    = "aux_ppp",
+                           force = FALSE,
+                           owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)) {
 
@@ -23,7 +22,6 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   ppp <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    repo   = repo,
     branch = branch,
     tag    = tag
   )

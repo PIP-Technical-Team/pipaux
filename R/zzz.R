@@ -8,7 +8,8 @@ pipuax_default_options <- list(
   pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
   pipaux.maindir = gls$PIP_DATA_DIR,
   pipfun.ghowner = "PIP-Technical-Team",
-  joyn.verbose   = FALSE
+  joyn.verbose   = FALSE,
+  pipfun.verbose = TRUE
 
 )
 

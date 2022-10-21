@@ -49,7 +49,6 @@ pip_cpi <- function(action = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag)
-    return(TRUE)
   }
   else {
     dt <- load_aux(

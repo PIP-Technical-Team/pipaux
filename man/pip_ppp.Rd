@@ -7,6 +7,7 @@
 pip_ppp(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
+  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   force = FALSE,
   tag = branch
@@ -17,6 +18,9 @@ pip_ppp(
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

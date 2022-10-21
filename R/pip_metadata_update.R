@@ -1,6 +1,6 @@
 #' Update metadata file
 #'
-#' @inheritParams pip_pfw_update
+#' @inheritParams pipfun::load_from_gh
 #'
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export

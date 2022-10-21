@@ -14,8 +14,9 @@ pip_regions <- function(action = c("update", "load"),
                         ) {
 
 
-  action  <- match.arg(action)
   measure <- "regions"
+  action  <- match.arg(action)
+  branch  <- match.arg(branch)
 
   if (action == "update") {
 
@@ -81,13 +82,13 @@ pip_regions <- function(action = c("update", "load"),
 
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
-      x       = df,
+      x       = dt,
       measure = measure,
       msrdir  = msrdir,
       force   = force
     )
     return(invisible(saved))
-    
+
 
   } else {
     df <- load_aux(

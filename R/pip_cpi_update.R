@@ -36,6 +36,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # Save
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   saved <- pipfun::pip_sign_save(
     x       = cpi,
     measure = measure,
