@@ -3,7 +3,7 @@
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
 #' @inheritParams pip_gdp
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @keywords internal
 pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
@@ -58,13 +58,13 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## Special national accounts --------
-  sna <- load_raw_aux(
+  sna <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
     branch = branch
   )
 
-  sna_fy <- load_raw_aux(
+  sna_fy <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
     branch = branch,

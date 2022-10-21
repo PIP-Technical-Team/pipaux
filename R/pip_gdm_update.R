@@ -16,7 +16,7 @@ pip_gdm_update <- function(force = FALSE,
 #   ____________________________________________________________________________
 #   Load raw file                                                  ####
 
-  df <- load_raw_aux(measure = "gdm",
+  df <- pipfun::load_from_gh(measure = "gdm",
                      owner = owner,
                      branch = branch,
                      tag = tag,

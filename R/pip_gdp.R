@@ -3,7 +3,7 @@
 #' Update or load GDP data.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
 #'   and "gh" are synonymous
 #' @export

@@ -3,7 +3,7 @@
 #' Update or load a dataset with regions.
 #'
 #' @inheritParams pip_prices
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_regions <- function(action  = c("update", "load"),
                         force = FALSE,
@@ -17,7 +17,7 @@ pip_regions <- function(action  = c("update", "load"),
   action <- match.arg(action)
 
   if (action == "update") {
-    df <- load_raw_aux(
+    df <- pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,

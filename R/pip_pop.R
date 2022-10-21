@@ -3,7 +3,7 @@
 #' Load or update population data.
 #'
 #' @inheritParams pip_prices
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export
 pip_pop <- function(action = c("update", "load"),

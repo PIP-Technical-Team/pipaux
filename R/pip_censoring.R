@@ -4,7 +4,7 @@
 #'
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
@@ -19,13 +19,13 @@ pip_censoring  <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    countries <- load_raw_aux(measure = measure,
+    countries <- pipfun::load_from_gh(measure = measure,
                               owner = owner,
                               branch = branch,
                               ext = "xlsx",
                               sheet = "countries")
 
-    regions   <- load_raw_aux(measure = measure,
+    regions   <- pipfun::load_from_gh(measure = measure,
                               owner = owner,
                               branch = branch,
                               ext = "xlsx",

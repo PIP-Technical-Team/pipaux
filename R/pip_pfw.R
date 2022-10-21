@@ -6,7 +6,7 @@
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 pip_pfw <- function(action  = c("update", "load"),

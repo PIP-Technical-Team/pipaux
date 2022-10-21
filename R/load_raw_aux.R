@@ -1,5 +1,9 @@
 #' Load Raw Auxiliary data
 #'
+#' @description `r lifecycle::badge("superseded")`
+#'
+#' This function is deprecated because of the new, more flexible and general
+#' function `pipfun::load_from_gh()`
 #' @param measure character: measure to be loaded
 #' @param owner character: Github repo owner. Default is
 #'   `getOption("pipfun.ghowner")`
@@ -23,6 +27,12 @@ load_raw_aux <- function(measure,
                          filename  = measure,
                          ext       = "csv",
                          ...) {
+
+  lifecycle::deprecate_warn("0.1.0.9003",
+                            "load_raw_aux()",
+                            "pipfun::load_from_gh()")
+
+
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
   on.exit({

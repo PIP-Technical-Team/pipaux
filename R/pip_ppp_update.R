@@ -20,7 +20,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   Load raw data                                                           ####
 
-  ppp <- load_raw_aux(
+  ppp <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
     repo   = repo,

@@ -18,7 +18,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   load raw data                                                           ####
 
-  cpi <- load_raw_aux(
+  cpi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
     branch = branch,

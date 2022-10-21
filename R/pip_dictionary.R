@@ -3,7 +3,7 @@
 #' Update or load a dataset with the indicators master sheet.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_dictionary <- function(action  = c("update", "load"),
                            force   = FALSE,
@@ -17,7 +17,7 @@ pip_dictionary <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    df <- load_raw_aux(measure = measure,
+    df <- pipfun::load_from_gh(measure = measure,
                        owner = owner,
                        branch = branch,
                        tag = tag)

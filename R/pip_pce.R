@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_gdp
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_pce <- function(action  = c("update", "load"),
                     force   = FALSE,

@@ -1,7 +1,7 @@
 #' Update PFW
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @keywords internal
 pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
@@ -13,7 +13,7 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   branch <- match.arg(branch)
 
   # Read data
-  pfw <- load_raw_aux(measure = measure,
+  pfw <- pipfun::load_from_gh(measure = measure,
                       owner = owner,
                       branch = branch,
                       ext = "dta")

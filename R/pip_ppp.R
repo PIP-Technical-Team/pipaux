@@ -3,7 +3,7 @@
 #' Load or update PPP data.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 pip_ppp <- function(action = c("update", "load"),

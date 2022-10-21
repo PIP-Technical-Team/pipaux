@@ -3,7 +3,7 @@
 #' Load or update data from the Maddison project.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 pip_maddison <- function(action = c("update", "load"),
@@ -17,7 +17,7 @@ pip_maddison <- function(action = c("update", "load"),
   branch  <- match.arg(branch)
 
   if (action == "update") {
-    mpd <-  load_raw_aux(
+    mpd <-  pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,

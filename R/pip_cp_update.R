@@ -27,7 +27,7 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   raw_files <- purrr::map(.x = file_names,
                           .f = ~{
-                            load_raw_aux(measure = "cp",
+                            pipfun::load_from_gh(measure = "cp",
                                          owner  = owner,
                                          branch = branch,
                                          filename = .x)

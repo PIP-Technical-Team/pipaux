@@ -50,7 +50,7 @@ pip_wdi_update <- function(force   = FALSE,
   ##  From file                                                         ####
 
   if (from   %in% c("file", "gh")) {
-    wdi <- load_raw_aux(measure = measure,
+    wdi <- pipfun::load_from_gh(measure = measure,
                         owner = owner,
                         branch = branch)
 

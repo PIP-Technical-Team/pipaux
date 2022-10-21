@@ -10,7 +10,7 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_prices
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_gdm <- function(action  = c("update", "load"),
                     force   = FALSE,

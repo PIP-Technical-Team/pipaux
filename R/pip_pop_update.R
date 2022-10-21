@@ -58,7 +58,7 @@ pip_pop_update <-  function(force   = FALSE,
 
     # Load data
 
-    pop_main <- load_raw_aux(
+    pop_main <- pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,

@@ -3,7 +3,7 @@
 #' Update or load a dataset with poverty lines.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_pl <- function(action = c("update", "load"),
                    force = FALSE,
@@ -20,7 +20,7 @@ pip_pl <- function(action = c("update", "load"),
   if (action == "update") {
     # Read yaml file
 
-    dl <- load_raw_aux(
+    dl <- pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,

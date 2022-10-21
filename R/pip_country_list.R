@@ -9,7 +9,7 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 pip_country_list <- function(action = c("update", "load"),
@@ -25,7 +25,7 @@ pip_country_list <- function(action = c("update", "load"),
   if (action == "update") {
 
     ## Special national accounts --------
-    cl <- load_raw_aux(
+    cl <- pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,

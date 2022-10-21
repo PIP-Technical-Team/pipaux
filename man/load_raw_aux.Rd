@@ -40,6 +40,9 @@ extension used}
 dataset
 }
 \description{
-Load Raw Auxiliary data
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+This function is deprecated because of the new, more flexible and general
+function \code{pipfun::load_from_gh()}
 }
 \keyword{internal}

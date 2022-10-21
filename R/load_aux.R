@@ -1,7 +1,7 @@
 #' Load any auxiliary data
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @export
 load_aux <- function(measure,

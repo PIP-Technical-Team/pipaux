@@ -4,7 +4,7 @@
 #' available in the PIP-Technical-Team group but in the Povcalnet-team group.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_income_groups <- function(action  = c("update", "load"),
                               force   = FALSE,
@@ -20,7 +20,7 @@ pip_income_groups <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    df <- load_raw_aux(measure = measure,
+    df <- pipfun::load_from_gh(measure = measure,
                        owner   = owner,
                        repo    = repo,
                        branch  = branch,

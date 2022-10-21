@@ -35,7 +35,7 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   #   ____________________________________________________________________________
   #   Computations                                                            ####
 
-  df <- load_raw_aux(measure = measure,
+  df <- pipfun::load_from_gh(measure = measure,
                      owner = owner,
                      branch = branch,
                      tag = tag)

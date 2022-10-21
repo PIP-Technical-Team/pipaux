@@ -10,7 +10,7 @@
 #' that's not really xls.
 #'
 #' @inheritParams pip_pfw
-#' @inheritParams load_raw_aux
+#' @inheritParams pipfun::load_from_gh
 #' @export
 pip_weo <- function(action  = c("update", "load"),
                     force   = FALSE,
@@ -27,7 +27,7 @@ pip_weo <- function(action  = c("update", "load"),
     # ---- Load data from disk ----
 
     # Read data
-    dt <- load_raw_aux(
+    dt <- pipfun::load_from_gh(
       measure = measure,
       owner  = owner,
       branch = branch,
