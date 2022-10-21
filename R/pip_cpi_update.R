@@ -11,8 +11,8 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   Set up                                                                  ####
 
-  branch  <- match.arg(branch)
   measure <- "cpi"
+  branch  <- match.arg(branch)
 
 
 #   ____________________________________________________________________________

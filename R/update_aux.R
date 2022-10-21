@@ -1,34 +1,59 @@
 #' Update Auxiliary data. Wrapper of measure-specific functions.
 #'
 #' @inheritParams pip_aux_labels
-#' @param ... Arguments of any of the pip_* functions for updating data.
+#' @inheritParams pip_cpi
+#' @inheritParams pipfun::load_from_gh
 #' @export
-update_aux <- function(measure = NULL,
-                       ...) {
+update_aux <- function(measure,
+                       force   = FALSE,
+                       owner   = getOption("pipfun.ghowner"),
+                       maindir = gls$PIP_DATA_DIR,
+                       branch  = c("DEV", "PROD", "main"),
+                       tag     = match.arg(branch)
+                       ) {
 
-  # verify measure is provided
-  if (is.null(measure)) {
-    msg     <- c(
-      "{.field measure} must be defined, as it does not have default value",
-      "i" = "make sure `measure` is not NULL."
-      )
-    cli::cli_abort(msg,
-                  class = "pipaux_error"
-                  )
+  branch <- match.arg(branch)
+  al <- as.list(environment())  # Arguments List
+
+
+  # Get all the aux table if measure == "all"
+  if (tolower(measure) == "all") {
+    measure <-
+      lsf.str("package:pipaux",
+              pattern = "^pip_[a-z]+$") |>
+      as.character() |>
+      {\(.) gsub("^pip_", "", .)}()
   }
 
-  # check arguments
-  al <- list(...) # Arguments List
-  an <- names(al) # arguments names
-
-  if (!any(an == "maindir")) {
-    al["maindir"] <- gls$PIP_DATA_DIR
-  }
-
+  # remove measure
+  al$measure <- NULL
 
   # build function name
-  fun_name <- get(paste0("pip_", measure))
+  fun_name <- glue("pip_{measure}")
 
-  rs <- do.call(fun_name, c(action = "update", al))
-  return(invisible(rs))
+  rs <- lapply(fun_name,
+               \(.x) {
+                 sv <-
+                 tryCatch(
+                   expr = {
+
+                     x <- do.call(.x, c(action = "update", al))
+                     x <- ifelse(isTRUE(x), "saved", "not saved")
+
+                   }, # end of expr section
+
+                   error = function(e) {
+                     "failed"
+                   }, # end of error section
+
+                   warning = function(w) {
+                     paste(x, "with warning")
+                   }
+                 ) # End of trycatch
+
+               })
+
+  names(rs) <- measure
+
+  return(rs)
 }

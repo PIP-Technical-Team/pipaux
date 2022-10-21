@@ -4,12 +4,29 @@
 \alias{update_aux}
 \title{Update Auxiliary data. Wrapper of measure-specific functions.}
 \usage{
-update_aux(measure = NULL, ...)
+update_aux(
+  measure,
+  force = FALSE,
+  owner = getOption("pipfun.ghowner"),
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+)
 }
 \arguments{
 \item{measure}{type of data frame, e.g., "cpi" or "PPP".}
 
-\item{...}{Arguments of any of the pip_* functions for updating data.}
+\item{force}{logical: If TRUE data will be overwritten.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
+
+\item{maindir}{character: Main directory of project.}
+
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
+
+\item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Update Auxiliary data. Wrapper of measure-specific functions.
