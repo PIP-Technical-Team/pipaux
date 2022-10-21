@@ -2,7 +2,7 @@
 #'
 #' Load or update population data.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export

@@ -9,8 +9,6 @@ pip_sign_save(x, measure, msrdir, force = FALSE, save_dta = TRUE)
 \arguments{
 \item{x}{data.frame Data frame to be signed and saved.}
 
-\item{measure}{character: Measure to be used. e.g., "cpi" or "ppp".}
-
 \item{msrdir}{character: Directory where the data and data signature will be
 saved.}
 

@@ -1,33 +1,73 @@
 #' Update Auxiliary data. Wrapper of measure-specific functions.
 #'
-#' @inheritParams pip_prices
-#' @param ... Arguments of any of the pip_* functions for updating data.
+#' @inheritParams pip_aux_labels
+#' @inheritParams pip_cpi
+#' @inheritParams pipfun::load_from_gh
 #' @export
-update_aux <- function(measure = NULL,
-                       ...) {
+update_aux <- function(measure,
+                       force   = FALSE,
+                       owner   = getOption("pipfun.ghowner"),
+                       maindir = gls$PIP_DATA_DIR,
+                       branch  = c("DEV", "PROD", "main"),
+                       tag     = match.arg(branch),
+                       verbose = FALSE
+                       ) {
 
-  # verify measure is provided
-  if (is.null(measure)) {
-    rlang::abort(c(
-      "`measure` must be defined, as it does not have default value",
-      i = "make sure `measure` is not NULL."
-    ),
-    class = "pipaux_error"
-    )
+  branch <- match.arg(branch)
+  al     <- as.list(environment())  # Arguments List
+
+  pipfun_verbose <- getOption("pipfun.verbose")
+  #   ____________________________________________________________________________
+  #   on.exit                                                                 ####
+  on.exit({
+    options(pipfun.verbose = pipfun_verbose)
+  })
+
+  options(pipfun.verbose = verbose)
+
+
+
+  # Get all the aux table if measure == "all"
+  if ("all" %in% tolower(measure)) {
+    measure <-
+      lsf.str("package:pipaux",
+              pattern = "^pip_[a-z]+$") |>
+      as.character() |>
+      {\(.) gsub("^pip_", "", .)}() |>
+      sort()
   }
 
-  # check arguments
-  al <- list(...) # Arguments List
-  an <- names(al) # arguments names
-
-  if (!any(an == "maindir")) {
-    al["maindir"] <- gls$PIP_DATA_DIR
-  }
-
+  # remove measure
+  al$measure <- NULL
+  al$verbose <- NULL
 
   # build function name
-  fun_name <- get(paste0("pip_", measure))
+  fun_name <- glue("pip_{measure}")
 
-  rs <- do.call(fun_name, c(action = "update", al))
-  return(invisible(rs))
+  rs <- lapply(fun_name,
+               \(.x) {
+                 sv <-
+                 tryCatch(
+                   expr = {
+
+                     x <- do.call(.x, c(action = "update", al))
+                     x <- ifelse(isTRUE(x), "saved", "up to date")
+
+                   }, # end of expr section
+
+                   error = function(e) {
+                     "failed"
+                   }, # end of error section
+
+                   warning = function(w) {
+                     paste(x, "with warning")
+                   }
+                 ) # End of trycatch
+
+               })
+
+  names(rs) <- measure
+
+  return(rs)
 }
+

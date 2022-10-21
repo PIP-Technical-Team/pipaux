@@ -13,9 +13,10 @@
 #' @import data.table
 pip_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
-                    tag     = branch) {
+                    owner   = getOption("pipfun.ghowner"),
+                    branch  = c("DEV", "PROD", "main"),
+                    tag     = match.arg(branch)) {
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -43,11 +44,11 @@ pip_cpi <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    pip_cpi_update(branch  = branch,
+    pip_cpi_update(maindir = maindir,
                    force   = force,
-                   maindir = maindir,
+                   owner   = owner,
+                   branch  = branch,
                    tag     = tag)
-    return(TRUE)
   }
   else {
     dt <- load_aux(

@@ -38,7 +38,13 @@ pip_weo_clean <- function(dt,
   }
 
   # Clean column names
-  dt <- janitor::clean_names(dt)
+  nn <-
+    names(dt) |>
+    tolower() |>
+    {\(.) gsub("[-/ ]", "_", .)}() |>
+    {\(.) gsub("([0-9]{4})", "x\\1", .)}()
+
+  names(dt) <- nn
 
   # ---- Data transformations ----
 

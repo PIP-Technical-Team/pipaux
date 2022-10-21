@@ -7,16 +7,14 @@
 pip_ppp_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  owner = "PIP-Technical-Team",
-  repo = "aux_ppp",
+  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch)
 )
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

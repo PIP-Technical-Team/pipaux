@@ -2,7 +2,7 @@
 #'
 #' Clean CPI data from Datalibweb to meet PIP protocols.
 #'
-#' @param y dataset with CPI data from datalibweb. loaded in `pip_prices()`.
+#' @param y dataset with CPI data from `pip_cpi_update()`.
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
 #' @inheritParams pip_cpi_update

@@ -7,9 +7,10 @@
 pip_cpi(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
   force = FALSE,
-  tag = branch
+  owner = getOption("pipfun.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
 )
 }
 \arguments{
@@ -19,10 +20,13 @@ memory.}
 
 \item{maindir}{character: Main directory of project.}
 
+\item{force}{logical: If TRUE data will be overwritten.}
+
+\item{owner}{character: Github repo owner. Default is
+\code{getOption("pipfun.ghowner")}}
+
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

@@ -5,7 +5,7 @@
 #' This function is deprecated because of the new, more flexible and general
 #' function `pipfun::pip_sign_save()`
 #' @param x data.frame Data frame to be signed and saved.
-#' @inheritParams pip_prices
+#' @inheritParams pip_cpi
 #' @param msrdir character: Directory where the data and data signature will be
 #'   saved.
 #' @param save_dta logical: If TRUE a Stata (.dta) version of the dataset is
@@ -22,13 +22,8 @@ pip_sign_save <- function(x,
                             "pip_sign_save()",
                             "pipfun::pip_sign_save()")
 
-#   ____________________________________________________________________________
-#   Files and directories                                                   ####
-
-  wholedir <- fs::path(msrdir, "_vintage")
-  if (!(fs::dir_exists(wholedir))) {
-    fs::dir_create(wholedir, recurse = TRUE)
-  }
+  # Note: clean CPI data file and then create data signature
+  ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
 
   # check signature of current fst file
   ds_production_path <- fs::path(msrdir, paste0(measure, "_datasignature.txt")) # data signature in production
@@ -44,14 +39,8 @@ pip_sign_save <- function(x,
     ms_status <- "new"
   }
 
-
-#   __________________________________________________________________
-#   Check signature                                         ####
-
   #--------- if Signature from dlw is different from the one in production ---------
 
-  # Note: clean CPI data file and then create data signature
-  ds_dlw <- digest::digest(x, algo = "xxhash64") # Data signature of file
 
   if (ds_dlw != ds_production) {
     ms_status <- "changed"
@@ -63,11 +52,13 @@ pip_sign_save <- function(x,
     ms_status <- "forced"
   }
 
-
-#   ____________________________________________________________________________
-#   if signature changes or force = TRUE                                    ####
-
   if (ms_status %in% c("forced", "changed")) {
+
+    # make sure directory exists
+    wholedir <- fs::path(msrdir, "_vintage/")
+    if (!(fs::dir_exists(wholedir))) {
+      fs::dir_create(wholedir, recurse = TRUE)
+    }
 
     # re-write x in production if data signature is not found
     # Vintage
@@ -76,8 +67,8 @@ pip_sign_save <- function(x,
     attr(x, "datetime") <- time
 
 
-##  ............................................................................
-##  Save main file                                                          ####
+    ##  ............................................................................
+    ##  Save main file                                                          ####
 
     var_class <- purrr::map(x, class) # variables class
 
@@ -85,7 +76,7 @@ pip_sign_save <- function(x,
       fst::write_fst(
         x = x,
         path = fs::path(msrdir, measure, ext = "fst")
-        )
+      )
 
       if (save_dta) {
         haven::write_dta(
@@ -105,15 +96,15 @@ pip_sign_save <- function(x,
       file = fs::path(msrdir, measure, ext = "qs")
     )
 
-##  ............................................................................
-##  Save vintages                                                           ####
+    ##  ............................................................................
+    ##  Save vintages                                                           ####
 
     if (is.data.frame(x) && !("list"  %in% unique(var_class))) {
       fst::write_fst(
         x = x,
         path = fs::path(msrdir, "_vintage/",
                         paste0(measure, "_", time),  ext = "fst")
-        )
+      )
 
       if (save_dta) {
         haven::write_dta(
@@ -136,9 +127,8 @@ pip_sign_save <- function(x,
       file = fs::path(msrdir, "_vintage/", paste0(measure, "_", time),  ext = "qs")
     )
 
-
-#   ____________________________________________________________________________
-#   Signatures                                                              ####
+    #   ____________________________________________________________________________
+    #   Signatures                                                              ####
 
 
     ds_text <- c(ds_dlw, time, Sys.info()[8])
@@ -150,21 +140,18 @@ pip_sign_save <- function(x,
 
 
     fillintext <- fcase(ms_status == "new", "was not found",
-          ms_status == "forced", "has been changed forcefully",
-          ms_status == "changed", "has changed",
-          default = "")
+                        ms_status == "forced", "has been changed forcefully",
+                        ms_status == "changed", "has changed",
+                        default = "")
 
 
     infmsg <-
       "Data signature {fillintext}
-      {.file {measure}.{ext}} has been updated"
+      {.file {measure}.fst} has been updated"
 
     cli::cli_alert_warning(infmsg)
-
     return(invisible(TRUE))
-
   } else {
-
     cli::cli_alert_info("Data signature is up to date.
                         {cli::col_blue('No update performed')}")
     return(invisible(FALSE))

@@ -1,4 +1,4 @@
-#' pipaux: A package for computating the notorious bar statistic
+#' pipaux: A package for processing Auxiliary data in the PIP process
 #'
 #' Description bla blab
 #'
@@ -16,6 +16,7 @@
 "_PACKAGE"
 
 # Make sure data.table knows we know we're using it
+#' @noRd
 .datatable.aware = TRUE
 
 # Prevent R CMD check from complaining about the use of pipe expressions
@@ -138,11 +139,23 @@ if (getRversion() >= "2.15.1") {
       "use_imputed",
       "use_microdata",
       "weo_gdp",
+      "..byv",
+      "..grs",
       "agegroup",
       "agegroup_label",
       "country_name",
       "education",
-      "gender"
+      "gender",
+      "grouping_type",
+      "indicator_code",
+      "inpovcal",
+      "..keepv",
+      "mdom",
+      "nac_data_level",
+      "nac_domain",
+      "report",
+      "reporting_pop",
+      "year1"
     ),
     package = utils::packageName()
   )

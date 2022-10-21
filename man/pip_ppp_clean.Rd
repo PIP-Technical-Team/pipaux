@@ -7,7 +7,7 @@
 pip_ppp_clean(y, default_year = getOption("pipaux.pppyear"))
 }
 \arguments{
-\item{y}{dataset with PPP data from datalibweb. loaded in \code{pip_prices()}.}
+\item{y}{dataset with PPP data from \code{pip_ppp_update()}.}
 
 \item{default_year}{numeric: ICP round year. Default is 2011}
 }

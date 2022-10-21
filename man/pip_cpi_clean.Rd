@@ -12,7 +12,7 @@ pip_cpi_clean(
 )
 }
 \arguments{
-\item{y}{dataset with CPI data from datalibweb. loaded in \code{pip_prices()}.}
+\item{y}{dataset with CPI data from \code{pip_cpi_update()}.}
 
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}

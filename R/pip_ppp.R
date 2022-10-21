@@ -8,6 +8,7 @@
 #' @import data.table
 pip_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
+                    owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
                     tag     = branch) {
@@ -38,9 +39,10 @@ pip_ppp <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    pip_ppp_update(branch  = branch,
+    pip_ppp_update(maindir = maindir,
                    force   = force,
-                   maindir = maindir,
+                   owner   = owner,
+                   branch  = branch,
                    tag     = tag)
   }
   else {

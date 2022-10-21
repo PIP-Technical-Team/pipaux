@@ -2,7 +2,7 @@
 #'
 #' Update a list with country profiles data
 #'
-#' @inheritParams pip_prices
+#' @inheritParams pip_cp
 #' @keywords internal
 pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                           force = FALSE,
@@ -17,7 +17,8 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
     c(
       "indicator_values_country_chart4",
       "indicator_values_country_KI1",
-      "indicator_values_country_chart1_chart2_KI2",
+      "indicator_values_country_chart1_chart2_KI2_data",
+      "indicator_values_country_chart1_chart2_KI2_ID",
       "indicator_values_country_chart5",
       "indicator_values_country_chart3",
       "indicator_values_country_chart6_KI4",
@@ -27,10 +28,11 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   raw_files <- purrr::map(.x = file_names,
                           .f = ~{
-                            pipfun::load_from_gh(measure = "cp",
-                                         owner  = owner,
-                                         branch = branch,
-                                         filename = .x)
+                            pipfun::load_from_gh(
+                              measure = "cp",
+                              owner  = owner,
+                              branch = branch,
+                              filename = .x)
                           })
 
 

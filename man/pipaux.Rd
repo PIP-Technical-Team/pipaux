@@ -4,7 +4,7 @@
 \name{pipaux}
 \alias{pipaux}
 \alias{pipaux-package}
-\title{pipaux: A package for computating the notorious bar statistic}
+\title{pipaux: A package for processing Auxiliary data in the PIP process}
 \description{
 Description bla blab
 }
