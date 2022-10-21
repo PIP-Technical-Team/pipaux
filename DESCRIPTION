@@ -25,7 +25,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Suggests: 
-    testthat,
+    testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     covr
@@ -58,3 +58,4 @@ Remotes:
     github::PIP-Technical-Team/pipload@new_pipeline,
     github::PIP-Technical-Team/pipfun@ongoing
 URL: https://pip-technical-team.github.io/pipaux/
+Config/testthat/edition: 3
