@@ -137,7 +137,12 @@ if (getRversion() >= "2.15.1") {
       "use_groupdata",
       "use_imputed",
       "use_microdata",
-      "weo_gdp"
+      "weo_gdp",
+      "agegroup",
+      "agegroup_label",
+      "country_name",
+      "education",
+      "gender"
     ),
     package = utils::packageName()
   )
