@@ -32,38 +32,41 @@ pip_gdm_update <- function(force = FALSE,
                  ignore.case = TRUE), ]
 
   # Select and rename columns
-  df <- df[,
-           c(
-             "CountryCode",
-             "SurveyTime",
-             "DataType",
-             "Coverage",
-             "SurveyMean_LCU",
-             "DistributionFileName",
-             "SurveyID"
-           )]
+  old_nms <-  c(
+    "CountryCode",
+    "SurveyTime",
+    "DataType",
+    "Coverage",
+    "SurveyMean_LCU",
+    "DistributionFileName",
+    "SurveyID"
+  )
 
-  names(df) <- c(
+  new_nms <- c(
     "country_code",
     "survey_year",
     "welfare_type",
-    "survey_coverage",
+    "pop_data_level",
     "survey_mean_lcu",
     "pcn_source_file",
     "pcn_survey_id"
   )
 
+  setnames(df, old_nms, new_nms)
+
+  df <- df[, ..new_nms]
+
   # Recode columns
   df[,
-     c("survey_coverage", "welfare_type", "pop_data_level") :=
+     c("pop_data_level", "welfare_type", "survey_coverage") :=
        {
-         x <- tolower(survey_coverage)
+         x <- tolower(pop_data_level)
 
          y <- tolower(welfare_type)
          y <- fifelse(y == "x", "consumption", "income")
 
          z <- fifelse(country_code %in% c("CHN", "IDN", "IND"),
-                      "national", survey_coverage)
+                      "national", pop_data_level)
 
          list(x, y, z)
        }
