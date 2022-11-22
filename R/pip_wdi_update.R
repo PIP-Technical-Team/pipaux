@@ -75,6 +75,9 @@ pip_wdi_update <- function(force   = FALSE,
   #   _________________________________________________________________________
   #   Save and Return                                                     ####
 
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pipfun::pip_sign_save(
     x       = wdi,

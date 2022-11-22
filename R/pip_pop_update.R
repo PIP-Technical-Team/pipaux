@@ -192,6 +192,9 @@ pip_pop_update <-  function(force   = FALSE,
   pop <- pop[country_code %in% cl$country_code]
 
   # Save
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pipfun::pip_sign_save(
     x       = pop,

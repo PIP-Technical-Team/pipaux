@@ -58,6 +58,9 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pipfun::pip_sign_save(
     x       = ppp,

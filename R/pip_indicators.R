@@ -39,7 +39,7 @@ pip_indicators <- function(action  = c("update", "load"),
 
 
    # Save dataset
-    if (branch == "main") {
+  if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
