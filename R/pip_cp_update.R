@@ -7,7 +7,7 @@
 pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                           force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          branch  = c("DEV", "PROD", "main", "old"),
+                          branch  = c("DEV", "PROD", "main", ""),
                           tag     = match.arg(branch)) {
 
   measure <- "cp"

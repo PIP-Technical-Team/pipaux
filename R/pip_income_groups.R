@@ -11,7 +11,7 @@ pip_income_groups <- function(action  = c("update", "load"),
                               owner   = "PovcalNet-Team",
                               repo    = "Class",
                               maindir = gls$PIP_DATA_DIR,
-                              branch  = c("DEV", "PROD", "main", "old"),
+                              branch  = c("DEV", "PROD", "main", ""),
                               tag     = match.arg(branch)) {
   measure <- "income_groups"
   branch <- match.arg(branch)

@@ -6,7 +6,7 @@
 #' @export
 load_aux <- function(measure,
                      maindir = gls$PIP_DATA_DIR,
-                     branch  = c("DEV", "PROD", "main", "old"),
+                     branch  = c("DEV", "PROD", "main", ""),
                      apply_label = TRUE) {
 
   branch <- match.arg(branch)

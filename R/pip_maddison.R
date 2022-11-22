@@ -10,7 +10,7 @@ pip_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
-                         branch  = c("DEV", "PROD", "main", "old"),
+                         branch  = c("DEV", "PROD", "main", ""),
                          tag     = match.arg(branch)) {
   measure <- "maddison"
   action  <- match.arg(action)
