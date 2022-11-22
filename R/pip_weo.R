@@ -16,7 +16,7 @@ pip_weo <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main", ""),
+                    branch  = c("DEV", "PROD", "main"),
                     tag     = match.arg(branch)) {
   measure <- "weo"
   branch <- match.arg(branch)

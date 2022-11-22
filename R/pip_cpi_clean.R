@@ -11,7 +11,7 @@
 pip_cpi_clean <- function(y,
                           cpivar = getOption("pipaux.cpivar"),
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main", "")) {
+                          branch  = c("DEV", "PROD", "main")) {
 
   x <- data.table::as.data.table(y)
 
