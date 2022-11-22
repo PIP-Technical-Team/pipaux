@@ -8,7 +8,7 @@
 #' @export
 pip_weo_clean <- function(dt,
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch  = c("DEV", "PROD", "main", "old")) {
 
 
   branch <- match.arg(branch)

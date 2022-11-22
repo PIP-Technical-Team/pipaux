@@ -9,7 +9,7 @@ pip_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
-                         branch  = c("DEV", "PROD", "main"),
+                         branch  = c("DEV", "PROD", "main", "old"),
                          tag     = match.arg(branch)) {
   measure <- "metadata"
   branch <- match.arg(branch)

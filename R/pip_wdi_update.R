@@ -11,7 +11,7 @@
 pip_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
+                           branch  = c("DEV", "PROD", "main", "old"),
                            tag     = match.arg(branch),
                            from    = c("gh", "file", "api")) {
 

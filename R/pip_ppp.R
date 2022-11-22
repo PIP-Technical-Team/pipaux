@@ -9,7 +9,7 @@
 pip_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
+                    branch  = c("DEV", "PROD", "main", "old"),
                     force   = FALSE,
                     tag     = branch) {
 

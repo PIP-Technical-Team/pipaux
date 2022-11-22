@@ -8,7 +8,7 @@
 pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
+                           branch  = c("DEV", "PROD", "main", "old"),
                            tag     = match.arg(branch),
                            from    = c("gh", "file", "api")) {
 
