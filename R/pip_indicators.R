@@ -9,7 +9,7 @@ pip_indicators <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch  = c("DEV", "PROD", "main", ""),
+                           branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch)) {
   measure <- "indicators"
   branch <- match.arg(branch)
@@ -39,7 +39,10 @@ pip_indicators <- function(action  = c("update", "load"),
 
 
    # Save dataset
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    if (branch == "main") {
+    branch <- ""
+  }
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
     saved  <- pipfun::pip_sign_save(
       x       = df,
       measure = measure,
