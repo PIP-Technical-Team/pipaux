@@ -241,7 +241,8 @@ pip_cp_clean <- function(x,
         "mpm_water",
         "mpm_monetary",
         "mpm_headcount",
-        "ppp_year"
+        "ppp_year",
+        "reporting_level"
       )],
     sp =
       dl$chart6_KI4[, c("country_code",
@@ -249,7 +250,8 @@ pip_cp_clean <- function(x,
                         "welfare_type",
                         "distribution",
                         "shared_prosperity",
-                        "ppp_year")
+                        "ppp_year",
+                        "reporting_level")
                     ]
   ) ## end of chart lists
 
