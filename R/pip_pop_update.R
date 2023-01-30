@@ -27,6 +27,7 @@ pip_pop_update <-  function(force   = FALSE,
 
   if (src == "wdi") {
 
+    codes <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
     pop <- purrr::map_df(codes, ~ {
       df <- wbstats::wb_data(indicator = .x, lang = "en")
       colnames(df)[colnames(df) == .x] <- "pop"

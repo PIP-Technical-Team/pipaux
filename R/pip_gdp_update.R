@@ -127,9 +127,9 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
 
 
-  #----------------------------------------------------------
-  #   Merge WDI GDP data with other sources
-  #----------------------------------------------------------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #   Merge WDI GDP data with other sources -------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
   # Merge Maddison and WDI (full join)
