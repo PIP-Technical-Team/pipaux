@@ -27,6 +27,7 @@ pip_pop_update <-  function(force   = FALSE,
 
   if (src == "wdi") {
 
+    codes <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
     pop <- purrr::map_df(codes, ~ {
       df <- wbstats::wb_data(indicator = .x, lang = "en")
       colnames(df)[colnames(df) == .x] <- "pop"
@@ -192,6 +193,9 @@ pip_pop_update <-  function(force   = FALSE,
   pop <- pop[country_code %in% cl$country_code]
 
   # Save
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pipfun::pip_sign_save(
     x       = pop,

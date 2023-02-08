@@ -23,6 +23,9 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                        branch = branch)
 
   # Save dataset
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
   saved <- pipfun::pip_sign_save(
     x       = pfw,

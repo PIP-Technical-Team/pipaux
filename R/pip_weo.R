@@ -38,7 +38,10 @@ pip_weo <- function(action  = c("update", "load"),
                         branch = branch)
 
     # Save dataset
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    if (branch == "main") {
+    branch <- ""
+  }
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
       x       = dt,
       measure = measure,

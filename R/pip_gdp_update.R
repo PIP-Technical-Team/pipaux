@@ -127,9 +127,9 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   wgdp <- wgdp[, .(country_code, year, wdi_gdp)]
 
 
-  #----------------------------------------------------------
-  #   Merge WDI GDP data with other sources
-  #----------------------------------------------------------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #   Merge WDI GDP data with other sources -------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
   # Merge Maddison and WDI (full join)
@@ -266,6 +266,9 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   # ---- Save and sign ----
 
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(

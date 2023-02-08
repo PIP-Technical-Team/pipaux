@@ -10,6 +10,9 @@ load_aux <- function(measure,
                      apply_label = TRUE) {
 
   branch <- match.arg(branch)
+  if (branch == "main") {
+    branch <- ""
+  }
   msrdir <- fs::path(maindir, "_aux/", branch, measure)
 
   file_paths <- fs::dir_ls(msrdir,
