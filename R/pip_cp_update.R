@@ -12,6 +12,8 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   measure <- "cp"
   branch  <- match.arg(branch)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## chart files --------
 
   file_names <-
     c(
@@ -38,6 +40,28 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   dl <- pip_cp_clean(raw_files,
                      file_names)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## download files --------
+  fl_files <- c("flat_cp", "flat_shp")
+
+  raw_fl <- purrr::map(.x = fl_files,
+                          .f = ~{
+                            x <- pipfun::load_from_gh(
+                              measure = "cp",
+                              owner  = owner,
+                              branch = branch,
+                              filename = .x,
+                              ext = "dta")
+                            setnames(x, "year", "reporting_year",
+                                     skip_absent=TRUE)
+                          })
+  names(raw_fl) <- fl_files
+  dl <- append(dl, list(flat = raw_fl))
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## save --------
 
   if (branch == "main") {
     branch <- ""
@@ -50,6 +74,9 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir  = msrdir,
     force   = force
   )
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## return  --------
 
   return(invisible(saved))
 }
