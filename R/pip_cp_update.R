@@ -46,15 +46,19 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   raw_fl <- purrr::map(.x = fl_files,
                           .f = ~{
-                            pipfun::load_from_gh(
+                            x <- pipfun::load_from_gh(
                               measure = "cp",
                               owner  = owner,
                               branch = branch,
                               filename = .x,
                               ext = "dta")
+                            setnames(x, "year", "reporting_year",
+                                     skip_absent=TRUE)
                           })
   names(raw_fl) <- fl_files
   dl <- append(dl, list(flat = raw_fl))
+
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## save --------
