@@ -31,7 +31,8 @@ pip_npl <- function(action  = c("update", "load"),
 
     setnames(x = npl,
              old = c("countrycode",  "year", "vsi_pov_nahc_nc"),
-             new = c("country_code", "reporting_year", "nat_headcount"))
+             new = c("country_code", "reporting_year", "nat_headcount"),
+             skip_absent = TRUE)
 
     npl[, c("region", "vsi_pov_nahc") := NULL]
     npl[, nat_headcount := nat_headcount / 100]
