@@ -5,17 +5,16 @@
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_countries <- function(action = c("update", "load"),
-                          force = FALSE,
-                          maindir = gls$PIP_DATA_DIR,
+pip_countries <- function(action  = c("update", "load"),
+                          force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
+                          maindir = gls$PIP_DATA_DIR,
                           branch  = c("DEV", "PROD", "main"),
-                          tag     = match.arg(branch)
-                          ) {
+                          tag     = match.arg(branch)) {
 
   measure <- "countries"
   action <- match.arg(action)
-  msrdir <- fs::path(maindir, "_aux/", measure)
+  branch <- match.arg(branch)
 
   if (action == "update") {
 
@@ -40,6 +39,15 @@ pip_countries <- function(action = c("update", "load"),
     countries <- cl[country_code %in% pfw$country_code
                     ][,
                       c("pcn_region", "pcn_region_code") := NULL]
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## save --------
+
+    if (branch == "main") {
+      branch <- ""
+    }
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
 
     pipfun::pip_sign_save(
       x = countries,
