@@ -56,13 +56,11 @@ pip_pop_update <-  function(force   = FALSE,
     ][,
       coverage := NULL]
 
-    pop <- pop[!is.na(pop)]
-    setorder(pop, country_code, year, pop_data_level)
+
   } else {
 
 
     # Now Emi's file is uploaded directly to GH. So we get it from there.
-
     # Load data
 
     pop_main <- pipfun::load_from_gh(
@@ -95,15 +93,15 @@ pip_pop_update <-  function(force   = FALSE,
 
     pop <- pop_long
     # Create data_level column
-    pop[
-      ,
+    pop[,
       pop_data_level :=
         fcase(
           grepl("POP", Series), 2,
           grepl("RUR", Series), 0,
           grepl("URB", Series), 1
         )
-    ]
+    ][,
+      Series := NULL]
 
     # Set colnames
     setnames(
@@ -111,16 +109,6 @@ pip_pop_update <-  function(force   = FALSE,
       old = c("Country", "Year", "Population"),
       new = c("country_code", "year", "pop")
     )
-    pop$Series <- NULL
-
-    # Remove years prior to 1960
-    pop <- pop[year >= 1960]
-
-    # Remove years after 2020
-    #pop <- pop[year <= 2020]
-
-    # Remove rows w/ missing pop values
-    pop <- pop[!is.na(pop)]
 
   }
 
@@ -128,10 +116,15 @@ pip_pop_update <-  function(force   = FALSE,
   # Clean data   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  pop <- pop[, c("country_code", "year", "pop_data_level", "pop")
-  ][,
-    pop_domain := fifelse(pop_data_level == 2, 1, 2)
-  ]
+  # Remove years prior to 1960
+  pop <- pop[!is.na(pop) & year >= 1960]
+
+  # sorting
+  setorder(pop, country_code, year, pop_data_level)
+  setcolorder(pop, c("country_code", "year", "pop_data_level", "pop"))
+
+  pop[,
+    pop_domain := fifelse(pop_data_level == 2, 1, 2)]
 
   # recode domain and data_level variables
   cols <- c("pop_domain", "pop_data_level")
@@ -154,11 +147,7 @@ pip_pop_update <-  function(force   = FALSE,
     )
   ]
 
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Save data   ---------
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  # Remove any non-WDI countries
   # Remove any non-WDI countries
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
@@ -166,6 +155,10 @@ pip_pop_update <-  function(force   = FALSE,
 
   setDT(cl)
   pop <- pop[country_code %in% cl$country_code]
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Save data   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # Save
   if (branch == "main") {

@@ -6,7 +6,7 @@
 \usage{
 pip_pop_update(
   force = FALSE,
-  src = c("emi", "wdi"),
+  from = c("gh", "file", "api"),
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
@@ -16,7 +16,7 @@ pip_pop_update(
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{src}{character: Source for population data.}
+\item{from}{character: Source for population data.}
 
 \item{maindir}{character: Main directory of project.}
 
