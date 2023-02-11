@@ -3,19 +3,19 @@ NULL
 
 #' Update POP
 #'
-#' @param src character: Source for population data.
+#' @param from character: Source for population data.
 #' @inheritParams pip_cpi
 #' @keywords internal
 #' @import data.table
 pip_pop_update <-  function(force   = FALSE,
-                            src     = c("emi", "wdi"),
+                            from    = c("gh", "file", "api"),
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
 
   # Check arguments
-  src    <- match.arg(src)
+  from    <- match.arg(from)
   branch <- match.arg(branch)
 
   # Directories
@@ -25,33 +25,39 @@ pip_pop_update <-  function(force   = FALSE,
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  if (src == "wdi") {
+  if (from == "api") {
 
-    codes <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
-    pop <- purrr::map_df(codes, ~ {
-      df <- wbstats::wb_data(indicator = .x, lang = "en")
-      colnames(df)[colnames(df) == .x] <- "pop"
-      df$coverage <- .x
-      return(df)
+    pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
+    pop   <- wbstats::wb_data(indicator = pop_indicators,
+                              country = "all", # this is new
+                              lang      = "en",
+                              return_wide = FALSE) |>
+      setDT()
 
-    })
 
-    setDT(pop)
 
-    # data level
-    pop[
-      ,
+    # rename vars
+    pop <- pop[, c("iso3c", "date", "indicator_id", "value")]
+
+    setnames(pop,
+             new = c("country_code", "year", "coverage", "pop"))
+
+
+
+    pop[,
+        year := as.numeric(year)
+    ][,
       pop_data_level :=
         fcase(
           grepl("POP", coverage), 2,
           grepl("RUR", coverage), 0,
           grepl("URB", coverage), 1
         )
-    ]
-    setnames(pop,
-      old = c("iso3c", "date"),
-      new = c("country_code", "year")
-    )
+    ][,
+      coverage := NULL]
+
+    pop <- pop[!is.na(pop)]
+    setorder(pop, country_code, year, pop_data_level)
   } else {
 
 
@@ -85,38 +91,7 @@ pip_pop_update <-  function(force   = FALSE,
     pop_long$Year <- as.numeric(as.character(pop_long$Year))
     pop_long$Population <- as.numeric(pop_long$Population)
 
-    # Merge with special country data
-    # Note for PSE, KWT and SXM, some years of population data are missing in Emi's
-    # main file and hence in WDI. Here we are complementing the main file with an
-    # additional file she shared to assure complete coverage. This file contains
-    # historical data and will not need to be updated every year. Hence, here we are
-    # just calling the version we received. Should we receive a new version,
-    # the import line below should be updated to reflect the accurate file.
 
-    # # Load data
-    # pop_special_file <-
-    #   list.files(pip_pop_dir,
-    #              pattern = "population_missing.*\\.xlsx") %>%
-    #   gsub("population_missing_|.xlsx", "", .) %>%
-    #   as.POSIXlt() %>%
-    #   max() %>%
-    #   as.character() %>%
-    #   sprintf("population_missing_%s.xlsx", .)
-    #
-    # pop_special_path        <- fs::path(pip_pop_dir, pop_special_file)
-    # pop_special             <- suppressMessages(readxl::read_xlsx(pop_special_path,
-    #                                                               sheet = "Long")
-    #                                             )
-    # pop_special             <- pop_special[c("Country", "Series", "Time", "Data")]
-    # names(pop_special)[3:4] <- c("Year", "Population")
-    # pop_special$Year        <- sub("YR", "", pop_special$Year)
-    #
-    # # Merge datasets
-    # pop_merge      <- rbind(pop_long, pop_special)
-    # pop_merge$Year <- as.numeric(pop_merge$Year)
-    # data.table::setDT(pop_merge)
-    #
-    # pop <- pop_merge
 
     pop <- pop_long
     # Create data_level column
