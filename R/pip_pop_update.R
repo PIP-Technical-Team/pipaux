@@ -1,12 +1,7 @@
-#' @importFrom magrittr %>%
-NULL
-
 #' Update POP
 #'
 #' @param from character: Source for population data.
-#' @inheritParams pip_cpi
-#' @keywords internal
-#' @import data.table
+#' @inheritParams pip_pop
 pip_pop_update <-  function(force   = FALSE,
                             from    = c("gh", "file", "api"),
                             maindir = gls$PIP_DATA_DIR,
@@ -78,8 +73,8 @@ pip_pop_update <-  function(force   = FALSE,
     pop_main$Time_Name   <- NULL
 
     # Reshape to long format
-    pop_long <- pop_main %>%
-      data.table::setDT() %>%
+    pop_long <- pop_main |>
+      data.table::setDT() |>
       data.table::melt(
         id.vars = c("Country", "Series"),
         measure.vars = year_vars,

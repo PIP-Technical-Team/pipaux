@@ -7,20 +7,20 @@
 #' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
 #' @export
 pip_pop <- function(action = c("update", "load"),
-                    force = FALSE,
-                    src = getOption("pipaux.popsrc"),
+                    force   = FALSE,
+                    from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
                     tag     = match.arg(branch)) {
   measure <- "pop"
-  src <- tolower(src)
+  from    <- tolower(from)
   action <- match.arg(action)
 
   if (action == "update") {
     pip_pop_update(
       force   = force,
-      src     = src,
+      from    = from,
       maindir = maindir,
       owner   = owner,
       branch  = branch,

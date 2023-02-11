@@ -31,4 +31,3 @@ will be used to update either the development server or production.}
 \description{
 Update POP
 }
-\keyword{internal}
