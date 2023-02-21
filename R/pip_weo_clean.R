@@ -12,24 +12,6 @@ pip_weo_clean <- function(dt,
 
 
   branch <- match.arg(branch)
-#   ____________________________________________________________________________
-#   on.exit                                                                 ####
-  on.exit({
-
-  })
-
-#   ____________________________________________________________________________
-#   Defenses                                                                ####
-  stopifnot( exprs = {
-
-    }
-  )
-
-#   ____________________________________________________________________________
-#   Early returns                                                           ####
-  if (FALSE) {
-    return()
-  }
 
 #   ____________________________________________________________________________
 #   Computations                                                            ####
@@ -57,25 +39,22 @@ pip_weo_clean <- function(dt,
     iso := fifelse(
       iso == "WBG", "PSE", iso # West Bank & Gaza
     )
-  ]
-  dt[
+  ][
     ,
     iso := fifelse(
       iso == "UVK", "XKX", iso # Kosovo
     )
-  ]
-
+  ][,
   # Replace subject codes
-  dt[,
-     subject_code := fcase(
-       weo_subject_code == "NGDPRPC", "weo_gdp_lcu",
-       weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017"
-     )
+    subject_code := fcase(
+     weo_subject_code == "NGDPRPC", "weo_gdp_lcu",
+     weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017"
+    )
   ]
 
   # Reshape to long format
-  dt <- dt %>%
-    melt(
+  dt <-
+    melt(data = dt,
       id.vars = c("iso", "subject_code"),
       measure.vars = names(dt)[grepl("\\d{4}", names(dt))],
       value.name = "weo_gdp", variable.name = "year"
@@ -84,13 +63,14 @@ pip_weo_clean <- function(dt,
 
   # Convert year and GDP to numeric
   dt[,
-     year := {
-       x <- sub("x", "", year)
-       as.numeric(x)
-     }]
+     c("weo_gdp", "year") := {
+       y <- sub("x", "", year) |>
+         as.numeric()
 
-  dt[,
-     weo_gdp := suppressWarnings(as.numeric(weo_gdp))]
+       x <- as.numeric(weo_gdp) |>
+         suppressWarnings()
+       list(x, y)
+     }]
 
   # Remove rows w/ missing GDP`
   dt <- na.omit(dt, cols = "weo_gdp")

@@ -19,10 +19,10 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
 #   Load data                                             ####
 
   # Update WDI
-  pip_wdi_update(maindir = maindir,
-                 from    = from,
-                 force   = force,
-                 branch  = branch)
+  # pip_wdi_update(maindir = maindir,
+  #                from    = from,
+  #                force   = force,
+  #                branch  = branch)
 
 
   wpce   <- load_aux(measure = "wdi",

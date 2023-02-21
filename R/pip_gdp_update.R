@@ -19,23 +19,23 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 #   ____________________________________________________________________________
 #   Update data                                                             ####
 
-  # Update Maddison Project Data
-  pip_maddison(force   = force,
-               maindir = maindir,
-               branch  = branch)
-
-  # Update WEO data
-
-  pip_weo(force   = force,
-          maindir = maindir,
-          branch  = branch)
-
-  # Update WDI
-  pip_wdi_update(maindir = maindir,
-                 from    = from,
-                 force   = force,
-                 branch  = branch)
-
+  # # Update Maddison Project Data
+  # pip_maddison(force   = force,
+  #              maindir = maindir,
+  #              branch  = branch)
+  #
+  # # Update WEO data
+  #
+  # pip_weo(force   = force,
+  #         maindir = maindir,
+  #         branch  = branch)
+  #
+  # # Update WDI
+  # pip_wdi_update(maindir = maindir,
+  #                from    = from,
+  #                force   = force,
+  #                branch  = branch)
+  #
 
 #   ____________________________________________________________________________
 #   Load Data                                                               ####

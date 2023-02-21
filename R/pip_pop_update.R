@@ -22,6 +22,9 @@ pip_pop_update <-  function(force   = FALSE,
 
   if (from == "api") {
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## from API --------
+
     pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
     pop   <- wbstats::wb_data(indicator = pop_indicators,
                               country = "all", # this is new
@@ -51,9 +54,27 @@ pip_pop_update <-  function(force   = FALSE,
     ][,
       coverage := NULL]
 
+    ### Ger special cases ---------
+    year_max <- max(pop$year, na.rm = TRUE)
+
+    spop <- pipfun::load_from_gh(
+      measure = measure,
+      filename = "spop",
+      owner  = owner,
+      branch = branch,
+      tag    = tag)  |>
+      clean_names_from_wide() |>
+      clean_from_wide()
+
+
+    pop <- rbindlist(list(pop, spop),
+            use.names = TRUE,
+            fill = TRUE)
+
 
   } else {
-
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## from Emi's file --------
 
     # Now Emi's file is uploaded directly to GH. So we get it from there.
     # Load data
@@ -64,46 +85,26 @@ pip_pop_update <-  function(force   = FALSE,
       branch = branch,
       tag    = tag,
       ext    = "xlsx"
-    )
+    ) |>
+      clean_names_from_wide() |>
+      clean_from_wide()
 
-    names(pop_main)[1:4] <- as.character(pop_main[2, 1:4])
-    pop_main             <- pop_main[-c(1:2), ]
-    year_vars            <- names(pop_main[, 6:ncol(pop_main)])
-    pop_main$Series_Name <- NULL
-    pop_main$Time_Name   <- NULL
+    year_max <- max(pop_main$year, na.rm = TRUE)
 
-    # Reshape to long format
-    pop_long <- pop_main |>
-      data.table::setDT() |>
-      data.table::melt(
-        id.vars = c("Country", "Series"),
-        measure.vars = year_vars,
-        variable.name = "Year",
-        value.name = "Population"
-      )
-    pop_long$Year <- as.numeric(as.character(pop_long$Year))
-    pop_long$Population <- as.numeric(pop_long$Population)
+    ### Ger special cases ---------
+    spop <- pipfun::load_from_gh(
+      measure = measure,
+      filename = "spop",
+      owner  = owner,
+      branch = branch,
+      tag    = tag
+    )  |>
+      clean_names_from_wide() |>
+      clean_from_wide()
 
-
-
-    pop <- pop_long
-    # Create data_level column
-    pop[,
-      pop_data_level :=
-        fcase(
-          grepl("POP", Series), 2,
-          grepl("RUR", Series), 0,
-          grepl("URB", Series), 1
-        )
-    ][,
-      Series := NULL]
-
-    # Set colnames
-    setnames(
-      pop,
-      old = c("Country", "Year", "Population"),
-      new = c("country_code", "year", "pop")
-    )
+    pop <- rbindlist(list(pop_main, spop),
+                          use.names = TRUE,
+                          fill = TRUE)
 
   }
 
@@ -113,6 +114,7 @@ pip_pop_update <-  function(force   = FALSE,
 
   # Remove years prior to 1960
   pop <- pop[!is.na(pop) & year >= 1960]
+  pop <- pop[year <= year_max]
 
   # sorting
   setorder(pop, country_code, year, pop_data_level)
@@ -169,4 +171,75 @@ pip_pop_update <-  function(force   = FALSE,
 
   return(invisible(saved))
 
+}
+
+
+
+#' Clean names from wide WDI format
+#'
+#' @param x data frame
+#'
+#' @return dataframe with names cleaned
+#' @keywords internal
+clean_names_from_wide <- function(x) {
+  if (!is.data.table(x)) {
+    setDT(x)
+  }
+  nnames <- as.character(x[2, 1:4])
+  setnames(x, 1:4, nnames)
+  x <- x[-c(1:2)]
+  x
+}
+
+
+#' Clean from WDI format
+#'
+#' @param x data frame
+#'
+#' @return dataframe with names cleaned
+#' @keywords internal
+clean_from_wide <- function(x) {
+  if (!is.data.table(x)) {
+    setDT(x)
+  }
+
+
+  year_vars            <- names(x[, 6:ncol(x)])
+  x$Series_Name <- NULL
+  x$Time_Name   <- NULL
+
+  # Reshape to long format
+  pop_long <- x |>
+    data.table::setDT() |>
+    data.table::melt(
+      id.vars = c("Country", "Series"),
+      measure.vars = year_vars,
+      variable.name = "Year",
+      value.name = "Population"
+    )
+  pop_long$Year <- as.numeric(as.character(pop_long$Year))
+  pop_long$Population <- as.numeric(pop_long$Population)
+
+
+
+  pop <- pop_long
+  # Create data_level column
+  pop[,
+      pop_data_level :=
+        fcase(
+          grepl("POP", Series), 2,
+          grepl("RUR", Series), 0,
+          grepl("URB", Series), 1
+        )
+  ][,
+    Series := NULL]
+
+  # Set colnames
+  setnames(
+    pop,
+    old = c("Country", "Year", "Population"),
+    new = c("country_code", "year", "pop")
+  )
+
+  return(pop)
 }

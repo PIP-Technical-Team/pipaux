@@ -17,6 +17,7 @@ pip_gdp <- function(action          = c("update", "load"),
 
   measure    <- "gdp"
   branch <- match.arg(branch)
+  action <- match.arg(action)
 
 
   if (action == "update") {
