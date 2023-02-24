@@ -107,13 +107,18 @@ pip_weo_clean <- function(dt,
   # ---- Chain PPP and LCU GDP columns ----
 
   # Chain LCU on PPP column
-  dt <- chain_values(
-    dt,
-    base_var        = "weo_gdp_ppp2017",
-    replacement_var = "weo_gdp_lcu",
-    new_name        = "weo_gdp",
-    by              = "country_code"
-  )
+
+  dt[, weo_gdp := chain(ori_var = weo_gdp_ppp2017,
+                        rep_var = weo_gdp_lcu),
+     by = country_code]
+  #
+  # dt <- chain_values(
+  #   dt,
+  #   base_var        = "weo_gdp_ppp2017",
+  #   replacement_var = "weo_gdp_lcu",
+  #   new_name        = "weo_gdp",
+  #   by              = "country_code"
+  # )
 
 
   # --- Sign and save ----
