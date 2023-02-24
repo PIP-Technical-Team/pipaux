@@ -148,8 +148,8 @@ last_item <- function(x, word = "and") {
 #' @keywords internal
 chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_code") {
 
-  # anyNA
-  anyNA <- function(x) all(is.na(x))
+  # allNA
+  allNA <- function(x) all(is.na(x))
 
   # Add rowid by group
   dt$n <- data.table::rowidv(dt, cols = by)
@@ -158,7 +158,7 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_
   # all observations of base_var
   dt_na <- dt[,
               .SDcols = base_var, by = by,
-              .(all_na = purrr::map_lgl(.SD, anyNA))
+              .(all_na = purrr::map_lgl(.SD, allNA))
   ]
   dt <- data.table::merge.data.table(dt, dt_na, by = by)
 
@@ -260,32 +260,56 @@ chain_backwards <- function(dt) {
 
 #' chain forward and then backward
 #'
-#' @param new_var
-#' @param rep_var
+#' @param ori_var numeric: orignal variablke
+#' @param rep_var numeric: replacement variable
 #'
 #' @keywords internal
-chain <- function(new_var,
+chain <- function(ori_var,
                   rep_var) {
-  # find obs where rep_var and fwd are NOT missing but new_var is
 
-  if (all(!is.na(new_var))) {
-    return(new_var)
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Defensive setup   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Defenses --------
+    stopifnot( exprs = {
+        is.numeric(ori_var)
+        is.numeric(rep_var)
+      }
+    )
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Early Return --------
+
+  # If no missing values, return original vector
+  if (!anyNA(ori_var)) {
+    return(ori_var)
+  }
+  # if all missing values, return replacement vector
+  if (all(is.na(ori_var))) {
+    return(rep_var)
   }
 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Calculations   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # find obs where rep_var and fwd are NOT missing but ori_var is
 
   working_obs <- which(!is.na(rep_var))
-  x <- new_var[working_obs]
+  x <- ori_var[working_obs]
   y <- rep_var[working_obs]
 
   if (length(x) == 0) {
-    return(new_var)
+    return(ori_var)
   }
 
   while (any(is.na(x))) {
 
     ns   <-  which(is.na(x)) # index of NA obs
     dns  <- c(0, diff(ns))   # Difference between indexes of NA
-    jns  <- which(dns>1)     # those whose diff is greater than 1
+    jns  <- which(dns > 1)   # those whose diff is greater than 1
 
     # IF there are NO differences greater than 1, ti means that all missing
     # values come one after the other. In that case, we get the last index of
@@ -297,19 +321,23 @@ chain <- function(new_var,
       i    <- max(ns[jns])     # get the the one with greater diff
     }
 
-    if (i > 1 && !is.na(x[i-1]) && !is.na(y[i-1])) {
+    if (i > 1 &&
+        !is.na(x[i - 1]) &&
+        !is.na(y[i - 1])) {
       # chain forward
-      x[i] <- x[i-1]*(y[i]/y[i-1])
+      x[i] <- x[i - 1] * (y[i] / y[i - 1])
 
-    } else if (i < length(x)  && !is.na(x[i+1]) && !is.na(y[i+1])) {
+    } else if (i < length(x)  &&
+               !is.na(x[i + 1]) &&
+               !is.na(y[i + 1])) {
       # chain backwards
-      x[i] <- x[i+1]*(y[i]/y[i+1])
+      x[i] <- x[i + 1] * (y[i] / y[i + 1])
     }
 
   } # end of while
 
-  new_var[working_obs] <- x
-  return(new_var)
+  ori_var[working_obs] <- x
+  return(ori_var)
 }
 
 

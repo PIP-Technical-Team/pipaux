@@ -4,10 +4,12 @@
 \alias{chain}
 \title{chain forward and then backward}
 \usage{
-chain(new_var, rep_var)
+chain(ori_var, rep_var)
 }
 \arguments{
-\item{rep_var}{}
+\item{ori_var}{numeric: orignal variablke}
+
+\item{rep_var}{numeric: replacement variable}
 }
 \description{
 chain forward and then backward
