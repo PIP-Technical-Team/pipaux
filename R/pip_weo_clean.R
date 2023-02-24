@@ -53,11 +53,14 @@ pip_weo_clean <- function(dt,
   ]
 
   # Reshape to long format
+
+  years_vars <- names(dt)[grepl("\\d{4}", names(dt))]
   dt <-
     melt(data = dt,
       id.vars = c("iso", "subject_code"),
-      measure.vars = names(dt)[grepl("\\d{4}", names(dt))],
-      value.name = "weo_gdp", variable.name = "year"
+      measure.vars = years_vars,
+      value.name = "weo_gdp",
+      variable.name = "year"
     )
   setnames(dt, "iso", "country_code")
 

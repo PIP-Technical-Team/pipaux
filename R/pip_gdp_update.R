@@ -133,14 +133,14 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 
   # Merge Maddison and WDI (full join)
-  gdp <- data.table::merge.data.table(
+  gdp <- merge.data.table(
     wgdp, madd,
     by = c("country_code", "year"),
     all = TRUE
   )
 
   # Merge WEO and WDI (full join)
-  gdp <- data.table::merge.data.table(
+  gdp <- merge.data.table(
     gdp, weo,
     by = c("country_code", "year"),
     all = TRUE

@@ -258,6 +258,61 @@ chain_backwards <- function(dt) {
   return(dt$new_var)
 }
 
+#' chain forward and then backward
+#'
+#' @param new_var
+#' @param rep_var
+#'
+#' @keywords internal
+chain <- function(new_var,
+                  rep_var) {
+  # find obs where rep_var and fwd are NOT missing but new_var is
+
+  if (all(!is.na(new_var))) {
+    return(new_var)
+  }
+
+
+  working_obs <- which(!is.na(rep_var))
+  x <- new_var[working_obs]
+  y <- rep_var[working_obs]
+
+  if (length(x) == 0) {
+    return(new_var)
+  }
+
+  while (any(is.na(x))) {
+
+    ns   <-  which(is.na(x)) # index of NA obs
+    dns  <- c(0, diff(ns))   # Difference between indexes of NA
+    jns  <- which(dns>1)     # those whose diff is greater than 1
+
+    # IF there are NO differences greater than 1, ti means that all missing
+    # values come one after the other. In that case, we get the last index of
+    # missing values. If there is differences greater than one, it mees that
+    # there is actual data between NAs, which will be used for calculations.
+    if (length(jns) == 0) {
+      i <-  max(ns)          # get the last obs with NA
+    } else {
+      i    <- max(ns[jns])     # get the the one with greater diff
+    }
+
+    if (i > 1 && !is.na(x[i-1]) && !is.na(y[i-1])) {
+      # chain forward
+      x[i] <- x[i-1]*(y[i]/y[i-1])
+
+    } else if (i < length(x)  && !is.na(x[i+1]) && !is.na(y[i+1])) {
+      # chain backwards
+      x[i] <- x[i+1]*(y[i]/y[i+1])
+    }
+
+  } # end of while
+
+  new_var[working_obs] <- x
+  return(new_var)
+}
+
+
 
 
 #' Get tags from specific Github repo
