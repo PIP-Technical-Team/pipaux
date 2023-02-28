@@ -59,3 +59,5 @@ Remotes:
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3
 ByteCompile: true
+Depends: 
+    R (>= 2.10)

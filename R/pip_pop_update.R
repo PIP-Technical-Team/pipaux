@@ -12,14 +12,17 @@ pip_pop_update <-  function(force   = FALSE,
   # Check arguments
   from    <- match.arg(from)
   branch <- match.arg(branch)
-
-  # Directories
   measure <- "pop"
 
+  # Get the most recent year in PFW to filter population projection
+
+  pfw      <- pipload::pip_load_aux("pfw",
+                                    branch  = branch,
+                                    maindir = maindir)
+  year_max <- pfw[, max(year)]
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
   if (from == "api") {
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +58,6 @@ pip_pop_update <-  function(force   = FALSE,
       coverage := NULL]
 
     ### Ger special cases ---------
-    year_max <- max(pop$year, na.rm = TRUE)
 
     spop <- pipfun::load_from_gh(
       measure = measure,
@@ -89,7 +91,6 @@ pip_pop_update <-  function(force   = FALSE,
       clean_names_from_wide() |>
       clean_from_wide()
 
-    year_max <- max(pop_main$year, na.rm = TRUE)
 
     ### Ger special cases ---------
     spop <- pipfun::load_from_gh(
