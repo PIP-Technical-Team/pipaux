@@ -151,7 +151,8 @@ pip_pop_update <-  function(force   = FALSE,
                  branch = branch)
 
   setDT(cl)
-  pop <- pop[country_code %in% cl$country_code]
+  pop <- pop[country_code %in% cl$country_code] |>
+    unique() # make sure we don't havce any duplicates
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Save data   ---------

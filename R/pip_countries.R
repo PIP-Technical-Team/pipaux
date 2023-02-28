@@ -26,7 +26,9 @@ pip_countries <- function(action  = c("update", "load"),
       tag    = tag
     )
 
-    pfw <- load_aux("pfw", maindir = maindir)
+    pfw <- load_aux(measure = "pfw",
+                    maindir = maindir,
+                    branch  = branch)
 
 
     pfw <- pfw[inpovcal == 1,

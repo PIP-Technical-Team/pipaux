@@ -350,7 +350,7 @@ chain <- function(ori_var,
   return(ori_var)
 }
 
-
+chain_val <- compiler::cmpfun(chain)
 
 
 #' Get tags from specific Github repo

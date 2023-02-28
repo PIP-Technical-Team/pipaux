@@ -108,7 +108,7 @@ pip_weo_clean <- function(dt,
 
   # Chain LCU on PPP column
 
-  dt[, weo_gdp := chain(ori_var = weo_gdp_ppp2017,
+  dt[, weo_gdp := chain_val(ori_var = weo_gdp_ppp2017,
                         rep_var = weo_gdp_lcu),
      by = country_code]
   #

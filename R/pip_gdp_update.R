@@ -149,7 +149,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   # Chain in following order 1) WDI, 2) WEO, 3) Maddison
 
   # Chain WEO on WDI
-  gdp[, new_gdp := chain(ori_var = wdi_gdp,
+  gdp[, new_gdp := chain_val(ori_var = wdi_gdp,
                          rep_var = weo_gdp),
      by = country_code]
 
@@ -163,7 +163,7 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   # )
 
   # Chain Maddison on new GDP column
-  gdp[, gdp := chain(ori_var = new_gdp,
+  gdp[, gdp := chain_val(ori_var = new_gdp,
                      rep_var = mpd_gdp),
       by = country_code]
 
