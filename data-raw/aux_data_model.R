@@ -14,15 +14,41 @@ aux_dirs <-
 aux_data <- lapply(aux_dirs, \(.) {
   load_aux(., maindir, branch )
 })
+names(aux_data) <- aux_dirs
 
 df <- purrr::keep(aux_data, is.data.frame)
 dl <- purrr::keep(aux_data, ~{!is.data.frame(.x)})
 
-df_l <- list()
+
+expand_list <- function(x, name_x) {
+
+  if (is.data.frame(x)) {
+    return(x)
+  } else {
+    names_x <- paste(name_x, names(x), sep = "_")
+    l <- purrr::map2(.x = x,
+                     .y = names_x,
+                     .f = expand_list)
+    names(l) <- names_x
+    return(l)
+  }
+}
+
+debugonce(expand_list)
+dd <- expand_list(aux_data[[11]], names(aux_data[11]))
+
+
+
+
 for (i in seq_along(dl)) {
 
-  name_x <- names(dl[i])
   x <- dl[[i]] # each list
+  name_x <- names(dl[i])
+  if (is.data.frame(x)) {
+    df_l[[paste(name_x, names(x[j]), sep = "_")]] <- x
+    next
+  }
+
 
   for (j in seq_along(x)) {
     df_l[[paste(name_x, names(x[j]), sep = "_")]] <- x[[j]]
