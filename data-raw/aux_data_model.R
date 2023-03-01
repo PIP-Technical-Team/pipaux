@@ -302,7 +302,14 @@ aux_data_model <-
 #     Draw                 ---------
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 aux_data_model |>
+  dm_select_tbl(!starts_with("cp_")) |>
   dm_draw()
+
+aux_data_model |>
+  dm_draw(view_type = "title_only")
+
+
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # save   ---------
