@@ -19,27 +19,6 @@ pip_wdi_update <- function(force   = FALSE,
   from   <- match.arg(from)
   branch <- match.arg(branch)
 
-  #   _________________________________________________________________
-  #   on.exit                                                 ####
-  on.exit({
-
-  })
-
-  #   ____________________________________________________________________
-  #   Defenses                                        ####
-  from <- match.arg(from)
-  stopifnot( exprs = {
-
-  }
-  )
-
-  #   _______________________________________________________________________
-  #   Early returns                                                 ####
-
-  if (FALSE) {
-    return()
-  }
-
   #   _______________________________________________________________________
   #   Computations                                                    ####
   measure <- "wdi"

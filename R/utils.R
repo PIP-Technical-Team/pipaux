@@ -316,7 +316,17 @@ chain <- function(ori_var,
     # missing values. If there is differences greater than one, it mees that
     # there is actual data between NAs, which will be used for calculations.
     if (length(jns) == 0) {
-      i <-  max(ns)          # get the last obs with NA
+
+      # We are in a scenratio where there is only one series of missing values.
+      # If there were more than one, we will be on `max(ns[jns])` below. In this
+      # scenario, we don't know whether the series of missing is at the end of
+      # at the beginning. So, if the higher index is the same as the length of
+      # the vector, we start from the start. Otherwise, we start from the end.
+      if (max(ns) == length(x)) {
+        i <- min(ns)
+      } else {
+        i <-  max(ns)          # get the last obs with NA
+      }
     } else {
       i    <- max(ns[jns])     # get the the one with greater diff
     }
@@ -340,7 +350,7 @@ chain <- function(ori_var,
   return(ori_var)
 }
 
-
+chain_val <- compiler::cmpfun(chain)
 
 
 #' Get tags from specific Github repo
