@@ -1,18 +1,17 @@
+# load data using `pip_cpi()` from DEV branch
+cpi_data <- pip_cpi(action = "load",
+                    branch = "DEV")
+cpi_data_unq <- unique(cpi_data,
+                       by = c("country_code", "cpi_year",
+                            "survey_acronym","cpi_data_level"))
+
 test_that("No duplicate records in PIP CPI data", {
   # skip_if_offline()
-  cpi_data <- pip_cpi(action = "load",
-                     branch = "DEV")
-  cpi_data_unq <- unique(cpi_data,
-                       by=c("country_code", "cpi_year",
-                            "survey_acronym","cpi_data_level"))
   expect_identical(cpi_data, cpi_data_unq)
 })
 
 test_that("Key variables data types in PIP CPI data", {
   # skip_if_offline()
-  cpi_data <- pip_cpi(action = "load",
-                     branch = "DEV")
-
   expect_true(is.character(cpi_data[["country_code"]]))
   expect_true(is.numeric(cpi_data[["cpi_year"]]))
   expect_true(is.character(cpi_data[["cpi_data_level"]]))
