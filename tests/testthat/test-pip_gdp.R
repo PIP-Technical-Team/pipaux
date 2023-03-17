@@ -1,13 +1,13 @@
 # load data using `pip_gdp()` from DEV branch
 gdp_data <- pip_gdp(action = "load",
                     branch = "DEV")
-gdp_data_unq <- unique(gdp_data,
-                       by = c("country_code", "year",
-                            "gdp_data_level"))
 
 test_that("No duplicate records in PIP GDP data", {
   # skip_if_offline()
-  expect_identical(gdp_data, gdp_data_unq)
+  expect_equal(any(duplicated(gdp_data,
+                              by = c("country_code", "year",
+                                     "gdp_data_level"))),
+               FALSE)
 })
 
 test_that("Key variables data types in PIP GDP data", {

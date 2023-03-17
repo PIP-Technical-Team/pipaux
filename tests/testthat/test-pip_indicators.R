@@ -1,0 +1,26 @@
+# load data using `pip_indicators()` from DEV branch
+pip_indicators_data <- pip_indicators(action = "load",
+                                            branch = "DEV")
+
+test_that("Variables data types in PIP indicators data", {
+  # skip_if_offline()
+  expect_true(is.character(pip_indicators_data[["page"]]))
+  expect_true(is.character(pip_indicators_data[["wdi_code"]]))
+  expect_true(is.character(pip_indicators_data[["indicator_code"]]))
+  expect_true(is.character(pip_indicators_data[["indicator_name"]]))
+  expect_true(is.character(pip_indicators_data[["scale_data"]]))
+  expect_true(is.character(pip_indicators_data[["scale_display"]]))
+  expect_true(is.numeric(pip_indicators_data[["scale_factor"]]))
+  expect_true(is.numeric(pip_indicators_data[["number_of_decimals"]]))
+  expect_true(is.character(pip_indicators_data[["indicator_definition_short"]]))
+  expect_true(is.character(pip_indicators_data[["indicator_definition_long"]]))
+  expect_true(is.character(pip_indicators_data[["key_indicator_template"]]))
+  expect_true(is.character(pip_indicators_data[["category"]]))
+  expect_true(is.logical(pip_indicators_data[["is_sensitive_to_povline"]]))
+  expect_true(is.character(pip_indicators_data[["symbol"]]))
+  expect_true(is.numeric(pip_indicators_data[["sort_order"]]))
+  expect_true(is.numeric(pip_indicators_data[["pip_sort_order"]]))
+  expect_true(is.character(pip_indicators_data[["tags"]]))
+  expect_true(is.numeric(pip_indicators_data[["from_year"]]))
+  expect_true(is.numeric(pip_indicators_data[["to_year"]]))
+})
