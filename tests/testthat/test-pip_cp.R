@@ -6,7 +6,7 @@ cp_data <- pip_cp(action = "load",
 headcount_national <- cp_data$key_indicators$headcount_national
 
 test_that("No duplicate records in Headcount (national) data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(headcount_national,
                               by = c("country_code", "ppp_year",
                                      "reporting_year"))),
@@ -14,7 +14,7 @@ test_that("No duplicate records in Headcount (national) data", {
 })
 
 test_that("Data types in headcount (national) data", {
-  # skip_if_offline()
+
   expect_true(is.character(headcount_national[["country_code"]]))
   expect_true(is.numeric(headcount_national[["ppp_year"]]))
   expect_true(is.numeric(headcount_national[["reporting_year"]]))
@@ -26,7 +26,7 @@ test_that("Data types in headcount (national) data", {
 mpm_headcount <- cp_data$key_indicators$mpm_headcount
 
 test_that("No duplicate records in mpm headcount data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(mpm_headcount,
                               by = c("country_code", "ppp_year",
                                      "reporting_year"))),
@@ -34,7 +34,7 @@ test_that("No duplicate records in mpm headcount data", {
 })
 
 test_that("Data types in mpm headcount data", {
-  # skip_if_offline()
+
   expect_true(is.character(mpm_headcount[["country_code"]]))
   expect_true(is.numeric(mpm_headcount[["ppp_year"]]))
   expect_true(is.numeric(mpm_headcount[["reporting_year"]]))
@@ -47,14 +47,14 @@ test_that("Data types in mpm headcount data", {
 reporting_pop <- cp_data$key_indicators$reporting_pop
 
 test_that("No duplicate records in reporting population data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(reporting_pop,
                               by = c("country_code", "reporting_year"))),
                FALSE)
 })
 
 test_that("Data types in reporting pop data", {
-  # skip_if_offline()
+
   expect_true(is.character(reporting_pop[["country_code"]]))
   expect_true(is.numeric(reporting_pop[["reporting_year"]]))
 
@@ -66,14 +66,14 @@ test_that("Data types in reporting pop data", {
 gni <- cp_data$key_indicators$gni
 
 test_that("No duplicate records in gni data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(gni,
                               by = c("country_code", "reporting_year"))),
                FALSE)
 })
 
 test_that("Data types in gni data", {
-  # skip_if_offline()
+
   expect_true(is.character(gni[["country_code"]]))
   expect_true(is.numeric(gni[["reporting_year"]]))
 
@@ -86,14 +86,14 @@ test_that("Data types in gni data", {
 gdp_growth <- cp_data$key_indicators$gdp_growth
 
 test_that("No duplicate records in gdp growth data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(gdp_growth,
                               by = c("country_code", "reporting_year"))),
                FALSE)
 })
 
 test_that("Data types in gdp growth data", {
-  # skip_if_offline()
+
   expect_true(is.character(gdp_growth[["country_code"]]))
   expect_true(is.numeric(gdp_growth[["reporting_year"]]))
 
@@ -106,14 +106,14 @@ test_that("Data types in gdp growth data", {
 shared_prosperity <- cp_data$key_indicators$shared_prosperity
 
 test_that("No duplicate records in shared prosperity data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(shared_prosperity,
                               by = c("country_code", "ppp_year"))),
                FALSE)
 })
 
 test_that("Data types in shared prosperity data", {
-  # skip_if_offline()
+
   expect_true(is.character(shared_prosperity[["country_code"]]))
   expect_true(is.numeric(shared_prosperity[["ppp_year"]]))
 
@@ -128,7 +128,7 @@ test_that("Data types in shared prosperity data", {
 ineq_trend <- cp_data$charts$ineq_trend
 
 test_that("No duplicate records in inequality trend data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(ineq_trend,
                               by = c("country_code", "reporting_year",
                                      "ppp_year"))),
@@ -136,7 +136,7 @@ test_that("No duplicate records in inequality trend data", {
 })
 
 test_that("Data types in inequality trend data", {
-  # skip_if_offline()
+
   expect_true(is.character(ineq_trend[["country_code"]]))
   expect_true(is.numeric(ineq_trend[["reporting_year"]]))
   expect_true(is.numeric(ineq_trend[["ppp_year"]]))
@@ -155,7 +155,7 @@ test_that("Data types in inequality trend data", {
 ineq_bar <- cp_data$charts$ineq_bar
 
 test_that("No duplicate records in inequality bar data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(ineq_bar,
                               by = c("country_code", "reporting_year",
                                      "gender", "agegroup", "education",
@@ -165,7 +165,7 @@ test_that("No duplicate records in inequality bar data", {
 })
 
 test_that("Data types in inequality bar data", {
-  # skip_if_offline()
+
   expect_true(is.character(ineq_bar[["country_code"]]))
   expect_true(is.numeric(ineq_bar[["reporting_year"]]))
   expect_true(is.character(ineq_bar[["gender"]]))
@@ -187,7 +187,7 @@ test_that("Data types in inequality bar data", {
 mpm <- cp_data$charts$mpm
 
 test_that("No duplicate records in mpm data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(mpm,
                               by = c("country_code", "reporting_year",
                                      "ppp_year"))),
@@ -195,7 +195,7 @@ test_that("No duplicate records in mpm data", {
 })
 
 test_that("Data types in mpm data", {
-  # skip_if_offline()
+
   expect_true(is.character(mpm[["country_code"]]))
   expect_true(is.numeric(mpm[["reporting_year"]]))
   expect_true(is.numeric(mpm[["ppp_year"]]))
@@ -215,7 +215,7 @@ test_that("Data types in mpm data", {
 sp <- cp_data$charts$sp
 
 test_that("No duplicate records in sp data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(sp,
                               by = c("country_code", "year_range",
                                      "welfare_type" ,"distribution",
@@ -224,7 +224,7 @@ test_that("No duplicate records in sp data", {
 })
 
 test_that("Data types in shared prosperity data", {
-  # skip_if_offline()
+
   expect_true(is.character(sp[["country_code"]]))
   expect_true(is.character(sp[["year_range"]]))
   expect_true(is.character(sp[["welfare_type"]]))
@@ -240,7 +240,7 @@ test_that("Data types in shared prosperity data", {
 flat_cp <- cp_data$flat$flat_cp
 
 test_that("No duplicate records in flat country profile data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(flat_cp,
                               by = c("country_code", "reporting_year",
                                      "ppp_year"))),
@@ -248,7 +248,7 @@ test_that("No duplicate records in flat country profile data", {
 })
 
 test_that("Data types in flat cp data", {
-  # skip_if_offline()
+
   expect_true(is.character(flat_cp[["country_code"]]))
   expect_true(is.numeric(flat_cp[["reporting_year"]]))
   expect_true(is.numeric(flat_cp[["ppp_year"]]))
@@ -303,18 +303,19 @@ test_that("Data types in flat cp data", {
 flat_shp <- cp_data$flat$flat_shp
 
 flap_shp_var_list <- names(flat_shp)
-flap_shp_var_list_chr <- c("country_code", "welfare_type", "is_interpolated")
+flap_shp_var_list_chr <- c("country_code", "welfare_type",
+                           "is_interpolated", "xyzdmxyzcoverage")
 flap_shp_var_list_num <- flap_shp_var_list[!(flap_shp_var_list %in% flap_shp_var_list_chr)]
 
 test_that("No duplicate records in flat shared prosperity data", {
-  # skip_if_offline()
+
   expect_equal(any(duplicated(flat_shp,
-                              by = c("country_code", "ppp_year"))),
+                              by = c("country_code", "ppp_year", "welfare_type"))),
                FALSE)
 })
 
 test_that("Data types in flat shared prosparity data", {
-  # skip_if_offline()
+
   # character data type
   expect_true(sapply(flap_shp_var_list_chr,
                      function(i) is.character(flat_shp[[i]])))
