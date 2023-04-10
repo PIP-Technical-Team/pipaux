@@ -12,26 +12,6 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
   measure <- "metadata"
   branch <- match.arg(branch)
-
-  #   ____________________________________________________________________________
-  #   on.exit                                                                 ####
-  on.exit({
-
-  })
-
-  #   ____________________________________________________________________________
-  #   Defenses                                                                ####
-  stopifnot( exprs = {
-
-  }
-  )
-
-  #   ____________________________________________________________________________
-  #   Early returns                                                           ####
-  if (FALSE) {
-    return()
-  }
-
   #   ____________________________________________________________________________
   #   Computations                                                            ####
 
@@ -107,6 +87,7 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
              country_name,
              reporting_year,
              survey_year,
+             surveyid_year,
              survey_title,
              survey_conductor,
              survey_coverage,
