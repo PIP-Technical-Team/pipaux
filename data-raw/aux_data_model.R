@@ -93,8 +93,8 @@ spop <- pipfun::load_from_gh(
   filename = "spop",
   owner  = owner,
   branch = branch)  |>
-  clean_names_from_wide() |>
-  clean_from_wide()
+  pipaux:::clean_names_from_wide() |>
+  pipaux:::clean_from_wide()
 
 
 
