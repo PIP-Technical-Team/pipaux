@@ -8,7 +8,7 @@ load_raw_aux(
   measure,
   owner = getOption("pipfun.ghowner"),
   repo = paste0("aux_", measure),
-  branch = c("DEV", "PROD", "main"),
+  branch = c("DEV", "PROD", "main", "test"),
   tag = match.arg(branch),
   filename = measure,
   ext = "csv",

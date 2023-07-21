@@ -8,7 +8,7 @@ pip_cpi_clean(
   y,
   cpivar = getOption("pipaux.cpivar"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
+  branch = c("DEV", "PROD", "main", "test")
 )
 }
 \arguments{

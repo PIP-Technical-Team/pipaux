@@ -11,7 +11,7 @@ pip_pop <- function(action = c("update", "load"),
                     from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
+                    branch  = c("DEV", "PROD", "main", "test"),
                     tag     = match.arg(branch)) {
   measure <- "pop"
   from    <- tolower(from)

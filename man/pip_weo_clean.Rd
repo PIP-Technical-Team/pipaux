@@ -7,7 +7,7 @@
 pip_weo_clean(
   dt,
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
+  branch = c("DEV", "PROD", "main", "test")
 )
 }
 \arguments{

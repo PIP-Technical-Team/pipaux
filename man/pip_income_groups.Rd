@@ -10,7 +10,7 @@ pip_income_groups(
   owner = "PovcalNet-Team",
   repo = "Class",
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
+  branch = c("DEV", "PROD", "main", "test"),
   tag = match.arg(branch)
 )
 }

@@ -9,7 +9,7 @@ pip_gdm(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
+  branch = c("DEV", "PROD", "main", "test"),
   tag = match.arg(branch)
 )
 }

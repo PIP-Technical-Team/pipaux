@@ -11,7 +11,7 @@ pip_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = "PIP-Technical-Team",
-                    branch          = c("DEV", "PROD", "main"),
+                    branch          = c("DEV", "PROD", "main", "test"),
                     tag             = match.arg(branch),
                     from            = "file") {
 

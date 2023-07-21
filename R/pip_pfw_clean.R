@@ -8,7 +8,7 @@
 #' @keywords internal
 pip_pfw_clean <- function(y,
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch  = c("DEV", "PROD", "main", "test")) {
 
   branch <- match.arg(branch)
 
