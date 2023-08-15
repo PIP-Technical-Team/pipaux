@@ -290,18 +290,23 @@ chain <- function(ori_var,
   if (all(is.na(ori_var))) {
     return(rep_var)
   }
+  if (all(is.na(rep_var))) {
+    return(ori_var)
+  }
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculations   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  # find obs where rep_var and fwd are NOT missing but ori_var is
+  # find obs where rep_var  is  NOT missing but ori_var is
 
   working_obs <- which(!is.na(rep_var))
   x <- ori_var[working_obs]
   y <- rep_var[working_obs]
 
-  if (length(x) == 0) {
+  # if the numb of obs to replace is 0 or one the algorithm
+  # does not work.
+  if (length(x) %in% c(0, 1)) {
     return(ori_var)
   }
 
