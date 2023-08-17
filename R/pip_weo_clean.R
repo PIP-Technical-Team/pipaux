@@ -13,8 +13,8 @@ pip_weo_clean <- function(dt,
 
   branch <- match.arg(branch)
 
-#   ____________________________________________________________________________
-#   Computations                                                            ####
+#   _________________________________________
+#   Computations                        ####
   if (!inherits(dt, "data.table")) {
     setDT(dt)
   }
