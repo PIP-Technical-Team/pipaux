@@ -11,8 +11,7 @@ auto_aux_update(
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
-  API_repo_data
+  tag = match.arg(branch)
 )
 }
 \arguments{
@@ -31,8 +30,6 @@ auto_aux_update(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{API_repo_data}{json output from Github (temporary argument)}
 }
 \description{
 Update the measure along with it's dependencies automatically.

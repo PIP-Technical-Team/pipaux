@@ -2,7 +2,6 @@
 #'
 #' @param measure character: measure to be updated, if NULL will update all of them
 #' @inheritParams pip_pop_update
-#' @param API_repo_data json output from Github (temporary argument)
 #' @export
 #'
 auto_aux_update <- function(measure = NULL,
@@ -11,8 +10,8 @@ auto_aux_update <- function(measure = NULL,
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch),
-                            API_repo_data) {
+                            tag     = match.arg(branch)
+                            ) {
 
   branch <- match.arg(branch)
   from <- match.arg(from)
@@ -28,9 +27,9 @@ auto_aux_update <- function(measure = NULL,
   # For testing purpose we are using only two repos
   # aux_repos <- c("PIP-Technical-Team/aux_ppp", "PIP-Technical-Team/aux_pfw")
   # Create URL with test branch
-  #API_url <- glue::glue("https://api.github.com/repos/{aux_repos}/git/trees/{branch}?recursive=1")
+  API_url <- glue::glue("https://api.github.com/repos/{aux_repos}/git/trees/{branch}?recursive=1")
   # Read the data
-  #API_repo_data <- lapply(API_url, jsonlite::fromJSON)
+  API_repo_data <- lapply(API_url, jsonlite::fromJSON)
   # Get the latest hash of the repo
   all_data <- dplyr::tibble(Repo = aux_repos, hash = purrr::map_chr(API_repo_data, `[[`, "sha"), branch = branch)
   if(file_path == "") {
