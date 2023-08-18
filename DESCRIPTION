@@ -52,7 +52,8 @@ Imports:
     lifecycle,
     joyn,
     compiler,
-    dm
+    dm, 
+    jsonlite
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@new_pipeline,
