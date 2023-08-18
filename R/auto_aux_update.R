@@ -2,6 +2,7 @@
 #'
 #' @param measure character: measure to be updated, if NULL will update all of them
 #' @inheritParams pip_pop_update
+#' @param API_repo_data json output from Github (temporary argument)
 #' @export
 #'
 auto_aux_update <- function(measure = NULL,
@@ -10,32 +11,39 @@ auto_aux_update <- function(measure = NULL,
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch)) {
+                            tag     = match.arg(branch),
+                            API_repo_data) {
+
+  branch <- match.arg(branch)
+  from <- match.arg(from)
+  #browser()
   # Get all repositories under PIP-Technical-Team
-  all_repos <- jsonlite::fromJSON("https://api.github.com/users/PIP-Technical-Team/repos")
-  #Keep only those repos that start with "aux_"
-  aux_repos <- all_repos %>%
-    dplyr::filter(grepl("^aux_", name)) %>%
-    dplyr::pull(full_name)
+  # all_repos <- jsonlite::fromJSON("https://api.github.com/users/PIP-Technical-Team/repos")
+  # #Keep only those repos that start with "aux_"
+  # aux_repos <- all_repos %>%
+  #   dplyr::filter(grepl("^aux_", name)) %>%
+  #   dplyr::pull(full_name)
 
   # For testing purpose we are using only two repos
   # aux_repos <- c("PIP-Technical-Team/aux_ppp", "PIP-Technical-Team/aux_pfw")
   # Create URL with test branch
-  API_url <- glue::glue("https://api.github.com/repos/{aux_repos}/git/trees/{branch}?recursive=1")
+  #API_url <- glue::glue("https://api.github.com/repos/{aux_repos}/git/trees/{branch}?recursive=1")
   # Read the data
-  API_repo_data <- lapply(API_url, jsonlite::fromJSON)
+  #API_repo_data <- lapply(API_url, jsonlite::fromJSON)
   # Get the latest hash of the repo
   all_data <- dplyr::tibble(Repo = aux_repos, hash = purrr::map_chr(API_repo_data, `[[`, "sha"))
-  if(!file.exists("git_metadata.csv")) {
+  if(!file.exists("inst/git_metadata.csv")) {
     new_data <- all_data
   } else {
-    old_data <- readr::read_csv("git_metadata.csv") %>%
+    old_data <- readr::read_csv("inst/git_metadata.csv", show_col_types = FALSE) %>%
+      dplyr::filter(branch == branch) %>%
       dplyr::rename(hash_original = hash)
+
     old_data <- old_data %>% dplyr::full_join(all_data, by = c("Repo"))
     new_data <- old_data %>% dplyr::filter(hash != hash_original | is.na(hash_original) | is.na(hash))
   }
   #Write the latest auxiliary file and corresponding hash to csv
-  readr::write_csv(all_data, "git_metadata.csv")
+  readr::write_csv(all_data, "inst/git_metadata.csv")
 
   # Remove everything till the last underscore so
   # PIP-Technical-Team/aux_ppp changes to ppp
