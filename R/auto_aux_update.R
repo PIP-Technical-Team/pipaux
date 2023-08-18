@@ -16,6 +16,7 @@ auto_aux_update <- function(measure = NULL,
 
   branch <- match.arg(branch)
   from <- match.arg(from)
+  file_path <- system.file("extdata", "git_metadata.csv", package = "pipaux")
   #browser()
   # Get all repositories under PIP-Technical-Team
   # all_repos <- jsonlite::fromJSON("https://api.github.com/users/PIP-Technical-Team/repos")
@@ -32,10 +33,10 @@ auto_aux_update <- function(measure = NULL,
   #API_repo_data <- lapply(API_url, jsonlite::fromJSON)
   # Get the latest hash of the repo
   all_data <- dplyr::tibble(Repo = aux_repos, hash = purrr::map_chr(API_repo_data, `[[`, "sha"))
-  if(!file.exists("inst/git_metadata.csv")) {
+  if(file_path == "") {
     new_data <- all_data
   } else {
-    old_data <- readr::read_csv("inst/git_metadata.csv", show_col_types = FALSE) %>%
+    old_data <- readr::read_csv(file_path, show_col_types = FALSE) %>%
       dplyr::filter(branch == branch) %>%
       dplyr::rename(hash_original = hash)
 
@@ -43,7 +44,7 @@ auto_aux_update <- function(measure = NULL,
     new_data <- old_data %>% dplyr::filter(hash != hash_original | is.na(hash_original) | is.na(hash))
   }
   #Write the latest auxiliary file and corresponding hash to csv
-  readr::write_csv(all_data, "inst/git_metadata.csv")
+  readr::write_csv(all_data, file_path)
 
   # Remove everything till the last underscore so
   # PIP-Technical-Team/aux_ppp changes to ppp
