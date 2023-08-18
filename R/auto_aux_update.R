@@ -32,7 +32,7 @@ auto_aux_update <- function(measure = NULL,
   # Read the data
   #API_repo_data <- lapply(API_url, jsonlite::fromJSON)
   # Get the latest hash of the repo
-  all_data <- dplyr::tibble(Repo = aux_repos, hash = purrr::map_chr(API_repo_data, `[[`, "sha"))
+  all_data <- dplyr::tibble(Repo = aux_repos, hash = purrr::map_chr(API_repo_data, `[[`, "sha"), branch = branch)
   if(file_path == "") {
     new_data <- all_data
   } else {
