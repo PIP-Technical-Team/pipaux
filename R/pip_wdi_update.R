@@ -19,14 +19,14 @@ pip_wdi_update <- function(force   = FALSE,
   from   <- match.arg(from)
   branch <- match.arg(branch)
 
-  #   _______________________________________________________________________
-  #   Computations                                                    ####
+  #   ______________________________________________________
+  #   Computations                                    ####
   measure <- "wdi"
   msrdir <- fs::path(maindir, "_aux", measure)
 
 
-  ##  .......................................................................
-  ##  From file                                                         ####
+  ##  ...............................................................
+  ##  From file                                          ####
 
   if (from   %in% c("file", "gh")) {
     wdi <- pipfun::load_from_gh(measure = measure,
