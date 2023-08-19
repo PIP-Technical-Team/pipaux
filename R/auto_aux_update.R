@@ -19,34 +19,19 @@ auto_aux_update <- function(measure = NULL,
                            "git_metadata.csv",
                            package = "pipaux")
 
-  # This should be created as a yml file that is store in the same plaseas
-  # git_metadata.csv
-  dependencies <- list(ppp = "country_list",
-                       pfw = character(),
-                       gdp = c("weo", "maddison", "wdi", "country_list"),
-                       wdi = character(),
-                       weo = c("pop"),
-                       pop = c("country_list", "pfw"),
-                       countries = c("pfw", "country_list"),
-                       metadata = "pfw",
-                       gdm = c("country_list", "pfw"),
-                       regions = c("country_list"),
-                       maddison = character(),
-                       country_list = character(),
-                       pce = c("wdi", "country_list"),
-                       cpi = "country_list",
-                       missing_data = c("country_list", "pce", "gdp", "pop", "pfw")
-  )
+ dependencies_path <- system.file("exdata",
+                             "config.yml",
+                             package = "pipaux")
+
+ dependencies <- config::get(file = dependencies_path)
+ dependencies <- sapply(dependencies, \(x) if(length(x)) strsplit(x, ",\\s+")[[1]] else character())
 
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos",
                       username = owner) |>
     vapply("[[", "", "name") |>
-  #Keep only those repos that start with "aux_"
+    #Keep only those repos that start with "aux_"
     grep("^aux_", x = _, value = TRUE)
-
-  # For testing purpose we are using only two repos
-  # all_repos <- c("aux_ppp", "aux_pfw")
 
   # get hashs
   hash <-
@@ -96,7 +81,7 @@ auto_aux_update <- function(measure = NULL,
   for(aux in aux_fns) {
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
-    list_of_funcs <- paste0("pip_", return_value(aux))
+    list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
     for(fn in list_of_funcs) {
       Sys.sleep(0.01)
       cli::cli_progress_update()
@@ -114,11 +99,11 @@ auto_aux_update <- function(measure = NULL,
 }
 
 
-return_value <- function(aux) {
+return_value <- function(aux, dependencies) {
   val <- dependencies[[aux]]
   if(length(val) > 0) {
     for(i in val) {
-      val <- c(return_value(i), val)
+      val <- c(return_value(i, dependencies), val)
     }
   }
   return(unique(c(val, aux)))
