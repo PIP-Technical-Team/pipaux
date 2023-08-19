@@ -53,16 +53,16 @@ auto_aux_update <- function(measure = NULL,
   } else {
     old_data <- readr::read_csv(file_path,
                                 show_col_types = FALSE) |>
-      dplyr::filter(branch == branch) %>%
+      dplyr::filter(.data$branch == branch) %>%
       dplyr::rename(hash_original = hash)
 
     old_data <- old_data |>
       dplyr::full_join(all_data, by = c("Repo"))
 
     new_data <- old_data %>%
-      dplyr::filter(hash != hash_original |
-                      is.na(hash_original) |
-                      is.na(hash))
+      dplyr::filter(.data$hash != .data$hash_original |
+                      is.na(.data$hash_original) |
+                      is.na(.data$hash))
   }
 
 

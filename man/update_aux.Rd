@@ -28,6 +28,8 @@ update_aux(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{verbose}{logical : Do you want verbose output?}
 }
 \description{
 Update Auxiliary data. Wrapper of measure-specific functions.
