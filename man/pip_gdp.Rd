@@ -8,7 +8,7 @@ pip_gdp(
   action = c("update", "load"),
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  owner = "PIP-Technical-Team",
+  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
   from = "file"
