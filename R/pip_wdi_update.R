@@ -22,8 +22,6 @@ pip_wdi_update <- function(force   = FALSE,
   #   ______________________________________________________
   #   Computations                                    ####
   measure <- "wdi"
-  msrdir <- fs::path(maindir, "_aux", measure)
-
 
   ##  ...............................................................
   ##  From file                                          ####

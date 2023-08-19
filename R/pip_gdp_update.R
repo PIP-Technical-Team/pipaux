@@ -31,10 +31,10 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   #         branch  = branch)
   #
   # # Update WDI
-  pip_wdi_update(maindir = maindir,
-                 from    = from,
-                 force   = force,
-                 branch  = branch)
+  # pip_wdi_update(maindir = maindir,
+  #                from    = from,
+  #                force   = force,
+  #                branch  = branch)
   #
 
 #   ____________________________________________________________________________

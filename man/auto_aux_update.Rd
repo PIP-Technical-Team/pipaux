@@ -15,7 +15,8 @@ auto_aux_update(
 )
 }
 \arguments{
-\item{measure}{character: measure to be updated, if NULL will update all of them}
+\item{measure}{character: measure to be updated, if NULL will update all of
+them}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
