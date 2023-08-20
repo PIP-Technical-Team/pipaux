@@ -1,0 +1,16 @@
+---
+title: "auto-aux-update"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{auto-aux-update}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This is a simple guide to know inner working of `auto_aux_update()` function.
+
+The goal of this function is to automatically update the data from Github to our network drive. Under [PIP-Technical-Team](https://github.com/PIP-Technical-Team) group on github, we have all the aux repositories like `aux_weo` , `aux_pce`, `aux_gdp` etc. This is where the data resides and updates. We already have corresponding functions in `pipaux` package like `pipaux::pip_weo`, `pipaux::pip_pce` and `pipaux::pip_gdp` respectively that does most of the heavy lifting and updates the data from Github to network drive. However, the challenge is each aux repo has some dependencies that is visualized in `data-raw/aux_data_model.R` .
+
+For example, to update data for `weo`, we first need updated data for `pop` and for that we need updated data for `country_list` and `pfw`. Basically what this means is just running `pip_weo` will not work in our case if we want to update `weo` data since `weo` is dependent on other files, we need to make sure they have up-to-date information for `weo` to be updated. So before we run `pip_weo`, we need to run `pip_pop` and before running `pip_pop` we need to run `pip_country_list` and `pip_pfw`. The order of executions of these `pip_.*` functions is important. We cannot run `pip_pop` first and `pip_pfw` later. We have captured this dependencies in a yml file namely `config.yml` .
+
+`auto_aux_update` function first checks if any of the data has changed. It keeps track of data by saving up the most recent hash in `git_metadata.csv` . So if the data has changed the hash which is saved in the csv file will not match up with the most recent hash that we get via Github API so we know the data needs to be updated. Next, through the yml file we find out the dependencies which needs to be updated run those functions. These `pip_.*` functions also check the data signature file present in each network drive folder. If the data has changed the signature would change and so it will update the data. For `weo`, the signature file is present at this path `Y:\PIP-Data_QA\_aux\DEV\weo\weo_datasignature` .
