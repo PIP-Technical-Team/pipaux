@@ -19,7 +19,7 @@ auto_aux_update <- function(measure = NULL,
                            "git_metadata.csv",
                            package = "pipaux")
 
- dependencies_path <- system.file("exdata",
+ dependencies_path <- system.file("extdata",
                              "config.yml",
                              package = "pipaux")
 
