@@ -79,28 +79,20 @@ auto_aux_update <- function(measure = NULL,
     intersect(names(dependencies))
 
   # For each auxiliary data to be updated
-  cli::cli_progress_bar(
-    total = NA,
-    format = "Running {.fn {fn}} for {.fn {aux}}
-    | {cli::pb_bar} {cli::pb_percent}"
-  )
+  cli::cli_alert_info("Updating data for {length(aux_fns)} files.")
   for(aux in aux_fns) {
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
     list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
     for(fn in list_of_funcs) {
-      Sys.sleep(0.01)
-      cli::cli_progress_update()
+      cli::cli_alert_info("Running function {fn} for aux file {aux}.")
       # Run the pip_.* function
       match.fun(fn)(maindir = maindir, branch = branch) |>
         suppressMessages()
     }
   }
-  cli::cli_progress_done()
-
   #Write the latest auxiliary file and corresponding hash to csv
   # Always save at the end.
-
   readr::write_csv(all_data, file_path)
 
 }
