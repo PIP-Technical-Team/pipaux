@@ -54,18 +54,21 @@ auto_aux_update <- function(measure = NULL,
   if(file_path == "") {
     new_data <- all_data
   } else {
-    old_data <- readr::read_csv(file_path,
-                                show_col_types = FALSE) |>
+    org_data <- readr::read_csv(file_path,
+                                show_col_types = FALSE)
+    old_data <- org_data %>%
       dplyr::filter(.data$branch == branch) %>%
       dplyr::rename(hash_original = hash)
 
-    old_data <- old_data |>
-      dplyr::full_join(all_data, by = c("Repo"))
+    old_data <- old_data %>%
+      dplyr::full_join(all_data, by = c("Repo", "branch"))
 
     new_data <- old_data %>%
       dplyr::filter(.data$hash != .data$hash_original |
                       is.na(.data$hash_original) |
                       is.na(.data$hash))
+
+    all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
   }
 
 
@@ -97,6 +100,7 @@ auto_aux_update <- function(measure = NULL,
 
   #Write the latest auxiliary file and corresponding hash to csv
   # Always save at the end.
+
   readr::write_csv(all_data, file_path)
 
 }
