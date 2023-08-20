@@ -33,6 +33,9 @@ auto_aux_update <- function(measure = NULL,
     #Keep only those repos that start with "aux_"
     grep("^aux_", x = _, value = TRUE)
 
+  if(!is.null(measure)) {
+    all_repos <- all_repos[all_repos %in% glue::glue("aux_{measure}")]
+  }
   # get hashs
   hash <-
     purrr::map(all_repos,
