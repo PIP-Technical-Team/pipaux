@@ -1,0 +1,16 @@
+default :
+  ppp : country_list
+  pfw :
+  gdp : weo, maddison, wdi, country_list
+  wdi :
+  weo : pop
+  pop : country_list, pfw
+  countries : pfw, country_list
+  metadata : pfw
+  gdm : country_list, pfw
+  regions : country_list
+  maddison :
+  country_list :
+  pce : wdi, country_list
+  cpi : country_list
+  missing_data : country_list, pce, gdp, pop, pfw
