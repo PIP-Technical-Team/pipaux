@@ -16,7 +16,7 @@ auto_aux_update <- function(measure = NULL,
   branch    <- match.arg(branch)
   from      <- match.arg(from)
 
-  org_data <- readr::read_csv("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/git_metadata.csv", col_types = FALSE)
+  org_data <- readr::read_csv("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/git_metadata.csv", show_col_types = FALSE)
 
   dependencies <- yaml::read_yaml("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/dependency.yml")
 
@@ -47,23 +47,21 @@ auto_aux_update <- function(measure = NULL,
   all_data <- dplyr::tibble(Repo = glue::glue("{owner}/{all_repos}"),
                             hash = hash,
                             branch = branch)
-  if(file_path == "") {
-    new_data <- all_data
-  } else {
-    old_data <- org_data %>%
-      dplyr::filter(.data$branch == branch) %>%
-      dplyr::rename(hash_original = hash)
 
-    old_data <- old_data %>%
-      dplyr::full_join(all_data, by = c("Repo", "branch"))
+  old_data <- org_data %>%
+    dplyr::filter(.data$branch == branch) %>%
+    dplyr::rename(hash_original = hash)
 
-    new_data <- old_data %>%
-      dplyr::filter(.data$hash != .data$hash_original |
-                      is.na(.data$hash_original) |
-                      is.na(.data$hash))
+  old_data <- old_data %>%
+    dplyr::full_join(all_data, by = c("Repo", "branch"))
 
-    all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
-  }
+  new_data <- old_data %>%
+    dplyr::filter(.data$hash != .data$hash_original |
+                    is.na(.data$hash_original) |
+                    is.na(.data$hash))
+
+  all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
+
 
 
   # Remove everything till the last underscore so
@@ -89,18 +87,17 @@ auto_aux_update <- function(measure = NULL,
   # Always save at the end.
   # sha - hash object of current csv file in Data/git_metadata.csv
   # content - base64 of changed data
-  out <- gh("GET /repos/{owner}/{repo}/contents/{file_path}",
+  out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
             owner = "PIP-Technical-Team", repo = "pipaux", file_path = "Data/git_metadata.csv",
             .params = list(ref = "metadata"))
 
-  body <- list(message = "updating csv file",
-               sha =  out$sha,
-               content = b64_string <- base64enc::base64encode(serialize(all_data, NULL)))
+  res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}", owner = "PIP-Technical-Team",
+     repo = "pipaux", path = "Data/git_metadata.csv",
+     .params = list(branch = "metadata", message = "updating csv file",
+                    sha = out$sha,content = convert_df_to_base64(all_data)),
+      .token = Sys.getenv("GITHUB_PAT"))
 
-  gh("PUT /repos/{owner}/{repo}/contents/{path}", owner = "PIP-Technical-Team",
-     repo = "auto_update_aux_dashboard", path = "Data/git_metadata.csv",
-     charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE)),
-     .params = list(ref = "metadata"))
+  message("File updated succesfully!!")
 
 }
 
@@ -113,4 +110,13 @@ return_value <- function(aux, dependencies) {
     }
   }
   return(unique(c(val, aux)))
+}
+
+convert_df_to_base64 <- function(df) {
+  df |>
+    write.table(quote = FALSE, row.names = FALSE, sep=",") |>
+    capture.output() |>
+    paste(collapse="\n") |>
+    charToRaw() |>
+    base64enc::base64encode()
 }
