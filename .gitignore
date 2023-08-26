@@ -8,3 +8,4 @@ docs
 tmp/
 renv/
 /sessionInfoLog
+.DS_Store

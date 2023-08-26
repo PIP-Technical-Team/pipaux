@@ -15,16 +15,12 @@ auto_aux_update <- function(measure = NULL,
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
-  file_path <- system.file("extdata",
-                           "git_metadata.csv",
-                           package = "pipaux")
 
- dependencies_path <- system.file("extdata",
-                             "config.yml",
-                             package = "pipaux")
+  org_data <- readr::read_csv("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/git_metadata.csv", col_types = FALSE)
 
- dependencies <- config::get(file = dependencies_path)
- dependencies <- sapply(dependencies, \(x) if(length(x)) strsplit(x, ",\\s+")[[1]] else character())
+  dependencies <- yaml::read_yaml("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/dependency.yml")
+
+  dependencies <- sapply(dependencies, \(x) if(length(x)) strsplit(x, ",\\s+")[[1]] else character())
 
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos",
@@ -54,8 +50,6 @@ auto_aux_update <- function(measure = NULL,
   if(file_path == "") {
     new_data <- all_data
   } else {
-    org_data <- readr::read_csv(file_path,
-                                show_col_types = FALSE)
     old_data <- org_data %>%
       dplyr::filter(.data$branch == branch) %>%
       dplyr::rename(hash_original = hash)
@@ -93,7 +87,20 @@ auto_aux_update <- function(measure = NULL,
   }
   #Write the latest auxiliary file and corresponding hash to csv
   # Always save at the end.
-  readr::write_csv(all_data, file_path)
+  # sha - hash object of current csv file in Data/git_metadata.csv
+  # content - base64 of changed data
+  out <- gh("GET /repos/{owner}/{repo}/contents/{file_path}",
+            owner = "PIP-Technical-Team", repo = "pipaux", file_path = "Data/git_metadata.csv",
+            .params = list(ref = "metadata"))
+
+  body <- list(message = "updating csv file",
+               sha =  out$sha,
+               content = b64_string <- base64enc::base64encode(serialize(all_data, NULL)))
+
+  gh("PUT /repos/{owner}/{repo}/contents/{path}", owner = "PIP-Technical-Team",
+     repo = "auto_update_aux_dashboard", path = "Data/git_metadata.csv",
+     charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE)),
+     .params = list(ref = "metadata"))
 
 }
 
