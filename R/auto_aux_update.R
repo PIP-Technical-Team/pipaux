@@ -15,6 +15,8 @@ auto_aux_update <- function(measure = NULL,
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
+  assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
+                          msg = "Enviroment variable `GITHUB_PAT` is empty. Please set it up using Sys.setenv(GITHUB_PAT = 'code')")
   gh_user   <- "https://raw.githubusercontent.com"
   org_data  <- paste(gh_user,
                      owner,
@@ -64,7 +66,7 @@ auto_aux_update <- function(measure = NULL,
     dplyr::rename(hash_original = hash)
 
   old_data <- old_data %>%
-    dplyr::full_join(all_data, by = c("Repo", "branch"))
+    dplyr::inner_join(all_data, by = c("Repo", "branch"))
 
   new_data <- old_data %>%
     dplyr::filter(.data$hash != .data$hash_original |
