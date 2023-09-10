@@ -15,12 +15,23 @@ auto_aux_update <- function(measure = NULL,
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
+  gh_user   <- "https://raw.githubusercontent.com"
+  org_data  <- paste(gh_user,
+                     owner,
+                     "pipaux/metadata/Data/git_metadata.csv",
+                     sep = "/"
+                     )  |>
+    readr::read_csv(show_col_types = FALSE)
 
-  org_data <- readr::read_csv("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/git_metadata.csv", show_col_types = FALSE)
 
-  dependencies <- yaml::read_yaml("https://raw.githubusercontent.com/PIP-Technical-Team/pipaux/metadata/Data/dependency.yml")
+  dependencies <- paste(gh_user,
+                        owner,
+                        "pipaux/metadata/Data/dependency.yml",
+                        sep = "/"
+                        ) |>
+    yaml::read_yaml()
 
-  dependencies <- sapply(dependencies, \(x) if(length(x)) strsplit(x, ",\\s+")[[1]] else character())
+  dependencies <- sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
 
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos",
@@ -83,21 +94,30 @@ auto_aux_update <- function(measure = NULL,
         suppressMessages()
     }
   }
-  #Write the latest auxiliary file and corresponding hash to csv
+
+  # Write the latest auxiliary file and corresponding hash to csv
   # Always save at the end.
   # sha - hash object of current csv file in Data/git_metadata.csv
   # content - base64 of changed data
   out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
-            owner = "PIP-Technical-Team", repo = "pipaux", file_path = "Data/git_metadata.csv",
-            .params = list(ref = "metadata"))
+            owner     = "PIP-Technical-Team",
+            repo      = "pipaux",
+            file_path = "Data/git_metadata.csv",
+            .params   = list(ref = "metadata"))
 
-  res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}", owner = "PIP-Technical-Team",
-     repo = "pipaux", path = "Data/git_metadata.csv",
-     .params = list(branch = "metadata", message = "updating csv file",
-                    sha = out$sha,content = convert_df_to_base64(all_data)),
-      .token = Sys.getenv("GITHUB_PAT"))
+  res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}",
+                owner   = "PIP-Technical-Team",
+                repo    = "pipaux",
+                path    = "Data/git_metadata.csv",
+                .params = list(branch  = "metadata",
+                               message = "updating csv file",
+                               sha     = out$sha, # why does the sha remain the same?
+                               content = convert_df_to_base64(all_data)
+                               ),
+                .token = Sys.getenv("GITHUB_PAT")
+                )
 
-  message("File updated succesfully!!")
+  cli::cli_alert("File updated succesfully!!")
 
 }
 
