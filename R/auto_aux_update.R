@@ -34,7 +34,6 @@ auto_aux_update <- function(measure = NULL,
     yaml::read_yaml()
 
   dependencies <- sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
-
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos",
                       username = owner) |>
@@ -119,8 +118,9 @@ auto_aux_update <- function(measure = NULL,
                 .token = Sys.getenv("GITHUB_PAT")
                 )
 
-  cli::cli_alert("File updated succesfully!!")
-
+  cli::cli_h2("File updated status.")
+  out <- aux_file_last_updated(names(dependencies), branch)
+  knitr::kable(out)
 }
 
 
@@ -141,4 +141,13 @@ convert_df_to_base64 <- function(df) {
     paste(collapse="\n") |>
     charToRaw() |>
     base64enc::base64encode()
+}
+
+aux_file_last_updated <- function(aux_files, branch) {
+  filenames <- glue::glue("{gls$PIP_DATA_DIR}/_aux/{branch}/{aux_files}/{aux_files}.qs")
+  data <- sapply(filenames, function(x) qs::qattributes(x)$datetime)
+  data.frame(filename = basename(names(data)),
+             time_last_update = as.POSIXct(data, format = "%Y%m%d%H%M%S"), row.names = NULL) |>
+    dplyr::arrange(desc(time_last_update))
+
 }
