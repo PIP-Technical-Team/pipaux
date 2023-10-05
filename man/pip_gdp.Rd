@@ -9,7 +9,8 @@ pip_gdp(
   maddison_action = "load",
   weo_action = "load",
   force = FALSE,
-  maindir = gls$PIP_DATA_DIR
+  maindir = gls$PIP_DATA_DIR,
+  sna_branch = c("main", "dev")
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ pip_gdp(
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{maindir}{character: Main directory of project.}
+
+\item{sna_branch}{character: release branch of pip-sna file needed. Default is "main"}
 }
 \description{
 Update or load GDP data.

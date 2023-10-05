@@ -46,4 +46,20 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir = msrdir,
     force = force
   )
+
+  vars        <- c("ppp_year", "release_version", "adaptation_version")
+  ppp_vintage <- unique(ppp[, ..vars], by = vars)
+
+  data.table::setnames(x = ppp_vintage,
+                       old = c("release_version", "adaptation_version"),
+                       new = c("ppp_rv", "ppp_av"))
+  # Save
+  pip_sign_save(
+    x = ppp_vintage,
+    measure = "ppp_vintage",
+    msrdir = msrdir,
+    force = force
+  )
+
+
 }

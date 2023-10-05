@@ -17,17 +17,18 @@ pip_metadata <- function(action = "update",
     pfw <- data.table::setDT(pfw)
 
     # Pick the latest metadata file
-    files <- list.files(fs::path(maindir, "_aux/metadata/"),
-      pattern = "metadata_to_update",
-      full.names = TRUE
+    metadata_dir <- fs::path(maindir, "_aux/metadata/")
+
+    u <- "https://github.com/PIP-Technical-Team/pip-metadata/raw/main/pip_metadata.csv"
+    df <- suppressMessages(
+      readr::read_csv(u)
     )
-    path <- sort(files, decreasing = TRUE)[1]
-    df <- readxl::read_xlsx(path)
+
 
     # Create distribution type column (data type)
     domain_check <- with(pfw, (gdp_domain == 2 | pce_domain == 2 |
-                                 pop_domain == 2 | cpi_domain == 2 |
-                                 ppp_domain == 2))
+                               pop_domain == 2 | cpi_domain == 2 |
+                               ppp_domain == 2))
     pfw$distribution_type <- ifelse(pfw$use_microdata == 1,
                                     "micro", NA_character_)
     pfw$distribution_type <- ifelse(pfw$use_imputed == 1,
@@ -96,7 +97,9 @@ pip_metadata <- function(action = "update",
       # Write files
       time <- format(Sys.time(), "%Y%m%d%H%M%S")
       saveRDS(df, fs::path(maindir, "_aux/metadata/metadata.rds"))
-      saveRDS(df, sprintf("%s_aux/metadata/_vintage/metadata_%s.rds", maindir, time))
+
+      vint_file <- paste0("metadata_", time)
+      saveRDS(df, fs::path(maindir, "_aux/metadata/_vintage", vint_file, ext = "rds"))
       readr::write_lines(hash, file = fs::path(maindir, "_aux/metadata/metadata_datasignature.txt"))
 
       # Print msg
@@ -125,3 +128,4 @@ pip_metadata <- function(action = "update",
     )
   }
 }
+

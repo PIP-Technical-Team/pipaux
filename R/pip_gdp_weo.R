@@ -22,14 +22,8 @@ pip_gdp_weo <- function(action = "update",
     # ---- Load data from disk ----
 
     # Get latest version of file (in case there are more)
-    dir <- sprintf("%s_aux/weo/", maindir)
-    weo_files <- list.files(dir, pattern = "WEO_.*[.]xls")
-    weo_latest <- weo_files %>%
-      gsub("WEO_|.xls", "", .) %>%
-      as.POSIXlt() %>%
-      max() %>%
-      as.character() %>%
-      sprintf("%s_aux/weo/WEO_%s.xls", maindir, .)
+    weo_files <- fs::dir_ls(msrdir, regexp = "WEO_.*[.]xls")
+    weo_latest <- max(weo_files)
 
     # Read data
     dt <- readxl::read_xls(
@@ -45,8 +39,7 @@ pip_gdp_weo <- function(action = "update",
     # ---- Data transformations ----
 
     # Select rows w/ data on real gdp per capita
-    dt <- dt[weo_subject_code %in%
-      c("NGDPRPC", "NGDPRPPPPC", "NGDP_R")]
+    dt <- dt[weo_subject_code %in% c("NGDPRPC", "NGDPRPPPPC")]
 
     # Fix country codes
     dt[
@@ -67,8 +60,7 @@ pip_gdp_weo <- function(action = "update",
       ,
       subject_code := fcase(
         weo_subject_code == "NGDPRPC", "weo_gdp_lcu",
-        weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017",
-        weo_subject_code == "NGDP_R", "weo_gdp_lcu_notpc"
+        weo_subject_code == "NGDPRPPPPC", "weo_gdp_ppp2017"
       )
     ]
 
@@ -110,15 +102,6 @@ pip_gdp_weo <- function(action = "update",
         pop = i.pop
       )
     ]
-
-    # Calculate per capita value for NGDP_R
-    dt[
-      ,
-      weo_gdp_lcu := fifelse(
-        is.na(weo_gdp_lcu), weo_gdp_lcu_notpc / pop, weo_gdp_lcu
-      )
-    ]
-
 
     # ---- Chain PPP and LCU GDP columns ----
 

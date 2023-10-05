@@ -11,7 +11,7 @@ pip_pop_update <-  function(force   = FALSE,
                             src     = c("emi", "wdi"),
                             maindir = gls$PIP_DATA_DIR) {
 
-    cl <- pip_country_list("load", maindir = maindir)
+  cl <- pip_country_list("load", maindir = maindir)
 
   # Check arguments
   src <- match.arg(src)
@@ -20,9 +20,9 @@ pip_pop_update <-  function(force   = FALSE,
   measure <- "pop"
   msrdir  <- fs::path(maindir, "_aux/", measure)
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# From WDI   ---------
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # From WDI   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   if (src == "wdi") {
     pop <- purrr::map_df(codes, ~ {
@@ -54,30 +54,30 @@ pip_pop_update <-  function(force   = FALSE,
     # Load main data file from Emi
 
     # compare data between PCN and PIP
-    pcn_pop_dir <- "P:/01.PovcalNet/03.QA/03.Population/data/"
-
-    if (dir.exists(pcn_pop_dir)) {
-      pcn_pop_files   <- list.files(pcn_pop_dir,
-                                    pattern = "population.*\\.xlsx")
-    } else {
-      pcn_pop_files <- NULL
-    }
+    # pcn_pop_dir <- "P:/01.PovcalNet/03.QA/03.Population/data/"
+    #
+    # if (dir.exists(pcn_pop_dir)) {
+    #   pcn_pop_files   <- list.files(pcn_pop_dir,
+    #                                 pattern = "population.*\\.xlsx")
+    # } else {
+    #   pcn_pop_files <- NULL
+    # }
 
     pip_pop_dir   <- fs::path(msrdir, "raw_data/")
     pip_pop_files <- list.files(pip_pop_dir)
 
-    miss_pop_files <- pcn_pop_files[!(pcn_pop_files %in% pip_pop_files)]
+    # miss_pop_files <- pcn_pop_files[!(pcn_pop_files %in% pip_pop_files)]
 
-    if (length(miss_pop_files) != 0) {
-
-      cli::cli_process_start("Copying POP files from PCN folder to PIP folder")
-
-      file.copy(from      = paste0(pcn_pop_dir, miss_pop_files),
-                to        = paste0(pip_pop_dir, miss_pop_files),
-                overwrite = FALSE)
-
-      cli::cli_process_done()
-    }
+    # if (length(miss_pop_files) != 0) {
+    #
+    #   cli::cli_process_start("Copying POP files from PCN folder to PIP folder")
+    #
+    #   file.copy(from      = paste0(pcn_pop_dir, miss_pop_files),
+    #             to        = paste0(pip_pop_dir, miss_pop_files),
+    #             overwrite = FALSE)
+    #
+    #   cli::cli_process_done()
+    # }
 
     # find only population_country files
     pip_pop_files <- list.files(pip_pop_dir,
@@ -112,7 +112,7 @@ pip_pop_update <-  function(force   = FALSE,
         variable.name = "Year",
         value.name = "Population"
       )
-    pop_long$Year <- as.character(pop_long$Year)
+    pop_long$Year <- as.numeric(as.character(pop_long$Year))
     pop_long$Population <- as.numeric(pop_long$Population)
 
     # Merge with special country data
@@ -123,31 +123,34 @@ pip_pop_update <-  function(force   = FALSE,
     # just calling the version we received. Should we receive a new version,
     # the import line below should be updated to reflect the accurate file.
 
-    # Load data
-    pop_special_file <-
-      list.files(pip_pop_dir,
-                 pattern = "population_missing.*\\.xlsx") %>%
-      gsub("population_missing_|.xlsx", "", .) %>%
-      as.POSIXlt() %>%
-      max() %>%
-      as.character() %>%
-      sprintf("population_missing_%s.xlsx", .)
+    # # Load data
+    # pop_special_file <-
+    #   list.files(pip_pop_dir,
+    #              pattern = "population_missing.*\\.xlsx") %>%
+    #   gsub("population_missing_|.xlsx", "", .) %>%
+    #   as.POSIXlt() %>%
+    #   max() %>%
+    #   as.character() %>%
+    #   sprintf("population_missing_%s.xlsx", .)
+    #
+    # pop_special_path        <- fs::path(pip_pop_dir, pop_special_file)
+    # pop_special             <- suppressMessages(readxl::read_xlsx(pop_special_path,
+    #                                                               sheet = "Long")
+    #                                             )
+    # pop_special             <- pop_special[c("Country", "Series", "Time", "Data")]
+    # names(pop_special)[3:4] <- c("Year", "Population")
+    # pop_special$Year        <- sub("YR", "", pop_special$Year)
+    #
+    # # Merge datasets
+    # pop_merge      <- rbind(pop_long, pop_special)
+    # pop_merge$Year <- as.numeric(pop_merge$Year)
+    # data.table::setDT(pop_merge)
+    #
+    # pop <- pop_merge
 
-    pop_special_path        <- fs::path(pip_pop_dir, pop_special_file)
-    pop_special             <- suppressMessages(readxl::read_xlsx(pop_special_path,
-                                                                  sheet = "Long")
-                                                )
-    pop_special             <- pop_special[c("Country", "Series", "Time", "Data")]
-    names(pop_special)[3:4] <- c("Year", "Population")
-    pop_special$Year        <- sub("YR", "", pop_special$Year)
-
-    # Merge datasets
-    pop_merge      <- rbind(pop_long, pop_special)
-    pop_merge$Year <- as.numeric(pop_merge$Year)
-    data.table::setDT(pop_merge)
-
+    pop <- pop_long
     # Create data_level column
-    pop_merge[
+    pop[
       ,
       pop_data_level :=
         fcase(
@@ -159,21 +162,21 @@ pip_pop_update <-  function(force   = FALSE,
 
     # Set colnames
     setnames(
-      pop_merge,
+      pop,
       old = c("Country", "Year", "Population"),
       new = c("country_code", "year", "pop")
     )
-    pop_merge$Series <- NULL
-    pop <- pop_merge
+    pop$Series <- NULL
 
     # Remove years prior to 1960
     pop <- pop[year >= 1960]
 
     # Remove years after 2020
-    pop <- pop[year <= 2020]
+    #pop <- pop[year <= 2020]
 
     # Remove rows w/ missing pop values
     pop <- pop[!is.na(pop)]
+
   } else {
     msg <- paste("src `", src, "` is not a valid source.")
     rlang::abort(c(
@@ -214,13 +217,13 @@ pip_pop_update <-  function(force   = FALSE,
     )
   ]
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Save data   ---------
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Save data   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # Remove any non-WDI countries
-  cl <- pip_country_list("load", maindir = maindir)
-  setDT(cl)
+  # cl <- pip_country_list("load", maindir = maindir)
+  # setDT(cl)
   pop <- pop[country_code %in% cl$country_code]
 
   pip_sign_save(x       = pop,

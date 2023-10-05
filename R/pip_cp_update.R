@@ -52,9 +52,13 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
           default = ""
         )
       )]
+      x$reporting_level <- ifelse(x$survey_coverage == "", "national",
+                                  x$survey_coverage)
     }
     return(x)
   })
+
+
   names(dl) <- gsub(".*indicator_values_country_|[.]csv", "", files)
 
   # Create list of key indicators datasets
@@ -62,18 +66,37 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     all = TRUE,
     by = c("country_code", "reporting_year")
   )
+
   key_indicators <- merge(key_indicators,
     dl$chart5[, c("country_code", "reporting_year", "mpm_headcount")],
     all = TRUE,
     by = c("country_code", "reporting_year")
   )
+
   key_indicators <- list(
-    headcount_national = key_indicators[, c("country_code", "reporting_year", "headcount_national")],
-    mpm_headcount = key_indicators[, c("country_code", "reporting_year", "mpm_headcount")],
-    reporting_pop = key_indicators[, c("country_code", "reporting_year", "reporting_pop")],
-    gni = key_indicators[, c("country_code", "reporting_year", "gni")],
-    gdp_growth = key_indicators[, c("country_code", "reporting_year", "gdp_growth")]
+    headcount_national = key_indicators[,
+                                        c("country_code",
+                                          "reporting_year",
+                                          "headcount_national")],
+    mpm_headcount = key_indicators[,
+                                   c("country_code",
+                                     "reporting_year",
+                                     "mpm_headcount")],
+
+    reporting_pop = key_indicators[,
+                                   c("country_code",
+                                     "reporting_year",
+                                     "reporting_pop")],
+
+    gni = key_indicators[, c("country_code",
+                             "reporting_year",
+                             "gni")],
+
+    gdp_growth = key_indicators[, c("country_code",
+                                    "reporting_year",
+                                    "gdp_growth")]
   )
+
   key_indicators[1:3] <- lapply(key_indicators[1:3], function(x) {
     x <- x %>%
       dplyr::filter(!is.na(x[, 3])) %>%
@@ -82,6 +105,7 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
       dplyr::ungroup() %>%
       data.table::as.data.table()
   })
+
   key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
     x <- x %>%
       dplyr::filter(!is.na(x[, 3])) %>%
@@ -101,6 +125,7 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     "country_code", "year_range",
     "distribution", "shared_prosperity"
   )]
+
   ki4$year1 <- sapply(strsplit(ki4$year_range, "-"), function(x) x[[1]])
   ki4$year2 <- sapply(strsplit(ki4$year_range, "-"), function(x) x[[2]])
   ki4 <- ki4 %>%
@@ -129,17 +154,18 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
         "country_code", "reporting_year",
         "survey_acronym", "welfare_type",
         "survey_comparability", "comparable_spell",
-        "gini", "theil"
+        "gini", "theil", "reporting_level"
       )],
     ineq_bar =
       dl$chart4[, c(
         "country_code", "reporting_year", "welfare_type",
         "survey_coverage", "gender", "agegroup", "education",
-        "distribution", "poverty_share_by_group"
+        "distribution", "poverty_share_by_group", "reporting_level"
       )],
     mpm =
       dl$chart5[, c(
-        "country_code", "reporting_year",
+        "country_code",
+        "reporting_year",
         "welfare_type",
         "mpm_education_attainment",
         "mpm_education_enrollment",
@@ -177,7 +203,7 @@ pip_cp_update <- function(force = FALSE, maindir = gls$PIP_DATA_DIR) {
     # Write files
     time <- format(Sys.time(), "%Y%m%d%H%M%S")
     saveRDS(cp, fs::path(maindir, "_aux/cp/cp.rds"))
-    saveRDS(cp, sprintf("%s_aux/cp/_vintage/cp_%s.rds", maindir, time))
+    saveRDS(cp, fs::path(maindir, "_aux/cp/_vintage", paste0("cp_", time), ext = "rds"))
     readr::write_lines(hash, file = fs::path(maindir, "_aux/cp/_datasignature.txt"))
 
     # Print msg
