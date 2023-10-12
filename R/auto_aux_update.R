@@ -112,7 +112,7 @@ auto_aux_update <- function(measure = NULL,
                 )
 
   cli::cli_h2("File updated status.")
-  out <- aux_file_last_updated(names(dependencies), branch)
+  out <- aux_file_last_updated(gls$PIP_DATA_DIR, names(dependencies), branch)
   knitr::kable(out)
 }
 
@@ -136,8 +136,8 @@ convert_df_to_base64 <- function(df) {
     base64enc::base64encode()
 }
 
-aux_file_last_updated <- function(aux_files, branch) {
-  filenames <- glue::glue("{gls$PIP_DATA_DIR}/_aux/{branch}/{aux_files}/{aux_files}.qs")
+aux_file_last_updated <- function(data_dir, aux_files, branch) {
+  filenames <- glue::glue("{data_dir}/_aux/{branch}/{aux_files}/{aux_files}.qs")
   data <- sapply(filenames, function(x) qs::qattributes(x)$datetime)
   data.frame(filename = basename(names(data)),
              time_last_update = as.POSIXct(data, format = "%Y%m%d%H%M%S"), row.names = NULL) |>
