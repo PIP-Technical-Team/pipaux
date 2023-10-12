@@ -112,7 +112,7 @@ auto_aux_update <- function(measure = NULL,
                 )
 
   cli::cli_h2("File updated status.")
-  out <- aux_file_last_updated(gls$PIP_DATA_DIR, names(dependencies), branch)
+  out <- aux_file_last_updated(maindir, names(dependencies), branch)
   knitr::kable(out)
 }
 
