@@ -26,14 +26,7 @@ auto_aux_update <- function(measure = NULL,
     readr::read_csv(show_col_types = FALSE)
 
 
-  dependencies <- paste(gh_user,
-                        owner,
-                        "pipaux/metadata/Data/dependency.yml",
-                        sep = "/"
-                        ) |>
-    yaml::read_yaml()
-
-  dependencies <- sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
+  dependencies <- read_dependencies(gh_user, owner)
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos",
                       username = owner) |>
@@ -150,4 +143,16 @@ aux_file_last_updated <- function(aux_files, branch) {
              time_last_update = as.POSIXct(data, format = "%Y%m%d%H%M%S"), row.names = NULL) |>
     dplyr::arrange(desc(time_last_update))
 
+}
+
+
+read_dependencies <- function(gh_user, owner) {
+  dependencies <- paste(gh_user,
+                        owner,
+                        "pipaux/metadata/Data/dependency.yml",
+                        sep = "/"
+  ) |>
+    yaml::read_yaml()
+
+  sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
 }
