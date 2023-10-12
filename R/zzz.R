@@ -7,7 +7,6 @@ pipuax_default_options <- list(
   pipaux.popsrc  = "emi",
   pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
   # pipaux.maindir = gls$PIP_DATA_DIR,
-  pipaux.maindir = pipfun::pip_create_globals()$PIP_DATA_DIR,
   pipfun.ghowner = "PIP-Technical-Team",
   joyn.verbose   = FALSE,
   pipfun.verbose = TRUE
