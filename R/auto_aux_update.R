@@ -15,6 +15,17 @@ auto_aux_update <- function(measure = NULL,
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
+
+  isgls <- ls(sys.frame(), pattern = "^gls$") |>
+    length() > 0
+
+  if (isFALSE(isgls)) {
+    cli::cli_abort("object {.var gls} is not available in Globel env.
+                  Run {.code gls <- pipfun::pip_create_globals()} first",
+                   wrap = TRUE)
+  }
+
+
   assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
                           msg = "Enviroment variable `GITHUB_PAT` is empty. Please set it up using Sys.setenv(GITHUB_PAT = 'code')")
   gh_user   <- "https://raw.githubusercontent.com"
