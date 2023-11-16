@@ -16,8 +16,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   measure <- "gdp"
 
 
-#   ____________________________________________________________________________
-#   Update data                                                             ####
+#   _________________________________________
+#   Update data                                 ####
 
   # # Update Maddison Project Data
   # pip_maddison(force   = force,

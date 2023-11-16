@@ -13,14 +13,13 @@ pip_gdm_update <- function(force = FALSE,
   measure <- "gdm"
   branch <- match.arg(branch)
 
-#   ____________________________________________________________________________
-#   Load raw file                                                  ####
+#   _________________________________________________________
+#   Load raw file                               ####
 
   df <- pipfun::load_from_gh(measure = "gdm",
                      owner = owner,
                      branch = branch,
-                     tag = tag,
-                     ext = "xlsx")
+                     tag = tag)
 
 
 #   ____________________________________________________________________________

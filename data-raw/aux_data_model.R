@@ -93,8 +93,8 @@ spop <- pipfun::load_from_gh(
   filename = "spop",
   owner  = owner,
   branch = branch)  |>
-  clean_names_from_wide() |>
-  clean_from_wide()
+  pipaux:::clean_names_from_wide() |>
+  pipaux:::clean_from_wide()
 
 
 
@@ -302,14 +302,16 @@ aux_data_model <-
 #     Draw                 ---------
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 aux_data_model |>
-  dm_select_tbl(!starts_with("cp_")) |>
-  dm_draw()
+  dm::dm_select_tbl(!starts_with("cp_")) |>
+  dm::dm_draw()
 
 aux_data_model |>
-  dm_draw(view_type = "title_only")
+  dm::dm_draw(view_type = "title_only")
 
 
-
+aux_data_model |>
+  dm::dm_select_tbl(!matches("^cp_")) |>
+  dm::dm_draw()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # save   ---------
