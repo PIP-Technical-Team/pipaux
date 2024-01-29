@@ -9,7 +9,9 @@ pipuax_default_options <- list(
   pipaux.maindir = gls$PIP_DATA_DIR,
   pipfun.ghowner = "PIP-Technical-Team",
   joyn.verbose   = FALSE,
-  pipfun.verbose = TRUE
+  pipfun.verbose = TRUE,
+  pipaux.detail.raw = FALSE,
+  pipaux.detail.output = FALSE
 
 )
 
