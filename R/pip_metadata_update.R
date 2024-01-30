@@ -1,7 +1,7 @@
 #' Update metadata file
 #'
 #' @inheritParams pipfun::load_from_gh
-#'
+#' @inheritParams pip_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
 pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,

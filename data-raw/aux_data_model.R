@@ -11,7 +11,7 @@
 
 library(dm)
 library(pipaux)
-
+library(dplyr)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Get all auxiliary data   ---------

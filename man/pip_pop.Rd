@@ -21,6 +21,8 @@ memory.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
+\item{from}{character: Source for population data.}
+
 \item{maindir}{character: Main directory of project.}
 
 \item{owner}{character: Github repo owner. Default is
@@ -30,8 +32,6 @@ memory.}
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{src}{character: Source for population data. Defaults to \code{getOption("pipaux.popsrc")}.}
 }
 \description{
 Load or update population data.
