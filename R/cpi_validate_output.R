@@ -72,9 +72,4 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                                    provider = "outlook")
       )
   }
-
-
-
-
-
 }
