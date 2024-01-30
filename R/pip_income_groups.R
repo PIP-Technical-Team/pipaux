@@ -58,17 +58,21 @@ pip_income_groups <- function(action       = c("update", "load"),
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
 
-    pipfun::pip_sign_save(
+    saved <- pipfun::pip_sign_save(
       x = ig,
       measure = measure,
       msrdir = msrdir,
       force = force
     )
-  } else {
-    df <- load_aux(
+    return(invisible(saved))
+
+  } else  {
+
+    load_aux(
       maindir = maindir,
-      measure = measure
+      measure = measure,
+      branch  = branch
     )
-    return(df)
+
   }
 }
