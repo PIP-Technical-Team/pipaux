@@ -51,8 +51,9 @@ Imports:
     pipfun (>= 0.0.0.9007),
     lifecycle,
     joyn,
-    dm, 
-    config
+    dm,
+    config,
+    collapse
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@new_pipeline,
