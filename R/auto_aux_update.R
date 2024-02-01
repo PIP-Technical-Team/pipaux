@@ -99,31 +99,38 @@ auto_aux_update <- function(measure = NULL,
         suppressMessages()
     }
   }
-
-  # Write the latest auxiliary file and corresponding hash to csv
-  # Always save at the end.
-  # sha - hash object of current csv file in Data/git_metadata.csv
-  # content - base64 of changed data
-  out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
-            owner     = "PIP-Technical-Team",
-            repo      = "pipaux",
-            file_path = "Data/git_metadata.csv",
-            .params   = list(ref = "metadata"))
-
-  res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}",
-                owner   = "PIP-Technical-Team",
-                repo    = "pipaux",
-                path    = "Data/git_metadata.csv",
-                .params = list(branch  = "metadata",
-                               message = "updating csv file",
-                               sha     = out$sha, # why does the sha remain the same?
-                               content = convert_df_to_base64(all_data)
-                               ),
-                .token = Sys.getenv("GITHUB_PAT")
-                )
-
-  cli::cli_h2("File updated status.")
   out <- aux_file_last_updated(maindir, names(dependencies), branch)
+  if(length(aux_fns) > 0) {
+    # Check if the file has updated, only then update the metadata file
+    # If the files that we wanted to updated were updated today only then write the file
+    temp_dat <- out |>
+        dplyr::filter(filename %in% paste0(aux_fns, ".qs")) |>
+        dplyr::filter(as.Date(time_last_update) == Sys.Date())
+    if(nrow(temp_dat) > 0) {
+    # Write the latest auxiliary file and corresponding hash to csv
+    # Always save at the end.
+    # sha - hash object of current csv file in Data/git_metadata.csv
+    # content - base64 of changed data
+      out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
+                owner     = "PIP-Technical-Team",
+                repo      = "pipaux",
+                file_path = "Data/git_metadata.csv",
+                .params   = list(ref = "metadata"))
+
+      res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}",
+                    owner   = "PIP-Technical-Team",
+                    repo    = "pipaux",
+                    path    = "Data/git_metadata.csv",
+                    .params = list(branch  = "metadata",
+                                   message = "updating csv file",
+                                   sha     = out$sha, # why does the sha remain the same?
+                                   content = convert_df_to_base64(all_data)
+                                   ),
+                    .token = Sys.getenv("GITHUB_PAT")
+                    )
+    }
+  }
+  cli::cli_h2("File updated status.")
   knitr::kable(out)
 }
 
