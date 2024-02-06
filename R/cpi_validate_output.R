@@ -3,7 +3,6 @@
 #' @param cpi clean cpi data, output via `pipfun::pip_cpi_clean`
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
-#' @import blastula
 #' @importFrom assertr in_set not_na is_uniq
 #'
 #' @export
@@ -45,31 +44,8 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                         cpi_data_level), description = "no duplicate records in key variables") %>%
     add_results(report)
 
-  if (any(report$get_validations(unnest = TRUE)$type == "error")){
+  validation_record <- get_results(report, unnest = FALSE) |>
+    setDT()
 
-    detail <- TRUE
-    save_summary(report, "cpi_output_validation_log.txt", success = FALSE, warning = FALSE)
-
-  }
-
-  if (detail) {
-
-    compose_email(
-      body = md(glue::glue(
-        "Hello,
-
-    The attched file contains data validation report for output *cpi* data.
-
-    Regards"))) |>
-      add_attachment(file = "cpi_output_validation_log.txt", filename = "cpi_output_validation_log") |>
-      smtp_send(
-        from = "tefera.degefu@outlook.com",
-        #to = "acastanedaa@worldbank.org",
-        to = "tdegefu@worldbank.org",
-        subject = "Raw cpi data validation report - data validator pkg",
-        credentials = creds_envvar(user = "tefera.degefu@outlook.com",
-                                   pass_envvar = "SMTP_GPID_EMAIL",
-                                   provider = "outlook")
-      )
-  }
+  get_error_validation(validation_record, detail)
 }
