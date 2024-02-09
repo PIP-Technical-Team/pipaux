@@ -71,12 +71,16 @@ auto_aux_update <- function(measure = NULL,
   old_data <- old_data %>%
     dplyr::inner_join(all_data, by = c("Repo", "branch"))
 
+  cli::cli_alert_info("Number of rows from csv file : {nrow(old_data)}")
+  cli::cli_alert_info("Number of rows from Github : {nrow(all_data)}")
+  cli::cli_alert_info("Both the numbers above should be equal or else some debugging is required.")
+
   new_data <- old_data %>%
     dplyr::filter(.data$hash != .data$hash_original |
                     is.na(.data$hash_original) |
                     is.na(.data$hash))
 
-  all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
+  # all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
 
 
 
@@ -94,9 +98,12 @@ auto_aux_update <- function(measure = NULL,
     list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
     for(fn in list_of_funcs) {
       cli::cli_alert_info("Running function {fn} for aux file {aux}.")
+      before_hash <- read_signature_file(fn, maindir, branch)
       # Run the pip_.* function
       match.fun(fn)(maindir = maindir, branch = branch) |>
         suppressMessages()
+
+      after_hash <- read_signature_file(fn, maindir, branch)
     }
   }
   out <- aux_file_last_updated(maindir, names(dependencies), branch)
@@ -116,7 +123,8 @@ auto_aux_update <- function(measure = NULL,
                 repo      = "pipaux",
                 file_path = "Data/git_metadata.csv",
                 .params   = list(ref = "metadata"))
-
+      # There is no way to update only the lines which has changed using Github API
+      # We need to update the entire file every time. Refer - https://stackoverflow.com/a/21315234/3962914
       res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}",
                     owner   = "PIP-Technical-Team",
                     repo    = "pipaux",
@@ -163,7 +171,6 @@ aux_file_last_updated <- function(data_dir, aux_files, branch) {
 
 }
 
-
 read_dependencies <- function(gh_user, owner) {
   dependencies <- paste(gh_user,
                         owner,
@@ -173,4 +180,12 @@ read_dependencies <- function(gh_user, owner) {
     yaml::read_yaml()
 
   sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
+}
+
+read_signature_file <- function(fn, maindir, branch) {
+  aux_file <- sub("pip_", "", fn)
+  # Construct the path to data signature aux file
+  data_signature_path <- fs::path(maindir, "_aux", branch, aux_file, glue::glue("{aux_file}_datasignature.txt"))
+  signature_hash <- readr::read_lines(data_signature_path)
+  return(signature_hash)
 }
