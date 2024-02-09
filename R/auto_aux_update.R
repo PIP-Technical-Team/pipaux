@@ -15,6 +15,7 @@ auto_aux_update <- function(measure = NULL,
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
+  files_changed <- FALSE
 
   isgls <- ls(sys.frame(), pattern = "^gls$") |>
     length() > 0
@@ -106,6 +107,7 @@ auto_aux_update <- function(measure = NULL,
       after_hash <- read_signature_file(aux_file, maindir, branch)
       if(before_hash != after_hash) {
         cli::cli_alert_info("Updating csv for {fn}")
+        files_changed <- TRUE
         org_data$hash[org_data$branch == branch &
           fs::path_file(org_data$Repo) |> sub('aux_', '',x =  _) %in% aux_file] <-
           new_data$hash[fs::path_file(new_data$Repo) |> sub('aux_', '',x =  _) &
@@ -114,7 +116,7 @@ auto_aux_update <- function(measure = NULL,
     }
   }
   last_updated_time <- aux_file_last_updated(maindir, names(dependencies), branch)
-  if(length(aux_fns) > 0) {
+  if(length(aux_fns) > 0 && files_changed) {
     # Write the latest auxiliary file and corresponding hash to csv
     # Always save at the end.
     # sha - hash object of current csv file in Data/git_metadata.csv
