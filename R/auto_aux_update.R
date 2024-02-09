@@ -113,7 +113,7 @@ auto_aux_update <- function(measure = NULL,
       }
     }
   }
-  out <- aux_file_last_updated(maindir, names(dependencies), branch)
+  last_updated_time <- aux_file_last_updated(maindir, names(dependencies), branch)
   if(length(aux_fns) > 0) {
     # Write the latest auxiliary file and corresponding hash to csv
     # Always save at the end.
@@ -139,7 +139,7 @@ auto_aux_update <- function(measure = NULL,
                     )
   }
   cli::cli_h2("File updated status.")
-  knitr::kable(out)
+  knitr::kable(last_updated_time)
 }
 
 
