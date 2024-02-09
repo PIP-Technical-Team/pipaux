@@ -182,7 +182,7 @@ read_dependencies <- function(gh_user, owner) {
   sapply(dependencies, \(x) if (length(x)) strsplit(x, ",\\s+")[[1]] else character())
 }
 
-read_signature_file <- function(fn, maindir, branch) {
+read_signature_file <- function(aux_file, maindir, branch) {
   # Construct the path to data signature aux file
   data_signature_path <- fs::path(maindir, "_aux", branch, aux_file, glue::glue("{aux_file}_datasignature.txt"))
   signature_hash <- readr::read_lines(data_signature_path)
