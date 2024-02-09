@@ -110,7 +110,7 @@ auto_aux_update <- function(measure = NULL,
         files_changed <- TRUE
         org_data$hash[org_data$branch == branch &
           fs::path_file(org_data$Repo) |> sub('aux_', '',x =  _) %in% aux_file] <-
-          new_data$hash[fs::path_file(new_data$Repo) |> sub('aux_', '',x =  _) &
+          new_data$hash[fs::path_file(new_data$Repo) |> sub('aux_', '',x =  _) %in% aux_file &
                           new_data$branch == branch]
       }
     }
