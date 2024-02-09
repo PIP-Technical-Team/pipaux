@@ -97,32 +97,33 @@ auto_aux_update <- function(measure = NULL,
     # Add pip_ suffix so that it becomes function name
     list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
     for(fn in list_of_funcs) {
+      aux_file <- sub("pip_", "", fn)
       cli::cli_alert_info("Running function {fn} for aux file {aux}.")
-      before_hash <- read_signature_file(fn, maindir, branch)
+      before_hash <- read_signature_file(aux_file, maindir, branch)
       # Run the pip_.* function
       match.fun(fn)(maindir = maindir, branch = branch) |>
         suppressMessages()
-
-      after_hash <- read_signature_file(fn, maindir, branch)
+      after_hash <- read_signature_file(aux_file, maindir, branch)
+      if(before_hash != after_hash) {
+        cli::cli_alert_info("Updating csv for {fn}")
+        org_data$hash[org_data$branch == branch &
+          fs::path_file(org_data$Repo) |> sub('aux_', '',x =  _) %in% aux_file] <-
+          new_data$hash[fs::path_file(new_data$Repo) |> sub('aux_', '',x =  _) &
+                          new_data$branch == branch]
+      }
     }
   }
   out <- aux_file_last_updated(maindir, names(dependencies), branch)
   if(length(aux_fns) > 0) {
-    # Check if the file has updated, only then update the metadata file
-    # If the files that we wanted to updated were updated today only then write the file
-    temp_dat <- out |>
-        dplyr::filter(filename %in% paste0(aux_fns, ".qs")) |>
-        dplyr::filter(as.Date(time_last_update) == Sys.Date())
-    if(nrow(temp_dat) > 0) {
     # Write the latest auxiliary file and corresponding hash to csv
     # Always save at the end.
     # sha - hash object of current csv file in Data/git_metadata.csv
     # content - base64 of changed data
-      out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
-                owner     = "PIP-Technical-Team",
-                repo      = "pipaux",
-                file_path = "Data/git_metadata.csv",
-                .params   = list(ref = "metadata"))
+    out <- gh::gh("GET /repos/{owner}/{repo}/contents/{file_path}",
+              owner     = "PIP-Technical-Team",
+              repo      = "pipaux",
+              file_path = "Data/git_metadata.csv",
+              .params   = list(ref = "metadata"))
       # There is no way to update only the lines which has changed using Github API
       # We need to update the entire file every time. Refer - https://stackoverflow.com/a/21315234/3962914
       res <- gh::gh("PUT /repos/{owner}/{repo}/contents/{path}",
@@ -131,12 +132,11 @@ auto_aux_update <- function(measure = NULL,
                     path    = "Data/git_metadata.csv",
                     .params = list(branch  = "metadata",
                                    message = "updating csv file",
-                                   sha     = out$sha, # why does the sha remain the same?
-                                   content = convert_df_to_base64(all_data)
+                                   sha     = out$sha,
+                                   content = convert_df_to_base64(org_data)
                                    ),
                     .token = Sys.getenv("GITHUB_PAT")
                     )
-    }
   }
   cli::cli_h2("File updated status.")
   knitr::kable(out)
@@ -183,7 +183,6 @@ read_dependencies <- function(gh_user, owner) {
 }
 
 read_signature_file <- function(fn, maindir, branch) {
-  aux_file <- sub("pip_", "", fn)
   # Construct the path to data signature aux file
   data_signature_path <- fs::path(maindir, "_aux", branch, aux_file, glue::glue("{aux_file}_datasignature.txt"))
   signature_hash <- readr::read_lines(data_signature_path)
