@@ -2,8 +2,8 @@
 % Please edit documentation in R/pipaux.R
 \docType{package}
 \name{pipaux}
-\alias{pipaux}
 \alias{pipaux-package}
+\alias{pipaux}
 \title{pipaux: A package for processing Auxiliary data in the PIP process}
 \description{
 Description bla blab
