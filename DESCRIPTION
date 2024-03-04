@@ -56,7 +56,7 @@ Imports:
     collapse
 VignetteBuilder: knitr
 Remotes: 
-    github::PIP-Technical-Team/pipload@new_pipeline,
+    github::PIP-Technical-Team/pipload@ongoing,
     github::PIP-Technical-Team/pipfun@ongoing
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3
