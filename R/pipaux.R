@@ -8,7 +8,8 @@
 #' @keywords internal
 #' @docType package
 #' @name pipaux
-#' @import data.table
+#' @rawNamespace import(collapse, except = fdroplevels)
+#' @rawNamespace import(data.table, except = fdroplevels)
 #' @importFrom lifecycle deprecated
 #' @importFrom pipfun pip_create_globals
 #' @importFrom magrittr "%>%" "%<>%"

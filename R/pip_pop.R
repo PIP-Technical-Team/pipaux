@@ -4,7 +4,7 @@
 #'
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
-#' @param src character: Source for population data. Defaults to `getOption("pipaux.popsrc")`.
+#' @param from character: Source for population data.
 #' @export
 pip_pop <- function(action = c("update", "load"),
                     force   = FALSE,

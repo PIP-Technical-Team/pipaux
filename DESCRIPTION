@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.1.0.9006
+Version: 0.1.2.9003
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
@@ -23,7 +23,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
@@ -51,12 +51,12 @@ Imports:
     pipfun (>= 0.0.0.9007),
     lifecycle,
     joyn,
-    compiler,
-    dm, 
-    jsonlite
+    dm,
+    config,
+    collapse
 VignetteBuilder: knitr
 Remotes: 
-    github::PIP-Technical-Team/pipload@new_pipeline,
+    github::PIP-Technical-Team/pipload@ongoing,
     github::PIP-Technical-Team/pipfun@ongoing
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3

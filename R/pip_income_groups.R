@@ -1,55 +1,68 @@
-#' PIP income groups
+#' PIP series of income group
 #'
 #' Update or load a dataset with historical income groups. The raw files are not
 #' available in the PIP-Technical-Team group but in the Povcalnet-team group.
 #'
-#' @inheritParams pip_pfw
+#' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_income_groups <- function(action  = c("update", "load"),
-                              force   = FALSE,
-                              owner   = "PovcalNet-Team",
-                              repo    = "Class",
-                              maindir = gls$PIP_DATA_DIR,
-                              branch  = c("DEV", "PROD", "main"),
-                              tag     = match.arg(branch)) {
-  measure <- "income_groups"
-  branch <- match.arg(branch)
-  action <- match.arg(action)
+pip_income_groups <- function(action       = c("update", "load"),
+                              force        = FALSE,
+                              owner        = getOption("pipfun.ghowner"),
+                              maindir      = gls$PIP_DATA_DIR,
+                              branch       = c("DEV", "PROD", "main"),
+                              class_branch = "master"
+) {
 
+  measure <- "income_groups"
+  action <- match.arg(action)
+  branch <- match.arg(branch)
 
   if (action == "update") {
 
-    df <- pipfun::load_from_gh(measure = measure,
-                       owner   = owner,
-                       repo    = repo,
-                       branch  = branch,
-                       tag     = tag,
-                       filename = "OutputData/CLASS",
-                       ext = "dta")
+    ## Special national accounts --------
+    ig <- pipfun::load_from_gh(
+      measure  = measure,
+      owner    = "GPID-WB",
+      repo     = "Class",
+      branch   = class_branch,
+      filename = "OutputData/CLASS",
+      ext      = "dta"
+    ) |>
+      get_vars(c('code',
+                 'year_data',
+                 'incgroup_historical',
+                 'fcv_historical',
+                 'region_SSA')) |>
+      # create variables for future development
+      ftransform(year         = year_data,
+                 income_group = incgroup_historical)
 
-    df <- df[,
-             c('code',
-               'year_data',
-               'incgroup_historical',
-               'fcv_historical',
-               'region_SSA')]
-    setnames(df, new = c('country_code', 'year_data',
-                         'incgroup_historical',
-                         'fcv_historical',
-                         'ssa_subregion_code'))
+    ig[,
+       income_group_code := fcase(income_group == "High income", "HIC",
+                                  income_group == "Upper middle income", "UMIC",
+                                  income_group == "Lower middle income", "LMIC",
+                                  income_group == "Low income", "LIC",
+                                  default = "")]
+    setnames(ig,
+             c("code", "region_SSA"),
+             c("country_code", "ssa_subregion_code"))
 
 
-    # save data
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ## save --------
+
     if (branch == "main") {
-    branch <- ""
-  }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+      branch <- ""
+    }
+    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+
     saved <- pipfun::pip_sign_save(
-      x       = df,
+      x = ig,
       measure = measure,
-      msrdir  = msrdir,
-      force   = force
+      msrdir = msrdir,
+      force = force
     )
     return(invisible(saved))
 

@@ -3,6 +3,7 @@
 #' @inheritParams pip_aux_labels
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical : Do you want verbose output?
 #' @export
 update_aux <- function(measure,
                        force   = FALSE,

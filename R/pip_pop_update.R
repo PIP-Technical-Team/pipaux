@@ -103,9 +103,16 @@ pip_pop_update <-  function(force   = FALSE,
       clean_names_from_wide() |>
       clean_from_wide()
 
-    pop <- rbindlist(list(pop_main, spop),
-                          use.names = TRUE,
-                          fill = TRUE)
+
+    pop <- joyn::joyn(pop_main, spop,
+                     by = c("country_code", "year", "pop_data_level"),
+                     update_values = TRUE,
+                     reportvar = FALSE,
+                     verbose = FALSE)
+
+    # pop <- rbindlist(list(pop_main, spop),
+    #                       use.names = TRUE,
+    #                       fill = TRUE)
 
   }
 
