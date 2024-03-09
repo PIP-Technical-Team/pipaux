@@ -91,6 +91,8 @@ pip_pop_update <-  function(force   = FALSE,
       clean_names_from_wide() |>
       clean_from_wide()
 
+    # validate pop main raw data
+    popmain_validate_raw(pop_main)
 
     ### Ger special cases ---------
     spop <- pipfun::load_from_gh(
@@ -103,6 +105,8 @@ pip_pop_update <-  function(force   = FALSE,
       clean_names_from_wide() |>
       clean_from_wide()
 
+    # validate special cases pop raw data
+    spop_validate_raw(spop)
 
     pop <- joyn::joyn(pop_main, spop,
                      by = c("country_code", "year", "pop_data_level"),
@@ -165,6 +169,9 @@ pip_pop_update <-  function(force   = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Save data   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # validate output pop data
+  pop_validate_output(pop)
 
   # Save
   if (branch == "main") {

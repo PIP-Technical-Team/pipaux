@@ -33,11 +33,18 @@ pip_weo <- function(action  = c("update", "load"),
       branch = branch,
       tag    = tag
     )
+
+    # validate weo raw data
+    weo_validate_raw(weo)
+
     dt <- pip_weo_clean(dt,
                         maindir = maindir,
                         branch = branch)
 
     # Save dataset
+    # validate weo raw data
+    weo_validate_output(weo)
+
     if (branch == "main") {
       branch <- ""
     }

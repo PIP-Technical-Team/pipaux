@@ -21,6 +21,8 @@ pip_gdm_update <- function(force = FALSE,
                      branch = branch,
                      tag = tag)
 
+  # validate gdm raw data
+  gdm_validate_raw(gdm)
 
 #   ____________________________________________________________________________
 #   Transform dataset                                                       ####
@@ -204,6 +206,8 @@ pip_gdm_update <- function(force = FALSE,
 
 
   # ---- Save and sign ----
+  # validate gdm output data
+  gdm_validate_output(gdm)
 
   if (branch == "main") {
     branch <- ""

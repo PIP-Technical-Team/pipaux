@@ -6,7 +6,7 @@
 #' @importFrom assertr in_set not_na is_uniq
 #'
 #' @export
-wdi_validate_output <- function(wdi, detail = getOption("pipaux.detail.raw")){
+wdi_validate_output <- function(wdi, detail = getOption("pipaux.detail.output")){
 
   stopifnot("WDI output data is not loaded" = !is.null(wdi))
 

@@ -25,6 +25,8 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     tag    = tag
   )
 
+  # validate cpi raw data
+  cpi_validate_raw(cpi)
 
 #   ____________________________________________________________________________
 #   Cleaning                                                                ####
@@ -33,6 +35,9 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   cpi <- pip_cpi_clean(cpi,
                        maindir = maindir,
                        branch = branch)
+
+  # validate cpi clean data before saving it
+  cpi_validate_output(cpi)
 
   # Save
   if (branch == "main") {

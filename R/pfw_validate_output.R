@@ -1,6 +1,6 @@
 #' Validate clean pfw data
 #'
-#' @param pfw clean pfw data, output via `pipfun::pip_pfw_clean`
+#' @param pfw clean pfw data, output via `pip_pfw_clean`
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq

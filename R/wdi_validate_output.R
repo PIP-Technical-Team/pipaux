@@ -6,7 +6,7 @@
 #' @importFrom assertr in_set not_na is_uniq
 #'
 #' @export
-weo_validate_output <- function(weo, detail = getOption("pipaux.detail.raw")){
+weo_validate_output <- function(weo, detail = getOption("pipaux.detail.output")){
 
   stopifnot("WEO output data is not loaded" = !is.null(weo))
 

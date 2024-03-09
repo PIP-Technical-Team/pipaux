@@ -33,6 +33,9 @@ pip_country_list <- function(action = c("update", "load"),
       tag    = tag
     )
 
+  # validate country list raw data
+    cl_validate_raw(cl)
+
     # Save
     if (branch == "main") {
     branch <- ""

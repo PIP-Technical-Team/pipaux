@@ -26,6 +26,9 @@ pip_countries <- function(action  = c("update", "load"),
       tag    = tag
     )
 
+    # validate country list raw data
+    cl_validate_raw(cl)
+
     pfw <- load_aux(measure = "pfw",
                     maindir = maindir,
                     branch  = branch)

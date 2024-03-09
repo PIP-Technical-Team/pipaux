@@ -1,4 +1,4 @@
-#' Validate raw maddison data
+#' Validate output maddison data
 #'
 #' @param mpd output mpd data
 #' @param detail has an option TRUE/FALSE, default value is FALSE
@@ -6,7 +6,7 @@
 #' @importFrom assertr in_set not_na is_uniq
 #'
 #' @export
-mpd_validate_raw <- function(mpd, detail = getOption("pipaux.detail.raw")){
+mpd_validate_output <- function(mpd, detail = getOption("pipaux.detail.output")){
 
   stopifnot("mpd/ maddison output data is not loaded" = !is.null(mpd))
 

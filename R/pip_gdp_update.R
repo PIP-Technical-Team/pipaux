@@ -63,6 +63,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     owner  = owner,
     branch = branch
   )
+  # validate sna data
+  sna_validate_raw(sna)
 
   sna_fy <- pipfun::load_from_gh(
     measure = "sna",
@@ -70,7 +72,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch = branch,
     filename = "sna_metadata"
   )
-
+  # validate sna_fy data
+  sna_fy_validate_raw(sna_fy)
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",

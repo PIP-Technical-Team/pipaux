@@ -6,7 +6,7 @@
 #' @importFrom assertr in_set not_na is_uniq
 #'
 #' @export
-ppp_validate_output <- function(ppp, detail = getOption("pipaux.detail.raw")){
+ppp_validate_output <- function(ppp, detail = getOption("pipaux.detail.output")){
 
   stopifnot("PPP output data is not loaded" = !is.null(ppp))
 

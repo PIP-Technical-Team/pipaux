@@ -53,7 +53,9 @@ Imports:
     joyn,
     dm,
     config,
-    collapse
+    collapse,
+    data.validator,
+    assertr
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@ongoing,

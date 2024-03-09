@@ -48,9 +48,14 @@ pip_wdi_update <- function(force   = FALSE,
              new = c("country_code", "year")
     )
   }
+  # validate wdi raw data
+  wdi_validate_raw(wdi)
 
   #   _________________________________________________________________________
   #   Save and Return                                                     ####
+
+  # validate wdi output data
+  wdi_validate_output(wdi)
 
   if (branch == "main") {
     branch <- ""

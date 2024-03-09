@@ -17,10 +17,16 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                       owner = owner,
                       branch = branch,
                       ext = "dta")
+  # validate pfw raw data
+  pfw_validate_raw(pfw)
+
   # Clean data
   pfw <- pip_pfw_clean(pfw,
                        maindir = maindir,
                        branch = branch)
+
+  # validate pfw raw data
+  pfw_validate_output(pfw)
 
   # Save dataset
   if (branch == "main") {

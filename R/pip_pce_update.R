@@ -39,13 +39,17 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
     branch = branch
   )
 
+  # validate sna data
+  sna_validate_raw(sna)
+
   sna_fy <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
     branch = branch,
     filename = "sna_metadata"
   )
-
+  # validate sna_fy data
+  sna_fy_validate_raw(sna_fy)
 #   ____________________________________________________________________________
 #   Clean PCE from WDI                                                      ####
 
@@ -223,6 +227,9 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   pce <- pce[country_code %in% cl$country_code]
 
   ## ---- Sign and save ----
+
+  # validate pce output data
+  pce_validate_output(pce)
 
   if (branch == "main") {
     branch <- ""

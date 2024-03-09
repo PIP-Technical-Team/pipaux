@@ -23,6 +23,11 @@ pip_maddison <- function(action = c("update", "load"),
       branch = branch,
       tag    = tag
     )
+  # validate raw data
+    mpd_validate_raw(mpd)
+
+  # # validate output data
+  #   mpd_validate_output(mpd)
 
   if (branch == "main") {
     branch <- ""

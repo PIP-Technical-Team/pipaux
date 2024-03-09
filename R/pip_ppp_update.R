@@ -26,6 +26,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     tag    = tag
   )
 
+  # validate ppp raw data
+  ppp_validate_raw(ppp)
 
 #   ____________________________________________________________________________
 #   cleaning                                                                ####
@@ -58,6 +60,10 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
+
+  # validate ppp output data
+  ppp_validate_output(ppp)
+
   if (branch == "main") {
     branch <- ""
   }
