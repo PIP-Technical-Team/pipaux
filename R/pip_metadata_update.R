@@ -20,6 +20,9 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                      branch = branch,
                      tag = tag)
 
+  # validate raw metdata data
+  metadata_validate_raw(metadata = df)
+
   # Load pfw
   pfw <- load_aux(measure = "pfw",
                   maindir = maindir,
@@ -100,6 +103,8 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
 ##  ............................................................................
 ##  Save                                                                    ####
+  # validate raw metdata data
+  metadata_validate_output(metadata = df)
 
   if (branch == "main") {
     branch <- ""

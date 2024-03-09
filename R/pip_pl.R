@@ -32,9 +32,13 @@ pip_pl <- function(action = c("update", "load"),
     dt <- purrr::map_df(dl,pip_pl_clean)
 
     # Save
+
+  # validate pl clean data
+    pl_validate_output(pl = dt)
+
     if (branch == "main") {
-    branch <- ""
-  }
+      branch <- ""
+    }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
       x       = dt,
