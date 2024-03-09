@@ -55,7 +55,10 @@ Imports:
     config,
     collapse,
     data.validator,
-    assertr
+    assertr,
+    covr,
+    blastula,
+    rlang
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@ongoing,
