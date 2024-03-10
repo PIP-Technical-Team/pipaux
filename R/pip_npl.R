@@ -29,6 +29,9 @@ pip_npl <- function(action  = c("update", "load"),
                                 ext    = "dta") |>
       setDT()
 
+    # validate npl raw data
+    npl_validate_raw(npl)
+
     setnames(x = npl,
              old = c("countrycode",  "year", "vsi_pov_nahc_nc"),
              new = c("country_code", "reporting_year", "nat_headcount"),
@@ -40,6 +43,9 @@ pip_npl <- function(action  = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+
+    # validate npl output data
+    npl_validate_output(npl)
 
     if (branch == "main") {
       branch <- ""

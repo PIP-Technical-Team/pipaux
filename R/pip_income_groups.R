@@ -52,6 +52,9 @@ pip_income_groups <- function(action       = c("update", "load"),
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
 
+    # validate income group output data
+    incgroup_validate_output(ig)
+
     if (branch == "main") {
       branch <- ""
     }
