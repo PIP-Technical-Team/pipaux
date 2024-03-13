@@ -11,7 +11,8 @@ pip_maddison <- function(action = c("update", "load"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
                          branch  = c("DEV", "PROD", "main"),
-                         tag     = match.arg(branch)) {
+                         tag     = match.arg(branch),
+                         detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
   action  <- match.arg(action)
   branch  <- match.arg(branch)
@@ -24,7 +25,7 @@ pip_maddison <- function(action = c("update", "load"),
       tag    = tag
     )
   # validate raw data
-    mpd_validate_raw(mpd)
+    mpd_validate_raw(mpd = mpd, detail = detail)
 
   # # validate output data
   #   mpd_validate_output(mpd)

@@ -12,7 +12,7 @@ spop_validate_raw <- function(spop, detail = getOption("pipaux.detail.output")){
 
   report <- data_validation_report()
 
-  validate(spop, name = "POP output data validation") |>
+  validate(spop, name = "Special POP raw data validation") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
     validate_if(is.numeric(year),

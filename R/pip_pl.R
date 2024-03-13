@@ -10,7 +10,8 @@ pip_pl <- function(action = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
                    branch  = c("DEV", "PROD", "main"),
-                   tag     = match.arg(branch)
+                   tag     = match.arg(branch),
+                   detail  = getOption("pipaux.detail.raw")
                    ) {
 
   measure <- "pl"
@@ -34,7 +35,7 @@ pip_pl <- function(action = c("update", "load"),
     # Save
 
   # validate pl clean data
-    pl_validate_output(pl = dt)
+    pl_validate_output(pl = dt, detail = detail)
 
     if (branch == "main") {
       branch <- ""

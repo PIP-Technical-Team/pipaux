@@ -10,7 +10,8 @@ pip_npl <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
                    branch  = c("DEV", "PROD", "main"),
-                   tag     = match.arg(branch)) {
+                   tag     = match.arg(branch),
+                   detail  = getOption("pipaux.detail.raw")) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## setup --------
 
@@ -30,7 +31,7 @@ pip_npl <- function(action  = c("update", "load"),
       setDT()
 
     # validate npl raw data
-    npl_validate_raw(npl)
+    npl_validate_raw(npl = npl, detail = detail)
 
     setnames(x = npl,
              old = c("countrycode",  "year", "vsi_pov_nahc_nc"),
@@ -45,7 +46,7 @@ pip_npl <- function(action  = c("update", "load"),
     ## save --------
 
     # validate npl output data
-    npl_validate_output(npl)
+    npl_validate_output(npl = npl, detail = detail)
 
     if (branch == "main") {
       branch <- ""

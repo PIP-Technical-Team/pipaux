@@ -13,7 +13,8 @@ pip_gdp <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     branch          = c("DEV", "PROD", "main"),
                     tag             = match.arg(branch),
-                    from            = "file") {
+                    from            = "file",
+                    detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
   branch <- match.arg(branch)
@@ -26,7 +27,8 @@ pip_gdp <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from)
+                   from    = from,
+                   detail  = detail)
 
   } else {
     dt <- load_aux(

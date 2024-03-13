@@ -11,7 +11,8 @@ pip_ppp <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
-                    tag     = branch) {
+                    tag     = branch,
+                    detail  = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -43,7 +44,8 @@ pip_ppp <- function(action = c("update", "load"),
                    force   = force,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
   }
   else {
     load_aux(

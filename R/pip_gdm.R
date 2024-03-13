@@ -17,7 +17,8 @@ pip_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
   branch <- match.arg(branch)
@@ -29,7 +30,8 @@ pip_gdm <- function(action  = c("update", "load"),
                    maindir = maindir,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
 
   } else {
     dt <- load_aux(

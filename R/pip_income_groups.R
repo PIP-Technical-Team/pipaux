@@ -11,7 +11,8 @@ pip_income_groups <- function(action       = c("update", "load"),
                               owner        = getOption("pipfun.ghowner"),
                               maindir      = gls$PIP_DATA_DIR,
                               branch       = c("DEV", "PROD", "main"),
-                              class_branch = "master"
+                              class_branch = "master",
+                              detail       = getOption("pipaux.detail.raw")
 ) {
 
   measure <- "income_groups"
@@ -53,7 +54,7 @@ pip_income_groups <- function(action       = c("update", "load"),
     ## save --------
 
     # validate income group output data
-    incgroup_validate_output(ig)
+    incgroup_validate_output(incgroup = ig, detail = detail)
 
     if (branch == "main") {
       branch <- ""

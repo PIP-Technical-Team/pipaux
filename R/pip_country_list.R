@@ -17,7 +17,8 @@ pip_country_list <- function(action = c("update", "load"),
                              force   = FALSE,
                              owner   = getOption("pipfun.ghowner"),
                              branch  = c("DEV", "PROD", "main"),
-                             tag     = match.arg(branch)
+                             tag     = match.arg(branch),
+                             detail  = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
   branch  <- match.arg(branch)
@@ -34,7 +35,7 @@ pip_country_list <- function(action = c("update", "load"),
     )
 
   # validate country list raw data
-    cl_validate_raw(cl)
+    cl_validate_raw(cl, detail = detail)
 
     # Save
     if (branch == "main") {

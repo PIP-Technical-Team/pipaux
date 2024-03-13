@@ -13,7 +13,8 @@ pip_wdi <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     branch          = c("DEV", "PROD", "main"),
                     tag             = match.arg(branch),
-                    from            = c("gh", "file", "api")) {
+                    from            = c("gh", "file", "api"),
+                    detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "wdi"
   branch <- match.arg(branch)
@@ -26,7 +27,8 @@ pip_wdi <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from)
+                   from    = from,
+                   detail  = detail)
 
   } else {
     dt <- load_aux(

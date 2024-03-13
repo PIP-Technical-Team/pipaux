@@ -10,7 +10,8 @@ pip_income_groups(
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
-  class_branch = "master"
+  class_branch = "master",
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

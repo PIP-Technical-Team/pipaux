@@ -10,7 +10,8 @@ pip_countries <- function(action  = c("update", "load"),
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,
                           branch  = c("DEV", "PROD", "main"),
-                          tag     = match.arg(branch)) {
+                          tag     = match.arg(branch),
+                          detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "countries"
   action <- match.arg(action)
@@ -27,7 +28,7 @@ pip_countries <- function(action  = c("update", "load"),
     )
 
     # validate country list raw data
-    cl_validate_raw(cl)
+    cl_validate_raw(cl, detail = detail)
 
     pfw <- load_aux(measure = "pfw",
                     maindir = maindir,
@@ -47,6 +48,9 @@ pip_countries <- function(action  = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+
+    # validate country output data
+    countries_validate_output(countries, detail = detail)
 
     if (branch == "main") {
       branch <- ""

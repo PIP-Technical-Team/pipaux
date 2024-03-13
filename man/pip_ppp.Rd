@@ -10,7 +10,8 @@ pip_ppp(
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   force = FALSE,
-  tag = branch
+  tag = branch,
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

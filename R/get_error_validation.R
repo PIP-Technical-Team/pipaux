@@ -1,7 +1,6 @@
 #' Get validation report  data validation error report
 #'
 #' @param vlddata validation data
-#' @import rlang
 #'
 #' @export
 get_error_validation <- function(vlddata, detail){

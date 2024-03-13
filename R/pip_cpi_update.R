@@ -6,7 +6,8 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 #   ____________________________________________________________________________
 #   Set up                                                                  ####
@@ -26,7 +27,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   )
 
   # validate cpi raw data
-  cpi_validate_raw(cpi)
+  cpi_validate_raw(cpi, detail = detail)
 
 #   ____________________________________________________________________________
 #   Cleaning                                                                ####
@@ -37,7 +38,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                        branch = branch)
 
   # validate cpi clean data before saving it
-  cpi_validate_output(cpi)
+  cpi_validate_output(cpi, detail = detail)
 
   # Save
   if (branch == "main") {

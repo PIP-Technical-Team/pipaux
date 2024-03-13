@@ -7,7 +7,8 @@ pip_pop_update <-  function(force   = FALSE,
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch)) {
+                            tag     = match.arg(branch),
+                            detail  = getOption("pipaux.detail.raw")) {
 
   # Check arguments
   from    <- match.arg(from)
@@ -35,7 +36,8 @@ pip_pop_update <-  function(force   = FALSE,
                               return_wide = FALSE) |>
       setDT()
 
-
+    # validate wb pop data
+    pop_validate_raw(pop = pop, detail = detail)
 
     # rename vars
     pop <- pop[, c("iso3c", "date", "indicator_id", "value")]
@@ -92,7 +94,7 @@ pip_pop_update <-  function(force   = FALSE,
       clean_from_wide()
 
     # validate pop main raw data
-    popmain_validate_raw(pop_main)
+    popmain_validate_raw(pop_main = pop_main, detail = detail)
 
     ### Ger special cases ---------
     spop <- pipfun::load_from_gh(
@@ -106,7 +108,7 @@ pip_pop_update <-  function(force   = FALSE,
       clean_from_wide()
 
     # validate special cases pop raw data
-    spop_validate_raw(spop)
+    spop_validate_raw(spop = spop, detail = detail)
 
     pop <- joyn::joyn(pop_main, spop,
                      by = c("country_code", "year", "pop_data_level"),
@@ -171,7 +173,7 @@ pip_pop_update <-  function(force   = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # validate output pop data
-  pop_validate_output(pop)
+  pop_validate_output(pop = pop, detail = detail)
 
   # Save
   if (branch == "main") {

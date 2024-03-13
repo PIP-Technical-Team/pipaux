@@ -11,7 +11,8 @@ pip_pop(
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  tag = match.arg(branch),
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

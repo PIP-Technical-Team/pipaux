@@ -11,7 +11,8 @@ pip_gdp(
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
-  from = "file"
+  from = "file",
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

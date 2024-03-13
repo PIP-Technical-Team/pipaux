@@ -11,7 +11,8 @@ pip_pce(
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
-  from = c("gh", "file", "api")
+  from = c("gh", "file", "api"),
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

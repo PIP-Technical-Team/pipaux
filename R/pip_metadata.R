@@ -10,7 +10,8 @@ pip_metadata <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
                          branch  = c("DEV", "PROD", "main"),
-                         tag     = match.arg(branch)) {
+                         tag     = match.arg(branch),
+                         detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
   branch <- match.arg(branch)
   action <- match.arg(action)
@@ -22,7 +23,8 @@ pip_metadata <- function(action  = c("update", "load"),
       force   = force,
       owner   = owner,
       branch  = branch,
-      tag     = tag
+      tag     = tag,
+      detail  = detail
     )
 
   } else {

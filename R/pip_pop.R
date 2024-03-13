@@ -12,7 +12,8 @@ pip_pop <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
   from    <- tolower(from)
   action <- match.arg(action)
@@ -24,7 +25,8 @@ pip_pop <- function(action = c("update", "load"),
       maindir = maindir,
       owner   = owner,
       branch  = branch,
-      tag     = tag )
+      tag     = tag,
+      detail  = detail)
 
   } else {
 

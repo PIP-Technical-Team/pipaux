@@ -13,7 +13,8 @@ pip_wdi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = c("gh", "file", "api")) {
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 
   from   <- match.arg(from)
@@ -49,13 +50,10 @@ pip_wdi_update <- function(force   = FALSE,
     )
   }
   # validate wdi raw data
-  wdi_validate_raw(wdi)
+  wdi_validate_raw(wdi = wdi, detail = detail)
 
   #   _________________________________________________________________________
   #   Save and Return                                                     ####
-
-  # validate wdi output data
-  wdi_validate_output(wdi)
 
   if (branch == "main") {
     branch <- ""
