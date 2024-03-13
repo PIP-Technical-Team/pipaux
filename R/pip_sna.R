@@ -11,5 +11,6 @@ pip_sna <- function(action  = c("update", "load"),
                     branch  = c("DEV", "PROD", "main"),
                     tag     = match.arg(branch),
                     from    = c("gh", "file", "api")) {
-  return(NULL)
+  
+   return(invisible(TRUE))
 }
