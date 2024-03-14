@@ -2,6 +2,7 @@
 #'
 #' Load or update PPP data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export

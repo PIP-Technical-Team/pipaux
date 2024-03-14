@@ -29,6 +29,8 @@ will be used to update either the development server or production.}
 
 \item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
 and "gh" are synonymous}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update GDP data using WDI, Maddison and Special cases.

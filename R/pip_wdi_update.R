@@ -2,6 +2,7 @@
 #'
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_gdp
 #' @return data.table with gdp and pce variables
 #' @export

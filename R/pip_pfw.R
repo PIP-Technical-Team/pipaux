@@ -2,6 +2,7 @@
 #'
 #' Load or update PIP Price Framework data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.

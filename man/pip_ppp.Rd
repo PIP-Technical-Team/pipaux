@@ -29,6 +29,8 @@ will be used to update either the development server or production.}
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Load or update PPP data.

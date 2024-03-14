@@ -3,6 +3,7 @@
 #' Update or load a dataset with historical income groups. The raw files are not
 #' available in the PIP-Technical-Team group but in the Povcalnet-team group.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export

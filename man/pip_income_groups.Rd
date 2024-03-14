@@ -28,6 +28,8 @@ memory.}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update or load a dataset with historical income groups. The raw files are not

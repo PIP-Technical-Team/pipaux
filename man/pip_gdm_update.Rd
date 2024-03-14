@@ -25,6 +25,8 @@ pip_gdm_update(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update GDM data using the PovcalNet Masterfile.

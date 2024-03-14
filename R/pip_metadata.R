@@ -2,6 +2,7 @@
 #'
 #' Update or load a dataset with survey metadata.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams load_raw_indicators
 #' @export

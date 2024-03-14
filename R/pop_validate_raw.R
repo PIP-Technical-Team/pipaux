@@ -1,6 +1,6 @@
 #' Validate pop raw data download from wdi
 #'
-#' @param spop raw pop data, as loaded via `wbstats::wb_data`
+#' @param pop raw pop data, as loaded via `wbstats::wb_data`
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq

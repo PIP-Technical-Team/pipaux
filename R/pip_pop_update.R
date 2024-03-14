@@ -1,6 +1,8 @@
 #' Update POP
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param from character: Source for population data.
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pop
 pip_pop_update <-  function(force   = FALSE,
                             from    = c("gh", "file", "api"),

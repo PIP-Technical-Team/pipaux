@@ -2,6 +2,7 @@
 #'
 #' Update series of national poverty lines
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export

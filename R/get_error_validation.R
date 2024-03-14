@@ -1,6 +1,7 @@
 #' Get validation report  data validation error report
 #'
 #' @param vlddata validation data
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #'
 #' @export
 get_error_validation <- function(vlddata, detail){

@@ -2,6 +2,7 @@
 #'
 #' Load or update PCE data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_gdp
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh

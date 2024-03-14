@@ -3,6 +3,7 @@
 #' Update or load a dataset with countries.
 #'
 #' @inheritParams pip_cpi
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_countries <- function(action  = c("update", "load"),

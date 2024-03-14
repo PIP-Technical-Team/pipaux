@@ -7,9 +7,9 @@
 pop_validate_raw(pop, detail = getOption("pipaux.detail.output"))
 }
 \arguments{
-\item{detail}{has an option TRUE/FALSE, default value is FALSE}
+\item{pop}{raw pop data, as loaded via \code{wbstats::wb_data}}
 
-\item{spop}{raw pop data, as loaded via \code{wbstats::wb_data}}
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Validate pop raw data download from wdi

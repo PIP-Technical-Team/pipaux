@@ -10,6 +10,7 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_cpi
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_gdm <- function(action  = c("update", "load"),

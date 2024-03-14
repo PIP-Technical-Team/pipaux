@@ -1,5 +1,6 @@
 #' Update metadata file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @inheritParams pip_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened

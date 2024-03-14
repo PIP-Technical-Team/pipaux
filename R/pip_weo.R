@@ -9,6 +9,7 @@
 #' `pip_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export

@@ -2,6 +2,7 @@
 #'
 #' Load or update population data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @param from character: Source for population data.

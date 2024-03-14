@@ -8,6 +8,8 @@ get_error_validation(vlddata, detail)
 }
 \arguments{
 \item{vlddata}{validation data}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Get validation report  data validation error report
