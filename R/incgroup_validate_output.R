@@ -17,6 +17,14 @@ incgroup_validate_output <- function(incgroup, detail = getOption("pipaux.detail
                 description = "`country_code` should be character") |>
     validate_if(is.numeric(year_data),
                 description = "`year_data` should be numeric") |>
+    validate_if(is.character(income_group),
+                description = "`income_group` should be character") |>
+    validate_cols(in_set(c("High income", "Low income", "Lower middle income", "Upper middle income")),
+                  income_group, description = "`income_group` values within range") |>
+    validate_if(is.character(income_group_code),
+                description = "`income_group_code` should be character") |>
+    validate_cols(in_set(c("HIC", "LIC", "LMIC", "UMIC")),
+                  income_group_code, description = "`income_group_code` values within range") |>
     validate_if(is.character(incgroup_historical),
                 description = "`incgroup_historical` should be character") |>
     validate_cols(in_set(c("High income", "Low income", "Lower middle income", "Upper middle income")),

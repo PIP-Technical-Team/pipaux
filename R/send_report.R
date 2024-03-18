@@ -1,7 +1,6 @@
 #' Send an email that contains auxiliary data validation report
 #'
 #' @import blastula
-#' @import rlang
 #'
 #' @export
 send_report <- function(){

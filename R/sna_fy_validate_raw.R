@@ -21,6 +21,8 @@ sna_fy_validate_raw <- function(sna_fy, detail = getOption("pipaux.detail.raw"))
                 description = "`SpecialNotes` should be character") |>
     validate_if(is.character(Month),
                 description = "`Month` should be character") |>
+    validate_if(is.numeric(Day),
+                description = "`Day` should be numeric") |>
     validate_cols(not_na, Code, Month, Day,
                   description = "no missing values in key variables") |>
     # validate_if(is_uniq(Code, LongName),
