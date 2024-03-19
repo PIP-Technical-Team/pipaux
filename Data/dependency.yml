@@ -1,15 +1,15 @@
 ppp : country_list
-pfw :
+pfw : countries 
 gdp : weo, maddison, wdi, country_list, sna
 wdi :
 weo : pop
 pop : country_list, pfw
-countries : pfw, country_list
+countries : 
 metadata : pfw
 gdm : country_list, pfw
 regions : country_list
 maddison :
-country_list :
+country_list : countries
 pce : wdi, country_list, sna
 cpi : country_list
 missing_data : country_list, pce, gdp, pop, pfw
