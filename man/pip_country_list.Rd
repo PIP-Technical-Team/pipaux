@@ -8,9 +8,8 @@ pip_country_list(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  class_branch = "master"
 )
 }
 \arguments{
@@ -21,13 +20,8 @@ pip_country_list(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{owner}{character: Github repo owner. Default is
-\code{getOption("pipfun.ghowner")}}
-
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
-
-\item{tag}{character: specific release to be used in the update.}
 }
 \value{
 logical if \code{action = "update"} or data.table if \code{action = "load"}
