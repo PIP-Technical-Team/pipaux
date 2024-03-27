@@ -40,18 +40,29 @@ pip_country_list <- function(action = c("update", "load"),
     )
 
     if (saved) {
+      cl_sha <- digest::sha1(cl)
+      out <- gh::gh(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        owner     = "PIP-Technical-Team",
+        repo      = "aux_country_list",
+        path      = "sha_country_list.txt",
+        .params   = list(ref = "DEV")
+      )
+
       res <- gh::gh(
         "PUT /repos/{owner}/{repo}/contents/{path}",
         owner   = "PIP-Technical-Team",
         repo    = "aux_country_list",
-        path    = "country_list.csv",
+        path    = "sha_country_list.txt",
         .params = list(
           branch  = branch,
           message = paste0("update on ", prettyNum(Sys.time())),
-          content = convert_df_to_base64(cl)
+          sha     = out$sha,
+          content = base64enc::base64encode(charToRaw(cl_sha))
         ),
         .token = Sys.getenv("GITHUB_PAT")
       )
+
     }
 
     return(invisible(saved))

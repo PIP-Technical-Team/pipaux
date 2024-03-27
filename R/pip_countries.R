@@ -19,12 +19,9 @@ pip_countries <- function(action  = c("update", "load"),
   if (action == "update") {
 
     ## Special national accounts --------
-    cl <- pipfun::load_from_gh(
-      measure = "country_list",
-      owner  = owner,
-      branch = branch,
-      tag    = tag
-    )
+    cl <- load_aux(maindir = maindir,
+                   measure = "country_list",
+                   branch  = branch)
 
     pfw <- load_aux(measure = "pfw",
                     maindir = maindir,

@@ -23,12 +23,9 @@ pip_regions <- function(action = c("update", "load"),
     ##  ............................................................................
     ##  Load country_list table                                                 ####
 
-    cl <- pipfun::load_from_gh(
-      measure = "country_list",
-      owner   = owner,
-      branch  = branch,
-      tag     = tag
-    )
+    cl <- load_aux(maindir = maindir,
+                   measure = "country_list",
+                   branch  = branch)
 
     setnames(cl, "country_code", "id") # to make it work w/o problems
 
