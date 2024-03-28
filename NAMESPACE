@@ -3,6 +3,7 @@
 export("%>%")
 export(auto_aux_update)
 export(cl_validate_raw)
+export(clean_validation_report)
 export(countries_validate_output)
 export(cpi_validate_output)
 export(cpi_validate_raw)

@@ -35,6 +35,8 @@ get_error_validation <- function(vlddata, detail){
       rlang::env_poke(.pipaux, "validation_report", compiled_result)
 
     }
+
+    cli::cli_inform("Validation report ('validation_report') has been added to the environment varaible (.pipaux).")
   }
 
 }

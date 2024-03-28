@@ -29,6 +29,8 @@ auto_aux_update <- function(measure = NULL,
     )
   }
 
+  # if there is validation report in the environment - remove it
+  clean_validation_report()
 
   assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
                           msg = "Enviroment variable `GITHUB_PAT` is empty.
