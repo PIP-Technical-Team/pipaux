@@ -11,6 +11,9 @@ auto_aux_update <- function(measure = NULL,
                             owner   = getOption("pipfun.ghowner"),
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
+
+  cli::cli_inform("Please make sure to run {.code library(pipaux)} before running this function.")
+
   branch    <- match.arg(branch)
   from      <- match.arg(from)
   files_changed <- FALSE
