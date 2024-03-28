@@ -2,6 +2,7 @@
 #'
 #' Update or load GDP data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
@@ -13,7 +14,8 @@ pip_gdp <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     branch          = c("DEV", "PROD", "main"),
                     tag             = match.arg(branch),
-                    from            = "file") {
+                    from            = "file",
+                    detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
   branch <- match.arg(branch)
@@ -26,7 +28,8 @@ pip_gdp <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from)
+                   from    = from,
+                   detail  = detail)
 
   } else {
     dt <- load_aux(

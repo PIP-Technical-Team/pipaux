@@ -10,7 +10,8 @@ pip_pce_update(
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
   tag = match.arg(branch),
-  from = c("gh", "file", "api")
+  from = c("gh", "file", "api"),
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ will be used to update either the development server or production.}
 
 \item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
 and "gh" are synonymous}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update PCE data using WDI and Special cases.

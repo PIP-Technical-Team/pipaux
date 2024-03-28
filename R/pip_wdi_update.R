@@ -2,6 +2,7 @@
 #'
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_gdp
 #' @return data.table with gdp and pce variables
 #' @export
@@ -13,7 +14,8 @@ pip_wdi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = c("gh", "file", "api")) {
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 
   from   <- match.arg(from)
@@ -48,6 +50,8 @@ pip_wdi_update <- function(force   = FALSE,
              new = c("country_code", "year")
     )
   }
+  # validate wdi raw data
+  wdi_validate_raw(wdi = wdi, detail = detail)
 
   #   _________________________________________________________________________
   #   Save and Return                                                     ####

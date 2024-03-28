@@ -6,7 +6,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 
 #   ____________________________________________________________________________
@@ -26,6 +27,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     tag    = tag
   )
 
+  # validate ppp raw data
+  ppp_validate_raw(ppp = ppp, detail = detail)
 
 #   ____________________________________________________________________________
 #   cleaning                                                                ####
@@ -58,6 +61,10 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
+
+  # validate ppp output data
+  ppp_validate_output(ppp = ppp, detail = detail)
+
   if (branch == "main") {
     branch <- ""
   }

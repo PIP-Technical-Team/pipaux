@@ -22,6 +22,8 @@ pip_country_list(
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \value{
 logical if \code{action = "update"} or data.table if \code{action = "load"}

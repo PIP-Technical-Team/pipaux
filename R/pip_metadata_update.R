@@ -1,5 +1,6 @@
 #' Update metadata file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @inheritParams pip_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
@@ -8,7 +9,8 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
                                 branch  = c("DEV", "PROD", "main"),
-                                tag     = match.arg(branch)) {
+                                tag     = match.arg(branch),
+                                detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
   branch <- match.arg(branch)
@@ -19,6 +21,9 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                      owner = owner,
                      branch = branch,
                      tag = tag)
+
+  # validate raw metdata data
+  metadata_validate_raw(metadata = df, detail = detail)
 
   # Load pfw
   pfw <- load_aux(measure = "pfw",
@@ -100,6 +105,8 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
 ##  ............................................................................
 ##  Save                                                                    ####
+  # validate raw metdata data
+  metadata_validate_output(metadata = df, detail = detail)
 
   if (branch == "main") {
     branch <- ""

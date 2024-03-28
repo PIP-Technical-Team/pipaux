@@ -8,8 +8,8 @@ pip_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)
-                           ) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
   measure <- "gdm"
   branch <- match.arg(branch)
 
@@ -21,6 +21,8 @@ pip_gdm_update <- function(force = FALSE,
                      branch = branch,
                      tag = tag)
 
+  # validate gdm raw data
+  gdm_validate_raw(gdm = df, detail = detail)
 
 #   ____________________________________________________________________________
 #   Transform dataset                                                       ####
@@ -204,6 +206,8 @@ pip_gdm_update <- function(force = FALSE,
 
 
   # ---- Save and sign ----
+  # validate gdm output data
+  gdm_validate_output(gdm = df, detail = detail)
 
   if (branch == "main") {
     branch <- ""

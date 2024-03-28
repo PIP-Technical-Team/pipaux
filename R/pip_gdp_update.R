@@ -10,7 +10,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = c("gh", "file", "api")) {
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
 
   branch <- match.arg(branch)
   measure <- "gdp"
@@ -63,6 +64,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     owner  = owner,
     branch = branch
   )
+  # validate sna data
+  sna_validate_raw(sna, detail = detail)
 
   sna_fy <- pipfun::load_from_gh(
     measure = "sna",
@@ -70,7 +73,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch = branch,
     filename = "sna_metadata"
   )
-
+  # validate sna_fy data
+  sna_fy_validate_raw(sna_fy, detail = detail)
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
@@ -274,6 +278,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   gdp <- gdp[country_code %in% cl$country_code]
 
   # ---- Save and sign ----
+  # validate gdp output data
+  gdp_validate_output(gdp = gdp, detail = detail)
 
   if (branch == "main") {
     branch <- ""

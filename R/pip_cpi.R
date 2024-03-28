@@ -7,6 +7,7 @@
 #'   memory.
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #'
 #' @export
@@ -16,7 +17,8 @@ pip_cpi <- function(action = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -48,7 +50,8 @@ pip_cpi <- function(action = c("update", "load"),
                    force   = force,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
   }
   else {
     dt <- load_aux(

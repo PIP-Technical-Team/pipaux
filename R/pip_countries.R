@@ -3,6 +3,7 @@
 #' Update or load a dataset with countries.
 #'
 #' @inheritParams pip_cpi
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_countries <- function(action  = c("update", "load"),
@@ -10,7 +11,8 @@ pip_countries <- function(action  = c("update", "load"),
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,
                           branch  = c("DEV", "PROD", "main"),
-                          tag     = match.arg(branch)) {
+                          tag     = match.arg(branch),
+                          detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "countries"
   action <- match.arg(action)
@@ -22,6 +24,9 @@ pip_countries <- function(action  = c("update", "load"),
     cl <- load_aux(maindir = maindir,
                    measure = "country_list",
                    branch  = branch)
+
+    # validate country list raw data
+    cl_validate_raw(cl, detail = detail)
 
     pfw <- load_aux(measure = "pfw",
                     maindir = maindir,
@@ -41,6 +46,9 @@ pip_countries <- function(action  = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+
+    # validate country output data
+    countries_validate_output(countries, detail = detail)
 
     if (branch == "main") {
       branch <- ""

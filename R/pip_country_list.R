@@ -8,6 +8,7 @@
 #'
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -26,6 +27,9 @@ pip_country_list <- function(action = c("update", "load"),
 
     ## Special national accounts --------
     cl <- pip_country_list_update(class_branch = class_branch)
+
+  # validate country list raw data
+    cl_validate_raw(cl, detail = detail)
 
     # Save
     if (branch == "main") {
