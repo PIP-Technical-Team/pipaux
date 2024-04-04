@@ -24,7 +24,7 @@ auto_aux_update <- function(measure = NULL,
   if (isFALSE(isgls)) {
     cli::cli_abort(
       "object {.var gls} is not available in Globel env.
-      Run {.code gls <- pipfun::pip_create_globals()} first",
+      Run {.code .run gls <- pipfun::pip_create_globals()} first",
       wrap = TRUE
     )
   }
