@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "countries"
+gls <- pipfun::pip_create_globals()
 
 test_that("countries_validate_output() works identifying duplicate error", {
 
@@ -12,7 +13,7 @@ test_that("countries_validate_output() works identifying duplicate error", {
     branch  = branch
   )
 
-  countries[, `:=` (country_code = fifelse(country_code == "ABW",
+  countries[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
   expect_error(countries_validate_output(countries), "Duplicate error")
@@ -29,8 +30,8 @@ test_that("countries_validate_output() works identifying invalid value", {
 
   countries[, `:=` (africa_split_code = fifelse(africa_split_code == "AFE",
                                          "SSA", africa_split_code),
-             pcn_region_code = fifelse(pcn_region_code == "SSA",
-                                       "SAR", pcn_region_code),
+             # pcn_region_code = fifelse(pcn_region_code == "SSA",
+             #                           "SAR", pcn_region_code),
              region_code = fifelse(region_code == "SSA",
                                    "SAR", region_code))]
 

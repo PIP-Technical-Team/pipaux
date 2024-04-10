@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "weo"
+gls <- pipfun::pip_create_globals()
 
 test_that("weo_validate_raw() works identifying duplicate error", {
 

@@ -2,6 +2,7 @@
 ## Initial parameters --------
 branch  <- "DEV"
 measure <- "pl"
+gls <- pipfun::pip_create_globals()
 
 test_that("pl_validate_output() works identifying duplicate error", {
 

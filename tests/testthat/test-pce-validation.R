@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "pce"
+gls <- pipfun::pip_create_globals()
 
 test_that("pce_validate_output() works identifying duplicate error", {
 

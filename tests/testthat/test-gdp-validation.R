@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "gdp"
+gls <- pipfun::pip_create_globals()
 
 test_that("gdp_validate_output() works identifying duplicate error", {
 

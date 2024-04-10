@@ -4,6 +4,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "metadata"
+gls <- pipfun::pip_create_globals()
 
 test_that("metadata_validate_raw() works identifying duplicate error", {
 

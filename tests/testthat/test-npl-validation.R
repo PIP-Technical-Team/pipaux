@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "npl"
+gls <- pipfun::pip_create_globals()
 
 test_that("npl_validate_raw() works identifying duplicate error", {
 

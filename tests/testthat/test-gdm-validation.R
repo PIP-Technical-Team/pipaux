@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "gdm"
+gls <- pipfun::pip_create_globals()
 
 test_that("gdm_validate_raw() works identifying duplicate error", {
 

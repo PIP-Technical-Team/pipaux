@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure = "cpi"
+gls <- pipfun::pip_create_globals()
 
 test_that("cpi_validate_raw() works identifying duplicate error", {
 

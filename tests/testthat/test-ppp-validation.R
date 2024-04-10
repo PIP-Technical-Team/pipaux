@@ -3,6 +3,7 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "ppp"
+gls <- pipfun::pip_create_globals()
 
 test_that("ppp_validate_raw() works identifying duplicate error", {
 

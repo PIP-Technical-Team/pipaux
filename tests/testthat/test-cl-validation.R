@@ -3,12 +3,13 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure = "country_list"
+gls <- pipfun::pip_create_globals()
 
 test_that("cl_validate_raw() works identifying duplicate error", {
 
   cl <- pip_country_list_update(class_branch = "master")
 
-  cl[, `:=` (country_code = fifelse(country_code == "ABW",
+  cl[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
   expect_error(cl_validate_raw(cl), "Duplicate error")
@@ -36,7 +37,7 @@ test_that("cl_validate_raw() works identifying duplicate error", {
                  measure = measure,
                  branch  = branch)
 
-  cl[, `:=` (country_code = fifelse(country_code == "ABW",
+  cl[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
   expect_error(cl_validate_raw(cl), "Duplicate error")
