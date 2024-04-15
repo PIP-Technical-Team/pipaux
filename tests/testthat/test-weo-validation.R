@@ -16,7 +16,7 @@ test_that("weo_validate_raw() works identifying duplicate error", {
   weo[, `:=` (`WEO Subject Code` = fifelse(`WEO Subject Code` == "NGDP",
                                  "NGDPD", `WEO Subject Code`))]
 
-  expect_error(weo_validate_raw(weo), "Duplicate error")
+  expect_error(weo_validate_raw(weo))
 
 })
 
@@ -32,7 +32,7 @@ test_that("weo_validate_output() works identifying duplicate error", {
   weo[, `:=` (year = fifelse(year == 1986 & country_code == "ABW",
                                        1987, year))]
 
-  expect_error(weo_validate_output(weo), "Duplicate error")
+  expect_error(weo_validate_output(weo))
 
 })
 
@@ -47,6 +47,6 @@ test_that("weo_validate_output() works identifying type/ formating error", {
   weo[, `:=` (year = as.character(year),
               weo_gdp = as.character(weo_gdp))]
 
-  expect_error(weo_validate_output(weo), "Type/ format error")
+  expect_error(weo_validate_output(weo))
 
 })

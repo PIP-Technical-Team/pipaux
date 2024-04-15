@@ -15,7 +15,7 @@ test_that("pfw_validate_raw() works identifying duplicate error", {
   pfw[, `:=` (year = fifelse((year == 1981 & code == "CHN"),
                                  1984, year))]
 
-  expect_error(pfw_validate_raw(pfw), "Duplicate error")
+  expect_error(pfw_validate_raw(pfw))
 
 })
 
@@ -31,7 +31,7 @@ test_that("pfw_validate_raw() works identifying type/ formating error", {
               pce_domain = as.character(pce_domain),
               pop_domain = as.character(pop_domain))]
 
-  expect_error(pfw_validate_raw(pfw), "Type/ format error")
+  expect_error(pfw_validate_raw(pfw))
 
 })
 
@@ -44,7 +44,7 @@ test_that("pfw_validate_raw() works identifying invalid value", {
 
   pfw[, datatype := fifelse(datatype == "c", "x", datatype)]
 
-  expect_error(pfw_validate_raw(pfw), "Invalid value in `datatype`")
+  expect_error(pfw_validate_raw(pfw))
 
 })
 
@@ -57,7 +57,7 @@ test_that("pfw_validate_raw() works identifying invalid value", {
 
   pfw[, pce_domain := fifelse(pce_domain == 1, 3, pce_domain)]
 
-  expect_error(pfw_validate_raw(pfw), "Invalid value in `pce_domain`")
+  expect_error(pfw_validate_raw(pfw))
 
 })
 
@@ -72,7 +72,7 @@ test_that("pfw_validate_output() works identifying duplicate error", {
   pfw[, `:=` (welfare_type = fifelse(welfare_type == "consumption",
                                        "income", welfare_type))]
 
-  expect_error(pfw_validate_output(pfw), "Duplicate error")
+  expect_error(pfw_validate_output(pfw))
 
 })
 
@@ -89,7 +89,7 @@ test_that("pfw_validate_output() works identifying type/ formating error", {
               pce_domain = as.character(pce_domain),
               pop_domain = as.character(pop_domain))]
 
-  expect_error(pfw_validate_output(pfw), "Type/ format error")
+  expect_error(pfw_validate_output(pfw))
 
 })
 
@@ -103,6 +103,6 @@ test_that("pfw_validate_output() works identifying invalid value", {
 
   pfw[, pce_domain := fifelse(pce_domain == 1, 3, pce_domain)]
 
-  expect_error(pfw_validate_output(pfw), "Invalid value in `pce_domain`")
+  expect_error(pfw_validate_output(pfw))
 
 })

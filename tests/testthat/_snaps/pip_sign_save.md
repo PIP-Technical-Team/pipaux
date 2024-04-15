@@ -6,7 +6,7 @@
       measure <- "ltst"
       saved <- pipfun::pip_sign_save(x = lx, measure = measure, msrdir = tdir,
         save_dta = TRUE)
-    Message <cliMessage>
+    Message
       ! Data signature has changed
       'ltst.rds' has been updated
     Code

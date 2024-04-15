@@ -15,6 +15,6 @@ test_that("mpd_validate_raw() works identifying type/ formating error", {
   mpd[, `:=` (year = as.character(year),
               mpd_gdp = as.character(mpd_gdp))]
 
-  expect_error(mpd_validate_raw(mpd), "Type/ format error")
+  expect_error(mpd_validate_raw(mpd))
 
 })

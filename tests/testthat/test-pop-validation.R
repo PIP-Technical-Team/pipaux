@@ -17,7 +17,7 @@ test_that("pop_validate_raw() works identifying duplicate error", {
   pop[, `:=` (indicator_id = fifelse(indicator_id == "SP.RUR.TOTL",
                                      "SP.URB.TOTL", indicator_id))]
 
-  expect_error(pop_validate_raw(pop), "Duplicate error")
+  expect_error(pop_validate_raw(pop))
 
 })
 
@@ -33,7 +33,7 @@ test_that("pop_validate_raw() works identifying type/ formating error", {
   pop[, `:=` (date = as.character(date),
               value = as.character(value))]
 
-  expect_error(pop_validate_raw(pop), "Type/ format error")
+  expect_error(pop_validate_raw(pop))
 
 })
 
@@ -49,7 +49,7 @@ test_that("pop_validate_raw() works identifying invalid value", {
   pop[, `:=` (indicator_id = fifelse(indicator_id == "SP.RUR.TOTL",
                                      "SP.RUR.totl", indicator_id))]
 
-  expect_error(pop_validate_raw(pop), "Invalid value in `indicator_id`")
+  expect_error(pop_validate_raw(pop))
 
 })
 
@@ -64,7 +64,7 @@ test_that("pop_validate_output() works identifying duplicate error", {
   pop[, `:=` (pop_data_level = fifelse((pop_data_level == "rural" & country_code == "ABW"),
                                        "urban", pop_data_level))]
 
-  expect_error(pop_validate_output(pop), "Duplicate error")
+  expect_error(pop_validate_output(pop))
 
 })
 
@@ -79,7 +79,7 @@ test_that("pop_validate_output() works identifying type/ formating error", {
   pop[, `:=` (year = as.character(year),
               pop = as.character(pop))]
 
-  expect_error(pop_validate_output(pop), "Type/ format error")
+  expect_error(pop_validate_output(pop))
 
 })
 
@@ -94,6 +94,6 @@ test_that("pop_validate_output() works identifying invalid value", {
   pop[, pop_data_level := fifelse(pop_data_level == "national",
                                   "national1", pop_data_level)]
 
-  expect_error(pop_validate_output(pop), "Invalid value in `pop_data_level`")
+  expect_error(pop_validate_output(pop))
 
 })

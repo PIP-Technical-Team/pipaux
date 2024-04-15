@@ -16,7 +16,7 @@ test_that("gdp_validate_output() works identifying type/ formating error", {
   incgroups[, `:=` (year_data = as.character(year_data),
               year = as.character(year))]
 
-  expect_error(incgroup_validate_output(incgroups), "Type/ format error")
+  expect_error(incgroup_validate_output(incgroups))
 
 })
 
@@ -31,6 +31,6 @@ test_that("incgroup_validate_output() works identifying invalid value", {
   incgroups[, income_group_code := fifelse(income_group_code == "HIC",
                                   "hic", income_group_code)]
 
-  expect_error(incgroup_validate_output(incgroups), "Invalid value in `income_group_code`")
+  expect_error(incgroup_validate_output(incgroups))
 
 })

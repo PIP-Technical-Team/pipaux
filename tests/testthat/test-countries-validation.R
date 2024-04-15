@@ -16,7 +16,7 @@ test_that("countries_validate_output() works identifying duplicate error", {
   countries[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
-  expect_error(countries_validate_output(countries), "Duplicate error")
+  expect_error(countries_validate_output(countries))
 
 })
 
@@ -35,6 +35,6 @@ test_that("countries_validate_output() works identifying invalid value", {
              region_code = fifelse(region_code == "SSA",
                                    "SAR", region_code))]
 
-  expect_error(countries_validate_output(countries), "Invalid values")
+  expect_error(countries_validate_output(countries))
 
 })

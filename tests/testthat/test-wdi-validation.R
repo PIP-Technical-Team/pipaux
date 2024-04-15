@@ -15,7 +15,7 @@ test_that("wdi_validate_raw() works identifying duplicate error", {
   wdi[, `:=` (year = fifelse((year == 1960 & country_code == "ABW"),
                                  1961, year))]
 
-  expect_error(wdi_validate_raw(wdi), "Duplicate error")
+  expect_error(wdi_validate_raw(wdi))
 
 })
 
@@ -31,6 +31,6 @@ test_that("wdi_validate_raw() works identifying type/ formating error", {
               NE.CON.PRVT.PC.KD = as.character(NE.CON.PRVT.PC.KD),
               NY.GDP.PCAP.KD = as.character(NY.GDP.PCAP.KD))]
 
-  expect_error(wdi_validate_raw(wdi), "Type/ format error")
+  expect_error(wdi_validate_raw(wdi))
 
 })

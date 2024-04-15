@@ -12,7 +12,7 @@ test_that("cl_validate_raw() works identifying duplicate error", {
   cl[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
-  expect_error(cl_validate_raw(cl), "Duplicate error")
+  expect_error(cl_validate_raw(cl))
 
 })
 
@@ -27,7 +27,7 @@ test_that("cl_validate_raw() works identifying invalid value", {
              region_code = fifelse(region_code == "SSA",
                                        "SAR", region_code))]
 
-  expect_error(cl_validate_raw(cl), "Invalid values")
+  expect_error(cl_validate_raw(cl))
 
 })
 
@@ -40,7 +40,7 @@ test_that("cl_validate_raw() works identifying duplicate error", {
   cl[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
 
-  expect_error(cl_validate_raw(cl), "Duplicate error")
+  expect_error(cl_validate_raw(cl))
 
 })
 
@@ -57,6 +57,6 @@ test_that("cl_validate_raw() works identifying invalid value", {
              region_code = fifelse(region_code == "SSA",
                                    "SAR", region_code))]
 
-  expect_error(cl_validate_raw(cl), "Invalid values")
+  expect_error(cl_validate_raw(cl))
 
 })

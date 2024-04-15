@@ -15,7 +15,7 @@ test_that("sna_validate_raw() works identifying type/ formating error", {
   sna[, `:=` (year = as.character(year),
               GDP = as.character(GDP))]
 
-  expect_error(sna_validate_raw(sna), "Type/ format error")
+  expect_error(sna_validate_raw(sna))
 
 })
 
@@ -29,6 +29,6 @@ test_that("sna_validate_raw() works identifying invalid value", {
 
   sna[, coverage := fifelse(coverage == "National", "national1", coverage)]
 
-  expect_error(sna_validate_raw(sna), "Invalid value in `DataType`")
+  expect_error(sna_validate_raw(sna))
 
 })

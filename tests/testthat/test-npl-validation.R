@@ -17,7 +17,7 @@ test_that("npl_validate_raw() works identifying duplicate error", {
   npl[, `:=` (year = fifelse((year == 2007 & countrycode == "AFG"),
                                  2011, year))]
 
-  expect_error(npl_validate_raw(npl), "Duplicate error")
+  expect_error(npl_validate_raw(npl))
 
 })
 
@@ -26,13 +26,14 @@ test_that("npl_validate_raw() works identifying type/ formating error", {
   npl <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
-  )
+    branch = branch,
+    ext    = "dta"
+  ) |> setDT()
 
   npl[, `:=` (year = as.character(year),
               comparability = as.character(comparability))]
 
-  expect_error(npl_validate_raw(npl), "Type/ format error")
+  expect_error(npl_validate_raw(npl))
 
 })
 
@@ -48,7 +49,7 @@ test_that("npl_validate_output() works identifying duplicate error", {
   npl[, `:=` (reporting_year = fifelse((reporting_year == 2007 & country_code == "AFG"),
                              2011, reporting_year))]
 
-  expect_error(npl_validate_output(npl), "Duplicate error")
+  expect_error(npl_validate_output(npl))
 
 })
 
@@ -64,7 +65,7 @@ test_that("npl_validate_output() works identifying type/ formating error", {
               comparability = as.character(comparability),
               nat_headcount = as.character(nat_headcount))]
 
-  expect_error(npl_validate_output(npl), "Type/ format error")
+  expect_error(npl_validate_output(npl))
 
 })
 

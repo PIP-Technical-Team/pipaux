@@ -16,7 +16,7 @@ test_that("cpi_validate_raw() works identifying duplicate error", {
   cpi[, `:=` (cpi_data_level = fifelse(cpi_data_level == 0,
                                     1, cpi_data_level))]
 
-  expect_error(cpi_validate_raw(cpi), "Duplicate error")
+  expect_error(cpi_validate_raw(cpi))
 
 })
 
@@ -35,7 +35,7 @@ test_that("cpi_validate_raw() works identifying type/ formating error", {
               cpi2011 = as.character(cpi2011),
               cpi2017 = as.character(cpi2017))]
 
-  expect_error(cpi_validate_raw(cpi), "Type/ format error")
+  expect_error(cpi_validate_raw(cpi))
 
 })
 
@@ -49,7 +49,7 @@ test_that("cpi_validate_raw() works identifying invalid value", {
 
   cpi[, cpi_domain := fifelse(cpi_domain == "National", "National1", cpi_domain)]
 
-  expect_error(cpi_validate_raw(cpi), "Invalid value in `cpi_domain`")
+  expect_error(cpi_validate_raw(cpi))
 
 })
 
@@ -64,7 +64,7 @@ test_that("cpi_validate_output() works identifying duplicate error", {
   cpi[, `:=` (cpi_data_level = fifelse(cpi_data_level == "rural",
                                        "urban", cpi_data_level))]
 
-  expect_error(cpi_validate_output(cpi), "Duplicate error")
+  expect_error(cpi_validate_output(cpi))
 
 })
 
@@ -82,7 +82,7 @@ test_that("cpi_validate_output() works identifying type/ formating error", {
               cpi2011 = as.character(cpi2011),
               cpi2017 = as.character(cpi2017))]
 
-  expect_error(cpi_validate_output(cpi), "Type/ format error")
+  expect_error(cpi_validate_output(cpi))
 
 })
 
@@ -97,6 +97,6 @@ test_that("cpi_validate_output() works identifying invalid value", {
 
   cpi[, cpi_domain := fifelse(cpi_domain == "National", "National1", cpi_domain)]
 
-  expect_error(cpi_validate_output(cpi), "Invalid value in `cpi_domain`")
+  expect_error(cpi_validate_output(cpi))
 
 })

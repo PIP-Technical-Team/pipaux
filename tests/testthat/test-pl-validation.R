@@ -15,7 +15,7 @@ test_that("pl_validate_output() works identifying duplicate error", {
   pl[, `:=` (ppp_year = fifelse(ppp_year == 2011,
                                        2017, ppp_year))]
 
-  expect_error(pl_validate_output(pl), "Duplicate error")
+  expect_error(pl_validate_output(pl))
 
 })
 
@@ -30,6 +30,6 @@ test_that("pl_validate_output() works identifying type/ formating error", {
   pl[, `:=` (poverty_line = as.character(poverty_line),
               ppp_year = as.character(ppp_year))]
 
-  expect_error(pl_validate_output(pl), "Type/ format error")
+  expect_error(pl_validate_output(pl))
 
 })

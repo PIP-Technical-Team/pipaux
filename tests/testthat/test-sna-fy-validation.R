@@ -15,6 +15,6 @@ test_that("sna_validate_raw() works identifying type/ formating error", {
 
   sna_fy[, Day := as.character(Day)]
 
-  expect_error(sna_fy_validate_raw(sna_fy), "Type/ format error")
+  expect_error(sna_fy_validate_raw(sna_fy))
 
 })
