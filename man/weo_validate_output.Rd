@@ -14,3 +14,4 @@ weo_validate_output(weo, detail = getOption("pipaux.detail.output"))
 \description{
 Validate clean weo data
 }
+\keyword{internal}

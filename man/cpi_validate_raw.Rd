@@ -14,3 +14,4 @@ cpi_validate_raw(cpi, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw cpi data
 }
+\keyword{internal}

@@ -14,3 +14,4 @@ npl_validate_raw(npl, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate npl raw data
 }
+\keyword{internal}

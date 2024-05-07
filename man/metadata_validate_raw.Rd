@@ -14,3 +14,4 @@ metadata_validate_raw(metadata, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw metadata data
 }
+\keyword{internal}

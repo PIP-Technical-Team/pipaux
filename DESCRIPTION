@@ -28,7 +28,9 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    covr
+    covr,
+    dm,
+    config
 Imports: 
     haven,
     digest,
@@ -50,11 +52,8 @@ Imports:
     httr,
     pipfun (>= 0.0.0.9007),
     lifecycle,
-    joyn,
-    dm,
-    config,
     collapse,
-    covr,
+    joyn,
     data.validator,
     assertr,
     blastula,

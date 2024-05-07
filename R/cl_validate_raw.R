@@ -4,6 +4,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq
+#' @keywords internal
 #'
 #' @export
 cl_validate_raw <- function(cl, detail = getOption("pipaux.detail.raw")){
@@ -12,26 +13,17 @@ cl_validate_raw <- function(cl, detail = getOption("pipaux.detail.raw")){
 
   report <- data_validation_report()
 
+  country_list <- pipfun::load_from_gh(measure = "pfw",
+                                       owner   = getOption("pipfun.ghowner"),
+                                       branch  = "DEV",
+                                       ext = "dta")
+
+  country_list <- unique(country_list[, country_code])
+
   validate(cl, name = "CL raw data validation") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_cols(in_set(c("ABW", "AFG", "AGO", "ALB", "AND", "ARE", "ARG", "ARM", "ASM", "ATG", "AUS", "AUT", "AZE",
-                           "BDI", "BEL", "BEN", "BFA", "BGD", "BGR", "BHR", "BHS", "BIH", "BLR", "BLZ", "BMU", "BOL",
-                           "BRA", "BRB", "BRN", "BTN", "BWA", "CAF", "CAN", "CHE", "CHI", "CHL", "CHN", "CIV", "CMR",
-                           "COD", "COG", "COL", "COM", "CPV", "CRI", "CUB", "CUW", "CYM", "CYP", "CZE", "DEU", "DJI",
-                           "DMA", "DNK", "DOM", "DZA", "ECU", "EGY", "ERI", "ESP", "EST", "ETH", "FIN", "FJI", "FRA",
-                           "FRO", "FSM", "GAB", "GBR", "GEO", "GHA", "GIB", "GIN", "GMB", "GNB", "GNQ", "GRC", "GRD",
-                           "GRL", "GTM", "GUM", "GUY", "HKG", "HND", "HRV", "HTI", "HUN", "IDN", "IMN", "IND", "IRL",
-                           "IRN", "IRQ", "ISL", "ISR", "ITA", "JAM", "JOR", "JPN", "KAZ", "KEN", "KGZ", "KHM", "KIR",
-                           "KNA", "KOR", "KWT", "LAO", "LBN", "LBR", "LBY", "LCA", "LIE", "LKA", "LSO", "LTU", "LUX",
-                           "LVA", "MAC", "MAF", "MAR", "MCO", "MDA", "MDG", "MDV", "MEX", "MHL", "MKD", "MLI", "MLT",
-                           "MMR", "MNE", "MNG", "MNP", "MOZ", "MRT", "MUS", "MWI", "MYS", "NAM", "NCL", "NER", "NGA",
-                           "NIC", "NLD", "NOR", "NPL", "NRU", "NZL", "OMN", "PAK", "PAN", "PER", "PHL", "PLW", "PNG",
-                           "POL", "PRI", "PRK", "PRT", "PRY", "PSE", "PYF", "QAT", "ROU", "RUS", "RWA", "SAU", "SDN",
-                           "SEN", "SGP", "SLB", "SLE", "SLV", "SMR", "SOM", "SRB", "SSD", "STP", "SUR", "SVK", "SVN",
-                           "SWE", "SWZ", "SXM", "SYC", "SYR", "TCA", "TCD", "TGO", "THA", "TJK", "TKM", "TLS", "TON",
-                           "TTO", "TUN", "TUR", "TUV", "TWN", "TZA", "UGA", "UKR", "URY", "USA", "UZB", "VCT", "VEN",
-                           "VGB", "VIR", "VNM", "VUT", "WSM", "XKX", "YEM", "ZAF", "ZMB", "ZWE")),
+    validate_cols(in_set(country_list),
                   country_code, description = "`country_code` values within range") |>
     validate_if(is.character(country_name),
                 description = "`country_name` should be character") |>

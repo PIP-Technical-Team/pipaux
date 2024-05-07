@@ -14,3 +14,4 @@ pl_validate_output(pl, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output pl data
 }
+\keyword{internal}

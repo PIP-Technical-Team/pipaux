@@ -14,3 +14,4 @@ pce_validate_output(pce, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output pce data
 }
+\keyword{internal}

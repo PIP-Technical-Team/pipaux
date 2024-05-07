@@ -14,3 +14,4 @@ npl_validate_output(npl, detail = getOption("pipaux.detail.output"))
 \description{
 Validate npl output data
 }
+\keyword{internal}

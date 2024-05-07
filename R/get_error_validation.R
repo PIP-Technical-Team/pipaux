@@ -36,7 +36,7 @@ get_error_validation <- function(vlddata, detail){
 
     }
 
-    cli::cli_inform("Validation report ('validation_report') has been added to the environment varaible (.pipaux).")
+    cli::cli_inform("Validation report ({.field validation_report}) has been added to the environment varaible ({.field .pipaux}).")
   }
 
 }

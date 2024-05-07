@@ -14,3 +14,4 @@ spop_validate_raw(spop, detail = getOption("pipaux.detail.output"))
 \description{
 Validate raw special cases pop data
 }
+\keyword{internal}

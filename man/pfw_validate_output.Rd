@@ -14,3 +14,4 @@ pfw_validate_output(pfw, detail = getOption("pipaux.detail.output"))
 \description{
 Validate clean pfw data
 }
+\keyword{internal}

@@ -14,3 +14,4 @@ incgroup_validate_output(incgroup, detail = getOption("pipaux.detail.output"))
 \description{
 Validate income group output data
 }
+\keyword{internal}

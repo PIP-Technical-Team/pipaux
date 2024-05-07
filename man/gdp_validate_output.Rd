@@ -14,3 +14,4 @@ gdp_validate_output(gdp, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output gdp data
 }
+\keyword{internal}

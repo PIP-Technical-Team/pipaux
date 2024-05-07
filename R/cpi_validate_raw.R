@@ -4,6 +4,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq
+#' @keywords internal
 #'
 #' @export
 cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){

@@ -14,3 +14,4 @@ sna_fy_validate_raw(sna_fy, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw sna_fy data
 }
+\keyword{internal}

@@ -4,6 +4,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq
+#' @keywords internal
 #'
 #' @export
 spop_validate_raw <- function(spop, detail = getOption("pipaux.detail.output")){

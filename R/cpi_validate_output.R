@@ -4,6 +4,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq
+#' @keywords internal
 #'
 #' @export
 cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output")){
@@ -66,6 +67,8 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
     validate_if(is_uniq(country_code, cpi_year, survey_acronym,
                         cpi_data_level),
                 description = "no duplicate records in key variables") |>
+    validate_if(is_uniq(country_code, cpi),
+                description = "no duplicate cpi values") |>
     add_results(report)
 
   validation_record <- get_results(report, unnest = FALSE) |>

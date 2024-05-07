@@ -14,3 +14,4 @@ wdi_validate_raw(wdi, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw wdi data
 }
+\keyword{internal}

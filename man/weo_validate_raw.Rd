@@ -14,3 +14,4 @@ weo_validate_raw(weo, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw weo data
 }
+\keyword{internal}

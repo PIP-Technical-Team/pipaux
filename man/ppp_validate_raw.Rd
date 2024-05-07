@@ -14,3 +14,4 @@ ppp_validate_raw(ppp, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw ppp data
 }
+\keyword{internal}

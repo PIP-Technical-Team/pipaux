@@ -14,3 +14,4 @@ pop_validate_output(pop, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output pop data
 }
+\keyword{internal}

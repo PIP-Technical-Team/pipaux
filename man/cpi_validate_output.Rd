@@ -14,3 +14,4 @@ cpi_validate_output(cpi, detail = getOption("pipaux.detail.output"))
 \description{
 Validate clean cpi data
 }
+\keyword{internal}

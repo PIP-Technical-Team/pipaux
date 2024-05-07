@@ -14,3 +14,4 @@ ppp_validate_output(ppp, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output ppp data
 }
+\keyword{internal}

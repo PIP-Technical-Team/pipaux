@@ -14,3 +14,4 @@ gdm_validate_output(gdm, detail = getOption("pipaux.detail.output"))
 \description{
 Validate clean gdm data
 }
+\keyword{internal}

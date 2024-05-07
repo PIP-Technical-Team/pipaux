@@ -14,3 +14,4 @@ pfw_validate_raw(pfw, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw pfw data
 }
+\keyword{internal}

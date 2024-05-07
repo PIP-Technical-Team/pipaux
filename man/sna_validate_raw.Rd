@@ -14,3 +14,4 @@ sna_validate_raw(sna, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw special national accounts (sna) data
 }
+\keyword{internal}

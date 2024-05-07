@@ -14,3 +14,4 @@ gdm_validate_raw(gdm, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw gdm data
 }
+\keyword{internal}

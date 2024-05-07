@@ -14,3 +14,4 @@ metadata_validate_output(metadata, detail = getOption("pipaux.detail.output"))
 \description{
 Validate output metadata data
 }
+\keyword{internal}

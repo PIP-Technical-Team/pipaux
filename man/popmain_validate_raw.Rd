@@ -14,3 +14,4 @@ popmain_validate_raw(pop_main, detail = getOption("pipaux.detail.raw"))
 \description{
 Validate raw main pop data
 }
+\keyword{internal}
