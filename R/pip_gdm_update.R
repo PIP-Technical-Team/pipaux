@@ -192,8 +192,7 @@ pip_gdm_update <- function(force = FALSE,
 
   pip_country_list(maindir = maindir,
                    force   = force,
-                   branch  = branch,
-                   tag     = tag)
+                   branch  = branch)
 
   cl   <- load_aux(measure = "country_list",
                    maindir = maindir,
