@@ -192,7 +192,6 @@ pip_gdm_update <- function(force = FALSE,
 
   pip_country_list(maindir = maindir,
                    force   = force,
-                   owner   = owner,
                    branch  = branch,
                    tag     = tag)
 
