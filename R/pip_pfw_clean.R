@@ -69,7 +69,8 @@ pip_pfw_clean <- function(y,
         grepl("[Cc]", welfare_type), "consumption",
         default = ""
       ),
-      surveyid_year = as.integer(surveyid_year)
+      surveyid_year = as.integer(surveyid_year),
+      survey_year   = round(survey_year, 2)
     )
   ]
 
@@ -81,3 +82,4 @@ pip_pfw_clean <- function(y,
   x <- unique(x) # remove duplicates
   return(x)
 }
+
