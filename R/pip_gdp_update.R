@@ -71,6 +71,13 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     filename = "sna_metadata"
   )
 
+  # load nowcast growth rates
+  nan <- pipfun::load_from_gh(
+    measure = "nan",
+    owner  = owner,
+    branch = branch
+  )
+
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
@@ -269,6 +276,41 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
       gdp_data_level == "2", "national"
     )
   ]
+
+
+  # add nowcast growth rates ----------
+  byvars <- c("country_code", "gdp_data_level")
+
+  # Find the latest GDP data year for each country
+  latest_gdp <- gdp[, .(last_year = max(year),
+                        last_gdp = gdp[which.max(year)]),
+                    by =  c(byvars, "gdp_domain")]
+
+  # Join this with growth rates or years after the last available GDP year
+  dt_growth <- joyn::joyn(nan, latest_gdp,
+                          by =  byvars,
+                          match_type = "m:1",
+                          keep = "left",
+                          reportvar = FALSE) |>
+    fsubset(year > last_year)
+
+  # Prepare for cumulative growth calculation
+  dt_growth[, c("initial_year", "initial_gdp") := .(last_year[1], last_gdp[1]),
+            by = byvars]
+
+  # Calculate projected GDP
+  # Calculate cumulative GDP projections
+  dt_growth[, cum_growth := cumprod(1 + gdppc_growth),
+            by = byvars
+  ][, projected_GDP := last_gdp * cum_growth
+  ]
+
+  # Select the relevant columns for the result
+  gdp <- dt_growth |>
+    fselect(country_code, gdp_data_level, gdp_domain, year, gdp = projected_GDP) |>
+    # append to actual GDP
+    rowbind(gdp, fill = TRUE) |>
+    setorder(country_code, gdp_data_level, year)
 
   # Remove any non-WDI countries
   gdp <- gdp[country_code %in% cl$country_code]
