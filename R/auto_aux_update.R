@@ -30,9 +30,7 @@ auto_aux_update <- function(measure = NULL,
   }
 
 
-  assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
-                          msg = "Enviroment variable `GITHUB_PAT` is empty.
-                          Please set it up using Sys.setenv(GITHUB_PAT = 'code')")
+  creds <- pipfun::get_github_creds()
   gh_user   <- "https://raw.githubusercontent.com"
   org_data  <- paste(gh_user,
                      owner,
