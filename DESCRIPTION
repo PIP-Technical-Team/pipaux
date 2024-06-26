@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.1.2.9005
+Version: 0.1.2.9006
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
@@ -48,7 +48,7 @@ Imports:
     glue,
     gh,
     httr,
-    pipfun (>= 0.0.0.9007),
+    pipfun (>=  0.0.1.9001),
     lifecycle,
     joyn,
     dm,

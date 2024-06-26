@@ -12,7 +12,7 @@ auto_aux_update <- function(measure = NULL,
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
 
-  cli::cli_inform("Please make sure to run {.code library(pipaux)} before running this function.")
+  pipfun::check_pkg_active("pipaux")
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
@@ -30,9 +30,7 @@ auto_aux_update <- function(measure = NULL,
   }
 
 
-  assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
-                          msg = "Enviroment variable `GITHUB_PAT` is empty.
-                          Please set it up using Sys.setenv(GITHUB_PAT = 'code')")
+  creds <- pipfun::get_github_creds()
   gh_user   <- "https://raw.githubusercontent.com"
   org_data  <- paste(gh_user,
                      owner,
@@ -174,6 +172,7 @@ auto_aux_update <- function(measure = NULL,
   cli::cli_h2("File updated status.")
   knitr::kable(last_updated_time)
 }
+
 
 
 return_value <- function(aux, dependencies) {
