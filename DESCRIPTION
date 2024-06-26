@@ -48,7 +48,7 @@ Imports:
     glue,
     gh,
     httr,
-    pipfun (>= 0.0.0.9021),
+    pipfun (>=  0.0.1.9001),
     lifecycle,
     joyn,
     dm,
