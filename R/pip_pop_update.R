@@ -19,7 +19,11 @@ pip_pop_update <-  function(force   = FALSE,
   pfw      <- pipload::pip_load_aux("pfw",
                                     branch  = branch,
                                     maindir = maindir)
-  year_max <- pfw[, max(year)]
+  # year_max <- pfw[, max(year)]
+  # get current year as max year
+  year_max <- Sys.Date() |>
+    format("%Y") |>
+    as.numeric()
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
