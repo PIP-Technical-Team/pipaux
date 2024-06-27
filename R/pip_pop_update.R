@@ -213,7 +213,7 @@ clean_from_wide <- function(x) {
   }
 
 
-  year_vars            <- names(x[, 6:ncol(x)])
+  year_vars            <- names(x)[6:ncol(x)]
   x$Series_Name <- NULL
   x$Time_Name   <- NULL
 
@@ -226,8 +226,13 @@ clean_from_wide <- function(x) {
       variable.name = "Year",
       value.name = "Population"
     )
-  pop_long$Year <- as.numeric(as.character(pop_long$Year))
-  pop_long$Population <- as.numeric(pop_long$Population)
+  pop_long[,
+           Year := as.numeric(as.character(Year))
+           ][,
+             Population := {
+               Population[Population == "."] <- NA_character_
+               as.numeric(Population)
+             }]
 
 
 
