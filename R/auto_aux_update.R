@@ -166,7 +166,7 @@ auto_aux_update <- function(measure = NULL,
         sha     = out$sha,
         content = convert_df_to_base64(org_data)
       ),
-      .token = Sys.getenv("GITHUB_PAT")
+      .token = creds$password
     )
   }
   cli::cli_h2("File updated status.")
