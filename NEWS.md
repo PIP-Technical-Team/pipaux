@@ -1,4 +1,4 @@
-# pipaux (development version)
+# pipaux 0.1.3
 
 - Save data to GitHub for GDP data. 
 - Adding validation rule for npl and income group files
