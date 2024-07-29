@@ -48,7 +48,7 @@ Imports:
     glue,
     gh,
     httr,
-    pipfun (>=  0.0.1.9001),
+    pipfun (>=  0.0.2),
     lifecycle,
     joyn,
     dm,
@@ -57,7 +57,7 @@ Imports:
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@ongoing,
-    github::PIP-Technical-Team/pipfun@ongoing
+    github::PIP-Technical-Team/pipfun@DEV
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3
 ByteCompile: true

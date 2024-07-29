@@ -326,7 +326,9 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir  = msrdir,
     force   = force
   )
-
+  # Push data (gdp) to GitHub as gdp.csv
+  pipfun::save_to_gh(gdp, measure = measure, branch = branch)
+  # All aux files that depend on gdp will be loaded from Github
   return(invisible(saved))
 
 }
