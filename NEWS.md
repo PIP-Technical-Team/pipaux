@@ -1,5 +1,7 @@
 # pipaux (development version)
 
+- Save data to GitHub for GDP data. 
+
 # pipaux 0.1.2
 
 - Added a dummy `pip_sna()` function to make it compatible with `auto_aux_update()` 

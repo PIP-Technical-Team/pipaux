@@ -185,6 +185,17 @@ return_value <- function(aux, dependencies) {
   return(unique(c(val, aux)))
 }
 
+#' Function to write dataframe to GitHub
+#'
+#' @param df A dataframe
+#'
+#' @return base64 encoded dataframe
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#' convert_df_to_base64(mtcars)
+#' }
 convert_df_to_base64 <- function(df) {
   df |>
     write.table(quote = FALSE,
