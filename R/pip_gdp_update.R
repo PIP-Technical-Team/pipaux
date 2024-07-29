@@ -207,18 +207,16 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     gdp[sna,
         on = .(country_code, year),
         `:=`(
-          chain_factor = i.GDP
+          sna_gdp = i.GDP
         )
     ]
 
-    syr_2010 <- gdp[country_code == "SYR" & year == 2010,
-                    gdp]
     gdp[,
-        gdp := fifelse(is.na(chain_factor),gdp, syr_2010 * chain_factor)
+        gdp := fifelse(is.na(sna_gdp),gdp, sna_gdp)
     ]
     # remove extra variables
     gdp[,
-        chain_factor := NULL]
+        sna_gdp := NULL]
   }
 
   # ---- Expand for special cases with U/R levels ----

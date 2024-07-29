@@ -1,6 +1,6 @@
 Package: pipaux
 Title: Management of auxiliary data in PIP workflow
-Version: 0.1.2.9009
+Version: 0.1.2.9010
 Authors@R: c(
             person(given = "R.Andres",
                    family = "Castaneda",
@@ -23,7 +23,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

@@ -1,6 +1,7 @@
 # pipaux (development version)
 
 - Save data to GitHub for GDP data. 
+- revert the issue of SYR GDP with SNA data.
 
 # pipaux 0.1.2
 
