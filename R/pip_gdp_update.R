@@ -286,6 +286,14 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
+  gdp <- gdp |> setnames("gdp_data_level", "reporting_level",
+                         skip_absent=TRUE)
+
+  setattr(gdp, "aux_name", "gdp")
+  setattr(gdp,
+          "aux_key",
+          c("country_code", "year", "reporting_level"))
+
   saved <- pipfun::pip_sign_save(
     x       = gdp,
     measure = measure,

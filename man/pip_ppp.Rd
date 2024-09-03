@@ -11,7 +11,8 @@ pip_ppp(
   branch = c("DEV", "PROD", "main"),
   force = FALSE,
   tag = branch,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ppp_defaults = TRUE
 )
 }
 \arguments{

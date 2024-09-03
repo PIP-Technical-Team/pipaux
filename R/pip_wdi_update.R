@@ -60,6 +60,12 @@ pip_wdi_update <- function(force   = FALSE,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(wdi, "aux_name", "wdi")
+  setattr(wdi,
+          "aux_key",
+          c("country_code", "year"))
+
   saved <- pipfun::pip_sign_save(
     x       = wdi,
     measure = measure,

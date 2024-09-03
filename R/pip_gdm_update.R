@@ -86,11 +86,11 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Merge with PFW                                                          ####
 
-  pip_pfw(maindir = maindir,
-          force   = force,
-          owner   = owner,
-          branch  = branch,
-          tag     = tag)
+  # pip_pfw(maindir = maindir,
+  #         force   = force,
+  #         owner   = owner,
+  #         branch  = branch,
+  #         tag     = tag)
 
   pfw    <-  load_aux(measure = "pfw",
                       maindir = maindir,
@@ -192,11 +192,11 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Remove any non-WDI countries                                            ####
 
-  pip_country_list(maindir = maindir,
-                   force   = force,
-                   owner   = owner,
-                   branch  = branch,
-                   tag     = tag)
+  # pip_country_list(maindir = maindir,
+  #                  force   = force,
+  #                  owner   = owner,
+  #                  branch  = branch,
+  #                  tag     = tag)
 
   cl   <- load_aux(measure = "country_list",
                    maindir = maindir,
@@ -213,6 +213,16 @@ pip_gdm_update <- function(force = FALSE,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  df <- df |> setnames(c("surveyid_year", "pop_data_level"),
+                         c("year", "reporting_level"),
+                         skip_absent=TRUE)
+
+  setattr(df, "aux_name", "gdm")
+  setattr(df,
+          "aux_key",
+          c("country_code", "year", "reporting_level", "welfare_type"))
+
   saved <- pipfun::pip_sign_save(
     x       = df,
     measure = measure,

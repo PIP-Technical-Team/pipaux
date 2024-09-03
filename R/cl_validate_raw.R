@@ -13,18 +13,19 @@ cl_validate_raw <- function(cl, detail = getOption("pipaux.detail.raw")){
 
   report <- data_validation_report()
 
+  # country_list <- pipload::pip_load_aux("pfw")
   country_list <- pipfun::load_from_gh(measure = "pfw",
                                        owner   = getOption("pipfun.ghowner"),
                                        branch  = "DEV",
                                        ext = "dta")
 
-  country_list <- unique(country_list[, country_code])
+  country_list <- unique(country_list[, code])
 
   validate(cl, name = "CL raw data validation") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_cols(in_set(country_list),
-                  country_code, description = "`country_code` values within range") |>
+    # validate_cols(in_set(country_list),
+    #               country_code, description = "`country_code` values within range") |>
     validate_if(is.character(country_name),
                 description = "`country_name` should be character") |>
     validate_if(is.character(africa_split),

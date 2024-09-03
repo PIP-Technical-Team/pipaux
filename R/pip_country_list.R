@@ -17,7 +17,8 @@ pip_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
                              branch  = c("DEV", "PROD", "main"),
-                             class_branch = "master"
+                             class_branch = "master",
+                             detail  = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
   branch  <- match.arg(branch)
@@ -36,6 +37,12 @@ pip_country_list <- function(action = c("update", "load"),
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(cl, "aux_name", "country_list")
+  setattr(cl,
+          "aux_key",
+          c("country_code"))
+
     saved <- pipfun::pip_sign_save(
       x       = cl,
       measure = measure,

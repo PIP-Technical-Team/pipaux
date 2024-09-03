@@ -9,7 +9,8 @@ pip_country_list(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   branch = c("DEV", "PROD", "main"),
-  class_branch = "master"
+  class_branch = "master",
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{

@@ -112,6 +112,14 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  df <- df |> setnames("reporting_year", "year", skip_absent=TRUE)
+
+  setattr(df, "aux_name", "metadata")
+  setattr(df,
+          "aux_key",
+          c("country_code", "year", "welfare_type"))
+
   saved <- pipfun::pip_sign_save(
     x       = df,
     measure = measure,

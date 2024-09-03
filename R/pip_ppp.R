@@ -13,7 +13,8 @@ pip_ppp <- function(action = c("update", "load"),
                     branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
                     tag     = branch,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    ppp_defaults = TRUE) {
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -52,7 +53,8 @@ pip_ppp <- function(action = c("update", "load"),
     load_aux(
       maindir = maindir,
       measure = measure,
-      branch  = branch
+      branch  = branch,
+      ppp_defaults = ppp_defaults
     )
   }
 

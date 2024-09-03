@@ -47,6 +47,10 @@ pip_countries <- function(action  = c("update", "load"),
     }
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
+    setattr(countries, "aux_name", "countries")
+    setattr(countries,
+            "aux_key",
+            c("country_code"))
 
     pipfun::pip_sign_save(
       x = countries,

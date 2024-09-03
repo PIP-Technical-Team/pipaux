@@ -46,6 +46,15 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
+  cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
+                         c("year", "reporting_level"),
+                         skip_absent=TRUE)
+
+  setattr(cpi, "aux_name", "cpi")
+  setattr(cpi,
+          "aux_key",
+          c("country_code", "year", "reporting_level", "survey_acronym"))
+
   saved <- pipfun::pip_sign_save(
     x       = cpi,
     measure = measure,

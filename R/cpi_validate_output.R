@@ -46,20 +46,20 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                 description = "`cpi2011` should be numeric") |>
     validate_if(is.numeric(cpi2017),
                 description = "`cpi2017` should be numeric") |>
-    validate_if(is.numeric(cpi2011_SM22),
-                description = "`cpi2011_SM22` should be numeric") |>
-    validate_if(is.numeric(cpi2017_SM22),
-                description = "`cpi2017_SM22` should be numeric") |>
+    # validate_if(is.numeric(cpi2011_SM22),
+    #             description = "`cpi2011_SM22` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_SM22),
+    #             description = "`cpi2017_SM22` should be numeric") |>
     validate_cols(is.logical, cpi2005,
                   description = "`cpi2005` should be logical") |>
     validate_if(is.character(cpi_data_level),
                 description = "`cpi_data_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")), cpi_data_level,
                   description = "`cpi_data_level` values within range") |>
-    validate_if(is.numeric(cpi2011_AM23),
-                description = "`cpi2011_AM23` should be numeric") |>
-    validate_if(is.numeric(cpi2017_AM23),
-                description = "`cpi2017_AM23` should be numeric") |>
+    # validate_if(is.numeric(cpi2011_AM23),
+    #             description = "`cpi2011_AM23` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_AM23),
+    #             description = "`cpi2017_AM23` should be numeric") |>
     validate_if(is.character(cpi_id),
                 description = "`cpi_id` should be character") |>
     validate_cols(not_na, country_code, cpi_year, survey_acronym, cpi_data_level,
@@ -67,9 +67,21 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
     validate_if(is_uniq(country_code, cpi_year, survey_acronym,
                         cpi_data_level),
                 description = "no duplicate records in key variables") |>
-    validate_if(is_uniq(country_code, cpi),
+    validate_if(is_uniq(country_code, cpi_year, survey_acronym,
+                        cpi_data_level),
                 description = "no duplicate cpi values") |>
     add_results(report)
+
+  num_var_list1 <- grep("cpi2011_", colnames(cpi))
+  num_var_list2 <- grep("cpi2017_", colnames(cpi))
+  num_var_list <- c(num_var_list1, num_var_list2)
+
+  for (i in 1:length(num_var_list)) {
+    validate(cpi, name = "CPI validation") |>
+      validate_cols(is.numeric, num_var_list[i],
+                    description = "variables (with numeric var name) should be numeric") |>
+      add_results(report)
+  }
 
   validation_record <- get_results(report, unnest = FALSE) |>
     setDT()

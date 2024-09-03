@@ -35,6 +35,13 @@ pip_maddison <- function(action = c("update", "load"),
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(mpd, "aux_name", "maddison")
+
+  setattr(mpd,
+          "aux_key",
+          c("country_code", "year"))
+
     saved <- pipfun::pip_sign_save(
       x = mpd,
       measure = measure,

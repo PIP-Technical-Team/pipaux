@@ -64,12 +64,12 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cpi_data_level` should be numeric") |>
     validate_cols(in_set(c(0, 1, 2)),
                   cpi_data_level, description = "`cpi_data_level` values within range") |>
-    validate_if(is.numeric(ref_year_AM23),
-                description = "`ref_year_AM23` should be numeric") |>
-    validate_if(is.numeric(cpi2011_AM23),
-                description = "`cpi2011_AM23` should be numeric") |>
-    validate_if(is.numeric(cpi2017_AM23),
-                description = "`cpi2011_AM23` should be numeric") |>
+    validate_if(is.numeric(ref_year_SM24),
+                description = "`ref_year_SM24` should be numeric") |>
+    validate_if(is.numeric(cpi2011_SM24),
+                description = "`cpi2011_SM24` should be numeric") |>
+    validate_if(is.numeric(cpi2017_SM24),
+                description = "`cpi2011_SM24` should be numeric") |>
     validate_if(is.numeric(change_cpi2017),
                 description = "`change_cpi2017` should be numeric") |>
     validate_if(is.numeric(change_icp2017),

@@ -182,6 +182,15 @@ pip_pop_update <-  function(force   = FALSE,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  pop <- pop |> setnames("pop_data_level", "reporting_level",
+                         skip_absent=TRUE)
+
+  setattr(pop, "aux_name", "pop")
+  setattr(pop,
+          "aux_key",
+          c("country_code", "year", "reporting_level"))
+
   saved <- pipfun::pip_sign_save(
     x       = pop,
     measure = measure,

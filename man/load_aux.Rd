@@ -8,7 +8,8 @@ load_aux(
   measure,
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
-  apply_label = TRUE
+  apply_label = TRUE,
+  ppp_defaults = TRUE
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ load_aux(
 will be used to update either the development server or production.}
 
 \item{apply_label}{logical: If TRUE, predefined labels will applied.}
+
+\item{ppp_defaults}{logical: If TRUE, wider format ppp data will be returned}
 }
 \description{
 Load any auxiliary data

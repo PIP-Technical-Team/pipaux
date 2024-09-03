@@ -34,6 +34,9 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(pfw, "aux_name", "pfw")
+
   saved <- pipfun::pip_sign_save(
     x       = pfw,
     measure = measure,
