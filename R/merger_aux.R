@@ -10,17 +10,17 @@
 #' @examples
 #' pfw <- pip_pfw(action = "load")
 #' ppp <- pip_ppp(action = "load")
-#' pfw_ppp <- merge_aux_files(pfw, ppp)
+#' pfw_ppp <- merger_aux(pfw, ppp)
 #'
 #' cpi <- pip_cpi(action = "cpi")
 #' cpi <- cpi[, -c("cpi_domain")]
-#' pfw_cpi <- merge_aux_files(cpi, pfw, keep = "right")
+#' pfw_cpi <- merger_aux(cpi, pfw, keep = "right")
 #'
-merge_aux_files <- function(aux_data1,
-                            aux_data2,
-                            keep = c("left", "right", "full",
-                                     "using", "master", "inner"),
-                            ...
+merger_aux <- function(aux_data1,
+                       aux_data2,
+                       keep = c("left", "right", "full",
+                                "using", "master", "inner"),
+                       ...
 ){
 
   keep  <- match.arg(keep)

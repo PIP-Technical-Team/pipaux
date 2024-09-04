@@ -1,0 +1,77 @@
+---
+title: "Utilizing the merge function"
+output: rmarkdown::html_vignette
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+
+library(pipaux)
+
+```
+
+# How to use the `merger_aux`
+
+To efficiently merge auxiliary files, you can utilize the merger_aux() from pipaux package. This function requires three arguments: the two data files you want to merge and the type of merge to perform. The merge type has six options: left, right, full, using, master, and inner, with "left" being the default.
+
+Here’s a breakdown of how it works:
+
+1.  Arguments:
+
+-   Data Files: You need to provide two auxiliary datasets that you want to merge. These are the primary inputs for the function.
+-   Merge Type: This argument specifies the nature of the merge operation. You can choose from six different merge types:
+    -   **Left**: Includes all records from the left dataset and matches records from the right dataset where possible.
+
+    -   **Right**: Includes all records from the right dataset and matches records from the left dataset where possible.
+
+    -   **Full**: Includes all records from both datasets, with matching records where available and missing records filled with nulls.
+
+    -   **Using**: Merges the datasets based on specified columns or keys.
+
+    -   **Master**: Uses the left dataset as the primary dataset and adds records from the right dataset.
+
+    -   **Inner**: Includes only the records that are present in both datasets.
+
+2.  Default Option: If you don’t specify a merge type, the function defaults to "left", meaning it will keep all records from the left dataset and include matching records from the right dataset where available.
+
+**Note:** Keys/IDs and names of auxiliary data files (such as *cpi*, *ppp*, *pfw*, *pop*, *gdp*, *gdm*, etc.) are embedded within the data files as attributes. The `merger_aux()` function utilizes these IDs to create suitable key variables for merging the data files and generating an ID for the combined data file. Additionally, the function produces a new auxiliary file name by combining the names of the files being merged.
+
+# Examples
+
+### 1. Merge pfw and cpi files
+
+```{r}
+
+# load pfw data from the testing folder
+pfw <- pip_pfw(action = "load",
+               branch = "DEV",
+               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+
+# load cpi
+cpi <- pip_cpi(action = "load",
+               branch = "DEV",
+               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+
+cpi <- cpi[, -c("cpi_domain")]
+
+pfw_cpi <- merger_aux(pfw, cpi)
+
+```
+
+```{r}
+
+# load ppp wide format data
+ppp <- pip_ppp(action = "load",
+               branch = "DEV",
+               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+
+pfw_cpi_ppp <- merger_aux(pfw_cpi, ppp)
+
+```
+
