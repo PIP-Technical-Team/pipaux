@@ -15,6 +15,7 @@
 #' cpi <- pip_cpi(action = "cpi")
 #' cpi <- cpi[, -c("cpi_domain")]
 #' pfw_cpi <- merger_aux(cpi, pfw, keep = "right")
+#' cpi_pfw <- merger_aux(cpi, pfw)
 #'
 merger_aux <- function(aux_data1,
                        aux_data2,

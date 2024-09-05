@@ -9,7 +9,7 @@ pip_pfw_key <- function(){
 
   pfw_temp <- pip_pfw(action = "load",
                  branch = "DEV",
-                 maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+                 maindir = "Q:/Team/Tefera/pip/PIP-Data_QA")
 
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
@@ -22,7 +22,7 @@ pip_pfw_key <- function(){
 
   cpi_temp <- pip_cpi(action = "load",
                  branch = "DEV",
-                 maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+                 maindir = "Q:/Team/Tefera/pip/PIP-Data_QA")
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &

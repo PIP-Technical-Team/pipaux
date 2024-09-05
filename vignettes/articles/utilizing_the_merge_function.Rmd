@@ -14,11 +14,13 @@ knitr::opts_chunk$set(
 
 library(pipaux)
 
+temp_fld <- "Q:/Team/Tefera/pip/PIP-Data_QA"
+
 ```
 
 # How to use the `merger_aux`
 
-To efficiently merge auxiliary files, you can utilize the merger_aux() from pipaux package. This function requires three arguments: the two data files you want to merge and the type of merge to perform. The merge type has six options: left, right, full, using, master, and inner, with "left" being the default.
+To efficiently merge auxiliary files, you can utilize the merger_aux() from pipaux package. This function requires three arguments: the two data files you want to merge and the type of merge to perform. The merge type has six options: **left**, **right**, **full**, **using**, **master**, and **inner**, with *left* being the default.
 
 Here’s a breakdown of how it works:
 
@@ -51,27 +53,85 @@ Here’s a breakdown of how it works:
 # load pfw data from the testing folder
 pfw <- pip_pfw(action = "load",
                branch = "DEV",
-               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+               maindir = temp_fld)
 
 # load cpi
 cpi <- pip_cpi(action = "load",
                branch = "DEV",
-               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+               maindir = temp_fld)
 
 cpi <- cpi[, -c("cpi_domain")]
 
+# a) keep "left"
 pfw_cpi <- merger_aux(pfw, cpi)
 
+# b) keep "inner"
+cpi_pfw <- merger_aux(pfw, cpi, keep = "inner")
+
 ```
+
+### 2. Merge cpi and pop files
 
 ```{r}
 
-# load ppp wide format data
-ppp <- pip_ppp(action = "load",
+# load cpi
+cpi <- pip_cpi(action = "load",
                branch = "DEV",
-               maindir = "//w1wbgencifs01/pip/PIP-Data_Testing/pipaux_Testing")
+               maindir = temp_fld)
 
-pfw_cpi_ppp <- merger_aux(pfw_cpi, ppp)
+# load ppp wide format data
+pop <- pip_ppp(action = "load",
+               branch = "DEV",
+               maindir = temp_fld)
+
+cpi_pop <- merger_aux(cpi, pop)
 
 ```
 
+### 3. Add pop data to pfw_cpi 
+
+This example is going to show how to merge a compiled data (generated in example 1a) with pop data.
+
+```{r}
+
+# load pop data
+pop <- pip_pop(action = "load",
+               branch = "DEV",
+               maindir = temp_fld)
+
+pop_pfw_cpi <- merger_aux(pop, 
+                          pfw_cpi, 
+                          keep = "right")
+
+```
+### 4. Add gdm data to cpi_pfw 
+
+This example is going to show how to merge a compiled data (generated in example 1b) with gdm data.
+
+```{r}
+
+# load pop data
+gdm <- pip_gdm(action = "load",
+               branch = "DEV",
+               maindir = temp_fld)
+
+gdm_cpi_pfw <- merger_aux(gdm,
+                          cpi_pfw,
+                          keep = "right")
+
+```
+
+### 5. Add ppp data to cpi_pfw 
+
+This example is going to show how to merge a compiled data (generated in example 1b) with ppp data.
+
+```{r}
+
+# load ppp data
+ppp <- pip_ppp(action = "load",
+               branch = "DEV",
+               maindir = temp_fld)
+
+cpi_pfw_ppp <- merger_aux(cpi_pfw, ppp)
+
+```
