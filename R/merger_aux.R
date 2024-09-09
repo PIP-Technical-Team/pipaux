@@ -8,11 +8,11 @@
 #' @export
 #'
 #' @examples
-#' pfw <- pip_pfw(action = "load")
-#' ppp <- pip_ppp(action = "load")
+#' pfw <- load_aux("pfw")
+#' ppp <- load_aux("ppp")
 #' pfw_ppp <- merger_aux(pfw, ppp)
 #'
-#' cpi <- pip_cpi(action = "cpi")
+#' cpi <- load_aux("cpi")
 #' cpi <- cpi[, -c("cpi_domain")]
 #' pfw_cpi <- merger_aux(cpi, pfw, keep = "right")
 #' cpi_pfw <- merger_aux(cpi, pfw)
