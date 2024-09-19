@@ -44,6 +44,10 @@ pip_weo <- function(action  = c("update", "load"),
                         branch = branch)
 
     # Save dataset
+    setattr(dt, "aux_name", "weo")
+    setattr(dt,
+            "aux_key",
+            c("country_code", "year"))
     # validate weo clean data
     weo_validate_output(weo = dt, detail = detail)
 
@@ -51,11 +55,6 @@ pip_weo <- function(action  = c("update", "load"),
       branch <- ""
     }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
-  setattr(dt, "aux_name", "weo")
-  setattr(dt,
-          "aux_key",
-          c("country_code", "year"))
 
   cat('\nDir : ', msrdir)
     saved <- pipfun::pip_sign_save(

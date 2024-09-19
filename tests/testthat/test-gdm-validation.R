@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "gdm"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("gdm_validate_raw() works identifying duplicate error", {
 
@@ -55,13 +56,13 @@ test_that("gdm_validate_raw() works identifying invalid value", {
 test_that("gdm_validate_output() works identifying duplicate error", {
 
   gdm <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  gdm[, `:=` (pop_data_level = fifelse(pop_data_level == "rural",
-                                       "urban", pop_data_level))]
+  gdm[, `:=` (reporting_level = fifelse(reporting_level == "rural",
+                                       "urban", reporting_level))]
 
   expect_error(gdm_validate_output(gdm))
 
@@ -70,12 +71,12 @@ test_that("gdm_validate_output() works identifying duplicate error", {
 test_that("gdm_validate_output() works identifying type/ formating error", {
 
   gdm <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  gdm[, `:=` (surveyid_year = as.character(surveyid_year),
+  gdm[, `:=` (year = as.character(year),
               survey_year = as.character(survey_year),
               survey_mean_lcu = as.character(survey_mean_lcu))]
 
@@ -86,13 +87,13 @@ test_that("gdm_validate_output() works identifying type/ formating error", {
 test_that("gdm_validate_output() works identifying invalid value", {
 
   gdm <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  gdm[, pop_data_level := fifelse(pop_data_level == "national",
-                                  "national1", pop_data_level)]
+  gdm[, reporting_level := fifelse(reporting_level == "national",
+                                  "national1", reporting_level)]
 
   expect_error(gdm_validate_output(gdm))
 

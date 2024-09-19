@@ -53,6 +53,12 @@ pip_income_groups <- function(action       = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+    # ig <- ig |> setnames("year_data", "year", skip_absent=TRUE)
+
+    setattr(ig, "aux_name", "income_groups")
+    setattr(ig,
+            "aux_key",
+            c("country_code", "year"))
 
     # validate income group output data
     incgroup_validate_output(incgroup = ig, detail = detail)
@@ -61,13 +67,6 @@ pip_income_groups <- function(action       = c("update", "load"),
       branch <- ""
     }
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
-    ig <- ig |> setnames("year_data", "year", skip_absent=TRUE)
-
-    setattr(ig, "aux_name", "income_groups")
-    setattr(ig,
-            "aux_key",
-            c("country_code", "year"))
 
     saved <- pipfun::pip_sign_save(
       x = ig,

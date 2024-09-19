@@ -16,17 +16,17 @@ npl_validate_output <- function(npl, detail = getOption("pipaux.detail.output"))
   validate(npl, name = "NPL output data validation") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_if(is.numeric(reporting_year),
-                description = "`reporting_year` should be numeric") |>
+    validate_if(is.numeric(year),
+                description = "`year` should be numeric") |>
     validate_if(is.numeric(nat_headcount),
                 description = "`nat_headcount` should be numeric") |>
     validate_if(is.numeric(comparability),
                 description = "`comparability` should be numeric") |>
     validate_if(is.character(footnote),
                 description = "`footnote` should be character") |>
-    validate_cols(not_na, country_code, reporting_year,
+    validate_cols(not_na, country_code, year,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, reporting_year),
+    validate_if(is_uniq(country_code, year),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

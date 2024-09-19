@@ -3,12 +3,13 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "countries"
-gls <- pipfun::pip_create_globals()
+gls     <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("countries_validate_output() works identifying duplicate error", {
 
   countries <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -23,7 +24,7 @@ test_that("countries_validate_output() works identifying duplicate error", {
 test_that("countries_validate_output() works identifying invalid value", {
 
   countries <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )

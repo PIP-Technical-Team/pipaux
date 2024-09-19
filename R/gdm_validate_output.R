@@ -18,8 +18,8 @@ gdm_validate_output <- function(gdm, detail = getOption("pipaux.detail.output"))
                 description = "`survey_id` should be character") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_if(is.integer(surveyid_year),
-                description = "`surveyid_year` should be integer") |>
+    validate_if(is.integer(year),
+                description = "`year` should be integer") |>
     validate_if(is.numeric(survey_year),
                 description = "`survey_year` should be numeric") |>
     validate_if(is.character(welfare_type),
@@ -34,17 +34,17 @@ gdm_validate_output <- function(gdm, detail = getOption("pipaux.detail.output"))
                   description = "`distribution_type` values within range") |>
     validate_if(is.character(gd_type),
                 description = "`gd_type` should be character") |>
-    validate_if(is.character(pop_data_level),
-                description = "`pop_data_level` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")), pop_data_level,
-                  description = "`pop_data_level` values within range") |>
+    validate_if(is.character(reporting_level),
+                description = "`reporting_level` should be character") |>
+    validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
+                  description = "`reporting_level` values within range") |>
     validate_if(is.character(pcn_source_file),
                 description = "`pcn_source_file` should be character") |>
     validate_if(is.character(pcn_survey_id),
                 description = "`pcn_survey_id` should be character") |>
-    validate_cols(not_na, country_code, surveyid_year, pop_data_level,
+    validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, surveyid_year, pop_data_level),
+    validate_if(is_uniq(country_code, year, reporting_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

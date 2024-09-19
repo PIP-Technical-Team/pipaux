@@ -18,19 +18,19 @@ gdp_validate_output <- function(gdp, detail = getOption("pipaux.detail.output"))
                 description = "`country_code` should be character") |>
     validate_if(is.numeric(year),
                 description = "`year` should be numeric") |>
-    validate_if(is.character(gdp_data_level),
-                description = "`gdp_data_level` should be character") |>
+    validate_if(is.character(reporting_level),
+                description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")),
-                  gdp_data_level, description = "`gdp_data_level` values within range") |>
+                  reporting_level, description = "`reporting_level` values within range") |>
     validate_if(is.numeric(gdp),
                 description = "`gdp` should be numeric") |>
     validate_if(is.character(gdp_domain),
                 description = "`gdp_domain` should be character") |>
     validate_cols(in_set(c("national", "urban/rural")),
                   gdp_domain, description = "`gdp_domain` values within range") |>
-    validate_cols(not_na, country_code, year, gdp_data_level,
+    validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, gdp_data_level),
+    validate_if(is_uniq(country_code, year, reporting_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

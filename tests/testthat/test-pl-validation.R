@@ -3,11 +3,12 @@
 branch  <- "DEV"
 measure <- "pl"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("pl_validate_output() works identifying duplicate error", {
 
   pl <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -22,7 +23,7 @@ test_that("pl_validate_output() works identifying duplicate error", {
 test_that("pl_validate_output() works identifying type/ formating error", {
 
   pl <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )

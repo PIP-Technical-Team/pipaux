@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "weo"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("weo_validate_raw() works identifying duplicate error", {
 
@@ -24,7 +25,7 @@ test_that("weo_validate_raw() works identifying duplicate error", {
 test_that("weo_validate_output() works identifying duplicate error", {
 
   weo <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -39,7 +40,7 @@ test_that("weo_validate_output() works identifying duplicate error", {
 test_that("weo_validate_output() works identifying type/ formating error", {
 
   weo <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )

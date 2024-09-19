@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure = "country_list"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("cl_validate_raw() works identifying duplicate error", {
 
@@ -46,7 +47,7 @@ test_that("cl_validate_raw() works identifying duplicate error", {
 
 test_that("cl_validate_raw() works identifying invalid value", {
 
-  cl <- load_aux(maindir = gls$PIP_DATA_DIR,
+  cl <- load_aux(maindir = temp_fld, #fldgls$PIP_DATA_DIR,
                  measure = measure,
                  branch  = branch)
 

@@ -45,6 +45,13 @@ pip_npl <- function(action  = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+    npl <- npl |> setnames("reporting_year", "year",
+                           skip_absent=TRUE)
+
+    setattr(npl, "aux_name", "npl")
+    setattr(npl,
+            "aux_key",
+            c("country_code", "year"))
 
     # validate npl output data
     npl_validate_output(npl = npl, detail = detail)
@@ -53,14 +60,6 @@ pip_npl <- function(action  = c("update", "load"),
       branch <- ""
     }
     msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
-    npl <- npl |> setnames("reporting_year", "year",
-                           skip_absent=TRUE)
-
-    setattr(npl, "aux_name", "npl")
-    setattr(npl,
-            "aux_key",
-            c("country_code", "year"))
 
     saved <- pipfun::pip_sign_save(
       x       = npl,

@@ -37,15 +37,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                        maindir = maindir,
                        branch = branch)
 
-  # validate cpi clean data before saving it
-  cpi_validate_output(cpi, detail = detail)
-
-  # Save
-  if (branch == "main") {
-    branch <- ""
-  }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
+  # changae cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
@@ -54,6 +46,15 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   setattr(cpi,
           "aux_key",
           c("country_code", "year", "reporting_level", "survey_acronym"))
+
+  # validate cpi clean data before saving it
+  cpi_validate_output(cpi, detail = detail)
+
+  # Save
+  if (branch == "main") {
+    branch <- ""
+  }
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = cpi,

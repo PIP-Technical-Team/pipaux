@@ -3,6 +3,8 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "sna"
+gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("sna_validate_raw() works identifying type/ formating error", {
 

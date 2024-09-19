@@ -228,6 +228,13 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   pce <- pce[country_code %in% cl$country_code]
 
   ## ---- Sign and save ----
+  pce <- pce |> setnames("pce_data_level", "reporting_level",
+                         skip_absent=TRUE)
+
+  setattr(pce, "aux_name", "pce")
+  setattr(pce,
+          "aux_key",
+          c("country_code", "year", "reporting_level"))
 
   # validate pce output data
   pce_validate_output(pce = pce, detail = detail)
@@ -236,14 +243,6 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
-  pce <- pce |> setnames("pce_data_level", "reporting_level",
-                         skip_absent=TRUE)
-
-  setattr(pce, "aux_name", "pce")
-  setattr(pce,
-          "aux_key",
-          c("country_code", "year", "reporting_level"))
 
   saved <- pipfun::pip_sign_save(
     x       = pce,

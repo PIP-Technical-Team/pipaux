@@ -278,14 +278,6 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   gdp <- gdp[country_code %in% cl$country_code]
 
   # ---- Save and sign ----
-  # validate gdp output data
-  gdp_validate_output(gdp = gdp, detail = detail)
-
-  if (branch == "main") {
-    branch <- ""
-  }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
   gdp <- gdp |> setnames("gdp_data_level", "reporting_level",
                          skip_absent=TRUE)
 
@@ -293,6 +285,14 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   setattr(gdp,
           "aux_key",
           c("country_code", "year", "reporting_level"))
+
+  # validate gdp output data
+  gdp_validate_output(gdp = gdp, detail = detail)
+
+  if (branch == "main") {
+    branch <- ""
+  }
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = gdp,

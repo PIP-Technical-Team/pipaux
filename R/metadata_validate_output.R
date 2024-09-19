@@ -18,8 +18,8 @@ metadata_validate_output <- function(metadata, detail = getOption("pipaux.detail
                 description = "`country_code` should be character") |>
     validate_if(is.character(country_name),
                 description = "`country_name` should be character") |>
-    validate_if(is.numeric(reporting_year),
-                description = "`reporting_year` should be numeric") |>
+    validate_if(is.numeric(year),
+                description = "`year` should be numeric") |>
     validate_if(is.numeric(survey_year),
                 description = "`survey_year` should be numeric") |>
     validate_if(is.character(survey_title),
@@ -38,9 +38,9 @@ metadata_validate_output <- function(metadata, detail = getOption("pipaux.detail
                 description = "`distribution_type` should be character") |>
     validate_cols(in_set(c("aggregated", "group", "micro", "micro, imputed", NA)),
                   distribution_type, description = "`distribution_type` values within range") |>
-    validate_cols(not_na, country_code, reporting_year, welfare_type,
+    validate_cols(not_na, country_code, year, welfare_type,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, reporting_year, welfare_type),
+    validate_if(is_uniq(country_code, year, welfare_type),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

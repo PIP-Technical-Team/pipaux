@@ -4,17 +4,18 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "gdp"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("gdp_validate_output() works identifying duplicate error", {
 
   gdp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  gdp[, `:=` (gdp_data_level = fifelse(gdp_data_level == "rural",
-                                       "urban", gdp_data_level))]
+  gdp[, `:=` (reporting_level = fifelse(reporting_level == "rural",
+                                       "urban", reporting_level))]
 
   expect_error(gdp_validate_output(gdp))
 
@@ -23,7 +24,7 @@ test_that("gdp_validate_output() works identifying duplicate error", {
 test_that("gdp_validate_output() works identifying type/ formating error", {
 
   gdp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -38,13 +39,13 @@ test_that("gdp_validate_output() works identifying type/ formating error", {
 test_that("gdp_validate_output() works identifying invalid value", {
 
   gdp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  gdp[, gdp_data_level := fifelse(gdp_data_level == "national",
-                                  "national1", gdp_data_level)]
+  gdp[, reporting_level := fifelse(reporting_level == "national",
+                                  "national1", reporting_level)]
 
   expect_error(gdp_validate_output(gdp))
 

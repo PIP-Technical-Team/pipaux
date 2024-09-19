@@ -32,15 +32,15 @@ ppp_validate_output <- function(ppp, detail = getOption("pipaux.detail.output"))
                 description = "`ppp_domain` should be character") |>
     validate_cols(in_set(c("1", "2")),
                   ppp_domain, description = "`ppp_domain` values within range") |>
-    validate_if(is.character(ppp_data_level),
-                description = "`ppp_data_level` should be character") |>
+    validate_if(is.character(reporting_level),
+                description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")),
-                  ppp_data_level, description = "`ppp_data_level` values within range") |>
-    validate_cols(not_na, country_code, ppp_year, ppp_data_level,
+                  reporting_level, description = "`reporting_level` values within range") |>
+    validate_cols(not_na, country_code, ppp_year, reporting_level,
                   adaptation_version, release_version,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(country_code, ppp_year,
-                        ppp_data_level, adaptation_version, release_version),
+                        reporting_level, adaptation_version, release_version),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

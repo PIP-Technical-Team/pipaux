@@ -5,6 +5,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "metadata"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("metadata_validate_raw() works identifying duplicate error", {
 
@@ -53,7 +54,7 @@ test_that("metadata_validate_raw() works identifying invalid value", {
 test_that("metadata_validate_output() works identifying duplicate error", {
 
   metadata <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -68,12 +69,12 @@ test_that("metadata_validate_output() works identifying duplicate error", {
 test_that("metadata_validate_output() works identifying type/ formating error", {
 
   metadata <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  metadata[, `:=` (reporting_year = as.character(reporting_year),
+  metadata[, `:=` (year = as.character(year),
               survey_year = as.character(survey_year))]
 
   expect_error(metadata_validate_output(metadata))
@@ -83,7 +84,7 @@ test_that("metadata_validate_output() works identifying type/ formating error", 
 test_that("metadata_validate_output() works identifying invalid value", {
 
   metadata <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )

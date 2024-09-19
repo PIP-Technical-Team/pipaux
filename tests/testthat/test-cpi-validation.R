@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure = "cpi"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("cpi_validate_raw() works identifying duplicate error", {
 
@@ -56,13 +57,13 @@ test_that("cpi_validate_raw() works identifying invalid value", {
 test_that("cpi_validate_output() works identifying duplicate error", {
 
   cpi <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  cpi[, `:=` (cpi_data_level = fifelse(cpi_data_level == "rural",
-                                       "urban", cpi_data_level))]
+  cpi[, `:=` (reporting_level = fifelse(reporting_level == "rural",
+                                       "urban", reporting_level))]
 
   expect_error(cpi_validate_output(cpi))
 
@@ -71,12 +72,12 @@ test_that("cpi_validate_output() works identifying duplicate error", {
 test_that("cpi_validate_output() works identifying type/ formating error", {
 
   cpi <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  cpi[, `:=` (cpi_year = as.character(cpi_year),
+  cpi[, `:=` (year = as.character(year),
               survey_year = as.character(survey_year),
               cpi_domain_value = as.character(cpi_domain_value),
               cpi2011 = as.character(cpi2011),
@@ -90,7 +91,7 @@ test_that("cpi_validate_output() works identifying type/ formating error", {
 test_that("cpi_validate_output() works identifying invalid value", {
 
   cpi <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )

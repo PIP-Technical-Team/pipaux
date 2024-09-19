@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "pop"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("pop_validate_raw() works identifying duplicate error", {
 
@@ -56,13 +57,13 @@ test_that("pop_validate_raw() works identifying invalid value", {
 test_that("pop_validate_output() works identifying duplicate error", {
 
   pop <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  pop[, `:=` (pop_data_level = fifelse((pop_data_level == "rural" & country_code == "ABW"),
-                                       "urban", pop_data_level))]
+  pop[, `:=` (reporting_level = fifelse((reporting_level == "rural" & country_code == "ABW"),
+                                       "urban", reporting_level))]
 
   expect_error(pop_validate_output(pop))
 
@@ -71,7 +72,7 @@ test_that("pop_validate_output() works identifying duplicate error", {
 test_that("pop_validate_output() works identifying type/ formating error", {
 
   pop <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -86,13 +87,13 @@ test_that("pop_validate_output() works identifying type/ formating error", {
 test_that("pop_validate_output() works identifying invalid value", {
 
   pop <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
 
-  pop[, pop_data_level := fifelse(pop_data_level == "national",
-                                  "national1", pop_data_level)]
+  pop[, reporting_level := fifelse(reporting_level == "national",
+                                  "national1", reporting_level)]
 
   expect_error(pop_validate_output(pop))
 

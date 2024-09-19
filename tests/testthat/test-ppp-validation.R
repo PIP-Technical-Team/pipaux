@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "ppp"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("ppp_validate_raw() works identifying duplicate error", {
 
@@ -54,13 +55,14 @@ test_that("ppp_validate_raw() works identifying invalid value", {
 test_that("ppp_validate_output() works identifying duplicate error", {
 
   ppp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
-    branch  = branch
+    branch  = branch,
+    ppp_defaults = FALSE
   )
 
-  ppp[, `:=` (ppp_data_level = fifelse(ppp_data_level == "rural",
-                                       "urban", ppp_data_level))]
+  ppp[, `:=` (reporting_level = fifelse(reporting_level == "rural",
+                                       "urban", reporting_level))]
 
   expect_error(ppp_validate_output(ppp))
 
@@ -69,9 +71,10 @@ test_that("ppp_validate_output() works identifying duplicate error", {
 test_that("ppp_validate_output() works identifying type/ formating error", {
 
   ppp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
-    branch  = branch
+    branch  = branch,
+    ppp_defaults = FALSE
   )
 
   ppp[, `:=` (ppp_year = as.character(ppp_year),
@@ -84,13 +87,14 @@ test_that("ppp_validate_output() works identifying type/ formating error", {
 test_that("ppp_validate_output() works identifying invalid value", {
 
   ppp <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
-    branch  = branch
+    branch  = branch,
+    ppp_defaults = FALSE
   )
 
-  ppp[, ppp_data_level := fifelse(ppp_data_level == "national",
-                                  "national1", ppp_data_level)]
+  ppp[, reporting_level := fifelse(reporting_level == "national",
+                                  "national1", reporting_level)]
 
   expect_error(ppp_validate_output(ppp))
 

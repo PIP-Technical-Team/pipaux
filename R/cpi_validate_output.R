@@ -16,8 +16,8 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
   validate(cpi, name = "CPI output data validation") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_if(is.integer(cpi_year),
-                description = "`cpi_year` should be integer") |>
+    validate_if(is.integer(year),
+                description = "`year` should be integer") |>
     validate_if(is.numeric(survey_year),
                 description = "`survey_year` should be numeric") |>
     validate_if(is.numeric(cpi),
@@ -52,23 +52,23 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
     #             description = "`cpi2017_SM22` should be numeric") |>
     validate_cols(is.logical, cpi2005,
                   description = "`cpi2005` should be logical") |>
-    validate_if(is.character(cpi_data_level),
-                description = "`cpi_data_level` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")), cpi_data_level,
-                  description = "`cpi_data_level` values within range") |>
+    validate_if(is.character(reporting_level),
+                description = "`reporting_level` should be character") |>
+    validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
+                  description = "`reporting_level` values within range") |>
     # validate_if(is.numeric(cpi2011_AM23),
     #             description = "`cpi2011_AM23` should be numeric") |>
     # validate_if(is.numeric(cpi2017_AM23),
     #             description = "`cpi2017_AM23` should be numeric") |>
     validate_if(is.character(cpi_id),
                 description = "`cpi_id` should be character") |>
-    validate_cols(not_na, country_code, cpi_year, survey_acronym, cpi_data_level,
+    validate_cols(not_na, country_code, year, survey_acronym, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, cpi_year, survey_acronym,
-                        cpi_data_level),
+    validate_if(is_uniq(country_code, year, survey_acronym,
+                        reporting_level),
                 description = "no duplicate records in key variables") |>
-    validate_if(is_uniq(country_code, cpi_year, survey_acronym,
-                        cpi_data_level),
+    validate_if(is_uniq(country_code, year, survey_acronym,
+                        reporting_level),
                 description = "no duplicate cpi values") |>
     add_results(report)
 

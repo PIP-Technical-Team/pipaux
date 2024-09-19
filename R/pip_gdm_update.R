@@ -206,6 +206,15 @@ pip_gdm_update <- function(force = FALSE,
 
 
   # ---- Save and sign ----
+  df <- df |> setnames(c("surveyid_year", "pop_data_level"),
+                       c("year", "reporting_level"),
+                       skip_absent=TRUE)
+
+  setattr(df, "aux_name", "gdm")
+  setattr(df,
+          "aux_key",
+          c("country_code", "year", "reporting_level", "welfare_type"))
+
   # validate gdm output data
   gdm_validate_output(gdm = df, detail = detail)
 
@@ -213,15 +222,6 @@ pip_gdm_update <- function(force = FALSE,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
-
-  df <- df |> setnames(c("surveyid_year", "pop_data_level"),
-                         c("year", "reporting_level"),
-                         skip_absent=TRUE)
-
-  setattr(df, "aux_name", "gdm")
-  setattr(df,
-          "aux_key",
-          c("country_code", "year", "reporting_level", "welfare_type"))
 
   saved <- pipfun::pip_sign_save(
     x       = df,

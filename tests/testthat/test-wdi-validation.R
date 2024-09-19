@@ -3,6 +3,8 @@
 branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "wdi"
+gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("wdi_validate_raw() works identifying duplicate error", {
 

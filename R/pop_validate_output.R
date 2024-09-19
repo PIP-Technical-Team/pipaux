@@ -18,19 +18,19 @@ pop_validate_output <- function(pop, detail = getOption("pipaux.detail.output"))
                 description = "`country_code` should be character") |>
     validate_if(is.numeric(year),
                 description = "`year` should be numeric") |>
-    validate_if(is.character(pop_data_level),
-                description = "`pop_data_level` should be character") |>
+    validate_if(is.character(reporting_level),
+                description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")),
-                  pop_data_level, description = "`pop_data_level` values within range") |>
+                  reporting_level, description = "`reporting_level` values within range") |>
     validate_if(is.numeric(pop),
                 description = "`pop` should be numeric") |>
     validate_if(is.character(pop_domain),
                 description = "`pop_domain` should be character") |>
     validate_cols(in_set(c("national", "urban/rural")),
                   pop_domain, description = "`pop_domain` values within range") |>
-    validate_cols(not_na, country_code, year, pop_data_level,
+    validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, pop_data_level),
+    validate_if(is_uniq(country_code, year, reporting_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

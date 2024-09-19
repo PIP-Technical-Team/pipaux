@@ -4,6 +4,7 @@ branch  <- "DEV"
 owner   <- getOption("pipfun.ghowner")
 measure <- "pfw"
 gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("pfw_validate_raw() works identifying duplicate error", {
 
@@ -64,7 +65,7 @@ test_that("pfw_validate_raw() works identifying invalid value", {
 test_that("pfw_validate_output() works identifying duplicate error", {
 
   pfw <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -79,7 +80,7 @@ test_that("pfw_validate_output() works identifying duplicate error", {
 test_that("pfw_validate_output() works identifying type/ formating error", {
 
   pfw <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
@@ -96,7 +97,7 @@ test_that("pfw_validate_output() works identifying type/ formating error", {
 test_that("pfw_validate_output() works identifying invalid value", {
 
   pfw <- load_aux(
-    maindir = gls$PIP_DATA_DIR,
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
     measure = measure,
     branch  = branch
   )
