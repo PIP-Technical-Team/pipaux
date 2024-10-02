@@ -2,12 +2,16 @@
 
 export("%>%")
 export(auto_aux_update)
+<<<<<<< HEAD
 export(aux_data)
 export(cl_validate_raw)
 export(clean_validation_report)
 export(countries_validate_output)
 export(cpi_validate_output)
 export(cpi_validate_raw)
+=======
+export(convert_df_to_base64)
+>>>>>>> origin/DEV_v2_tefera_testing
 export(draw_model)
 export(gdm_validate_output)
 export(gdm_validate_raw)
@@ -38,7 +42,9 @@ export(pip_indicators)
 export(pip_maddison)
 export(pip_metadata)
 export(pip_metadata_update)
+export(pip_metaregion)
 export(pip_missing_data)
+export(pip_nan)
 export(pip_npl)
 export(pip_pce)
 export(pip_pfw)

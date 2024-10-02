@@ -12,7 +12,7 @@ auto_aux_update <- function(measure = NULL,
                             branch  = c("DEV", "PROD", "main"),
                             tag     = match.arg(branch)) {
 
-  cli::cli_inform("Please make sure to run {.code library(pipaux)} before running this function.")
+  pipfun::check_pkg_active("pipaux")
 
   branch    <- match.arg(branch)
   from      <- match.arg(from)
@@ -32,9 +32,7 @@ auto_aux_update <- function(measure = NULL,
   # if there is validation report in the environment - remove it
   clean_validation_report()
 
-  assertthat::assert_that(Sys.getenv("GITHUB_PAT") != "",
-                          msg = "Enviroment variable `GITHUB_PAT` is empty.
-                          Please set it up using Sys.setenv(GITHUB_PAT = 'code')")
+  creds <- pipfun::get_github_creds()
   gh_user   <- "https://raw.githubusercontent.com"
   org_data  <- paste(gh_user,
                      owner,
@@ -170,12 +168,13 @@ auto_aux_update <- function(measure = NULL,
         sha     = out$sha,
         content = convert_df_to_base64(org_data)
       ),
-      .token = Sys.getenv("GITHUB_PAT")
+      .token = creds$password
     )
   }
   cli::cli_h2("File updated status.")
   knitr::kable(last_updated_time)
 }
+
 
 
 return_value <- function(aux, dependencies) {
@@ -188,6 +187,17 @@ return_value <- function(aux, dependencies) {
   return(unique(c(val, aux)))
 }
 
+#' Function to write dataframe to GitHub
+#'
+#' @param df A dataframe
+#'
+#' @return base64 encoded dataframe
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#' convert_df_to_base64(mtcars)
+#' }
 convert_df_to_base64 <- function(df) {
   df |>
     write.table(quote = FALSE,

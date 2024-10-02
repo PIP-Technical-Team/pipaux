@@ -192,11 +192,9 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Remove any non-WDI countries                                            ####
 
-  # pip_country_list(maindir = maindir,
-  #                  force   = force,
-  #                  owner   = owner,
-  #                  branch  = branch,
-  #                  tag     = tag)
+  pip_country_list(maindir = maindir,
+                   force   = force,
+                   branch  = branch)
 
   cl   <- load_aux(measure = "country_list",
                    maindir = maindir,

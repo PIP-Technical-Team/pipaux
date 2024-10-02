@@ -53,19 +53,20 @@ pip_missing_data <- function(action  = c("update", "load"),
 
     ref_years <- gls$PIP_REF_YEARS
 
-    # Prepara NAC data ------
+    # Prepare NAC data ------
 
     # Standardize ^_data_level ^_domain column names
     setnames(pce, names(pce) ,sub("^pce[_]", "nac_", names(pce)))
     setnames(gdp, names(gdp) ,sub("^gdp[_]", "nac_", names(gdp)))
 
-    nac <- joyn::merge(gdp, pce,
+    nac <- joyn::joyn(gdp, pce,
                        by = c(
                          "country_code", "year", "nac_data_level",
                          "nac_domain"),
                        match_type = "1:1",
                        reportvar = FALSE,
-                       verbose = FALSE)
+                       verbose = FALSE,
+                      keep = "full")
 
     nac <-
       nac[year %in% ref_years
@@ -74,7 +75,7 @@ pip_missing_data <- function(action  = c("update", "load"),
 
 
 
-    # Prepara Grid of all countries and ref years ---------
+    # Prepare Grid of all countries and ref years ---------
 
     cl <- cl[, c("country_code", "region_code")]
 
@@ -97,7 +98,7 @@ pip_missing_data <- function(action  = c("update", "load"),
 
     # pfw[, mdom := max(.SD[, mget(domvar)]), by = .I]  # when 1.14.3 becomes available
     dom[,
-        #  Create rowo position (must be done in 1.14.2)
+        #  Create row position (must be done in 1.14.2)
         n := .I
     ][,
       # max reporting year per country/year
@@ -148,14 +149,14 @@ pip_missing_data <- function(action  = c("update", "load"),
     # as well Those that are in NAC but are not ingrid are those without survey,
     # which we took care above
 
-    ct_nonac <- joyn::merge(ct_sv, nac,
+    ct_nonac <- joyn::joyn(ct_sv, nac,
                             by = c("country_code", "year"),
                             match_type = "1:m",
                             verbose = FALSE)
 
 
     ct_nonac <-
-      ct_nonac[report == "x"
+      ct_nonac[.joyn == "x"
                ][,
                  c("country_code", "year")
                  ]
@@ -172,7 +173,7 @@ pip_missing_data <- function(action  = c("update", "load"),
 
 
 # Add region_code -------
-  ct_miss_data <- joyn::merge(ct_miss_data, cl,
+  ct_miss_data <- joyn::joyn(ct_miss_data, cl,
                               by = "country_code",
                               keep = "left",
                               match_type = "m:1",
@@ -192,7 +193,6 @@ pip_missing_data <- function(action  = c("update", "load"),
     pop_md <-
       pop[ct_miss_data,
           on = c("country_code", "year")]
-
 
 #  .................................................................
 ##  Save data                                                    ####

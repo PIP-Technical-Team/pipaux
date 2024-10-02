@@ -22,7 +22,11 @@ pip_pop_update <-  function(force   = FALSE,
   pfw      <- pipload::pip_load_aux("pfw",
                                     branch  = branch,
                                     maindir = maindir)
-  year_max <- pfw[, max(year)]
+  # year_max <- pfw[, max(year)]
+  # get current year as max year
+  year_max <- Sys.Date() |>
+    format("%Y") |>
+    as.numeric()
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,7 +236,7 @@ clean_from_wide <- function(x) {
   }
 
 
-  year_vars            <- names(x[, 6:ncol(x)])
+  year_vars            <- names(x)[6:ncol(x)]
   x$Series_Name <- NULL
   x$Time_Name   <- NULL
 
@@ -245,8 +249,13 @@ clean_from_wide <- function(x) {
       variable.name = "Year",
       value.name = "Population"
     )
-  pop_long$Year <- as.numeric(as.character(pop_long$Year))
-  pop_long$Population <- as.numeric(pop_long$Population)
+  pop_long[,
+           Year := as.numeric(as.character(Year))
+           ][,
+             Population := {
+               Population[Population == "."] <- NA_character_
+               as.numeric(Population)
+             }]
 
 
 

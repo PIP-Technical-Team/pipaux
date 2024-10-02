@@ -1,4 +1,12 @@
-# pipaux (development version)
+# pipaux 0.1.3
+
+- Save data to GitHub for GDP data. 
+- Adding validation rule for npl and income group files
+- upload a hash instead of a csv
+- Add 'detail' argument in higher level functions
+- revert the issue of SYR GDP with SNA data.
+- update countries validate function and gls to unit test function wherever it is required
+- add github creds in auto_aux_update
 
 # pipaux 0.1.2
 

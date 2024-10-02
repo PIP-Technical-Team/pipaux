@@ -407,3 +407,32 @@ get_gh <- function(owner,
   return(rs)
 
 }
+
+#' SAve auxiliary file to Github Repo
+#' 
+#' Sometimes we need to save auxiliary files to Github repo. 
+#' This function allows for this.
+#'
+#' @inheritParams pipfun::save_to_gh
+#' @export 
+#' @return NULL
+save_aux_to_gh <- function(df,
+                       measure,
+                       owner     = getOption("pipfun.ghowner"),
+                       repo      = paste0("aux_", measure),
+                       branch    = "DEV",
+                       tag       = branch,
+                       filename  = measure,
+                       ext       = "csv",
+                         ...
+                         ) {
+  
+  pipfun::save_to_gh(df = df,
+                     repo = repo, 
+                     owner = owner,
+                     branch = branch,
+                     tag = tag,
+                     filename = filename,
+                     ext = ext,
+                     ...)
+}

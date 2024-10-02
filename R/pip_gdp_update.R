@@ -73,8 +73,14 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch = branch,
     filename = "sna_metadata"
   )
-  # validate sna_fy data
-  sna_fy_validate_raw(sna_fy, detail = detail)
+
+  # load nowcast growth rates
+  nan <- pipfun::load_from_gh(
+    measure = "nan",
+    owner  = owner,
+    branch = branch
+  )
+
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
@@ -204,18 +210,16 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     gdp[sna,
         on = .(country_code, year),
         `:=`(
-          chain_factor = i.GDP
+          sna_gdp = i.GDP
         )
     ]
 
-    syr_2010 <- gdp[country_code == "SYR" & year == 2010,
-                    gdp]
     gdp[,
-        gdp := fifelse(is.na(chain_factor),gdp, syr_2010 * chain_factor)
+        gdp := fifelse(is.na(sna_gdp),gdp, sna_gdp)
     ]
     # remove extra variables
     gdp[,
-        chain_factor := NULL]
+        sna_gdp := NULL]
   }
 
   # ---- Expand for special cases with U/R levels ----
@@ -274,6 +278,41 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     )
   ]
 
+
+  # add nowcast growth rates ----------
+  byvars <- c("country_code", "gdp_data_level")
+
+  # Find the latest GDP data year for each country
+  latest_gdp <- gdp[, .(last_year = max(year),
+                        last_gdp = gdp[which.max(year)]),
+                    by =  c(byvars, "gdp_domain")]
+
+  # Join this with growth rates or years after the last available GDP year
+  dt_growth <- joyn::joyn(nan, latest_gdp,
+                          by =  byvars,
+                          match_type = "m:1",
+                          keep = "left",
+                          reportvar = FALSE) |>
+    fsubset(year > last_year)
+
+  # Prepare for cumulative growth calculation
+  dt_growth[, c("initial_year", "initial_gdp") := .(last_year[1], last_gdp[1]),
+            by = byvars]
+
+  # Calculate projected GDP
+  # Calculate cumulative GDP projections
+  dt_growth[, cum_growth := cumprod(1 + gdppc_growth),
+            by = byvars
+  ][, projected_GDP := last_gdp * cum_growth
+  ]
+
+  # Select the relevant columns for the result
+  gdp <- dt_growth |>
+    fselect(country_code, gdp_data_level, gdp_domain, year, gdp = projected_GDP) |>
+    # append to actual GDP
+    rowbind(gdp, fill = TRUE) |>
+    setorder(country_code, gdp_data_level, year)
+
   # Remove any non-WDI countries
   gdp <- gdp[country_code %in% cl$country_code]
 
@@ -300,7 +339,12 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir  = msrdir,
     force   = force
   )
-
+  # Push data (gdp) to GitHub as gdp.csv
+  save_aux_to_gh(gdp, 
+                 repo  = paste0("aux_", measure), 
+                 branch = branch,
+                 filename  = measure)
+  # All aux files that depend on gdp will be loaded from Github
   return(invisible(saved))
 
 }

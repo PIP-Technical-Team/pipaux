@@ -37,7 +37,7 @@ pip_cpi_clean <- function(y,
     `:=`(
       country_code   = code,
       cpi_year       = as.integer(year),
-      survey_year    = ref_year,
+      survey_year    = round(ref_year, 2),
       cpi            = get(cpivar),
       survey_acronym = survname,
       cpi_domain     = as.character(cpi_domain),
