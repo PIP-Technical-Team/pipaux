@@ -12,7 +12,8 @@ test_that("sna_validate_raw() works identifying type/ formating error", {
     measure = measure,
     owner  = owner,
     branch = branch,
-    filename = "sna_metadata"
+    filename = "sna_metadata",
+    ext    = "csv"
   )
 
   sna_fy[, Day := as.character(Day)]

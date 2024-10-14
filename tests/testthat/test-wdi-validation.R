@@ -11,7 +11,8 @@ test_that("wdi_validate_raw() works identifying duplicate error", {
   wdi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   wdi[, `:=` (year = fifelse((year == 1960 & country_code == "ABW"),
@@ -26,7 +27,8 @@ test_that("wdi_validate_raw() works identifying type/ formating error", {
   wdi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   wdi[, `:=` (year = as.character(year),

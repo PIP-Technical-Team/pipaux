@@ -23,7 +23,8 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = measure,
     owner  = owner,
     branch = branch,
-    tag    = tag
+    tag    = tag,
+    ext    = "csv"
   )
 
   # validate cpi raw data

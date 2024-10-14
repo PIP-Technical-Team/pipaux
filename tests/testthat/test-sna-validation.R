@@ -10,8 +10,9 @@ test_that("sna_validate_raw() works identifying type/ formating error", {
 
   sna <- pipfun::load_from_gh(
     measure = measure,
-    owner  = owner,
-    branch = branch
+    owner   = owner,
+    branch  = branch,
+    ext     = "csv"
   )
 
   sna[, `:=` (year = as.character(year),
@@ -26,7 +27,8 @@ test_that("sna_validate_raw() works identifying invalid value", {
   sna <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   sna[, coverage := fifelse(coverage == "National", "national1", coverage)]

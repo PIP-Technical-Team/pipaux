@@ -62,7 +62,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   sna <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
   # validate sna data
   sna_validate_raw(sna, detail = detail)
@@ -71,14 +72,16 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = "sna",
     owner  = owner,
     branch = branch,
-    filename = "sna_metadata"
+    filename = "sna_metadata",
+    ext     = "csv"
   )
 
   # load nowcast growth rates
   nan <- pipfun::load_from_gh(
     measure = "nan",
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
 
@@ -340,8 +343,8 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     force   = force
   )
   # Push data (gdp) to GitHub as gdp.csv
-  save_aux_to_gh(gdp, 
-                 repo  = paste0("aux_", measure), 
+  save_aux_to_gh(gdp,
+                 repo  = paste0("aux_", measure),
                  branch = branch,
                  filename  = measure)
   # All aux files that depend on gdp will be loaded from Github

@@ -20,7 +20,8 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   df <- pipfun::load_from_gh(measure = measure,
                      owner = owner,
                      branch = branch,
-                     tag = tag)
+                     tag = tag,
+                     ext = "csv")
 
   # validate raw metdata data
   metadata_validate_raw(metadata = df, detail = detail)

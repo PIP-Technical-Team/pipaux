@@ -11,11 +11,12 @@ test_that("ppp_validate_raw() works identifying duplicate error", {
   ppp <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   ppp[, `:=` (CoverageType = fifelse(CoverageType == "Urban",
-                                 "Rural", CoverageType))]
+                                 "Rural1", CoverageType))]
 
   expect_error(ppp_validate_raw(ppp))
 
@@ -26,7 +27,8 @@ test_that("ppp_validate_raw() works identifying type/ formating error", {
   ppp <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   ppp[, `:=` (ppp_2017_v1_v1 = as.character(ppp_2017_v1_v1),
@@ -43,7 +45,8 @@ test_that("ppp_validate_raw() works identifying invalid value", {
   ppp <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   ppp[, ppp_domain := fifelse(ppp_domain == 1, 3, ppp_domain)]

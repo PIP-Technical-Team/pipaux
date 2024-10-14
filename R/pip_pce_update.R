@@ -37,7 +37,8 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   sna <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   # validate sna data
@@ -47,7 +48,8 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = "sna",
     owner  = owner,
     branch = branch,
-    filename = "sna_metadata"
+    filename = "sna_metadata",
+    ext     = "csv"
   )
   # validate sna_fy data
   sna_fy_validate_raw(sna_fy = sna_fy, detail = detail)

@@ -12,7 +12,8 @@ test_that("metadata_validate_raw() works identifying duplicate error", {
   metadata <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   metadata[, `:=` (svy_id = fifelse(svy_id == "CNH_2005_URHS_v01_M",
@@ -27,7 +28,8 @@ test_that("metadata_validate_raw() works identifying type/ formating error", {
   metadata <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   metadata[, `:=` (year_start = as.character(year_start),
@@ -42,7 +44,8 @@ test_that("metadata_validate_raw() works identifying invalid value", {
   metadata <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   metadata[, reg := fifelse(reg == "SSA", "ssa", reg)]

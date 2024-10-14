@@ -23,7 +23,8 @@ pip_maddison <- function(action = c("update", "load"),
       measure = measure,
       owner  = owner,
       branch = branch,
-      tag    = tag
+      tag    = tag,
+      ext    = "csv"
     )
   # validate raw data
     mpd_validate_raw(mpd = mpd, detail = detail)

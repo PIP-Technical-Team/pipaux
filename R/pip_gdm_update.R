@@ -17,9 +17,10 @@ pip_gdm_update <- function(force = FALSE,
 #   Load raw file                               ####
 
   df <- pipfun::load_from_gh(measure = "gdm",
-                     owner = owner,
+                     owner  = owner,
                      branch = branch,
-                     tag = tag)
+                     tag    = tag,
+                     ext    = "csv")
 
   # validate gdm raw data
   gdm_validate_raw(gdm = df, detail = detail)

@@ -31,7 +31,8 @@ pip_wdi_update <- function(force   = FALSE,
   if (from   %in% c("file", "gh")) {
     wdi <- pipfun::load_from_gh(measure = measure,
                         owner = owner,
-                        branch = branch)
+                        branch = branch,
+                        ext    = "csv")
 
   } else {
   ##  ........................................................................

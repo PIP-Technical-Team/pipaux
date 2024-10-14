@@ -72,7 +72,8 @@ pip_pop_update <-  function(force   = FALSE,
       filename = "spop",
       owner  = owner,
       branch = branch,
-      tag    = tag)  |>
+      tag    = tag,
+      ext    = "csv")  |>
       clean_names_from_wide() |>
       clean_from_wide()
 
@@ -108,7 +109,8 @@ pip_pop_update <-  function(force   = FALSE,
       filename = "spop",
       owner  = owner,
       branch = branch,
-      tag    = tag
+      tag    = tag,
+      ext    = "csv"
     )  |>
       clean_names_from_wide() |>
       clean_from_wide()

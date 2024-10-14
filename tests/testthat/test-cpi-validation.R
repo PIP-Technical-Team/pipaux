@@ -11,7 +11,8 @@ test_that("cpi_validate_raw() works identifying duplicate error", {
   cpi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   cpi[, `:=` (cpi_data_level = fifelse(cpi_data_level == 0,
@@ -27,7 +28,8 @@ test_that("cpi_validate_raw() works identifying type/ formating error", {
   cpi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   cpi[, `:=` (year = as.character(year),
@@ -45,7 +47,8 @@ test_that("cpi_validate_raw() works identifying invalid value", {
   cpi <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   cpi[, cpi_domain := fifelse(cpi_domain == "National", "National1", cpi_domain)]

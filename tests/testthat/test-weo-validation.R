@@ -11,7 +11,8 @@ test_that("weo_validate_raw() works identifying duplicate error", {
   weo <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   weo[, `:=` (`WEO Subject Code` = fifelse(`WEO Subject Code` == "NGDP",

@@ -11,7 +11,8 @@ test_that("mpd_validate_raw() works identifying type/ formating error", {
   mpd <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   mpd[, `:=` (year = as.character(year),

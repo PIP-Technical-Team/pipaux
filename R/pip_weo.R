@@ -33,7 +33,8 @@ pip_weo <- function(action  = c("update", "load"),
       measure = measure,
       owner  = owner,
       branch = branch,
-      tag    = tag
+      tag    = tag,
+      ext    = "csv"
     )
 
     # validate weo raw data

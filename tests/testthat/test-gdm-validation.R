@@ -11,7 +11,8 @@ test_that("gdm_validate_raw() works identifying duplicate error", {
   gdm <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   gdm[, `:=` (Coverage = fifelse(Coverage == "Urban",
@@ -26,7 +27,8 @@ test_that("gdm_validate_raw() works identifying type/ formating error", {
   gdm <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   gdm[, `:=` (SurveyTime = as.character(SurveyTime),
@@ -44,7 +46,8 @@ test_that("gdm_validate_raw() works identifying invalid value", {
   gdm <- pipfun::load_from_gh(
     measure = measure,
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
 
   gdm[, DataType := fifelse(DataType == "x", "i", DataType)]
