@@ -5,11 +5,7 @@
 #'
 pip_pfw_key <- function(){
 
-  # pfw_temp <- pipload::pip_load_aux("pfw")
-
-  pfw_temp <- pip_pfw(action = "load",
-                 branch = "DEV",
-                 maindir = "Q:/Team/Tefera/pip/PIP-Data_QA")
+  pfw_temp <- load_aux("pfw", maindir = temp_fld)
 
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
@@ -18,11 +14,7 @@ pip_pfw_key <- function(){
                                   cpi_domain_var)]
 
 
-  # cpi_temp <- pipload::pip_load_aux("cpi")
-
-  cpi_temp <- pip_cpi(action = "load",
-                 branch = "DEV",
-                 maindir = "Q:/Team/Tefera/pip/PIP-Data_QA")
+  cpi_temp <- load_aux("cpi", maindir = temp_fld)
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &
