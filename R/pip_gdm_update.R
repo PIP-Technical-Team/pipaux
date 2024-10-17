@@ -8,8 +8,8 @@ pip_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)
-                           ) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
   measure <- "gdm"
   branch <- match.arg(branch)
 
@@ -17,10 +17,13 @@ pip_gdm_update <- function(force = FALSE,
 #   Load raw file                               ####
 
   df <- pipfun::load_from_gh(measure = "gdm",
-                     owner = owner,
+                     owner  = owner,
                      branch = branch,
-                     tag = tag)
+                     tag    = tag,
+                     ext    = "csv")
 
+  # validate gdm raw data
+  gdm_validate_raw(gdm = df, detail = detail)
 
 #   ____________________________________________________________________________
 #   Transform dataset                                                       ####
@@ -84,11 +87,11 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Merge with PFW                                                          ####
 
-  pip_pfw(maindir = maindir,
-          force   = force,
-          owner   = owner,
-          branch  = branch,
-          tag     = tag)
+  # pip_pfw(maindir = maindir,
+  #         force   = force,
+  #         owner   = owner,
+  #         branch  = branch,
+  #         tag     = tag)
 
   pfw    <-  load_aux(measure = "pfw",
                       maindir = maindir,
@@ -202,11 +205,23 @@ pip_gdm_update <- function(force = FALSE,
 
 
   # ---- Save and sign ----
+  df <- df |> setnames(c("surveyid_year", "pop_data_level"),
+                       c("year", "reporting_level"),
+                       skip_absent=TRUE)
+
+  setattr(df, "aux_name", "gdm")
+  setattr(df,
+          "aux_key",
+          c("country_code", "year", "reporting_level", "welfare_type"))
+
+  # validate gdm output data
+  gdm_validate_output(gdm = df, detail = detail)
 
   if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   saved <- pipfun::pip_sign_save(
     x       = df,
     measure = measure,

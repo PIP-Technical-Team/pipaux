@@ -1,0 +1,100 @@
+
+## Initial parameters --------
+branch  <- "DEV"
+owner   <- getOption("pipfun.ghowner")
+measure <- "pop"
+gls <- pipfun::pip_create_globals()
+temp_fld <- "Y:/tefera_pipaux_test"
+
+test_that("pop_validate_raw() works identifying duplicate error", {
+
+  pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
+  pop   <- wbstats::wb_data(indicator = pop_indicators,
+                            country = "all", # this is new
+                            lang      = "en",
+                            return_wide = FALSE) |>
+    setDT()
+
+  pop[, `:=` (indicator_id = fifelse(indicator_id == "SP.RUR.TOTL",
+                                     "SP.URB.TOTL", indicator_id))]
+
+  expect_error(pop_validate_raw(pop))
+
+})
+
+test_that("pop_validate_raw() works identifying type/ formating error", {
+
+  pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
+  pop   <- wbstats::wb_data(indicator = pop_indicators,
+                            country = "all", # this is new
+                            lang      = "en",
+                            return_wide = FALSE) |>
+    setDT()
+
+  pop[, `:=` (date = as.character(date),
+              value = as.character(value))]
+
+  expect_error(pop_validate_raw(pop))
+
+})
+
+test_that("pop_validate_raw() works identifying invalid value", {
+
+  pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
+  pop   <- wbstats::wb_data(indicator = pop_indicators,
+                            country = "all", # this is new
+                            lang      = "en",
+                            return_wide = FALSE) |>
+    setDT()
+
+  pop[, `:=` (indicator_id = fifelse(indicator_id == "SP.RUR.TOTL",
+                                     "SP.RUR.totl", indicator_id))]
+
+  expect_error(pop_validate_raw(pop))
+
+})
+
+test_that("pop_validate_output() works identifying duplicate error", {
+
+  pop <- load_aux(
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
+    measure = measure,
+    branch  = branch
+  )
+
+  pop[, `:=` (reporting_level = fifelse((reporting_level == "rural" & country_code == "ABW"),
+                                       "urban", reporting_level))]
+
+  expect_error(pop_validate_output(pop))
+
+})
+
+test_that("pop_validate_output() works identifying type/ formating error", {
+
+  pop <- load_aux(
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
+    measure = measure,
+    branch  = branch
+  )
+
+  pop[, `:=` (year = as.character(year),
+              pop = as.character(pop))]
+
+  expect_error(pop_validate_output(pop))
+
+})
+
+test_that("pop_validate_output() works identifying invalid value", {
+
+  pop <- load_aux(
+    maindir = temp_fld, #gls$PIP_DATA_DIR,
+    measure = measure,
+    branch  = branch
+  )
+
+  pop[, reporting_level := fifelse(reporting_level == "national",
+                                  "national1", reporting_level)]
+
+  expect_error(pop_validate_output(pop))
+
+})

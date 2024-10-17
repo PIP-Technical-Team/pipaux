@@ -10,7 +10,8 @@ pip_income_groups(
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
-  class_branch = "master"
+  class_branch = "master",
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ memory.}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update or load a dataset with historical income groups. The raw files are not

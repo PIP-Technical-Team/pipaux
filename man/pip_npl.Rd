@@ -10,7 +10,8 @@ pip_npl(
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  tag = match.arg(branch),
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ memory.}
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update series of national poverty lines

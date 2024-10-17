@@ -9,7 +9,8 @@ pip_metadata_update(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  tag = match.arg(branch),
+  detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ pip_metadata_update(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \value{
 logical. TRUE if saved correctly. FALSE if error happened

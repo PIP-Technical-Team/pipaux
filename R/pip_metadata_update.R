@@ -1,5 +1,6 @@
 #' Update metadata file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @inheritParams pip_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
@@ -8,7 +9,8 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
                                 branch  = c("DEV", "PROD", "main"),
-                                tag     = match.arg(branch)) {
+                                tag     = match.arg(branch),
+                                detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
   branch <- match.arg(branch)
@@ -18,7 +20,11 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   df <- pipfun::load_from_gh(measure = measure,
                      owner = owner,
                      branch = branch,
-                     tag = tag)
+                     tag = tag,
+                     ext = "csv")
+
+  # validate raw metdata data
+  metadata_validate_raw(metadata = df, detail = detail)
 
   # Load pfw
   pfw <- load_aux(measure = "pfw",
@@ -100,11 +106,21 @@ pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 
 ##  ............................................................................
 ##  Save                                                                    ####
+  df <- df |> setnames("reporting_year", "year", skip_absent=TRUE)
+
+  setattr(df, "aux_name", "metadata")
+  setattr(df,
+          "aux_key",
+          c("country_code", "year", "welfare_type"))
+
+  # validate raw metdata data
+  metadata_validate_output(metadata = df, detail = detail)
 
   if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   saved <- pipfun::pip_sign_save(
     x       = df,
     measure = measure,

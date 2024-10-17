@@ -29,6 +29,8 @@ auto_aux_update <- function(measure = NULL,
     )
   }
 
+  # if there is validation report in the environment - remove it
+  clean_validation_report()
 
   creds <- pipfun::get_github_creds()
   gh_user   <- "https://raw.githubusercontent.com"

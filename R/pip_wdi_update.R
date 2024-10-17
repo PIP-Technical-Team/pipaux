@@ -2,6 +2,7 @@
 #'
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_gdp
 #' @return data.table with gdp and pce variables
 #' @export
@@ -13,7 +14,8 @@ pip_wdi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = c("gh", "file", "api")) {
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 
   from   <- match.arg(from)
@@ -29,7 +31,8 @@ pip_wdi_update <- function(force   = FALSE,
   if (from   %in% c("file", "gh")) {
     wdi <- pipfun::load_from_gh(measure = measure,
                         owner = owner,
-                        branch = branch)
+                        branch = branch,
+                        ext    = "csv")
 
   } else {
   ##  ........................................................................
@@ -48,6 +51,8 @@ pip_wdi_update <- function(force   = FALSE,
              new = c("country_code", "year")
     )
   }
+  # validate wdi raw data
+  wdi_validate_raw(wdi = wdi, detail = detail)
 
   #   _________________________________________________________________________
   #   Save and Return                                                     ####
@@ -56,6 +61,12 @@ pip_wdi_update <- function(force   = FALSE,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(wdi, "aux_name", "wdi")
+  setattr(wdi,
+          "aux_key",
+          c("country_code", "year"))
+
   saved <- pipfun::pip_sign_save(
     x       = wdi,
     measure = measure,
