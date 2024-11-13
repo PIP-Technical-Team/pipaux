@@ -21,7 +21,8 @@ pip_indicators <- function(action  = c("update", "load"),
       pipfun::load_from_gh(
         measure = measure,
         owner  = owner,
-        branch = branch
+        branch = branch,
+        ext    = "csv"
       )
 
     # Convert empty strings to NA in all character variables

@@ -10,7 +10,8 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
                            tag     = match.arg(branch),
-                           from    = c("gh", "file", "api")) {
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
   branch <- match.arg(branch)
   from   <- match.arg(from)
@@ -36,16 +37,22 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   sna <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
-    branch = branch
+    branch = branch,
+    ext    = "csv"
   )
+
+  # validate sna data
+  sna_validate_raw(sna = sna, detail = detail)
 
   sna_fy <- pipfun::load_from_gh(
     measure = "sna",
     owner  = owner,
     branch = branch,
-    filename = "sna_metadata"
+    filename = "sna_metadata",
+    ext     = "csv"
   )
-
+  # validate sna_fy data
+  sna_fy_validate_raw(sna_fy = sna_fy, detail = detail)
 #   ____________________________________________________________________________
 #   Clean PCE from WDI                                                      ####
 
@@ -223,6 +230,16 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   pce <- pce[country_code %in% cl$country_code]
 
   ## ---- Sign and save ----
+  pce <- pce |> setnames("pce_data_level", "reporting_level",
+                         skip_absent=TRUE)
+
+  setattr(pce, "aux_name", "pce")
+  setattr(pce,
+          "aux_key",
+          c("country_code", "year", "reporting_level"))
+
+  # validate pce output data
+  pce_validate_output(pce = pce, detail = detail)
 
   if (branch == "main") {
     branch <- ""

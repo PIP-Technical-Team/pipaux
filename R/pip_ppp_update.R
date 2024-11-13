@@ -6,7 +6,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 
 #   ____________________________________________________________________________
@@ -23,9 +24,12 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = measure,
     owner  = owner,
     branch = branch,
-    tag    = tag
+    tag    = tag,
+    ext    = "csv"
   )
 
+  # validate ppp raw data
+  ppp_validate_raw(ppp = ppp, detail = detail)
 
 #   ____________________________________________________________________________
 #   cleaning                                                                ####
@@ -58,10 +62,23 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
+  ppp <- ppp |> setnames("ppp_data_level", "reporting_level",
+                         skip_absent=TRUE)
+
+  setattr(ppp, "aux_name", "ppp")
+  setattr(ppp,
+          "aux_key",
+          c("country_code", "reporting_level")) # this is going to be key variables only when PPP default year selected.
+
+  # validate ppp output data
+  ppp_validate_output(ppp = ppp, detail = detail)
+
   if (branch == "main") {
     branch <- ""
   }
+
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   saved <- pipfun::pip_sign_save(
     x       = ppp,
     measure = measure,
@@ -79,6 +96,15 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   data.table::setnames(x = ppp_vintage,
                        old = c("release_version", "adaptation_version"),
                        new = c("ppp_rv", "ppp_av"))
+
+  # ppp_vintage <- ppp_vintage |> setnames("ppp_data_level", "reporting_level",
+  #                        skip_absent=TRUE)
+  #
+  # setattr(ppp_vintage, "aux_name", "ppp")
+  # setattr(ppp_vintage,
+  #         "aux_key",
+  #         c("country_code", "reporting_level"))
+
   # Save
   pipfun::pip_sign_save(
     x = ppp_vintage,

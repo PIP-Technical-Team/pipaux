@@ -8,6 +8,7 @@
 #'
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -16,7 +17,8 @@ pip_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
                              branch  = c("DEV", "PROD", "main"),
-                             class_branch = "master"
+                             class_branch = "master",
+                             detail  = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
   branch  <- match.arg(branch)
@@ -27,11 +29,20 @@ pip_country_list <- function(action = c("update", "load"),
     ## Special national accounts --------
     cl <- pip_country_list_update(class_branch = class_branch)
 
+  # validate country list raw data
+    cl_validate_raw(cl, detail = detail)
+
     # Save
     if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(cl, "aux_name", "country_list")
+  setattr(cl,
+          "aux_key",
+          c("country_code"))
+
     saved <- pipfun::pip_sign_save(
       x       = cl,
       measure = measure,

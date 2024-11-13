@@ -2,6 +2,7 @@
 #'
 #' Load or update PPP data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -11,7 +12,9 @@ pip_ppp <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
-                    tag     = branch) {
+                    tag     = branch,
+                    detail  = getOption("pipaux.detail.raw"),
+                    ppp_defaults = TRUE) {
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -43,13 +46,15 @@ pip_ppp <- function(action = c("update", "load"),
                    force   = force,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
   }
   else {
     load_aux(
       maindir = maindir,
       measure = measure,
-      branch  = branch
+      branch  = branch,
+      ppp_defaults = ppp_defaults
     )
   }
 

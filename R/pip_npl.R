@@ -2,6 +2,7 @@
 #'
 #' Update series of national poverty lines
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -10,7 +11,8 @@ pip_npl <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
                    branch  = c("DEV", "PROD", "main"),
-                   tag     = match.arg(branch)) {
+                   tag     = match.arg(branch),
+                   detail  = getOption("pipaux.detail.raw")) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## setup --------
 
@@ -29,6 +31,9 @@ pip_npl <- function(action  = c("update", "load"),
                                 ext    = "dta") |>
       setDT()
 
+    # validate npl raw data
+    npl_validate_raw(npl = npl, detail = detail)
+
     setnames(x = npl,
              old = c("countrycode",  "year", "vsi_pov_nahc_nc"),
              new = c("country_code", "reporting_year", "nat_headcount"),
@@ -40,6 +45,16 @@ pip_npl <- function(action  = c("update", "load"),
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
+    npl <- npl |> setnames("reporting_year", "year",
+                           skip_absent=TRUE)
+
+    setattr(npl, "aux_name", "npl")
+    setattr(npl,
+            "aux_key",
+            c("country_code", "year"))
+
+    # validate npl output data
+    npl_validate_output(npl = npl, detail = detail)
 
     if (branch == "main") {
       branch <- ""

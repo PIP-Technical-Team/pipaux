@@ -2,6 +2,7 @@
 #'
 #' Load or update data from the Maddison project.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -11,7 +12,8 @@ pip_maddison <- function(action = c("update", "load"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
                          branch  = c("DEV", "PROD", "main"),
-                         tag     = match.arg(branch)) {
+                         tag     = match.arg(branch),
+                         detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
   action  <- match.arg(action)
   branch  <- match.arg(branch)
@@ -21,13 +23,26 @@ pip_maddison <- function(action = c("update", "load"),
       measure = measure,
       owner  = owner,
       branch = branch,
-      tag    = tag
+      tag    = tag,
+      ext    = "csv"
     )
+  # validate raw data
+    mpd_validate_raw(mpd = mpd, detail = detail)
+
+  # # validate output data
+  #   mpd_validate_output(mpd)
 
   if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(mpd, "aux_name", "maddison")
+
+  setattr(mpd,
+          "aux_key",
+          c("country_code", "year"))
+
     saved <- pipfun::pip_sign_save(
       x = mpd,
       measure = measure,

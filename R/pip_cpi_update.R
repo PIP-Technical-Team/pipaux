@@ -6,7 +6,8 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch)) {
+                           tag     = match.arg(branch),
+                           detail  = getOption("pipaux.detail.raw")) {
 
 #   ____________________________________________________________________________
 #   Set up                                                                  ####
@@ -22,9 +23,12 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = measure,
     owner  = owner,
     branch = branch,
-    tag    = tag
+    tag    = tag,
+    ext    = "csv"
   )
 
+  # validate cpi raw data
+  cpi_validate_raw(cpi, detail = detail)
 
 #   ____________________________________________________________________________
 #   Cleaning                                                                ####
@@ -33,6 +37,19 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   cpi <- pip_cpi_clean(cpi,
                        maindir = maindir,
                        branch = branch)
+
+  # changae cpi_year and cpi_data_level to year and reporting_level
+  cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
+                         c("year", "reporting_level"),
+                         skip_absent=TRUE)
+
+  setattr(cpi, "aux_name", "cpi")
+  setattr(cpi,
+          "aux_key",
+          c("country_code", "year", "reporting_level", "survey_acronym"))
+
+  # validate cpi clean data before saving it
+  cpi_validate_output(cpi, detail = detail)
 
   # Save
   if (branch == "main") {

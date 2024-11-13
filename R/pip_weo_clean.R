@@ -96,7 +96,7 @@ pip_weo_clean <- function(dt,
                   branch = branch)
 
   setDT(pop)
-  pop <- pop[pop_data_level == "national", ]
+  pop <- pop[reporting_level == "national", ] #pop_data_level = reporting_level
   dt[pop,
      on = .(country_code, year),
      `:=`(

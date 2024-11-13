@@ -9,6 +9,7 @@
 #' `pip_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
@@ -17,7 +18,8 @@ pip_weo <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail  = getOption("pipaux.detail.raw")) {
   measure <- "weo"
   branch <- match.arg(branch)
   action <- match.arg(action)
@@ -31,17 +33,30 @@ pip_weo <- function(action  = c("update", "load"),
       measure = measure,
       owner  = owner,
       branch = branch,
-      tag    = tag
+      tag    = tag,
+      ext    = "csv"
     )
+
+    # validate weo raw data
+    weo_validate_raw(weo = dt, detail = detail)
+
     dt <- pip_weo_clean(dt,
                         maindir = maindir,
                         branch = branch)
 
     # Save dataset
+    setattr(dt, "aux_name", "weo")
+    setattr(dt,
+            "aux_key",
+            c("country_code", "year"))
+    # validate weo clean data
+    weo_validate_output(weo = dt, detail = detail)
+
     if (branch == "main") {
       branch <- ""
     }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   cat('\nDir : ', msrdir)
     saved <- pipfun::pip_sign_save(
       x       = dt,

@@ -10,8 +10,9 @@ pipuax_default_options <- list(
   pipfun.ghowner = "PIP-Technical-Team",
   joyn.verbose   = FALSE,
   pipfun.verbose = TRUE,
+  pipaux.detail.raw = FALSE,
+  pipaux.detail.output = FALSE,
   joyn.reportvar = "report"
-
 )
 
 .onLoad <- function(libname, pkgname) {

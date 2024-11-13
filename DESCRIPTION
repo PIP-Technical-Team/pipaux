@@ -28,7 +28,9 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    covr
+    covr,
+    dm,
+    config
 Imports: 
     haven,
     digest,
@@ -50,10 +52,12 @@ Imports:
     httr,
     pipfun (>=  0.0.2),
     lifecycle,
+    collapse,
     joyn,
-    dm,
-    config,
-    collapse
+    data.validator,
+    assertr,
+    blastula,
+    rlang
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@DEV_v2,
