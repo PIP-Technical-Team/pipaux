@@ -10,7 +10,7 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
-pip_pfw <- function(action  = c("update", "load"),
+aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,

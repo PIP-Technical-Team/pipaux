@@ -14,13 +14,6 @@ pip_country_list(
 )
 }
 \arguments{
-\item{action}{character: Either "load" or "update". Default is "update". If
-"update" data will be updated on the system. If "load" data is loaded in memory.}
-
-\item{maindir}{character: Main directory of project.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
 

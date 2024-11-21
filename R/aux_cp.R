@@ -1,0 +1,33 @@
+#' Country Profiles
+#'
+#' Update a list with country profiles data
+#'
+#' @inheritParams aux_cpi
+#' @inheritParams pipfun::load_from_gh
+#' @export
+aux_cp <- function(action  = c("update", "load"),
+                   force   = FALSE,
+                   owner   = getOption("pipfun.ghowner"),
+                   maindir = gls$PIP_DATA_DIR,
+                   branch  = c("DEV", "PROD", "main"),
+                   tag     = match.arg(branch)) {
+  measure <- "cp"
+  branch <- match.arg(branch)
+  action <- match.arg(action)
+
+  if (action == "update") {
+    aux_cp_update(maindir = maindir,
+                  force   = force,
+                  owner   = owner,
+                  branch  = branch,
+                  tag     = tag)
+  } else {
+
+    dl <- load_aux(
+      maindir = maindir,
+      measure = measure,
+      branch  = branch
+    )
+    return(dl)
+  }
+}

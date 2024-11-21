@@ -14,10 +14,6 @@ pip_pfw_update(
 )
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
@@ -25,8 +21,6 @@ pip_pfw_update(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update PFW
