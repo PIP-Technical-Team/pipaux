@@ -3,11 +3,11 @@
 #' Load or update data from the Maddison project.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
-pip_maddison <- function(action = c("update", "load"),
+aux_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,

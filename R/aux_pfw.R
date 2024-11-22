@@ -22,7 +22,7 @@ aux_pfw <- function(action  = c("update", "load"),
   action <- match.arg(action)
 
   if (action == "update") {
-    pip_pfw_update(maindir = maindir,
+    aux_pfw_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
                    branch  = branch,

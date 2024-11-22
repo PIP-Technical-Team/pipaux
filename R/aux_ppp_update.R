@@ -2,7 +2,7 @@
 #'
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
@@ -36,7 +36,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 
   # Clean data
-  ppp <- pip_ppp_clean(ppp)
+  ppp <- aux_ppp_clean(ppp)
 
   # Remove any non-WDI countries
   cl <- load_aux(maindir = maindir,

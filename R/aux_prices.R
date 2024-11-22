@@ -11,7 +11,7 @@
 #'
 #' @export
 #' @import data.table
-pip_prices <- function(measure = NULL,
+aux_prices <- function(measure = NULL,
                        action = "update",
                        maindir = gls$PIP_DATA_DIR,
                        dlwdir  = Sys.getenv("PIP_DLW_ROOT_DIR"),
@@ -73,19 +73,19 @@ pip_prices <- function(measure = NULL,
   #--------- update ---------
   if (action == "update") {
     if (measure == "cpi") {
-      pip_cpi_update(
+      aux_cpi_update(
         maindir = maindir,
         dlwdir = dlwdir,
         force = force
       )
     } else if (measure == "ppp") {
-      pip_ppp_update(
+      aux_ppp_update(
         maindir = maindir,
         dlwdir = dlwdir,
         force = force
       )
     } else if (measure == "pfw") {
-      pip_pfw_update(
+      aux_pfw_update(
         maindir = maindir,
         dlwdir = dlwdir,
         force = force

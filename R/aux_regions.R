@@ -2,10 +2,10 @@
 #'
 #' Update or load a dataset with regions.
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_regions <- function(action = c("update", "load"),
+aux_regions <- function(action = c("update", "load"),
                         force = FALSE,
                         maindir = gls$PIP_DATA_DIR,
                         owner   = getOption("pipfun.ghowner"),

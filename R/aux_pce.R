@@ -3,11 +3,11 @@
 #' Load or update PCE data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_gdp
-#' @inheritParams pip_pfw
+#' @inheritParams aux_gdp
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_pce <- function(action  = c("update", "load"),
+aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
@@ -20,7 +20,7 @@ pip_pce <- function(action  = c("update", "load"),
   action <- match.arg(action)
 
   if (action == "update") {
-    pip_pce_update(maindir = maindir,
+    aux_pce_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
                    branch  = branch,

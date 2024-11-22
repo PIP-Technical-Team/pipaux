@@ -3,10 +3,10 @@
 #' Update or load a dataset with survey metadata.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams load_raw_indicators
 #' @export
-pip_metadata <- function(action  = c("update", "load"),
+aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
@@ -19,7 +19,7 @@ pip_metadata <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    pip_metadata_update(
+    aux_metadata_update(
       maindir = maindir,
       force   = force,
       owner   = owner,

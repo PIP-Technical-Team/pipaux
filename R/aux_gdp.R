@@ -1,29 +1,29 @@
-#' PIP wdi
+#' PIP GDP
 #'
-#' Update or load wdi data.
+#' Update or load GDP data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
 #'   and "gh" are synonymous
 #' @export
-pip_wdi <- function(action          = c("update", "load"),
+aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
                     branch          = c("DEV", "PROD", "main"),
                     tag             = match.arg(branch),
-                    from            = c("gh", "file", "api"),
+                    from            = "file",
                     detail          = getOption("pipaux.detail.raw")) {
 
-  measure    <- "wdi"
+  measure    <- "gdp"
   branch <- match.arg(branch)
   action <- match.arg(action)
 
 
   if (action == "update") {
-    pip_wdi_update(maindir = maindir,
+    aux_gdp_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
                    branch  = branch,
@@ -39,4 +39,4 @@ pip_wdi <- function(action          = c("update", "load"),
     )
     return(dt)
   }
-} # end of pip_wdi
+} # end of pip_gdp

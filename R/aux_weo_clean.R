@@ -6,7 +6,7 @@
 #'
 #' @return data.table
 #' @export
-pip_weo_clean <- function(dt,
+aux_weo_clean <- function(dt,
                           maindir = gls$PIP_DATA_DIR,
                           branch  = c("DEV", "PROD", "main")) {
 

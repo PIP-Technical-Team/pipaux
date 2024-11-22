@@ -3,10 +3,10 @@
 #' Update or load a dataset with poverty lines.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_pl <- function(action = c("update", "load"),
+aux_pl <- function(action = c("update", "load"),
                    force = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,

@@ -3,7 +3,7 @@
 #' @return data.table
 #' @export
 #'
-pip_pfw_key <- function(){
+aux_pfw_key <- function(){
 
   pfw_temp <- load_aux("pfw", maindir = temp_fld)
 

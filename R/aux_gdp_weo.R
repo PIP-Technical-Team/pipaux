@@ -6,12 +6,12 @@
 #' as an .xls file in `<maindir>/_aux/weo/`. The filename should be in the
 #' following structure `WEO_<YYYY-DD-MM>.xls`. Due to potential file corruption
 #' the file must be opened and re-saved before it can be updated with
-#' `pip_gdp_weo()`. Hopefully in the future IMF will stop using an `.xls` file
+#' `aux_gdp_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
-#' @inheritParams pip_prices
+#' @inheritParams aux_prices
 #' @export
-pip_gdp_weo <- function(action = "update",
+aux_gdp_weo <- function(action = "update",
                         force = FALSE,
                         maindir = gls$PIP_DATA_DIR) {
   measure <- "weo"
@@ -101,7 +101,7 @@ pip_gdp_weo <- function(action = "update",
 
     # ---- Merge with population ----
 
-    pop <- pip_pop("load", maindir = maindir)
+    pop <- aux_pop("load", maindir = maindir)
     setDT(pop)
     pop <- pop[pop_data_level == "national", ]
     dt[pop,
@@ -138,7 +138,7 @@ pip_gdp_weo <- function(action = "update",
     dt <- dt[, c("country_code", "year", "weo_gdp")]
 
     # Save dataset
-    pip_sign_save(
+    aux_sign_save(
       x = dt,
       measure = measure,
       msrdir = msrdir,

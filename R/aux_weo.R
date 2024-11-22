@@ -10,10 +10,10 @@
 #' that's not really xls.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_weo <- function(action  = c("update", "load"),
+aux_weo <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
@@ -40,7 +40,7 @@ pip_weo <- function(action  = c("update", "load"),
     # validate weo raw data
     weo_validate_raw(weo = dt, detail = detail)
 
-    dt <- pip_weo_clean(dt,
+    dt <- aux_weo_clean(dt,
                         maindir = maindir,
                         branch = branch)
 

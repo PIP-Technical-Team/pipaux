@@ -3,13 +3,13 @@
 #' GDP and HFCE data from WDI. It could be either from API or from file
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_gdp
+#' @inheritParams aux_gdp
 #' @return data.table with gdp and pce variables
 #' @export
 #'
 #' @examples
-#' pip_wdi_update()
-pip_wdi_update <- function(force   = FALSE,
+#' aux_wdi_update()
+aux_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),

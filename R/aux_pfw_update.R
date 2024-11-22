@@ -1,9 +1,9 @@
 #' Update PFW
 #'
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
@@ -22,7 +22,7 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   pfw_validate_raw(pfw = pfw, detail = detail)
 
   # Clean data
-  pfw <- pip_pfw_clean(pfw,
+  pfw <- aux_pfw_clean(pfw,
                        maindir = maindir,
                        branch = branch)
 

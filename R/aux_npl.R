@@ -3,10 +3,10 @@
 #' Update series of national poverty lines
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_npl <- function(action  = c("update", "load"),
+aux_npl <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,

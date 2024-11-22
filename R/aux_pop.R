@@ -3,11 +3,11 @@
 #' Load or update population data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @param from character: Source for population data.
 #' @export
-pip_pop <- function(action = c("update", "load"),
+aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
                     from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
@@ -20,7 +20,7 @@ pip_pop <- function(action = c("update", "load"),
   action <- match.arg(action)
 
   if (action == "update") {
-    pip_pop_update(
+    aux_pop_update(
       force   = force,
       from    = from,
       maindir = maindir,

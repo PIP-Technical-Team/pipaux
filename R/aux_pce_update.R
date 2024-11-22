@@ -2,10 +2,10 @@
 #'
 #' Update PCE data using WDI and Special cases.
 #'
-#' @inheritParams pip_gdp
+#' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),

@@ -2,10 +2,10 @@
 #'
 #' Update or load a dataset with the indicators master sheet.
 #'
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_indicators <- function(action  = c("update", "load"),
+aux_indicators <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,

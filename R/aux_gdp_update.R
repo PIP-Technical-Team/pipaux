@@ -2,10 +2,10 @@
 #'
 #' Update GDP data using WDI, Maddison and Special cases.
 #'
-#' @inheritParams pip_gdp
+#' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),

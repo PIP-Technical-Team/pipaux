@@ -3,11 +3,11 @@
 #' Load or update PPP data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
-pip_ppp <- function(action = c("update", "load"),
+aux_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
                     branch  = c("DEV", "PROD", "main"),
@@ -42,7 +42,7 @@ pip_ppp <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    pip_ppp_update(maindir = maindir,
+    aux_ppp_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
                    branch  = branch,

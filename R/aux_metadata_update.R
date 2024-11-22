@@ -2,10 +2,10 @@
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
-#' @inheritParams pip_metadata
+#' @inheritParams aux_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
-pip_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
                                 branch  = c("DEV", "PROD", "main"),
