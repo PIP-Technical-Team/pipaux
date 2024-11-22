@@ -9,11 +9,11 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
-pip_country_list <- function(action = c("update", "load"),
+aux_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
                              branch  = c("DEV", "PROD", "main"),
@@ -27,7 +27,7 @@ pip_country_list <- function(action = c("update", "load"),
   if (action == "update") {
 
     ## Special national accounts --------
-    cl <- pip_country_list_update(class_branch = class_branch)
+    cl <- aux_country_list_update(class_branch = class_branch)
 
   # validate country list raw data
     cl_validate_raw(cl, detail = detail)

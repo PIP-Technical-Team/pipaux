@@ -2,9 +2,9 @@
 #'
 #' Update GDM data using the PovcalNet Masterfile.
 #'
-#' @inheritParams pip_gdm
+#' @inheritParams aux_gdm
 #' @keywords internal
-pip_gdm_update <- function(force = FALSE,
+aux_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
                            branch  = c("DEV", "PROD", "main"),
@@ -193,7 +193,7 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Remove any non-WDI countries                                            ####
 
-  pip_country_list(maindir = maindir,
+  aux_country_list(maindir = maindir,
                    force   = force,
                    branch  = branch)
 

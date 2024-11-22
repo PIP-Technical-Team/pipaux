@@ -9,11 +9,11 @@
 #'
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_gdm <- function(action  = c("update", "load"),
+aux_gdm <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
@@ -27,7 +27,7 @@ pip_gdm <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    pip_gdm_update(force   = force,
+    aux_gdm_update(force   = force,
                    maindir = maindir,
                    owner   = owner,
                    branch  = branch,

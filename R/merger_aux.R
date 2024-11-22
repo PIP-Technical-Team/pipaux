@@ -41,7 +41,7 @@ merger_aux <- function(aux_data1,
   if (measure1 == "pfw" || measure2 == "pfw"){
 
     # generate a dataset that can be used to add reporting_level variable to pfw data
-    pfw_key <- pip_pfw_key()
+    pfw_key <- aux_pfw_key()
 
     pfw <- pfw_key[pfw, on = .(country_code, survey_year, survey_acronym, cpi_domain_var)]
 

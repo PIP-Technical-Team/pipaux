@@ -12,7 +12,7 @@
 #'
 #' @export
 #' @import data.table
-pip_cpi <- function(action = c("update", "load"),
+aux_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
@@ -46,7 +46,7 @@ pip_cpi <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    pip_cpi_update(maindir = maindir,
+    aux_cpi_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
                    branch  = branch,

@@ -1,6 +1,6 @@
 #' Validate clean cpi data
 #'
-#' @param cpi clean cpi data, output via `pip_cpi_clean`
+#' @param cpi clean cpi data, output via `aux_cpi_clean`
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq

@@ -1,8 +1,8 @@
 #' Update CPI
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @keywords internal
-pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = c("DEV", "PROD", "main"),
@@ -34,7 +34,7 @@ pip_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
 #   Cleaning                                                                ####
 
   # Clean data
-  cpi <- pip_cpi_clean(cpi,
+  cpi <- aux_cpi_clean(cpi,
                        maindir = maindir,
                        branch = branch)
 

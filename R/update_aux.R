@@ -1,7 +1,7 @@
 #' Update Auxiliary data. Wrapper of measure-specific functions.
 #'
-#' @inheritParams pip_aux_labels
-#' @inheritParams pip_cpi
+#' @inheritParams aux_labels_pip
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @param verbose logical : Do you want verbose output?
 #' @export
@@ -32,9 +32,9 @@ update_aux <- function(measure,
   if ("all" %in% tolower(measure)) {
     measure <-
       lsf.str("package:pipaux",
-              pattern = "^pip_[a-z]+$") |>
+              pattern = "^aux_[a-z]+$") |>
       as.character() |>
-      {\(.) gsub("^pip_", "", .)}() |>
+      {\(.) gsub("^aux_", "", .)}() |>
       sort()
   }
 
@@ -43,7 +43,7 @@ update_aux <- function(measure,
   al$verbose <- NULL
 
   # build function name
-  fun_name <- glue("pip_{measure}")
+  fun_name <- glue("aux_{measure}")
 
   rs <- lapply(fun_name,
                \(.x) {

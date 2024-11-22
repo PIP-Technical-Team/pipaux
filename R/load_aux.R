@@ -1,6 +1,6 @@
 #' Load any auxiliary data
 #'
-#' @inheritParams pip_pfw
+#' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @param apply_label logical: If TRUE, predefined labels will applied.
 #' @param ppp_defaults logical: If TRUE, wider format ppp data will be returned

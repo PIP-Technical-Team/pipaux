@@ -2,10 +2,10 @@
 #'
 #' Update or load a dataset with countries.
 #'
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_countries <- function(action  = c("update", "load"),
+aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,

@@ -1,10 +1,10 @@
-#' pip_aux_labels
+#' PIP Auxiliary Labels
 #'
 #' @param x Data frame to be labeled.
 #' @param measure type of data frame, e.g., "cpi" or "PPP".
 #'
 #' @keywords internal
-pip_aux_labels <- function(x, measure) {
+aux_labels_pip <- function(x, measure) {
   if (measure == "cpi") {
 
     # Label variables

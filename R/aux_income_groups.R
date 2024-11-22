@@ -4,10 +4,10 @@
 #' available in the PIP-Technical-Team group but in the Povcalnet-team group.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams pip_cpi
+#' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-pip_income_groups <- function(action       = c("update", "load"),
+aux_income_groups <- function(action       = c("update", "load"),
                               force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
                               maindir      = gls$PIP_DATA_DIR,

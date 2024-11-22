@@ -2,7 +2,7 @@
 #'
 #' @param measure character: measure to be updated, if NULL will update all of
 #'   them
-#' @inheritParams pip_pop_update
+#' @inheritParams aux_pop_update
 #' @export
 auto_aux_update <- function(measure = NULL,
                             force   = FALSE,
