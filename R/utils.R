@@ -409,12 +409,12 @@ get_gh <- function(owner,
 }
 
 #' SAve auxiliary file to Github Repo
-#' 
-#' Sometimes we need to save auxiliary files to Github repo. 
+#'
+#' Sometimes we need to save auxiliary files to Github repo.
 #' This function allows for this.
 #'
 #' @inheritParams pipfun::save_to_gh
-#' @export 
+#' @export
 #' @return NULL
 save_aux_to_gh <- function(df,
                        measure,
@@ -426,9 +426,9 @@ save_aux_to_gh <- function(df,
                        ext       = "csv",
                          ...
                          ) {
-  
+
   pipfun::save_to_gh(df = df,
-                     repo = repo, 
+                     repo = repo,
                      owner = owner,
                      branch = branch,
                      tag = tag,
@@ -436,3 +436,26 @@ save_aux_to_gh <- function(df,
                      ext = ext,
                      ...)
 }
+
+#' Call auxiliary function for a specified measure
+#' @param measure character: name of auxiliary data measure
+#' @param ... additional arguments to pass
+#'
+call_aux_function <- function(measure,
+                              package_name = "pipaux",
+                              ...) {
+
+  stopifnot(exprs = exists(function_name, envir = asNamespace(package_name)))
+  function_name <- paste0("aux_", measure)
+
+  func <- get(function_name,  envir = asNamespace(package_name))
+
+  return(func(...))
+}
+
+
+
+
+
+
+
