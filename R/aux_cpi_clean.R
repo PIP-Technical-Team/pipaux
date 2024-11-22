@@ -5,7 +5,7 @@
 #' @param y dataset with CPI data from `aux_cpi_update()`.
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
-#' @inheritParams pip_cpi_update
+#' @inheritParams aux_cpi_update
 #'
 #' @keywords internal
 aux_cpi_clean <- function(y,

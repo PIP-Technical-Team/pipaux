@@ -5,7 +5,6 @@
 #' @return data.table with key values
 #' @export
 #'
-#' @examples
 aux_data <- function(aux_file){
 
   # list of possible auxiliary keys --------------------------------------------

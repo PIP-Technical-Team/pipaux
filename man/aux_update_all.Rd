@@ -11,7 +11,11 @@ aux_update_all(
 )
 }
 \arguments{
+\item{force}{logical: If TRUE data will be overwritten.}
+
 \item{popsrc}{character: Source for population data. Defaults to \code{getOption("pipaux.popsrc")}.}
+
+\item{maindir}{character: Main directory of project.}
 }
 \description{
 Update all auxiliary data at once

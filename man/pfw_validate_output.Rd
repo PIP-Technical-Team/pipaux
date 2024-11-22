@@ -7,7 +7,7 @@
 pfw_validate_output(pfw, detail = getOption("pipaux.detail.output"))
 }
 \arguments{
-\item{pfw}{clean pfw data, output via \code{pip_pfw_clean}}
+\item{pfw}{clean pfw data, output via \code{aux_pfw_clean}}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

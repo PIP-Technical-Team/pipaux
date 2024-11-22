@@ -7,7 +7,7 @@
 cpi_validate_output(cpi, detail = getOption("pipaux.detail.output"))
 }
 \arguments{
-\item{cpi}{clean cpi data, output via \code{pip_cpi_clean}}
+\item{cpi}{clean cpi data, output via \code{aux_cpi_clean}}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

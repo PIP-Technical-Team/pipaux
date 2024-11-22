@@ -12,6 +12,8 @@ aux_sign_save(x, measure, msrdir, force = FALSE, save_dta = TRUE)
 \item{msrdir}{character: Directory where the data and data signature will be
 saved.}
 
+\item{force}{logical: If TRUE data will be overwritten.}
+
 \item{save_dta}{logical: If TRUE a Stata (.dta) version of the dataset is
 also saved.}
 }
