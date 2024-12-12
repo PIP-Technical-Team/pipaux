@@ -447,12 +447,17 @@ call_aux_function <- function(measure,
 
   function_name <- paste0("aux_", measure)
 
-  stopifnot(exprs = exists(function_name,
-                           envir = asNamespace(package_name)))
+  if (!exists(function_name,
+              envir = asNamespace(package_name))) {
+    cli::cli_abort(paste0("Function '", function_name, "' does not exist in the '", package_name, "' package."))
+  }
 
-  func <- get(function_name,  envir = asNamespace(package_name))
+  # Get the function
+  func <- get(function_name,
+              envir = asNamespace(package_name))
 
-  return(func)
+  # Call the function with additional arguments
+  func(...)
 }
 
 
