@@ -2,7 +2,8 @@
 #'
 #' @param aux_data1 auxiliary data one
 #' @param aux_data1 auxiliary data two
-#' @param keep merge/ join type, the default is left join, options (left, right, full, using, master, inner)
+#' @param merge_type merge/ join type, the default is left join, options (left, right, full, using, master, inner)
+#' @param commn_vars option to keep or retain common variables, default is TRUE
 #'
 #' @return data.table with key information
 #' @export
@@ -13,19 +14,19 @@
 #' pfw_ppp <- merger_aux(pfw, ppp)
 #'
 #' cpi <- load_aux("cpi")
-#' cpi <- cpi[, -c("cpi_domain")]
-#' pfw_cpi <- merger_aux(cpi, pfw, keep = "right")
+#' pfw_cpi <- merger_aux(cpi, pfw, merge_type = "right", commn_vars = FALSE)
 #' cpi_pfw <- merger_aux(cpi, pfw)
 #'
 merger_aux <- function(aux_data1,
                        aux_data2,
-                       keep = c("left", "right", "full",
+                       merge_type = c("left", "right", "full",
                                 "using", "master", "inner"),
+                       commn_vars = TRUE,
                        ...
 ){
 
-  keep  <- match.arg(keep)
-  print(keep)
+  merge_type  <- match.arg(merge_type)
+  print(merge_type)
 
   stopifnot("First data is empty" = !is.null(aux_data1))
   stopifnot("Second data is empty" = !is.null(aux_data2))
@@ -111,8 +112,8 @@ merger_aux <- function(aux_data1,
                       aux_data2,
                       by = int_key,
                       match_type = mtype,
-                      keep = keep)
-
+                      keep = merge_type,
+                      keep_common_vars = commn_vars)
 
   attr(mdata, "aux_key", union(attr(aux_data1, "aux_key"),
                                attr(aux_data2, "aux_key")))

@@ -40,7 +40,7 @@ Here’s a breakdown of how it works:
 
     -   **Inner**: Includes only the records that are present in both datasets.
 
-2.  Default Option: If you don’t specify a merge type, the function defaults to "left", meaning it will keep all records from the left dataset and include matching records from the right dataset where available.
+2.  Default Options: i) If you don’t specify a merge type, the function defaults to "left", meaning it will keep all records from the left dataset and include matching records from the right dataset where available. ii) If there are any common variables, the default behavior is to retain them (with different names) in the merged dataset. Otherwise, set keep_common_vars = FALSE to retain only the common variables from one of the datasets.  
 
 **Note:** Keys/IDs and names of auxiliary data files (such as *cpi*, *ppp*, *pfw*, *pop*, *gdp*, *gdm*, etc.) are embedded within the data files as attributes. The `merger_aux()` function utilizes these IDs to create suitable key variables for merging the data files and generating an ID for the combined data file. Additionally, the function produces a new auxiliary file name by combining the names of the files being merged.
 
@@ -60,13 +60,12 @@ cpi <- load_aux("cpi",
                 branch = "DEV",
                 maindir = temp_fld)
 
-cpi <- cpi[, -c("cpi_domain")]
+# a) merge type "left"
+pfw_cpi <- merger_aux(pfw, cpi) # keeps the common variable from both datasets
+pfw_cpi <- merger_aux(pfw, cpi, common_vars = FALSE) # keeps only pfw common variable
 
-# a) keep "left"
-pfw_cpi <- merger_aux(pfw, cpi)
-
-# b) keep "inner"
-cpi_pfw <- merger_aux(pfw, cpi, keep = "inner")
+# b) merge type "inner"
+cpi_pfw <- merger_aux(pfw, cpi, merge_type = "inner")
 
 ```
 
@@ -101,7 +100,7 @@ pop <- load_aux("pop",
 
 pop_pfw_cpi <- merger_aux(pop, 
                           pfw_cpi, 
-                          keep = "right")
+                          merge_type = "right")
 
 ```
 ### 4. Add gdm data to cpi_pfw 
@@ -117,7 +116,7 @@ gdm <- load_aux("gdm",
 
 gdm_cpi_pfw <- merger_aux(gdm,
                           cpi_pfw,
-                          keep = "right")
+                          merge_type = "right")
 
 ```
 

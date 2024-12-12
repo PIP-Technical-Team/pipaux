@@ -8,8 +8,6 @@ cpi <- load_aux("cpi",
                 branch = "DEV",
                 maindir = temp_fld)
 
-cpi <- cpi[, -c("cpi_domain")]
-
 ppp <- load_aux("ppp",
                 branch = "DEV",
                 maindir = temp_fld)
