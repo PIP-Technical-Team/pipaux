@@ -438,9 +438,14 @@ save_aux_to_gh <- function(df,
 }
 
 #' Call auxiliary function for a specified measure
-#' @param measure character: name of auxiliary data measure
-#' @param ... additional arguments to pass
 #'
+#' @param measure character: Name of the auxiliary data measure (e.g., "ppp").
+#' @param package_name character: Name of the package containing the auxiliary function (default is "pipaux").
+#' @param ... additional arguments to pass to the auxiliary function.
+#'
+#' @return The result of the auxiliary function call.
+#' @examples
+#' \donotrun{call_aux_function("ppp")}
 call_aux_function <- function(measure,
                               package_name = "pipaux",
                               ...) {
