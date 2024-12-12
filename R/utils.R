@@ -445,12 +445,14 @@ call_aux_function <- function(measure,
                               package_name = "pipaux",
                               ...) {
 
-  stopifnot(exprs = exists(function_name, envir = asNamespace(package_name)))
   function_name <- paste0("aux_", measure)
+
+  stopifnot(exprs = exists(function_name,
+                           envir = asNamespace(package_name)))
 
   func <- get(function_name,  envir = asNamespace(package_name))
 
-  return(func(...))
+  return(func)
 }
 
 
