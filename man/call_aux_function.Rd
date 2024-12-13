@@ -7,18 +7,15 @@
 call_aux_function(measure, package_name = "pipaux", ...)
 }
 \arguments{
-\item{measure}{character: Name of the auxiliary data measure (e.g., "ppp").}
+\item{measure}{character: Name of the auxiliary data measure (e.g., "ppp")}
 
-\item{package_name}{character: Name of the package containing the auxiliary function (default is "pipaux").}
+\item{package_name}{character: Name of the package containing the auxiliary function (default is "pipaux")}
 
-\item{...}{additional arguments to pass to the auxiliary function.}
+\item{...}{additional arguments to pass to the auxiliary function}
 }
 \value{
 The result of the auxiliary function call.
 }
 \description{
 Call auxiliary function for a specified measure
-}
-\examples{
-\donotrun{call_aux_function("ppp")}
 }
