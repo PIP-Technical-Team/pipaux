@@ -1,0 +1,21 @@
+---
+title: "Managing Branches of Aux Repos"
+subtitle: "test"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Managing Branches of Aux Repos}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(pipaux)
+devtools::load_all(".")
+```
