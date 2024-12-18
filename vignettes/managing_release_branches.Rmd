@@ -1,9 +1,9 @@
 ---
-title: "Managing Branches of Aux Repos"
-subtitle: "test"
+title: "Auxiliary Data - Version Control"
+subtitle: "Release branch management"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Managing Branches of Aux Repos}
+  %\VignetteIndexEntry{Auxiliary Data - Version Control}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,23 +20,23 @@ knitr::opts_chunk$set(
 devtools::load_all(".")
 ```
 
-The {pipaux} package manages auxiliary data used across PIP. It includes functions like aux_ppp() for PPP data and aux_gdp() for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions both save the updated dataset locally and push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 
+The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions both save the updated dataset locally and push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 
 
 To ensure that the version of auxiliary data used for each release is properly tracked, 2 steps are necessary:
 
-- Each auxiliary data repository should have a dedicated release branch.
-- The release branch must be periodically updated with changes from the DEV branch.
+- Each auxiliary data repository should have a dedicated **release branch**.
+- The release branch must be periodically **updated** with changes from the **DEV branch**.
 To facilitate the management of release branches and synchronization with the DEV branch, the {pipfun} package provides functions designed for this purpose.
 
 Specifically, 
 
 ### 1. Check if release branch is there, and if not, create it 
 
-```{r setup}
+```{r initial-setup}
 # install.packages("pak")
-pak::pak("PIP-Technical-Team/pipfun@DEV_v2")
-library("pipfun")
+#pak::pak("PIP-Technical-Team/pipfun@DEV_v2")
 
+library("pipfun")
 
 ```
 
@@ -45,18 +45,21 @@ library("pipfun")
 
 # Get branches in repo
 
-repo_branches <- pipfun::get_repo_branches(repo = "aux_test", owner = getOption("pipfun.ghowner"))
+# Example 1: TEST repo
+repo_branches <- pipfun::get_repo_branches(repo  = "aux_test", 
+                                           owner = getOption("pipfun.ghowner"))
 repo_branches
 
-# Example with ppp repo
+# Example 2: PPP repo
 
-# pipfun::get_repo_branches(repo = "aux_ppp", owner = getOption("pipfun.ghowner"))
+pipfun::get_repo_branches(repo  = "aux_ppp", 
+                          owner = getOption("pipfun.ghowner"))
 
 
 # As no release branch is found, create it from DEV
-create_new_branch(new_branch = "20241005",
-                  ref_branch = "DEV",
-                  repo = "aux_test")
+# create_new_branch(new_branch = "20241005",
+#                   ref_branch = "DEV",
+#                   repo = "aux_ppp")
 
 ```
 
@@ -64,7 +67,7 @@ create_new_branch(new_branch = "20241005",
 ### 2. Check that release branch is updated with DEV
 ```{r}
 
-pipfun::compare_branch_content(repo = "aux_test",
+pipfun::compare_branch_content(repo    = "aux_test",
                                branch1 = "DEV",
                                branch2 = "20241005")
 
@@ -72,19 +75,19 @@ pipfun::compare_branch_content(repo = "aux_test",
 
 ### 3. Update release branch if needed
 
-In this case, given that the release branch has just been created, it is up to date with DEV. However, had `same_content' been FALSE, we need to update release branch accordingly as follows:
+In this case, given that the release branch has just been created, it is up to date with DEV. However, had "same_content" been `FALSE`, we need to update release branch accordingly as follows:
 
 
 ```{r}
 
-# Option 1: let release branch point to the latest commit as in DEV
-pipfun::update_branches(repo = "aux_test",
+# Option 1: Make release branch point to the latest commit as in DEV
+pipfun::update_branches(repo    = "aux_test",
                         branch1 = "DEV",
                         branch2 = "20241005")
 
 # Option 2: Merge DEV into release branch
 
-pipfun::merge_branch_into(repo = "aux_test",
+pipfun::merge_branch_into(repo          = "aux_test",
                           source_branch = "DEV",
                           target_branch = "20241005")
 ```

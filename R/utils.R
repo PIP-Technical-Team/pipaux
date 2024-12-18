@@ -448,7 +448,8 @@ call_aux_function <- function(measure,
                               package_name = "pipaux",
                               ...) {
 
-  function_name <- paste0("aux_", measure)
+  function_name <- paste0("aux_",
+                          measure)
 
   if (!exists(function_name,
               envir = asNamespace(package_name))) {
