@@ -2,7 +2,6 @@
 
 export("%>%")
 export(auto_aux_update)
-export(aux_data)
 export(cl_validate_raw)
 export(clean_validation_report)
 export(convert_df_to_base64)

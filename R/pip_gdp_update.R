@@ -319,6 +319,9 @@ pip_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   # Remove any non-WDI countries
   gdp <- gdp[country_code %in% cl$country_code]
 
+  # drop gdp_domain
+  gdp <- gdp[, -c("gdp_domain")]
+
   # ---- Save and sign ----
   gdp <- gdp |> setnames("gdp_data_level", "reporting_level",
                          skip_absent=TRUE)

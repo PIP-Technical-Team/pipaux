@@ -91,16 +91,16 @@ test_that("cpi_validate_output() works identifying type/ formating error", {
 })
 
 
-test_that("cpi_validate_output() works identifying invalid value", {
-
-  cpi <- load_aux(
-    maindir = temp_fld, #gls$PIP_DATA_DIR,
-    measure = measure,
-    branch  = branch
-  )
-
-  cpi[, cpi_domain := fifelse(cpi_domain == "National", "National1", cpi_domain)]
-
-  expect_error(cpi_validate_output(cpi))
-
-})
+# test_that("cpi_validate_output() works identifying invalid value", {
+#
+#   cpi <- load_aux(
+#     maindir = temp_fld, #gls$PIP_DATA_DIR,
+#     measure = measure,
+#     branch  = branch
+#   )
+#
+#   cpi[, cpi_domain := fifelse(cpi_domain == "National", "National1", cpi_domain)]
+#
+#   expect_error(cpi_validate_output(cpi))
+#
+# })

@@ -8,7 +8,7 @@ merger_aux(
   aux_data1,
   aux_data2,
   merge_type = c("left", "right", "full", "using", "master", "inner"),
-  commn_vars = TRUE,
+  commn_vars = FALSE,
   ...
 )
 }

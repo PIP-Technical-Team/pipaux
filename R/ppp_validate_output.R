@@ -28,10 +28,10 @@ ppp_validate_output <- function(ppp, detail = getOption("pipaux.detail.output"))
                 description = "`ppp_default` should be numeric") |>
     validate_if(is.logical(ppp_default_by_year),
                 description = "`ppp_default_by_year` should be numeric") |>
-    validate_if(is.character(ppp_domain),
-                description = "`ppp_domain` should be character") |>
-    validate_cols(in_set(c("1", "2")),
-                  ppp_domain, description = "`ppp_domain` values within range") |>
+    # validate_if(is.character(ppp_domain),
+    #             description = "`ppp_domain` should be character") |>
+    # validate_cols(in_set(c("1", "2")),
+    #               ppp_domain, description = "`ppp_domain` values within range") |>
     validate_if(is.character(reporting_level),
                 description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")),

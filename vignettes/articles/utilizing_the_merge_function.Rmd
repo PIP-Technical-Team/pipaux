@@ -40,7 +40,7 @@ Here’s a breakdown of how it works:
 
     -   **Inner**: Includes only the records that are present in both datasets.
 
-2.  Default Options: i) If you don’t specify a merge type, the function defaults to "left", meaning it will keep all records from the left dataset and include matching records from the right dataset where available. ii) If there are any common variables, the default behavior is to retain them (with different names) in the merged dataset. Otherwise, set keep_common_vars = FALSE to retain only the common variables from one of the datasets.  
+2.  Default Options: i) If you don’t specify a merge type, the function defaults to "left", meaning it will keep all records from the left dataset and include matching records from the right dataset where available. ii) If there are any common variables, the default behavior is to retain them (with different names) in the merged dataset. Otherwise, set keep_common_vars = TRUE to retain only the common variables from one of the datasets.  
 
 **Note:** Keys/IDs and names of auxiliary data files (such as *cpi*, *ppp*, *pfw*, *pop*, *gdp*, *gdm*, etc.) are embedded within the data files as attributes. The `merger_aux()` function utilizes these IDs to create suitable key variables for merging the data files and generating an ID for the combined data file. Additionally, the function produces a new auxiliary file name by combining the names of the files being merged.
 
@@ -61,8 +61,8 @@ cpi <- load_aux("cpi",
                 maindir = temp_fld)
 
 # a) merge type "left"
-pfw_cpi <- merger_aux(pfw, cpi) # keeps the common variable from both datasets
-pfw_cpi <- merger_aux(pfw, cpi, common_vars = FALSE) # keeps only pfw common variable
+pfw_cpi <- merger_aux(pfw, cpi) # keeps only pfw common variable
+pfw_cpi <- merger_aux(pfw, cpi, common_vars = TRUE) # keeps the common variable from both datasets
 
 # b) merge type "inner"
 cpi_pfw <- merger_aux(pfw, cpi, merge_type = "inner")

@@ -24,10 +24,10 @@ gdp_validate_output <- function(gdp, detail = getOption("pipaux.detail.output"))
                   reporting_level, description = "`reporting_level` values within range") |>
     validate_if(is.numeric(gdp),
                 description = "`gdp` should be numeric") |>
-    validate_if(is.character(gdp_domain),
-                description = "`gdp_domain` should be character") |>
-    validate_cols(in_set(c("national", "urban/rural")),
-                  gdp_domain, description = "`gdp_domain` values within range") |>
+    # validate_if(is.character(gdp_domain),
+    #             description = "`gdp_domain` should be character") |>
+    # validate_cols(in_set(c("national", "urban/rural")),
+    #               gdp_domain, description = "`gdp_domain` values within range") |>
     validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(country_code, year, reporting_level),

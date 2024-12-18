@@ -229,6 +229,9 @@ pip_pce_update <- function(maindir = gls$PIP_DATA_DIR,
 
   pce <- pce[country_code %in% cl$country_code]
 
+  # drop pce_domain
+  pce <- pce[, -c("pce_domain")]
+
   ## ---- Sign and save ----
   pce <- pce |> setnames("pce_data_level", "reporting_level",
                          skip_absent=TRUE)
