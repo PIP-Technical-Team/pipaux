@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 devtools::load_all(".")
 ```
 
-The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions both save the updated dataset locally and push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 
+The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 
 
 To ensure that the version of auxiliary data used for each release is properly tracked, 2 steps are necessary:
 
