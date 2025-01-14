@@ -38,7 +38,7 @@ load_aux <- function(measure,
 
 
   if (apply_label) {
-    df <- pip_aux_labels(df, measure = measure)
+    df <- aux_labels_pip(df, measure = measure)
   }
 
   if (inherits(df, "data.frame")) {

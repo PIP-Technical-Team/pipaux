@@ -445,7 +445,6 @@ save_aux_to_gh <- function(df,
 #'
 #' @return The result of the auxiliary function call.
 call_aux_function <- function(measure,
-                              package_name = "pipaux",
                               ...) {
 
   function_name <- paste0("aux_",
