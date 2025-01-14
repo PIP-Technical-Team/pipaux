@@ -2,6 +2,7 @@
 #'
 #' Load or update PIP Price Framework data.
 #'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.
@@ -14,7 +15,8 @@ pip_pfw <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
   branch <- match.arg(branch)
   action <- match.arg(action)
@@ -24,7 +26,8 @@ pip_pfw <- function(action  = c("update", "load"),
                    force   = force,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
 
   } else {
 

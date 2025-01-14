@@ -3,11 +3,14 @@
 #' @inheritParams pip_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @param apply_label logical: If TRUE, predefined labels will applied.
+#' @param ppp_defaults logical: If TRUE, wider format ppp data will be returned
+#'
 #' @export
 load_aux <- function(measure,
                      maindir = gls$PIP_DATA_DIR,
                      branch  = c("DEV", "PROD", "main"),
-                     apply_label = TRUE) {
+                     apply_label = TRUE,
+                     ppp_defaults = TRUE) {
 
   branch <- match.arg(branch)
   if (branch == "main") {
@@ -41,6 +44,26 @@ load_aux <- function(measure,
   if (inherits(df, "data.frame")) {
     setDT(df)
   }
+
+  if (measure == "ppp" & ppp_defaults == TRUE) {
+
+    df <- df[ppp_default_by_year == TRUE,
+               .(country_code, ppp_year, ppp, reporting_level)] |>
+      dcast(country_code + reporting_level ~ ppp_year,
+            value.var = "ppp")
+
+    num_var_list <- grep("^[[:digit:]]", names(df))
+    var_names <- names(df)[num_var_list]
+    setnames(df,
+             var_names,
+             paste(rep("ppp", length(var_names)), var_names, sep = "_"))
+
+    setattr(df, "aux_name", "ppp")
+    setattr(df,
+            "aux_key",
+            c("country_code", "reporting_level"))
+  }
+
   return(df)
 }
 

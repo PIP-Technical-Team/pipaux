@@ -10,6 +10,7 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @inheritParams pip_cpi
+#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @export
 pip_gdm <- function(action  = c("update", "load"),
@@ -17,7 +18,8 @@ pip_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
                     branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch)) {
+                    tag     = match.arg(branch),
+                    detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
   branch <- match.arg(branch)
@@ -29,7 +31,8 @@ pip_gdm <- function(action  = c("update", "load"),
                    maindir = maindir,
                    owner   = owner,
                    branch  = branch,
-                   tag     = tag)
+                   tag     = tag,
+                   detail  = detail)
 
   } else {
     dt <- load_aux(

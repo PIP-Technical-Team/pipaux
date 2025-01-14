@@ -81,6 +81,12 @@ pip_regions <- function(action = c("update", "load"),
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(dt, "aux_name", "regions")
+  setattr(dt,
+          "aux_key",
+          c("region_code"))
+
     saved <- pipfun::pip_sign_save(
       x       = dt,
       measure = measure,
