@@ -38,7 +38,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                        maindir = maindir,
                        branch = branch)
 
-  # changae cpi_year and cpi_data_level to year and reporting_level
+  # change cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
