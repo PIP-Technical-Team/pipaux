@@ -444,20 +444,20 @@ save_aux_to_gh <- function(df,
 #' @param ... additional arguments to pass to the auxiliary function
 #'
 #' @return The result of the auxiliary function call.
-call_aux_function <- function(measure,
+aux <- function(measure,
                               ...) {
 
   function_name <- paste0("aux_",
                           measure)
 
   if (!exists(function_name,
-              envir = asNamespace(package_name))) {
-    cli::cli_abort(paste0("Function '", function_name, "' does not exist in the '", package_name, "' package."))
+              envir = asNamespace("pipaux"))) {
+    cli::cli_abort(paste0("Function '", function_name, "' does not exist in the '", "pipaux package."))
   }
 
   # Get the function
   func <- get(function_name,
-              envir = asNamespace(package_name))
+              envir = asNamespace("pipaux"))
 
   # Call the function with additional arguments
   func(...)
