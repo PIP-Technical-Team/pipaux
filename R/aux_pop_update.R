@@ -179,6 +179,10 @@ aux_pop_update <-  function(force   = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Save data   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # drop pce_domain
+  pop <- pop[, -c("pop_domain")]
+
   pop <- pop |> setnames("pop_data_level", "reporting_level",
                          skip_absent=TRUE)
 

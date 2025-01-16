@@ -24,10 +24,10 @@ pce_validate_output <- function(pce, detail = getOption("pipaux.detail.output"))
                 description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")),
                   reporting_level, description = "`reporting_level` values within range") |>
-    validate_if(is.character(pce_domain),
-                description = "`pce_domain` should be character") |>
-    validate_cols(in_set(c("national", "urban/rural")),
-                  pce_domain, description = "`pce_domain` values within range") |>
+    # validate_if(is.character(pce_domain),
+    #             description = "`pce_domain` should be character") |>
+    # validate_cols(in_set(c("national", "urban/rural")),
+    #               pce_domain, description = "`pce_domain` values within range") |>
     validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(country_code, year, reporting_level),

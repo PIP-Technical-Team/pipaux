@@ -10,7 +10,6 @@ aux_pfw_key <- function(){
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
                                   survey_acronym,
-                                  welfare_type,
                                   cpi_domain_var)]
 
 

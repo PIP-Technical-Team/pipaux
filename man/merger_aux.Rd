@@ -7,14 +7,17 @@
 merger_aux(
   aux_data1,
   aux_data2,
-  keep = c("left", "right", "full", "using", "master", "inner"),
+  merge_type = c("left", "right", "full", "using", "master", "inner"),
+  commn_vars = FALSE,
   ...
 )
 }
 \arguments{
 \item{aux_data1}{auxiliary data two}
 
-\item{keep}{merge/ join type, the default is left join, options (left, right, full, using, master, inner)}
+\item{merge_type}{merge/ join type, the default is left join, options (left, right, full, using, master, inner)}
+
+\item{commn_vars}{option to keep or retain common variables, default is TRUE}
 }
 \value{
 data.table with key information
@@ -28,8 +31,7 @@ ppp <- load_aux("ppp")
 pfw_ppp <- merger_aux(pfw, ppp)
 
 cpi <- load_aux("cpi")
-cpi <- cpi[, -c("cpi_domain")]
-pfw_cpi <- merger_aux(cpi, pfw, keep = "right")
+pfw_cpi <- merger_aux(cpi, pfw, merge_type = "right", commn_vars = FALSE)
 cpi_pfw <- merger_aux(cpi, pfw)
 
 }

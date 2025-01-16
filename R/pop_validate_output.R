@@ -24,10 +24,10 @@ pop_validate_output <- function(pop, detail = getOption("pipaux.detail.output"))
                   reporting_level, description = "`reporting_level` values within range") |>
     validate_if(is.numeric(pop),
                 description = "`pop` should be numeric") |>
-    validate_if(is.character(pop_domain),
-                description = "`pop_domain` should be character") |>
-    validate_cols(in_set(c("national", "urban/rural")),
-                  pop_domain, description = "`pop_domain` values within range") |>
+    # validate_if(is.character(pop_domain),
+    #             description = "`pop_domain` should be character") |>
+    # validate_cols(in_set(c("national", "urban/rural")),
+    #               pop_domain, description = "`pop_domain` values within range") |>
     validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(country_code, year, reporting_level),

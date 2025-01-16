@@ -30,10 +30,10 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                 description = "`change_cpi2011` should be numeric") |>
     validate_cols(in_set(c(0, 1)), change_cpi2011,
                   description = "`change_cpi2011` values within range") |>
-    validate_if(is.character(cpi_domain),
-                description = "`cpi_domain` should be character") |>
-    validate_cols(in_set(c("National", "Urban/Rural")), cpi_domain,
-                  description = "`cpi_domian` values within range") |>
+    # validate_if(is.character(cpi_domain),
+    #             description = "`cpi_domain` should be character") |>
+    # validate_cols(in_set(c("National", "Urban/Rural")), cpi_domain,
+    #               description = "`cpi_domian` values within range") |>
     validate_if(is.numeric(cpi_domain_value),
                 description = "`cpi_domain_value` should be numeric") |>
     validate_cols(in_set(c(0, 1)), cpi_domain_value,

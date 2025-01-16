@@ -62,6 +62,10 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
 #   ____________________________________________________________________________
 #   Saving                                                                  ####
+
+  # drop ppp_domain
+  ppp <- ppp[, -c("ppp_domain")]
+
   ppp <- ppp |> setnames("ppp_data_level", "reporting_level",
                          skip_absent=TRUE)
 
