@@ -436,7 +436,17 @@ save_aux_to_gh <- function(df,
                      ext = ext,
                      ...)
 }
+
+
+# -------------------------------------------
+# Check dependencies ####
+# -------------------------------------------
+
+# (1.) Get dependencies of measure
+# (2.) Check if dep has changed in GitHub with respect to Y-drive:
+#      -> if file is newer and different in content in GitHub, flag an update
 #
+
 
 
 
