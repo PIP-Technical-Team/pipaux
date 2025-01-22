@@ -409,12 +409,12 @@ get_gh <- function(owner,
 }
 
 #' SAve auxiliary file to Github Repo
-#' 
-#' Sometimes we need to save auxiliary files to Github repo. 
+#'
+#' Sometimes we need to save auxiliary files to Github repo.
 #' This function allows for this.
 #'
 #' @inheritParams pipfun::save_to_gh
-#' @export 
+#' @export
 #' @return NULL
 save_aux_to_gh <- function(df,
                        measure,
@@ -426,9 +426,9 @@ save_aux_to_gh <- function(df,
                        ext       = "csv",
                          ...
                          ) {
-  
+
   pipfun::save_to_gh(df = df,
-                     repo = repo, 
+                     repo = repo,
                      owner = owner,
                      branch = branch,
                      tag = tag,
@@ -436,3 +436,38 @@ save_aux_to_gh <- function(df,
                      ext = ext,
                      ...)
 }
+
+
+# data.table is generally careful to minimize the scope for namespace
+# conflicts (i.e., functions with the same name as in other packages);
+# a more conservative approach using @importFrom should be careful to
+# import any needed data.table special symbols as well, e.g., if you
+# run DT[ , .N, by='grp'] in your package, you'll need to add
+# @importFrom data.table .N to prevent the NOTE from R CMD check.
+# See ?data.table::`special-symbols` for the list of such symbols
+# data.table defines; see the 'Importing data.table' vignette for more
+# advice (vignette('datatable-importing', 'data.table')).
+#
+#' @import data.table
+NULL
+
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+#' @param lhs A value or the magrittr placeholder.
+#' @param rhs A function call using the magrittr semantics.
+#' @return The result of calling `rhs(lhs)`.
+NULL
+
+
+
+
+
+

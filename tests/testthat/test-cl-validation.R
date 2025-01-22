@@ -8,7 +8,7 @@ temp_fld <- "Y:/tefera_pipaux_test"
 
 test_that("cl_validate_raw() works identifying duplicate error", {
 
-  cl <- pip_country_list_update(class_branch = "master")
+  cl <- aux_country_list_update(class_branch = "master")
 
   cl[, `:=` (country_code = fifelse(country_code == "AGO",
                                     "ALB", country_code))]
@@ -19,7 +19,7 @@ test_that("cl_validate_raw() works identifying duplicate error", {
 
 test_that("cl_validate_raw() works identifying invalid value", {
 
-  cl <- pip_country_list_update(class_branch = "master")
+  cl <- aux_country_list_update(class_branch = "master")
 
   cl[, `:=` (africa_split_code = fifelse(africa_split_code == "AFE",
                                           "SSA", africa_split_code),
