@@ -40,3 +40,125 @@ aux_wdi <- function(action          = c("update", "load"),
     return(dt)
   }
 } # end of pip_wdi
+
+#' Update National accounts data from WDI
+#'
+#' GDP and HFCE data from WDI. It could be either from API or from file
+#'
+#' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @inheritParams aux_gdp
+#' @return data.table with gdp and pce variables
+#' @export
+#'
+#' @examples
+#' aux_wdi_update()
+aux_wdi_update <- function(force   = FALSE,
+                           maindir = gls$PIP_DATA_DIR,
+                           owner   = getOption("pipfun.ghowner"),
+                           branch  = c("DEV", "PROD", "main"),
+                           tag     = match.arg(branch),
+                           from    = c("gh", "file", "api"),
+                           detail  = getOption("pipaux.detail.raw")) {
+
+
+  from   <- match.arg(from)
+  branch <- match.arg(branch)
+
+  #   ______________________________________________________
+  #   Computations                                    ####
+  measure <- "wdi"
+
+  ##  ...............................................................
+  ##  From file                                          ####
+
+  if (from   %in% c("file", "gh")) {
+    wdi <- pipfun::load_from_gh(measure = measure,
+                                owner = owner,
+                                branch = branch,
+                                ext    = "csv")
+
+  } else {
+    ##  ........................................................................
+    ##  From API                                                            ####
+    wdi_indicators <- c("NY.GDP.PCAP.KD", "NE.CON.PRVT.PC.KD")
+    wdi   <- wbstats::wb_data(indicator = wdi_indicators,
+                              lang = "en") |>
+      setDT()
+
+    wdi[,
+        c("country", "iso2c") := NULL]
+
+    # Rename columns
+    setnames(wdi,
+             old = c("iso3c", "date"),
+             new = c("country_code", "year")
+    )
+  }
+  # validate wdi raw data
+  wdi_validate_raw(wdi = wdi, detail = detail)
+
+  #   _________________________________________________________________________
+  #   Save and Return                                                     ####
+
+  if (branch == "main") {
+    branch <- ""
+  }
+  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  setattr(wdi, "aux_name", "wdi")
+  setattr(wdi,
+          "aux_key",
+          c("country_code", "year"))
+
+  saved <- pipfun::pip_sign_save(
+    x       = wdi,
+    measure = measure,
+    msrdir  = msrdir,
+    force   = force,
+    save_dta = FALSE
+  )
+
+  return(invisible(saved))
+
+}
+
+#' Validate raw wdi data
+#'
+#' @param wdi raw wdi data, as loaded via `pipfun::load_from_gh`
+#' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @import data.validator
+#' @importFrom assertr in_set not_na is_uniq
+#' @keywords internal
+#'
+#' @export
+wdi_validate_raw <- function(wdi, detail = getOption("pipaux.detail.raw")){
+
+  stopifnot("WDI raw data is not loaded" = !is.null(wdi))
+
+  report <- data_validation_report()
+
+  validate(wdi, name = "WDI raw data validation") |>
+    validate_if(is.character(country_code),
+                description = "`country_code` should be character") |>
+    validate_if(is.numeric(year),
+                description = "`year` should be numeric") |>
+    validate_if(is.numeric(NE.CON.PRVT.PC.KD),
+                description = "`NE.CON.PRVT.PC.KD` should be numeric") |>
+    validate_if(is.numeric(NY.GDP.PCAP.KD),
+                description = "`NY.GDP.PCAP.KD` should be numeric") |>
+    validate_cols(not_na, country_code, year,
+                  description = "no missing values in key variables") |>
+    validate_if(is_uniq(country_code, year),
+                description = "no duplicate records in key variables") |>
+    add_results(report)
+
+  validation_record <- get_results(report, unnest = FALSE) |>
+    setDT()
+
+  if (any(validation_record[["type"]] == "error")){
+    get_error_validation(validation_record, detail)
+  }
+
+}
+
+
