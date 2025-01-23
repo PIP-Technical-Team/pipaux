@@ -34,13 +34,64 @@ aux_fun <- function(measure,
 check_deps <- function(measure,
                        ...) {
 
+  # ------------------- #
+  # Get deps ~~~~
+  # ------------------- #
+
   get_deps <- get_dependencies(measure)
+
+  # ------------------- #
+  # Check deps ~~~~
+  # ------------------- #
+
+  # 3 scenarios:
+  #   1. Raw data has changed in GitHub but not updated in Y drive
+  #   2. Raw data **of one of its dependencies** has changed in GitHub but not updated in Y drive
+  #   (3. TBC) the update_* function has changed
+  #         or the update_* function of one/more deps has changed
+
+  # TODO: return names of measures to update or TRUE if any dep has changed
+
+  # Case 1
+
+  # GitHub sha #####
+  # Get sha of the release branch
+
+  gh_raw_sha <- pipfun::get_branch_info_from_gh(
+    branch = "TODO",     # TODO this should be the release branch, how do we identify it?
+    repo = paste0("aux_", measure)
+  )$commit$sha
+
+  # Y drive sha ####
+  # Use digest:: to get hash of the file in Y drive - should this be already saved as an attribute?
+
+
+
+
+
+
+
+  # Y drive
+
 
 }
 
 # Get dependencies ####
-get_dependencies <- function(measure) {
 
+#' Get dependencies of an auxiliary data measure
+#'
+#' This function retrieves the dependencies of a specified auxiliary data measure
+#'
+#' @param measure A character string specifying the auxiliary data measure
+#' Must be one of the measures listed in the configuration file
+#' @return A character vector of dependencies for the specified measure. If the
+#' measure has no dependencies, an empty character vector is returned.
+#' @keywords internal
+#' @examples
+#' # dependencies <- get_dependencies("cpi")
+#' # print(dependencies)
+#'
+get_dependencies <- function(measure) {
   # Locate config file with dependencies
   yml_path <- system.file("extdata",
                           "config.yml",
@@ -55,7 +106,7 @@ get_dependencies <- function(measure) {
 
   # Check if the measure exists in the YAML data
   if (!measure %in% names(yml_data$default)) {
-    cli::cli_abort("measure {measure} not found")
+    cli::cli_abort("Measure '{measure}' not found in the YAML file.")
   }
 
   # Extract dependencies for the given measure
@@ -67,9 +118,16 @@ get_dependencies <- function(measure) {
   }
 
   # Convert dependencies to a vector
-  deps_vector <- unlist(strsplit(deps,
-                                 ",\\s*"))
+  deps_vector <- unlist(strsplit(deps, ",\\s*"))
 
   return(deps_vector)
 }
 
+# Get file hash - TO CHECK
+# get_local_file_hash <- function(filepath) {
+#   if (!file.exists(filepath)) {
+#     stop("Local file not found.")
+#   }
+#   hash <- digest::digest(file = filepath, algo = "sha256", file = TRUE)
+#   return(hash)
+# }
