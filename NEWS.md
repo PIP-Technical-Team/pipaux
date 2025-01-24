@@ -1,4 +1,6 @@
 # pipaux 0.2.0
+This version is for the development of the new pipeline. Main branch is DEV_v2. 
+
 
 # pipaux 0.1.4
 
