@@ -28,60 +28,49 @@ aux_fun <- function(measure,
   func(...)
 }
 
-# Check dependencies v0 test ####
+# Check status v0  ####
 
-check_deps <- function(measure,
-                       ...) {
+# Check status of an auxiliary data measure
+check_status <- function(measure,
+                         repo,
+                         owner      = getOption("pipfun.ghowner"),
+                         dev_branch = c("DEV", "DEV_v2"),
+                         release_branch, #not sure this is needed
+                         maindir) {
 
-  # ------------------- #
-  # Get deps ~~~~
-  # ------------------- #
+  # ---------------------------
+  # Initialize output
+  # ---------------------------
 
-  get_deps <- get_dependencies(measure)
+  update_gh <- FALSE
+  update_y  <- FALSE
 
-  # ------------------- #
-  # Check deps ~~~~
-  # ------------------- #
+  # ---------------------------
+  # Check GitHub status
+  # ---------------------------
 
-  # 3 scenarios - for each dependency:
-  #   1. Raw data has changed in GitHub but not updated in Y drive:
-  #         a. first make sure release br is updated in GH
-  #         b. second, check is sha in Y drive matches sha in GH
-  #   2. Raw data **of one/more of its dependencies** has changed in GitHub but not updated in Y drive
-  #   (3. TBC) the update_* function has changed
-  #         or the update_* function of one/more deps has changed
+  dev_branch <- match.arg(dev_branch)
 
-  # TODO: return names of measures to update or TRUE if any dep has changed
+  # check if measure repo has release branch
+  has_release_branch <- pipfun::get_repo_branches(owner = owner,
+                            repo = paste0("aux_", measure))$has_release_branch
 
-  # Case 1
+  release_up_to_date <- pipfun::compare_branch_content(owner = owner,
+                                                       repo = paste0("aux_", measure),
+                                                       branch1 = dev_branch,
+                                                       branch2 = release_branch)$same_content
 
-  # GitHub sha #####
-  # Get sha of the release branch
+  update_gh <- !(has_release_branch && up_to_date)
 
-  # identify latest release branch
-  release_branch <- pipfun::get_repo_branches(repo =  paste0("aux_", measure))$release_branches |>
-    flast()
-
-  # TODO -not in here?: make sure release br is updated, otherwise update it
-
-  gh_raw_sha <- pipfun::get_branch_info_from_gh(
-    branch = release_branch,
-    repo = paste0("aux_", measure)
-  )$commit$sha
-
-  # Y drive sha ####
-  # Use digest:: to get hash of the file in Y drive - should this be already saved as an attribute?
+  # ---------------------------
+  # Check Y drive status
+  # ---------------------------
 
 
-
-
-
-
-
-  # return dependency measure(s) to be updated
 
 
 }
+
 
 # Get dependencies ####
 
