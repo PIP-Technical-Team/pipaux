@@ -50,14 +50,20 @@ aux_income_groups <- function(action       = c("update", "load"),
              c("code", "region_SSA"),
              c("country_code", "ssa_subregion_code"))
 
-    ### Get file info
-    # ----- raw sha ------
+    ### Get info
+
+    # ----- file raw sha ------
     raw_sha <- pipfun::get_file_info_from_gh(
       owner    = "GPID-WB",
       repo     = "Class",
       branch   = class_branch,
       file_path = "OutputData/CLASS.dta"
     )$sha
+
+    # ----- function raw sha ------
+    raw_sha_fun <- digest::digest(deparse(
+      aux_income_groups)
+      )
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,10 +87,13 @@ aux_income_groups <- function(action       = c("update", "load"),
                        branch, #should be the name of release with identity, e.g., 20250203_TEST
                        measure) # measure dir
 
-    # store raw sha attribute
+    # store shas as attributes
     setattr(ig,
             "raw_sha",
             raw_sha)
+    setattr(ig,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x = ig,
