@@ -166,6 +166,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     ext    = "csv"
   )
 
+
   # validate cpi raw data
   cpi_validate_raw(cpi, detail = detail)
 
@@ -205,6 +206,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir  = msrdir,
     force   = force
   )
+
 
   return(invisible(saved))
 }

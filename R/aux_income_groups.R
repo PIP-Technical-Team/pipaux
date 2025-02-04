@@ -11,14 +11,14 @@ aux_income_groups <- function(action       = c("update", "load"),
                               force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
                               maindir      = gls$PIP_DATA_DIR,
-                              branch       = c("DEV", "PROD", "main"),
+                              branch,
                               class_branch = "master",
                               detail       = getOption("pipaux.detail.raw")
 ) {
 
   measure <- "income_groups"
   action <- match.arg(action)
-  branch <- match.arg(branch)
+  #branch <- match.arg(branch)
 
   if (action == "update") {
 
@@ -50,6 +50,15 @@ aux_income_groups <- function(action       = c("update", "load"),
              c("code", "region_SSA"),
              c("country_code", "ssa_subregion_code"))
 
+    ### Get file info
+    # ----- raw sha ------
+    raw_sha <- pipfun::get_file_info_from_gh(
+      owner    = "GPID-WB",
+      repo     = "Class",
+      branch   = class_branch,
+      file_path = "OutputData/CLASS.dta"
+    )$sha
+
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
@@ -66,7 +75,16 @@ aux_income_groups <- function(action       = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+    msrdir <- fs::path(maindir,
+                       "aux_data",
+                       branch, #should be the name of release with identity, e.g., 20250203_TEST
+                       measure) # measure dir
+
+    # store raw sha attribute
+    setattr(ig,
+            "raw_sha",
+            raw_sha)
 
     saved <- pipfun::pip_sign_save(
       x = ig,
