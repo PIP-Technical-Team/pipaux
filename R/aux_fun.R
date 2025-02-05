@@ -32,18 +32,12 @@ aux_fun <- function(measure,
 
 # Check status of an auxiliary data measure
 check_status <- function(measure,
-                         repo,
+                         repo = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
                          dev_branch = c("DEV", "DEV_v2"),
-                         release_branch, #not sure this is needed
-                         maindir) {
-
-  # ---------------------------
-  # Initialize output
-  # ---------------------------
-
-  update_gh <- FALSE
-  update_y  <- FALSE
+                         release_branch = paste0(wrk_release$release, "_",
+                                                 wrk_release$identity), #not sure this is needed
+                         maindir = getOption("pipaux.working_dir")) {
 
   # ---------------------------
   # Check GitHub status
@@ -53,21 +47,83 @@ check_status <- function(measure,
 
   # check if measure repo has release branch
   has_release_branch <- pipfun::get_repo_branches(owner = owner,
-                            repo = paste0("aux_", measure))$has_release_branch
+                            repo = repo)$has_release_branch
 
   release_up_to_date <- pipfun::compare_branch_content(owner = owner,
                                                        repo = paste0("aux_", measure),
                                                        branch1 = dev_branch,
                                                        branch2 = release_branch)$same_content
 
-  update_gh <- !(has_release_branch && up_to_date)
-
   # ---------------------------
   # Check Y drive status
   # ---------------------------
 
+  # Check if raw sha has changed in GitHub
+
+  # issues with file paths:
+
+  # Q1 : can we assume the file to be called always "measure.ext"? ####
+  # Q2 : what is more efficient between using get_file_info_from_gh and
+  #     retrieving the commit history, and getting the sha of the lates commit?
+
+  # gh_sha <- pipfun::get_file_info_from_gh(
+  #   owner    = "GPID-WB",
+  #   repo     = "Class",
+  #   branch   = release_branch,
+  #   file_path = "OutputData/CLASS.dta"
+  # )$sha
+
+  gh_sha <- tryCatch(
+    {
+      pipfun::get_file_info_from_gh(
+        owner    = owner,
+        repo     = repo,
+        branch   = release_branch,
+        file_path = paste0(measure, ".dta")
+      )$sha
+    },
+    error = function(e) {
+      message("File not found or another error occurred: ", e$message)
+      NULL  # or use 0 if you prefer
+    }
+  )
 
 
+  # issue: do i need to read the file to get its attribute?
+
+  # Construct file path
+  y_file_path <- fs::path(maindir,
+                          "aux_data",
+                          release_branch,
+                          measure, # folder
+                          measure, # file
+                          ext = "qs")
+
+  y_sha <- attr(qs::qread(y_file_path),
+                "raw_sha")
+
+  # Function sha ####
+
+  fun_sha <- digest::digest(deparse(
+    paste0("aux_", measure))
+  )
+
+  y_fun_sha <- attr(qs::qread(y_file_path),
+                    "raw_sha_fun")
+
+  # ---------------------------
+  # Output & Return
+  # ---------------------------
+
+  # Update GitHub is TRUE if release branch has to be created or updated
+  update_gh <- !(has_release_branch && release_up_to_date)
+
+  # Update Y drive if file sha or fun sha has changed
+  update_y <- !(gh_sha     == y_sha &&
+                   fun_sha == y_fun_sha)
+
+  return(list(update_gh = update_gh,
+              update_y  = update_y))
 
 }
 
