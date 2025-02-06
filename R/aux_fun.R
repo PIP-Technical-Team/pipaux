@@ -99,6 +99,8 @@ check_status <- function(measure,
                           measure, # file
                           ext = "qs")
 
+  # NB: NO NEED TO READ THE FILE
+
   y_sha <- attr(qs::qread(y_file_path),
                 "raw_sha")
 
