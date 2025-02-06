@@ -61,7 +61,10 @@ aux_income_groups <- function(action       = c("update", "load"),
     #   file_path = "OutputData/CLASS.dta"
     # )$sha
 
-    raw_sha <- attr(ig, "gh")$gh_raw_sha
+    #raw_sha <- attr(ig, "gh")$gh_raw_sha
+
+    gh <- attr(ig,
+               "gh")
 
     # ----- function raw sha ------
     raw_sha_fun <- digest::digest(deparse(
@@ -77,6 +80,10 @@ aux_income_groups <- function(action       = c("update", "load"),
     setattr(ig,
             "aux_key",
             c("country_code", "year"))
+
+    setattr(ig,
+           "raw_sha_fun",
+           raw_sha_fun)
 
     # validate income group output data
     incgroup_validate_output(incgroup = ig, detail = detail)
