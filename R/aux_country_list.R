@@ -16,12 +16,12 @@
 aux_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
-                             branch  = c("DEV", "PROD", "main"),
+                             branch,
                              class_branch = "master",
                              detail  = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
-  branch  <- match.arg(branch)
+  #branch  <- match.arg(branch)
   action  <- match.arg(action)
 
   if (action == "update") {
@@ -36,7 +36,7 @@ aux_country_list <- function(action = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(cl, "aux_name", "country_list")
   setattr(cl,
