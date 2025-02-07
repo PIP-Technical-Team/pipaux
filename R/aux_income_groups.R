@@ -54,20 +54,11 @@ aux_income_groups <- function(action       = c("update", "load"),
 
     # ----- file raw sha ------
 
-     # raw_sha <- pipfun::get_file_info_from_gh(
-    #   owner    = "GPID-WB",
-    #   repo     = "Class",
-    #   branch   = class_branch,
-    #   file_path = "OutputData/CLASS.dta"
-    # )$sha
-
-    #raw_sha <- attr(ig, "gh")$gh_raw_sha
-
     gh <- attr(ig,
                "gh")
 
     # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(deparse(
+    raw_sha_fun <- digest::digest(body(
       aux_income_groups)
       )
 
