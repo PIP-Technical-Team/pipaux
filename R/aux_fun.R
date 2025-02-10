@@ -28,7 +28,8 @@ aux_fun <- function(measure,
   func(...)
 }
 
-# Check status v0  ####
+# Check status v0 ---- ####
+# working well when gh is a single list of attributes ----- #
 
 # Check status of an auxiliary data measure
 check_status <- function(measure,
@@ -111,7 +112,7 @@ check_status <- function(measure,
       gh <- qs::qattributes(y_file_path)$gh
 
       # DEBUG
-      print(paste0("gh_raw_sha: ", gh$gh_raw_sha))
+      #print(paste0("gh_raw_sha: ", gh$gh_raw_sha))
 
       # Check if raw sha has changed | GitHub ---- #
 
@@ -169,4 +170,141 @@ check_status <- function(measure,
   } # end of case when update gh is FALSE
 
 } # end of check_status
+
+# Check status v2 ---- ####
+# attempt when gh is a list of lists ----- #
+check_status_v2 <- function(measure,
+                         repo = paste0("aux_", measure),
+                         owner      = getOption("pipfun.ghowner"),
+                         maindir = getOption("pipaux.working_dir")) {
+
+  # ---------------------------
+  # 1. Check GitHub status
+  # ---------------------------
+
+  # Get repo branches and info
+  gh_branches <- pipfun::get_repo_branches(owner = owner,
+                                           repo  = repo)
+
+  # Check if measure repo has release branch
+  has_release_branch <- gh_branches$has_release_branch
+
+  if (has_release_branch) {
+    release_branch <- gh_branches$release_branch
+
+    release_up_to_date <- pipfun::compare_branch_content(
+      owner    = owner,
+      repo     = paste0("aux_", measure),
+      branch1  = "DEV",
+      branch2  = release_branch
+    )$same_content
+  }
+
+  # Update GitHub is TRUE if release branch has to be created or updated
+  update_gh <- !(has_release_branch && release_up_to_date)
+
+  if (update_gh) {
+    return(list(
+      update_gh = update_gh,
+      update_y  = TRUE
+    ))
+  } else {
+
+    # ------------------------------------------------------
+    # 2. Check Y drive status
+    #    --conditional on gh update being FALSE
+    # ------------------------------------------------------
+
+    # DEBUG
+    print(paste0("release_branch: ", release_branch))
+
+    ## Construct file path
+    y_file_path <- fs::path(maindir,
+                            "aux_data",
+                            release_branch,
+                            measure, # folder
+                            measure, # file
+                            ext = "qs")
+
+    # DEBUG
+    print(paste0("y_file_path: ", y_file_path))
+
+    ## Check if file exists
+    if (!fs::file_exists(y_file_path)) {
+      cli::cli_alert_danger("File {y_file_path} does not exist.")
+      return(list(
+        update_gh = update_gh,
+        update_y  = TRUE
+      ))
+    } else {  # If file exists in Y drive
+
+      # Get gh info from file saved in Y drive ----#
+      gh <- qs::qattributes(y_file_path)$gh
+
+      # Ensure gh is always a named list of lists
+      if (length(gh) > 0 && !is.list(gh[[1]])) {
+        gh <- list(gh_list = gh) # Wrap list of elements into a list of lists
+      }
+
+      # Function to get SHA from GitHub
+      get_gh_sha <- function(gh_entry) {
+        tryCatch(
+          {
+            pipfun::get_file_info_from_gh(
+              owner    = gh_entry$owner,
+              repo     = gh_entry$repo,
+              branch   = gh_entry$branch,
+              file_path = gh_entry$file_path
+            )$sha
+          },
+          error = function(e) {
+            message("File not found or another error occurred: ", e$message)
+            NULL  # or use 0?
+          }
+        )
+      }
+
+      # Apply function over all elements in gh
+      gh_sha_list <- lapply(gh, function(entry) {
+        list(
+          gh_sha = get_gh_sha(entry),
+          y_sha  = entry$gh_raw_sha  # Raw SHA stored in the .qs file
+        )
+      })
+
+      # DEBUG
+      print(gh_sha_list)
+
+      # Function sha ---- #
+
+      ## Current sha
+      fun_sha <- digest::digest(body(
+        paste0("aux_", measure))
+      )
+
+      ## Raw sha - as it was assigned to .qs file at time of saving
+      raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
+
+      # DEBUG
+      print(paste0("fun_sha: ", fun_sha))
+      print(paste0("raw_fun_sha: ", raw_fun_sha))
+
+      # ---------------------------
+      # Output & Return
+      # ---------------------------
+
+      # Update Y drive if any gh_sha does not match y_sha OR if function SHA changed
+      update_y <- any(sapply(gh_sha_list, function(x) x$gh_sha != x$y_sha)) ||
+        !(fun_sha == raw_fun_sha)
+
+      return(list(update_gh = update_gh,
+                  update_y  = update_y))
+    }
+  }
+}
+
+
+
+
+
 
