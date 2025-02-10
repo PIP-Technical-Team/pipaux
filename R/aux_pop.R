@@ -12,10 +12,11 @@ aux_pop <- function(action = c("update", "load"),
                     from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
+                    branch,
                     tag     = match.arg(branch),
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
+  branch <- branch
   from    <- tolower(from)
   action <- match.arg(action)
 
@@ -49,22 +50,26 @@ aux_pop_update <-  function(force   = FALSE,
                             from    = c("gh", "file", "api"),
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
-                            branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch),
+                            branch,
+                            tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {
 
   # Check arguments
   from    <- match.arg(from)
-  branch <- match.arg(branch)
+  branch <- branch
+  tag <- branch
   measure <- "pop"
 
   # Get the most recent year in PFW to filter population projection
 
-  pfw      <- pipload::pip_load_aux("pfw",
-                                    branch  = branch,
-                                    maindir = maindir)
+  # pfw      <- pipload::pip_load_aux("pfw",
+  #                                   #branch  = branch,
+  #                                   maindir = maindir)
+
   # year_max <- pfw[, max(year)]
+
   # get current year as max year
+
   year_max <- Sys.Date() |>
     format("%Y") |>
     as.numeric()
@@ -137,7 +142,15 @@ aux_pop_update <-  function(force   = FALSE,
       branch = branch,
       tag    = tag,
       ext    = "xlsx"
-    ) |>
+    )
+
+    ### Get the attributes before they get lost
+    gh_pop_main <- attr(pop_main, "gh")
+
+    ## DEBUG STATEMENT
+    print(gh_pop_main)
+
+    pop_main <- pop_main |>
       clean_names_from_wide() |>
       clean_from_wide()
 
@@ -152,7 +165,15 @@ aux_pop_update <-  function(force   = FALSE,
       branch = branch,
       tag    = tag,
       ext    = "csv"
-    )  |>
+    )
+
+    ### Get the attributes before they get lost
+    gh_spop <- attr(spop, "gh")
+
+    ## DEBUG STATEMENT
+    print(gh_spop)
+
+    spop <- spop |>
       clean_names_from_wide() |>
       clean_from_wide()
 
@@ -239,7 +260,23 @@ aux_pop_update <-  function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+  setattr(pop,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+  # Set gh attributes --------------------------------
+
+  setattr(pop,
+          "gh",
+          list(gh_spop = gh_spop,
+               gh_pop_main = gh_pop_main))
 
   saved <- pipfun::pip_sign_save(
     x       = pop,
