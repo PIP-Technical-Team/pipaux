@@ -38,10 +38,19 @@ aux_country_list <- function(action = c("update", "load"),
   }
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
   setattr(cl, "aux_name", "country_list")
   setattr(cl,
           "aux_key",
           c("country_code"))
+
+  setattr(cl,
+          "raw_sha_fun",
+          raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = cl,
@@ -50,31 +59,31 @@ aux_country_list <- function(action = c("update", "load"),
       force   = force
     )
 
-    if (saved) {
-      cl_sha <- digest::sha1(cl)
-      out <- gh::gh(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        owner     = "PIP-Technical-Team",
-        repo      = "aux_country_list",
-        path      = "sha_country_list.txt",
-        .params   = list(ref = "DEV")
-      )
-
-      res <- gh::gh(
-        "PUT /repos/{owner}/{repo}/contents/{path}",
-        owner   = "PIP-Technical-Team",
-        repo    = "aux_country_list",
-        path    = "sha_country_list.txt",
-        .params = list(
-          branch  = branch,
-          message = paste0("update on ", prettyNum(Sys.time())),
-          sha     = out$sha,
-          content = base64enc::base64encode(charToRaw(cl_sha))
-        ),
-        .token = Sys.getenv("GITHUB_PAT")
-      )
-
-    }
+    # if (saved) {
+    #   cl_sha <- digest::sha1(cl)
+    #   out <- gh::gh(
+    #     "GET /repos/{owner}/{repo}/contents/{path}",
+    #     owner     = "PIP-Technical-Team",
+    #     repo      = "aux_country_list",
+    #     path      = "sha_country_list.txt",
+    #     .params   = list(ref = "DEV")
+    #   )
+    #
+    #   res <- gh::gh(
+    #     "PUT /repos/{owner}/{repo}/contents/{path}",
+    #     owner   = "PIP-Technical-Team",
+    #     repo    = "aux_country_list",
+    #     path    = "sha_country_list.txt",
+    #     .params = list(
+    #       branch  = branch,
+    #       message = paste0("update on ", prettyNum(Sys.time())),
+    #       sha     = out$sha,
+    #       content = base64enc::base64encode(charToRaw(cl_sha))
+    #     ),
+    #     .token = Sys.getenv("GITHUB_PAT")
+    #   )
+    #
+    # }
 
     return(invisible(saved))
 
