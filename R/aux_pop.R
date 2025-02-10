@@ -56,8 +56,8 @@ aux_pop_update <-  function(force   = FALSE,
 
   # Check arguments
   from    <- match.arg(from)
-  branch <- branch
-  tag <- branch
+  branch  <- branch
+  tag     <- branch
   measure <- "pop"
 
   # Get the most recent year in PFW to filter population projection

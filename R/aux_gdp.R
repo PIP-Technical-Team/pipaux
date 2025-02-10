@@ -12,17 +12,21 @@ aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = c("DEV", "PROD", "main"),
-                    tag             = match.arg(branch),
+                    branch,
+                    tag             = branch,
                     from            = "file",
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
-  branch <- match.arg(branch)
+  branch <- branch
+  tag <- tag
+  #branch <- match.arg(branch)
   action <- match.arg(action)
 
 
   if (action == "update") {
+
+    # Get raw data from various sources, format it, and push it to github
     aux_gdp_update(maindir = maindir,
                    force   = force,
                    owner   = owner,
@@ -30,6 +34,44 @@ aux_gdp <- function(action          = c("update", "load"),
                    tag     = tag,
                    from    = from,
                    detail  = detail)
+
+    # load raw data from gh together with its metadata
+
+    gdp <- pipfun::load_from_gh(
+      measure = "gdp",
+      owner  = owner,
+      branch = branch,
+      ext = "csv"
+    )
+
+
+    if (branch == "main") {
+      branch <- ""
+    }
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+    # ----- function raw sha ------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+    setattr(gdp,
+            "raw_sha_fun",
+            raw_sha_fun)
+
+    saved <- pipfun::pip_sign_save(
+      x       = gdp,
+      measure = measure,
+      msrdir  = msrdir,
+      force   = force
+    )
+
+    # saved <- pipfun::pip_sign_save(
+    #   x       = gdp,
+    #   measure = measure,
+    #   msrdir  = msrdir,
+    #   force   = force
+    # )
 
   } else {
     dt <- load_aux(
@@ -215,14 +257,13 @@ aux_gdp_weo <- function(action = "update",
 aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch,
+                           tag     = branch,
                            from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
 
-  branch <- match.arg(branch)
+  #branch <- match.arg(branch)
   measure <- "gdp"
-
 
   #   _________________________________________
   #   Update data                                 ####
@@ -286,8 +327,8 @@ aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
   # load nowcast growth rates
   nan <- pipfun::load_from_gh(
     measure = "nan",
-    owner  = owner,
-    branch = branch,
+    owner  = "PIP-Technical-Team",
+    branch = "DEV",
     ext    = "csv"
   )
 
@@ -545,21 +586,25 @@ aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
 
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  #msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
-  saved <- pipfun::pip_sign_save(
-    x       = gdp,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
-  )
+  # saved <- pipfun::pip_sign_save(
+  #   x       = gdp,
+  #   measure = measure,
+  #   msrdir  = msrdir,
+  #   force   = force
+  # )
   # Push data (gdp) to GitHub as gdp.csv
-  save_aux_to_gh(gdp,
-                 repo  = paste0("aux_", measure),
-                 branch = branch,
+
+  save_aux_to_gh(df        = gdp,
+                 owner     = owner,
+                 measure   = measure,
+                 repo      = paste0("aux_", measure),
+                 tag       = tag,
+                 branch    = branch,
                  filename  = measure)
   # All aux files that depend on gdp will be loaded from Github
-  return(invisible(saved))
+  return(invisible(TRUE))
 
 }
 

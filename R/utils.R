@@ -431,7 +431,7 @@ save_aux_to_gh <- function(df,
                      repo = repo,
                      owner = owner,
                      branch = branch,
-                     tag = tag,
+                     #tag = tag,
                      filename = filename,
                      ext = ext,
                      ...)
