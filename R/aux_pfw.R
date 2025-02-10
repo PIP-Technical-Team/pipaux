@@ -18,6 +18,7 @@ aux_pfw <- function(action  = c("update", "load"),
                     tag     = match.arg(branch),
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
+  branch <- branch
   action <- match.arg(action)
 
   if (action == "update") {
@@ -166,7 +167,7 @@ aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
 
   setattr(pfw, "aux_name", "pfw")
 
-  setattr(cl,
+  setattr(pfw,
           "raw_sha_fun",
           raw_sha_fun)
 

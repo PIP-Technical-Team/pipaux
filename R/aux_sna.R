@@ -11,11 +11,11 @@ aux_sna <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = c("DEV", "PROD", "main"),
+                    branch,
                     tag             = match.arg(branch)) {
 
   measure    <- "sna"
-  branch <- match.arg(branch)
+  branch <- branch
   action <- match.arg(action)
 
 
@@ -24,12 +24,22 @@ aux_sna <- function(action          = c("update", "load"),
     sna <- pipfun::load_from_gh(
       measure = "sna",
       owner  = owner,
-      branch = branch
+      branch = branch,
+      ext = "csv"
     )
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+    # ----- function raw sha ------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+    setattr(sna,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = sna,

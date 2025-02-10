@@ -195,7 +195,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
           "aux_key",
           c("country_code", "year", "reporting_level", "survey_acronym"))
 
-  setattr(cl,
+  setattr(cpi,
           "raw_sha_fun",
           raw_sha_fun)
 
