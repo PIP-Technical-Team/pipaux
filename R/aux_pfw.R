@@ -14,11 +14,10 @@ aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
+                    branch,
                     tag     = match.arg(branch),
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -132,12 +131,11 @@ aux_pfw_clean <- function(y,
 aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
+                           branch,
                            tag     = match.arg(branch),
                            detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pfw"
-  branch <- match.arg(branch)
 
   # Read data
   pfw <- pipfun::load_from_gh(measure = measure,
@@ -159,9 +157,18 @@ aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
 
   setattr(pfw, "aux_name", "pfw")
+
+  setattr(cl,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   saved <- pipfun::pip_sign_save(
     x       = pfw,

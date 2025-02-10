@@ -16,7 +16,7 @@ aux_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
+                    branch,
                     tag     = match.arg(branch),
                     detail = getOption("pipaux.detail.raw")) {
 
@@ -30,7 +30,6 @@ aux_cpi <- function(action = c("update", "load"),
   #   Defenses                                                                ####
   measure <- "cpi"
   action <- match.arg(action)
-  branch <- match.arg(branch)
 
   stopifnot( exprs = {
 
@@ -144,15 +143,15 @@ aux_cpi_clean <- function(y,
 aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch,
+                           tag,
                            detail  = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
 
   measure <- "cpi"
-  branch  <- match.arg(branch)
+  tag <- branch
 
 
   #   ____________________________________________________________________________
@@ -186,10 +185,19 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
 
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
   setattr(cpi, "aux_name", "cpi")
   setattr(cpi,
           "aux_key",
           c("country_code", "year", "reporting_level", "survey_acronym"))
+
+  setattr(cl,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   # validate cpi clean data before saving it
   cpi_validate_output(cpi, detail = detail)
@@ -198,7 +206,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = cpi,
