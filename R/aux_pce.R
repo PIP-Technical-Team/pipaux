@@ -11,12 +11,12 @@ aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    branch,
+                    tag     = branch,
                     from    = c("gh", "file", "api"),
                     detail  = getOption("pipaux.detail.raw")) {
+
   measure <- "pce"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -48,12 +48,11 @@ aux_pce <- function(action  = c("update", "load"),
 aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch,
+                           tag     = branch,
                            from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
-  branch <- match.arg(branch)
   from   <- match.arg(from)
 
   #   ________________________________________________________________
@@ -287,7 +286,18 @@ aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(pce,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = pce,
