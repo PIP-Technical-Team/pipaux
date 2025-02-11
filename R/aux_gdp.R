@@ -66,13 +66,6 @@ aux_gdp <- function(action          = c("update", "load"),
       force   = force
     )
 
-    # saved <- pipfun::pip_sign_save(
-    #   x       = gdp,
-    #   measure = measure,
-    #   msrdir  = msrdir,
-    #   force   = force
-    # )
-
   } else {
     dt <- load_aux(
       maindir = maindir,

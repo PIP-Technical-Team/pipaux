@@ -6,7 +6,7 @@
 #' as an .xls file in `<maindir>/_aux/weo/`. The filename should be in the
 #' following structure `WEO_<YYYY-DD-MM>.xls`. Due to potential file corruption
 #' the file must be opened and re-saved before it can be updated with
-#' `pip_weo()`. Hopefully in the future IMF will stop using an `.xls` file
+#' `aux_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
@@ -17,11 +17,11 @@ aux_weo <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    branch,
+                    tag     = branch,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "weo"
-  branch <- match.arg(branch)
+  #branch <- branch
   action <- match.arg(action)
 
   if (action == "update") {
@@ -37,6 +37,9 @@ aux_weo <- function(action  = c("update", "load"),
       ext    = "csv"
     )
 
+    # Save raw attributes before they get lost when cleaning
+    gh <- attr(dt, "gh")
+
     # validate weo raw data
     weo_validate_raw(weo = dt, detail = detail)
 
@@ -49,13 +52,25 @@ aux_weo <- function(action  = c("update", "load"),
     setattr(dt,
             "aux_key",
             c("country_code", "year"))
+
+    setattr(dt, "gh", gh)
+
     # validate weo clean data
     weo_validate_output(weo = dt, detail = detail)
+
+    # ----- function raw sha -----------------------------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+    setattr(dt,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     if (branch == "main") {
       branch <- ""
     }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   cat('\nDir : ', msrdir)
     saved <- pipfun::pip_sign_save(
@@ -86,10 +101,10 @@ aux_weo <- function(action  = c("update", "load"),
 #' @export
 aux_weo_clean <- function(dt,
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch) {
 
 
-  branch <- match.arg(branch)
+
 
   #   _________________________________________
   #   Computations                        ####
