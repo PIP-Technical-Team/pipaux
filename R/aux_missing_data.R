@@ -10,12 +10,11 @@ aux_missing_data <- function(action  = c("update", "load"),
                              force   = FALSE,
                              owner   = getOption("pipfun.ghowner"),
                              maindir = gls$PIP_DATA_DIR,
-                             branch  = c("DEV", "PROD", "main"),
-                             tag     = match.arg(branch)
+                             branch,
+                             tag     = branch
                              ) {
 
   measure <- "missing_data"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
 #   ________________________________________________________________
@@ -196,7 +195,17 @@ aux_missing_data <- function(action  = c("update", "load"),
 
 #  .................................................................
 ##  Save data                                                    ####
-    msrdir  <- fs::path(maindir, "_aux/", branch, measure)
+    msrdir  <- fs::path(maindir, "aux_data", branch, measure)
+
+    # ----- function raw sha -----------------------------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+
+    setattr(pop_md,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = pop_md,
