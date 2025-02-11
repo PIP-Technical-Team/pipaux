@@ -9,14 +9,13 @@ aux_regions <- function(action = c("update", "load"),
                         force = FALSE,
                         maindir = gls$PIP_DATA_DIR,
                         owner   = getOption("pipfun.ghowner"),
-                        branch  = c("DEV", "PROD", "main"),
+                        branch,
                         tag     = match.arg(branch)
                         ) {
 
 
   measure <- "regions"
   action  <- match.arg(action)
-  branch  <- match.arg(branch)
 
   if (action == "update") {
 
@@ -80,12 +79,22 @@ aux_regions <- function(action = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(dt, "aux_name", "regions")
   setattr(dt,
           "aux_key",
           c("region_code"))
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+   setattr(dt,
+          "raw_sha_fun",
+          raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = dt,
