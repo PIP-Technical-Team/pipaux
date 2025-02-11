@@ -17,12 +17,11 @@ aux_gdm <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    branch,
+                    tag     = branch,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -53,11 +52,10 @@ aux_gdm <- function(action  = c("update", "load"),
 aux_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch,
+                           tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "gdm"
-  branch <- match.arg(branch)
 
   #   _________________________________________________________
   #   Load raw file                               ####
@@ -67,6 +65,9 @@ aux_gdm_update <- function(force = FALSE,
                              branch = branch,
                              tag    = tag,
                              ext    = "csv")
+
+  # save attributes before they get removed by subsequent formatting ops
+  gh <- attr(df, "gh")
 
   # validate gdm raw data
   gdm_validate_raw(gdm = df, detail = detail)
@@ -133,12 +134,6 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Merge with PFW                                                          ####
 
-  # pip_pfw(maindir = maindir,
-  #         force   = force,
-  #         owner   = owner,
-  #         branch  = branch,
-  #         tag     = tag)
-
   pfw    <-  load_aux(measure = "pfw",
                       maindir = maindir,
                       branch = branch)
@@ -177,7 +172,11 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Merge with inventory                                                    ####
 
-  inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"),
+  # inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"),
+  #                      as.data.table = TRUE)
+
+  inv <- fst::read_fst(fs::path("Y:\\tefera_pipaux_test",
+                                "_inventory/inventory.fst"),
                        as.data.table = TRUE)
 
   # Create survey_id column
@@ -263,10 +262,30 @@ aux_gdm_update <- function(force = FALSE,
   # validate gdm output data
   gdm_validate_output(gdm = df, detail = detail)
 
+  # Raw attributes ####
+  # -------- From github  ----------------------
+
+  setattr(df, "gh", gh)
+
+  # ----- function raw sha ----------------------
+
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(df,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  ##  ----------------------------------------------------------
+  ##  Save file                                           ####
 
   saved <- pipfun::pip_sign_save(
     x       = df,
