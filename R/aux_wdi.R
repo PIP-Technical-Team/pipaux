@@ -12,13 +12,12 @@ aux_wdi <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = c("DEV", "PROD", "main"),
+                    branch,
                     tag             = match.arg(branch),
                     from            = c("gh", "file", "api"),
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "wdi"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
 
@@ -55,14 +54,13 @@ aux_wdi <- function(action          = c("update", "load"),
 aux_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch ,
+                           tag     = branch,
                            from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
 
 
   from   <- match.arg(from)
-  branch <- match.arg(branch)
 
   #   ______________________________________________________
   #   Computations                                    ####
@@ -103,12 +101,22 @@ aux_wdi_update <- function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(wdi, "aux_name", "wdi")
   setattr(wdi,
           "aux_key",
           c("country_code", "year"))
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(wdi,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   saved <- pipfun::pip_sign_save(
     x       = wdi,
