@@ -86,6 +86,10 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir = msrdir,
     force = force
   )
+  pipfun::save_to_gh(ppp_vintage,
+                     measure = measure,
+                     branch = branch,
+                     filename = "ppp_vintage")
 
   return(invisible(saved))
 }
