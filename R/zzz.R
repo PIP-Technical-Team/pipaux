@@ -5,7 +5,7 @@ pipuax_default_options <- list(
   pipaux.pppvar  = "icp2017",
   pipaux.pppyear = 2017,
   pipaux.popsrc  = "emi",
-  pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
+  pipaux.madsrc  = "https://dataverse.nl/api/access/datafile/421303",
   # pipaux.maindir = gls$PIP_DATA_DIR,
   pipfun.ghowner = "PIP-Technical-Team",
   joyn.verbose   = FALSE,
