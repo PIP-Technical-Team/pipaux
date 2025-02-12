@@ -1,9 +1,9 @@
 
 # gls <- pipfun::pip_create_globals()
 pipuax_default_options <- list(
-  pipaux.cpivar  = "cpi2017",
-  pipaux.pppvar  = "icp2017",
-  pipaux.pppyear = 2017,
+  pipaux.cpivar  = "cpi2021",
+  pipaux.pppvar  = "icp2021",
+  pipaux.pppyear = 2021,
   pipaux.popsrc  = "emi",
   pipaux.madsrc  = "https://dataverse.nl/api/access/datafile/421303",
   # pipaux.maindir = gls$PIP_DATA_DIR,
