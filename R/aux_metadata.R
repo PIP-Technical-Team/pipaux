@@ -10,11 +10,10 @@ aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
-                         branch  = c("DEV", "PROD", "main"),
-                         tag     = match.arg(branch),
+                         branch,
+                         tag     = branch,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -49,12 +48,12 @@ aux_metadata <- function(action  = c("update", "load"),
 aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
-                                branch  = c("DEV", "PROD", "main"),
-                                tag     = match.arg(branch),
+                                branch,
+                                tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
-  branch <- match.arg(branch)
+
   #   ____________________________________________________________________________
   #   Computations                                                            ####
 
@@ -63,6 +62,9 @@ aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                              branch = branch,
                              tag = tag,
                              ext = "csv")
+
+  # Get gh attributes before they get removed
+  gh <- attr(df, "gh")
 
   # validate raw metdata data
   metadata_validate_raw(metadata = df, detail = detail)
@@ -160,7 +162,19 @@ aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(df,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+  setattr(df, "gh", gh)
 
   saved <- pipfun::pip_sign_save(
     x       = df,
