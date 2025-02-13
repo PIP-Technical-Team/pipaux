@@ -182,14 +182,28 @@ check_status_v2 <- function(measure,
   # 1. Check GitHub status
   # ---------------------------
 
-  # Get repo branches and info
-  gh_branches <- pipfun::get_repo_branches(owner = owner,
-                                           repo  = repo)
+  # ---- NOTE ---- #
+  # -------------- #
 
-  # Check if measure repo has release branch
-  has_release_branch <- gh_branches$has_release_branch
+  # If the repo does not exist (as of now), it means there is no raw file in GitHub.
+  # For example, the data file in the Y drive originates from formatting dependencies,
+  # which are checked separately. Therefore, update_gh is set to FALSE.
 
-  if (has_release_branch) {
+
+  # Default to update_gh = FALSE in case of an error
+  update_gh <- FALSE
+
+  # Try to get repo branches and info
+  gh_branches <- tryCatch(
+    pipfun::get_repo_branches(owner = owner, repo = repo),
+    error = function(e) {
+      message("GitHub repository not found or an error occurred: ", e$message)
+      return(NULL)
+    }
+  )
+
+  # Proceed only if repo exists
+  if (!is.null(gh_branches) && gh_branches$has_release_branch) {
     release_branch <- gh_branches$release_branch
 
     release_up_to_date <- pipfun::compare_branch_content(
@@ -198,10 +212,11 @@ check_status_v2 <- function(measure,
       branch1  = "DEV",
       branch2  = release_branch
     )$same_content
+
+    # Update GitHub is TRUE if release branch needs to be created or updated
+    update_gh <- !release_up_to_date
   }
 
-  # Update GitHub is TRUE if release branch has to be created or updated
-  update_gh <- !(has_release_branch && release_up_to_date)
 
   if (update_gh) {
     return(list(

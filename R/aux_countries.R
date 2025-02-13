@@ -9,12 +9,12 @@ aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main"),
+                          branch,
                           tag     = match.arg(branch)) {
 
   measure <- "countries"
   action <- match.arg(action)
-  branch <- match.arg(branch)
+
 
   if (action == "update") {
 
@@ -45,12 +45,21 @@ aux_countries <- function(action  = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     setattr(countries, "aux_name", "countries")
     setattr(countries,
             "aux_key",
             c("country_code"))
+
+    # ----- function raw sha ------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+    setattr(countries,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     pipfun::pip_sign_save(
       x = countries,
