@@ -8,6 +8,7 @@ aux_fun <- function(measure,
                     action = c("update", "load"),
                     repo = paste0("aux_", measure),
                     owner,
+                    identity,
                     maindir = getOption("pipaux.working_dir"),
                     ...) {
 
@@ -47,13 +48,13 @@ aux_fun <- function(measure,
     })
   }
 
-  update_status <- check_status(measure = measure,
+  check_status <- check_status(measure = measure,
                                 repo    = repo,
                                 owner   = owner,
                                 maindir = maindir)
 
-  update_gh <- update_status$update_gh
-  update_y  <- update_status$update_y
+  update_gh <- check_status$update_gh
+  update_y  <- check_status$update_y
 
   if (!update_gh & !update_y) {
     cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
@@ -62,34 +63,31 @@ aux_fun <- function(measure,
 
   if (update_y == TRUE) {
 
-    # Check GitHub first: is release branch updated with most recent version of DEV?
+    #   ____________________________________________________________
+    #   First check and update GitHub                           ####
+
     if(update_gh == TRUE) {
 
+      pipfun:::sync_release_branch(owner = owner,
+                                   repo = repo,
+                                   ref_branch = "DEV",
+                                   identity = identity)
 
     }
 
+    #   ____________________________________________________________
+    #   Update Y drive                                          ####
+
+    # Retrieve the function from the {pipaux} namespace
+    # -- The namespace refers to the version currently loaded in the R session
+
+    func <- get(function_name,
+                envir = asNamespace("pipaux"))
+
+    # Call the function with additional arguments
+    func(...)
+
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # Retrieve the function from the {pipaux} namespace
-  # -- The namespace refers to the version currently loaded in the R session
-  # func <- get(function_name,
-  #             envir = asNamespace("pipaux"))
-  #
-  # # Call the function with additional arguments
-  # func(...)
 }
 
 # Check status v0 ---- ####
