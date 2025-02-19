@@ -3,9 +3,16 @@
 #' @param measure character: Name of the auxiliary data measure (e.g., "ppp")
 #' @param ... additional arguments to pass to the auxiliary function
 #'
-#' @return The result of the auxiliary function call.
+#' @return The result of the auxiliary function call
 aux_fun <- function(measure,
+                    action = c("update", "load"),
+                    repo = paste0("aux_", measure),
+                    owner,
+                    maindir = getOption("pipaux.working_dir"),
                     ...) {
+
+  measure <- measure
+  action <- match.arg(action)
 
   function_name <- paste0("aux_",
                           measure)
@@ -19,20 +26,77 @@ aux_fun <- function(measure,
     cli::cli_abort(paste0("Function '", function_name, "' does not exist in the '", "pipaux package."))
   }
 
+  #   ____________________________________________________________
+  #   Read Dependencies                                       ####
+
+  dependencies <- read_dependencies(gh_user = "https://raw.githubusercontent.com",
+                                    owner   = "PIP-Technical-Team")[[measure]]
+
+
+  # Extract the relevant measure's dependencies
+  # if (!measure %in% names(dependencies)) {
+  #   cli::cli_abort(paste0("Measure '", measure, "' not found in dependencies."))
+  # }
+  #
+
+  if (length(dependencies) >= 1) {
+    lapply(dependencies, function(dep) {
+      aux_fun(measure = dep,
+              action  = action,
+              owner   = owner, ...)
+    })
+  }
+
+  update_status <- check_status(measure = measure,
+                                repo    = repo,
+                                owner   = owner,
+                                maindir = maindir)
+
+  update_gh <- update_status$update_gh
+  update_y  <- update_status$update_y
+
+  if (!update_gh & !update_y) {
+    cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
+    return(NULL)
+  }
+
+  if (update_y == TRUE) {
+
+    # Check GitHub first: is release branch updated with most recent version of DEV?
+    if(update_gh == TRUE) {
+
+
+    }
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # Retrieve the function from the {pipaux} namespace
   # -- The namespace refers to the version currently loaded in the R session
-  func <- get(function_name,
-              envir = asNamespace("pipaux"))
-
-  # Call the function with additional arguments
-  func(...)
+  # func <- get(function_name,
+  #             envir = asNamespace("pipaux"))
+  #
+  # # Call the function with additional arguments
+  # func(...)
 }
 
 # Check status v0 ---- ####
 # working well when gh is a single list of attributes ----- #
 
 # Check status of an auxiliary data measure
-check_status <- function(measure,
+check_status_v0 <- function(measure,
                          repo = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
                          #identity = c("PROD", "TEST", "INT"),
@@ -173,7 +237,7 @@ check_status <- function(measure,
 
 # Check status v2 ---- ####
 # attempt when gh is a list of lists ----- #
-check_status_v2 <- function(measure,
+check_status_v1 <- function(measure,
                             repo       = paste0("aux_", measure),
                             owner      = getOption("pipfun.ghowner"),
                             maindir    = getOption("pipaux.working_dir")) {
@@ -320,11 +384,11 @@ check_status_v2 <- function(measure,
 
 #version 3
 
-check_status_v3 <- function(measure,
-                            repo       = paste0("aux_", measure),
-                            owner      = getOption("pipfun.ghowner"),
-                            maindir    = getOption("pipaux.working_dir"),
-                            verbose    = FALSE) {
+check_status <- function(measure,
+                         repo       = paste0("aux_", measure),
+                         owner      = getOption("pipfun.ghowner"),
+                         maindir    = getOption("pipaux.working_dir"),
+                         verbose    = FALSE) {
 
   update_gh <- FALSE
 
