@@ -110,9 +110,115 @@ aux_fun <- function(measure,
   }
 }
 
+# Refactoring aux fun attempt one
+aux_fun_new <- function(measure,
+                    action = c("update", "load"),
+                    repo = paste0("aux_", measure),
+                    branch = paste0(release, "_", identity),
+                    owner,
+                    release,
+                    identity,
+                    maindir = getOption("pipaux.working_dir"),
+                    processed = new.env(parent = emptyenv()),
+                    ...) {
 
-#version 3
+  action <- match.arg(action)
+  release_branch <- paste0(release, "_", identity)
 
+  # repo <- repo
+  #
+  #
+  # # Set repo to "Class" if measure is "income_groups" or "country_list"
+  # if (measure %in% c("income_groups", "country_list")) {
+  #   repo <- "Class"
+  # }
+
+  repo <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+
+
+  # If measure has already been processed, return early
+  if (rlang::env_has(processed,
+                     measure)) {
+    return(invisible(NULL))
+  }
+
+  # Mark this measure as processed
+  rlang::env_poke(processed,
+                  measure,
+                  TRUE)
+
+
+  function_name <- paste0("aux_", measure)
+
+  # Check if the function exists in the pipaux namespace
+  if (!exists(function_name, envir = asNamespace("pipaux"))) {
+    cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
+  }
+
+  # Read all dependencies
+  dependencies_all <- read_dependencies(
+    gh_user = "https://raw.githubusercontent.com",
+    owner   = "PIP-Technical-Team"
+  )
+
+  # Get dependencies for this measure; if none, default to an empty vector
+  dependencies <- dependencies_all[[measure]]
+
+  if (is.null(dependencies)) {
+    dependencies <- character(0)
+  }
+
+  # Recursively process dependencies using lapply
+  invisible(lapply(dependencies, function(dep) {
+    aux_fun_new(measure  = dep,
+            action   = action,
+            repo     = paste0("aux_", dep),
+            branch   = release_branch,
+            owner    = owner,
+            release  = release,
+            identity = identity,
+            maindir  = maindir,
+            processed = processed,
+            ...)
+  }))
+
+  # Check update status for the current measure
+  check_status_result <- check_status(measure = measure,
+                                      repo    = repo,
+                                      owner   = owner,
+                                      maindir = maindir)
+  update_gh <- check_status_result$update_gh
+  update_y  <- check_status_result$update_y
+
+  if (!update_gh && !update_y) {
+    cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
+    return(invisible(NULL))
+  }
+
+  if (update_y) {
+    # Update GitHub if necessary
+    if (update_gh) {
+      pipfun::sync_release_branch(owner      = owner,
+                                  repo       = repo,
+                                  ref_branch = "DEV",
+                                  release    = release,
+                                  identity   = identity)
+    }
+
+    # Retrieve and execute the function from the pipaux namespace
+    func <- get(function_name, envir = asNamespace("pipaux"))
+    func(action  = action,
+         maindir = maindir,
+         owner   = owner,
+         branch  = release_branch)
+  }
+
+  invisible(NULL)
+}
+
+
+
+# MEMO: ADD DOCUMENTATION
 check_status <- function(measure,
                          repo       = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
