@@ -7,13 +7,16 @@
 aux_fun <- function(measure,
                     action = c("update", "load"),
                     repo = paste0("aux_", measure),
+                    branch,
                     owner,
+                    release,
                     identity,
                     maindir = getOption("pipaux.working_dir"),
                     ...) {
 
   measure <- measure
   action <- match.arg(action)
+  release_branch <- paste0(release, "_", identity)
 
   function_name <- paste0("aux_",
                           measure)
@@ -40,18 +43,31 @@ aux_fun <- function(measure,
   # }
   #
 
+  #   ____________________________________________________________
+  #   Recursively call aux_fun for each dependency            ####
+
   if (length(dependencies) >= 1) {
+
     lapply(dependencies, function(dep) {
-      aux_fun(measure = dep,
-              action  = action,
-              owner   = owner, ...)
+      aux_fun(measure  = measure,
+              action   = action,
+              repo     = repo,
+              branch   = release_branch,
+              owner    = owner,
+              release  = release,
+              identity = identity,
+              maindir  = maindir,
+              ...)
     })
   }
 
+  #   ____________________________________________________________
+  #   Check update status of measure, both in GH and Y:       ####
+
   check_status <- check_status(measure = measure,
-                                repo    = repo,
-                                owner   = owner,
-                                maindir = maindir)
+                               repo    = repo,
+                               owner   = owner,
+                               maindir = maindir)
 
   update_gh <- check_status$update_gh
   update_y  <- check_status$update_y
@@ -68,10 +84,11 @@ aux_fun <- function(measure,
 
     if(update_gh == TRUE) {
 
-      pipfun:::sync_release_branch(owner = owner,
-                                   repo = repo,
-                                   ref_branch = "DEV",
-                                   identity = identity)
+      pipfun::sync_release_branch(owner      = owner,
+                                  repo       = repo,
+                                  ref_branch = "DEV",
+                                  release    = release,
+                                  identity   = identity)
 
     }
 
@@ -85,7 +102,11 @@ aux_fun <- function(measure,
                 envir = asNamespace("pipaux"))
 
     # Call the function with additional arguments
-    func(...)
+    func(action = action,
+         maindir = maindir,
+         owner = owner,
+         branch = release_branch,
+         ...)
 
   }
 }
