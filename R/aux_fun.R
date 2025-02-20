@@ -7,7 +7,7 @@
 aux_fun <- function(measure,
                     action = c("update", "load"),
                     repo = paste0("aux_", measure),
-                    branch,
+                    branch = paste0(release, "_", identity),
                     owner,
                     release,
                     identity,
@@ -409,7 +409,7 @@ check_status <- function(measure,
                          maindir    = getOption("pipaux.working_dir"),
                          verbose    = FALSE) {
 
-  update_gh <- FALSE
+  update_gh <- TRUE
 
   gh_branches <- tryCatch(
     pipfun::get_repo_branches(owner = owner, repo = repo),
