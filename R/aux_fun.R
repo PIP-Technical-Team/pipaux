@@ -115,7 +115,7 @@ aux_fun_new <- function(measure,
                     action = c("update", "load"),
                     repo = paste0("aux_", measure),
                     branch = paste0(release, "_", identity),
-                    owner,
+                    owner = "RossanaTat",
                     release,
                     identity,
                     maindir = getOption("pipaux.working_dir"),
@@ -147,6 +147,8 @@ aux_fun_new <- function(measure,
                   measure,
                   TRUE)
 
+  # Log processing of the current measure
+  cli::cli_alert_info("Processing measure: {measure}")
 
   function_name <- paste0("aux_", measure)
 
