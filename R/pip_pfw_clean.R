@@ -61,7 +61,7 @@ pip_pfw_clean <- function(y,
         survey_coverage == "N", "national",
         survey_coverage == "R", "rural",
         survey_coverage == "U", "urban",
-        default = ""
+        default = "partial"
       ),
       # Recode welfare type
       welfare_type = fcase(

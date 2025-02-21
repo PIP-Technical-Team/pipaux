@@ -312,6 +312,14 @@ chain <- function(ori_var,
     return(ori_var)
   }
 
+  known <- which(!is.na(x))
+
+  # If there are no non-missing values in the working subset,
+  # return ori_var (or handle as desired).
+  if (length(known) == 0) {
+    return(ori_var)
+  }
+
   while (any(is.na(x))) {
 
     ns   <-  which(is.na(x)) # index of NA obs
@@ -406,4 +414,87 @@ get_gh <- function(owner,
   # Return -------------
   return(rs)
 
+}
+
+
+
+
+#' Chain backwards and forward national accounts.
+#'
+#' Update version with no while()
+#'
+#' @rdname chain
+chain2 <- function(ori_var, rep_var) {
+  # defensive checks: both vectors must be numeric
+  stopifnot(is.numeric(ori_var), is.numeric(rep_var))
+
+  # early returns if nothing to fill or if only one vector is missing entirely
+  if (!anyNA(ori_var)) return(ori_var)
+  if (all(is.na(ori_var))) return(rep_var)
+  if (all(is.na(rep_var))) return(ori_var)
+
+  # work only on those positions where rep_var is observed
+  w <- which(!is.na(rep_var))
+  x <- ori_var[w]
+  y <- rep_var[w]
+
+  # if the working vector is of length 0 or 1, there is nothing to chain
+  if (length(x) <= 1) return(ori_var)
+
+  # Identify indices in the working subset that were originally non-missing.
+  # These values serve as boundaries for filling in the missing (NA) values.
+  known <- which(!is.na(x))
+
+  # If there are no non-missing values in the working subset,
+  # return ori_var (or handle as desired).
+  if (length(known) == 0) {
+    return(ori_var)
+  }
+
+  # --- Begin Segment ---
+  # If the first element(s) of x are missing, fill them using backward chaining
+  # from the first known (non-NA) value.
+  if (known[1] > 1) {
+    idx <- seq_len(known[1] - 1)
+    # For any index i in the beginning block, the chain gives:
+    #    x[i] = x[known[1]] * (y[i] / y[known[1]])
+    x[idx] <- x[known[1]] * (y[idx] / y[known[1]])
+  }
+
+  # --- Interior Segments ---
+  # For each gap between two originally non-missing values, fill the missing
+  # block as follows:
+  #   - If the gap is a single missing value, fill it using forward chaining
+  #     from the left boundary.
+  #   - If there is more than one missing in the gap, then update the first
+  #     missing (adjacent to the left boundary) by forward chaining and update
+  #     the remaining ones by chaining backward from the right boundary.
+  if (length(known) > 1) {
+    for (j in 1:(length(known) - 1)) {
+      L <- known[j]
+      R <- known[j + 1]
+      if (R - L > 1) {  # there is at least one NA between L and R
+        seg <- (L + 1):(R - 1)
+        # first missing in the segment is filled from the left boundary:
+        x[seg[1]] <- x[L] * (y[seg[1]] / y[L])
+        # if more than one missing in the segment, fill the remaining ones
+        # using backward chaining from the right boundary.
+        if (length(seg) > 1) {
+          x[seg[-1]] <- x[R] * (y[seg[-1]] / y[R])
+        }
+      }
+    }
+  }
+
+  # --- End Segment ---
+  # If there are missing values at the end of x (after the last known value),
+  # fill them using forward chaining from the last known value.
+  if (known[length(known)] < length(x)) {
+    idx <- (known[length(known)] + 1):length(x)
+    x[idx] <- x[known[length(known)]] * (y[idx] / y[known[length(known)]])
+  }
+
+  # place the filled working vector back into the original vector
+  ori_var[w] <- x
+  return(ori_var)
 }

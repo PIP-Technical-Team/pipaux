@@ -2,9 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{chain}
 \alias{chain}
+\alias{chain2}
 \title{chain forward and then backward}
 \usage{
 chain(ori_var, rep_var)
+
+chain2(ori_var, rep_var)
 }
 \arguments{
 \item{ori_var}{numeric: orignal variablke}
@@ -12,6 +15,6 @@ chain(ori_var, rep_var)
 \item{rep_var}{numeric: replacement variable}
 }
 \description{
-chain forward and then backward
+Update version with no while()
 }
 \keyword{internal}
