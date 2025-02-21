@@ -112,17 +112,17 @@ aux_fun <- function(measure,
 
 # Refactoring aux fun attempt one
 aux_fun_new <- function(measure,
-                    action = c("update", "load"),
-                    repo = paste0("aux_", measure),
-                    branch = paste0(release, "_", identity),
-                    owner = "RossanaTat",
+                    action    = c("update", "load"),
+                    repo      = paste0("aux_", measure),
+                    branch    = paste0(release, "_", identity),
+                    owner     = "RossanaTat",
                     release,
                     identity,
-                    maindir = getOption("pipaux.working_dir"),
+                    maindir   = getOption("pipaux.working_dir"),
                     processed = new.env(parent = emptyenv()),
                     ...) {
 
-  action <- match.arg(action)
+  action         <- match.arg(action)
   release_branch <- paste0(release, "_", identity)
 
   # repo <- repo
@@ -147,17 +147,12 @@ aux_fun_new <- function(measure,
                   measure,
                   TRUE)
 
-  # Log processing of the current measure
+  # Debug MSG on processing of the current measure
   cli::cli_alert_info("Processing measure: {measure}")
 
-  function_name <- paste0("aux_", measure)
-
-  # Check if the function exists in the pipaux namespace
-  if (!exists(function_name, envir = asNamespace("pipaux"))) {
-    cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
-  }
-
   # Read all dependencies
+  # _______________________________________________________ #####
+
   dependencies_all <- read_dependencies(
     gh_user = "https://raw.githubusercontent.com",
     owner   = "PIP-Technical-Team"
@@ -171,24 +166,28 @@ aux_fun_new <- function(measure,
   }
 
   # Recursively process dependencies using lapply
+  # _______________________________________________________ #####
+
   invisible(lapply(dependencies, function(dep) {
-    aux_fun_new(measure  = dep,
-            action   = action,
-            repo     = paste0("aux_", dep),
-            branch   = release_branch,
-            owner    = owner,
-            release  = release,
-            identity = identity,
-            maindir  = maindir,
-            processed = processed,
-            ...)
+    aux_fun_new(measure   = dep,
+                action    = action,
+                repo      = paste0("aux_", dep),
+                branch    = release_branch,
+                owner     = owner,
+                release   = release,
+                identity  = identity,
+                maindir   = maindir,
+                processed = processed,
+                ...)
   }))
 
   # Check update status for the current measure
+  # _______________________________________________________ #####
   check_status_result <- check_status(measure = measure,
                                       repo    = repo,
                                       owner   = owner,
                                       maindir = maindir)
+
   update_gh <- check_status_result$update_gh
   update_y  <- check_status_result$update_y
 
@@ -197,8 +196,14 @@ aux_fun_new <- function(measure,
     return(invisible(NULL))
   }
 
+  # Update - GH first and then Y:
+  # _______________________________________________________ #####
+
+
   if (update_y) {
+
     # Update GitHub if necessary
+
     if (update_gh) {
       pipfun::sync_release_branch(owner      = owner,
                                   repo       = repo,
@@ -207,8 +212,17 @@ aux_fun_new <- function(measure,
                                   identity   = identity)
     }
 
-    # Retrieve and execute the function from the pipaux namespace
+    # Retrieve and execute the function from the pipaux namespace ######
+
+    # Check if the function exists in the pipaux namespace
+    function_name <- paste0("aux_", measure)
+
+    if (!exists(function_name, envir = asNamespace("pipaux"))) {
+      cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
+    }
+
     func <- get(function_name, envir = asNamespace("pipaux"))
+
     func(action  = action,
          maindir = maindir,
          owner   = owner,
