@@ -244,6 +244,7 @@ aux_fun_new <- function(measure,
                         action    = c("update", "load"),
                         repo      = paste0("aux_", measure),
                         owner     = getOption("pipfun.ghowner"),
+                        branch    = paste0(release, "", identity),
                         release   = working_release$release,
                         identity  = working_release$identity,
                         maindir   = getOption("pipaux.working_dir"),
@@ -260,61 +261,60 @@ aux_fun_new <- function(measure,
     tag <- release_branch
   }
 
-  #DEBUG STATEMENT
+  # DEBUG STATEMENT
   print(release_branch)
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
-  #owner <- if (measure %in% c("income_groups", "country_list")) "GPID_WB" else owner
 
-  # If measure has already been processed, return early
+  # If measure has already been processed, skip it
   if (rlang::env_has(processed, measure)) {
-    return(invisible(NULL))
-  }
+    cli::cli_alert_info("{measure} has already been processed, skipping dependencies...")
 
-  # Mark this measure as processed
-  rlang::env_poke(processed, measure, TRUE)
+  } else {
+    # Mark this measure as processed
+    rlang::env_poke(processed, measure, TRUE)
 
-  # Debug message on processing the current measure
-  cli::cli_alert_info("Processing measure: {measure}")
+    # Debug message on processing the current measure
+    cli::cli_alert_info("Processing measure: {measure}")
 
-  # Read all dependencies
-  dependencies_all <- read_dependencies(
-    gh_user = "https://raw.githubusercontent.com",
-    owner   = "PIP-Technical-Team"
-  )
-
-  # Get dependencies for this measure; if none, default to an empty vector
-  dependencies <- dependencies_all[[measure]]
-  if (is.null(dependencies)) {
-    dependencies <- character(0)
-  }
-
-  # Recursively process dependencies using a for loop with tryCatch
-  for (dep in dependencies) {
-    tryCatch(
-      {
-        aux_fun_new(
-          measure   = dep,
-          action    = action,
-          repo      = repo,
-          branch    = release_branch,
-          owner     = owner,
-          release   = release,
-          identity  = identity,
-          maindir   = maindir,
-          processed = processed,
-          force     = force,
-          tag       = tag,
-          ...
-        )
-      },
-      error = function(e) {
-        cli::cli_alert_danger("Error processing {dep}: {conditionMessage(e)}")
-      }
+    # Read all dependencies
+    dependencies_all <- read_dependencies(
+      gh_user = "https://raw.githubusercontent.com",
+      owner   = "PIP-Technical-Team"
     )
-  }
 
+    # Get dependencies for this measure; if none, default to an empty vector
+    dependencies <- dependencies_all[[measure]]
+    if (is.null(dependencies)) {
+      dependencies <- character(0)
+    }
+
+    # Recursively process dependencies
+    for (dep in dependencies) {
+      tryCatch(
+        {
+          aux_fun_new(
+            measure   = dep,
+            action    = action,
+            repo      = repo,
+            branch    = release_branch,
+            owner     = owner,
+            release   = release,
+            identity  = identity,
+            maindir   = maindir,
+            processed = processed,
+            force     = force,
+            tag       = tag,
+            ...
+          )
+        },
+        error = function(e) {
+          cli::cli_alert_danger("Error processing {dep}: {conditionMessage(e)}")
+        }
+      )
+    }
+  }
 
   # Check update status for the current measure
   check_status <- check_status(measure = measure,
