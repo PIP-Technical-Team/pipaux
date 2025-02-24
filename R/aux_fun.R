@@ -243,20 +243,29 @@ aux_fun_v1 <- function(measure,
 aux_fun_new <- function(measure,
                         action    = c("update", "load"),
                         repo      = paste0("aux_", measure),
-                        owner     = "RossanaTat",
+                        owner     = getOption("pipfun.ghowner"),
                         release   = working_release$release,
                         identity  = working_release$identity,
                         maindir   = getOption("pipaux.working_dir"),
                         processed = new.env(parent = emptyenv()),
                         force     = FALSE,
-                        tag       = match.arg(branch),
+                        tag       = NULL,
                         ...) {
 
+  # Set arguments
   action         <- match.arg(action)
   release_branch <- paste0(release, "_", identity)
 
+  if (is.null(tag)) {
+    tag <- release_branch
+  }
+
+  #DEBUG STATEMENT
+  print(release_branch)
+
   # Set repo to "Class" if measure is "income_groups" or "country_list"
-  repo <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+  repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+  owner <- if (measure %in% c("income_groups", "country_list")) "GPID_WB" else owner
 
   # If measure has already been processed, return early
   if (rlang::env_has(processed, measure)) {
