@@ -354,15 +354,37 @@ aux_fun_new <- function(measure,
 
     func <- get(function_name, envir = asNamespace("pipaux"))
 
-    func(
-      action  = action,
-      maindir = maindir,
-      #owner   = owner,
-      branch  = release_branch,
-      force   = force,
-      ...
-      #tag     = tag
-    )
+    # Build a list of all possible arguments to pass
+    all_args <- c(
+      list(
+        action  = action,
+        maindir = maindir,
+        branch  = release_branch,
+        force   = force,
+        owner = owner,
+        tag = tag,
+        repo = repo
+      ))  # include additional arguments from ...
+
+    # Retrieve the formal arguments of the function
+    formal_args <- names(formals(func))
+
+    # Filter to include only matching arguments
+    filtered_args <- all_args[names(all_args) %in% formal_args]
+
+    # Call the function with the filtered arguments
+    do.call(func, filtered_args)
+  }
+
+    # func(
+    #   action  = action,
+    #   maindir = maindir,
+    #   #owner   = owner,
+    #   branch  = release_branch,
+    #   force   = force,
+    #   ...
+    #   #tag     = tag
+    # )
   }
 
   invisible(NULL)
