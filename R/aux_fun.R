@@ -265,7 +265,7 @@ aux_fun_new <- function(measure,
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
-  owner <- if (measure %in% c("income_groups", "country_list")) "GPID_WB" else owner
+  #owner <- if (measure %in% c("income_groups", "country_list")) "GPID_WB" else owner
 
   # If measure has already been processed, return early
   if (rlang::env_has(processed, measure)) {
@@ -314,6 +314,7 @@ aux_fun_new <- function(measure,
       }
     )
   }
+
 
   # Check update status for the current measure
   check_status <- check_status(measure = measure,
@@ -373,7 +374,11 @@ check_status <- function(measure,
                          repo       = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
                          maindir    = getOption("pipaux.working_dir"),
-                         verbose    = FALSE) {
+                         release,
+                         identity,
+                         verbose    = TRUE) {
+
+  release_branch <- paste0(release, "_", identity)
 
   update_gh <- TRUE
 
@@ -385,8 +390,13 @@ check_status <- function(measure,
     }
   )
 
-  if (!is.null(gh_branches) && gh_branches$has_release_branch) {
-    release_branch <- gh_branches$release_branch
+  # If GitHub repo is not found, set update_gh to FALSE
+  if (is.null(gh_branches)) {
+    update_gh <- FALSE
+  } else if (release_branch %in% gh_branches$release_branches) {
+
+    # TO DO: MODIFY THIS, OR PIPFUN, TO CHECK THAT THE WORKING RELEASE BRANCH IS THERE
+    #release_branch <- gh_branches$release_branch
 
     release_up_to_date <- pipfun::compare_branch_content(
       owner    = owner,
