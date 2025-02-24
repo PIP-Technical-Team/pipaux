@@ -262,7 +262,7 @@ aux_fun_new <- function(measure,
   }
 
   # DEBUG STATEMENT
-  print(release_branch)
+  #print(release_branch)
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
@@ -297,7 +297,7 @@ aux_fun_new <- function(measure,
           aux_fun_new(
             measure   = dep,
             action    = action,
-            repo      = repo,
+            repo      = paste0("aux_", dep),
             branch    = release_branch,
             owner     = owner,
             release   = release,
@@ -320,7 +320,9 @@ aux_fun_new <- function(measure,
   check_status <- check_status(measure = measure,
                                repo    = repo,
                                owner   = owner,
-                               maindir = maindir)
+                               maindir = maindir,
+                               release = release,
+                               identity = identity)
   update_gh <- check_status$update_gh
   update_y  <- check_status$update_y
 
@@ -355,10 +357,11 @@ aux_fun_new <- function(measure,
     func(
       action  = action,
       maindir = maindir,
-      owner   = owner,
+      #owner   = owner,
       branch  = release_branch,
       force   = force,
-      tag     = tag
+      ...
+      #tag     = tag
     )
   }
 
@@ -459,6 +462,9 @@ check_status <- function(measure,
 
       update_y <- any(sapply(gh_sha_list, function(x) x$gh_sha != x$y_sha)) ||
         !(fun_sha == raw_fun_sha)
+
+      # Treat NA as a FALSE - TO CHECK
+      update_y <- ifelse(is.na(update_y), FALSE, update_y)
 
       return(list(update_gh = update_gh, update_y = update_y))
     }
