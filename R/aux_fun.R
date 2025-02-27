@@ -244,9 +244,7 @@ aux_fun_new <- function(measure,
                         action    = c("update", "load"),
                         repo      = paste0("aux_", measure),
                         owner     = getOption("pipfun.ghowner"),
-                        branch    = paste0(release, "_", identity),
-                        release   = working_release$release,
-                        identity  = working_release$identity,
+                        #branch    = paste0(release, "_", identity),
                         maindir   = getOption("pipaux.working_dir"),
                         processed = new.env(parent = emptyenv()),
                         force     = FALSE,
@@ -255,6 +253,12 @@ aux_fun_new <- function(measure,
 
   # Set arguments
   action         <- match.arg(action)
+
+  # Get working release
+  pipfun::get_wrk_release()
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
   release_branch <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
@@ -299,10 +303,8 @@ aux_fun_new <- function(measure,
             measure   = dep,
             action    = action,
             repo      = paste0("aux_", dep),
-            branch    = release_branch,
+            #branch    = release_branch,
             owner     = owner,
-            release   = release,
-            identity  = identity,
             maindir   = maindir,
             processed = processed,
             force     = force,
@@ -321,9 +323,7 @@ aux_fun_new <- function(measure,
   check_status <- check_status(measure = measure,
                                repo    = repo,
                                owner   = owner,
-                               maindir = maindir,
-                               release = release,
-                               identity = identity)
+                               maindir = maindir)
 
   update_gh <- check_status$update_gh
   update_y  <- check_status$update_y
@@ -338,7 +338,8 @@ aux_fun_new <- function(measure,
 
     # Update GitHub if necessary
     if (update_gh) {
-      # use branch instead of release and identity
+
+      # use branch instead of release and identity - pipfun is for functions to be used across all PIP!!
       pipfun::sync_release_branch(
         owner      = owner,
         repo       = repo,
@@ -404,13 +405,18 @@ check_status <- function(measure,
                          repo       = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
                          maindir    = getOption("pipaux.working_dir"),
-                         release,
-                         identity,
+                         #release,
+                         #identity,
                          verbose    = TRUE) {
 
-  #pipfun::get_wrk_release()
+  # Get working release
+  pipfun::get_wrk_release()
 
-  release_branch <- paste0(release, "_", identity)
+  release  <- wrk_release$release
+  identity <- wrk_release$identity
+
+  release_branch <- paste0(release, "_",
+                           identity)
 
   update_gh <- TRUE
 
