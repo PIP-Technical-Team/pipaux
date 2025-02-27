@@ -295,8 +295,9 @@ aux_fun_new <- function(measure,
     }
 
     # Recursively process dependencies
-    # use seq_along for dependencies
-    for (dep in dependencies) {
+    for (i in seq_along(dependencies)) {
+
+      dep <- dependencies[i]
       tryCatch(
         {
           aux_fun_new(
@@ -316,7 +317,7 @@ aux_fun_new <- function(measure,
           cli::cli_alert_danger("Error processing {dep}: {conditionMessage(e)}")
         }
       )
-    }
+    } # end of dependencies for loop
   }
 
   # Check update status for the current measure
