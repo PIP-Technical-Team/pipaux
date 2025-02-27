@@ -9,10 +9,10 @@ aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   branch  = c("DEV", "PROD", "main"),
+                   branch,
                    tag     = match.arg(branch)) {
   measure <- "cp"
-  branch <- match.arg(branch)
+  #branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -356,11 +356,11 @@ clean_cp_names <- function(x) {
 aux_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                           force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          branch  = c("DEV", "PROD", "main"),
+                          branch,
                           tag     = match.arg(branch)) {
 
   measure <- "cp"
-  branch  <- match.arg(branch)
+  #branch  <- match.arg(branch)
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## chart files --------
 
@@ -383,7 +383,8 @@ aux_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                               measure = "cp",
                               owner  = owner,
                               branch = branch,
-                              filename = .x)
+                              filename = .x,
+                              ext = "csv")
                           })
 
 
@@ -415,7 +416,7 @@ aux_cp_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = dl,
