@@ -21,12 +21,12 @@ aux_censoring  <- function(action  = c("update", "load"),
     countries <- pipfun::load_from_gh(measure = measure,
                                       owner   = owner,
                                       branch  = branch,
-                                      filename   = "countries")
+                                      filename   = "countries.csv")
 
     regions   <- pipfun::load_from_gh(measure = measure,
                                       owner   = owner,
                                       branch  = branch,
-                                      filename   = "regions")
+                                      filename   = "regions.csv")
 
     countries[,
               id := paste(country_code, reporting_year,
@@ -41,7 +41,18 @@ aux_censoring  <- function(action  = c("update", "load"),
 
     if (branch == "main") {
     branch <- ""
-  }
+    }
+    # ----- function raw sha ----------------------
+
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+
+    setattr(dl,
+            "raw_sha_fun",
+            raw_sha_fun)
+
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
       x       = dl,
