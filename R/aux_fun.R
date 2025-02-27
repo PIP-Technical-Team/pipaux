@@ -290,6 +290,7 @@ aux_fun_new <- function(measure,
 
     # Get dependencies for this measure; if none, default to an empty vector
     dependencies <- dependencies_all[[measure]]
+
     if (is.null(dependencies)) {
       dependencies <- character(0)
     }
@@ -340,13 +341,13 @@ aux_fun_new <- function(measure,
     # Update GitHub if necessary
     if (update_gh) {
 
-      # use branch instead of release and identity - pipfun is for functions to be used across all PIP!!
       pipfun::sync_release_branch(
         owner      = owner,
         repo       = repo,
         ref_branch = "DEV",
-        release    = release,
-        identity   = identity
+        target_branch = release_branch
+        #release    = release,
+        #identity   = identity
       )
     }
 
@@ -370,9 +371,8 @@ aux_fun_new <- function(measure,
         owner = owner,
         tag = tag,
         repo = repo
-      ))  # include additional arguments ?
+      ))
 
-    # check if instead of filtering you can use ...
     # Retrieve the formal arguments of the function
     formal_args <- names(formals(func))
 
