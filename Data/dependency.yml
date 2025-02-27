@@ -3,7 +3,7 @@ pfw :
 gdp : weo, maddison, wdi, country_list, sna
 wdi :
 weo : pop
-pop : country_list, pfw
+pop : country_list
 countries : pfw, country_list
 metadata : pfw
 gdm : country_list, pfw
