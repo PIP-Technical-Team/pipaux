@@ -2,7 +2,7 @@ Repo,hash,branch
 PIP-Technical-Team/aux_censoring,39f37b55751c0184cac4c12e3be9e903864f8171,DEV
 PIP-Technical-Team/aux_country_list,936d0005b0d59142a22358f411a8c9bf8daccdca,DEV
 PIP-Technical-Team/aux_cp,ec7f1a6e1082fda568cb5a0dea2b8649f2a90b99,DEV
-PIP-Technical-Team/aux_cpi,918ddac93421579db93c490adbab2a33fc0d3813,DEV
+PIP-Technical-Team/aux_cpi,65a3e195d897733bcbf28321197207a62f9ed44b,DEV
 PIP-Technical-Team/aux_dictionary,3c597365da8a9e6f25a5f571d427b52c27ac379d,DEV
 PIP-Technical-Team/aux_dlw,c51a7a271b3b8566e3bd2a0c749179a1a2fc9e6a,DEV
 PIP-Technical-Team/aux_gdm,dc3a3126859b2e815bdfb8f101baab9b4e130a80,DEV
@@ -13,7 +13,7 @@ PIP-Technical-Team/aux_maddison,6051166dd0e0ca9c5f4f9438d7f756359f493014,DEV
 PIP-Technical-Team/aux_metadata,345a87962beb9ef04b3c3e90d343f94150de3861,DEV
 PIP-Technical-Team/aux_npl,ae9abc913a987d8107f7b2d10f570cd24a2bd0d0,DEV
 PIP-Technical-Team/aux_pce,6e5fa243d225112c8ff00d63b55be68ad9700886,DEV
-PIP-Technical-Team/aux_pfw,cd7cd889cea6520aaf0e44c692f921c115315e13,DEV
+PIP-Technical-Team/aux_pfw,4b36ce2a53c13d7be44ce111e7a51562f3a712a3,DEV
 PIP-Technical-Team/aux_pl,e81910e2848e88d3b0319beec15b0b0b1a4f86d8,DEV
 PIP-Technical-Team/aux_pop,e5cc51657fb066b9eebde04f05409b4929d08199,DEV
 PIP-Technical-Team/aux_ppp,1169a4739ccfe22592c8e76888828ec2dbd2fb65,DEV
