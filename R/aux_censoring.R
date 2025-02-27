@@ -10,11 +10,10 @@ aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch  = c("DEV", "PROD", "main"),
+                           branch,
                            tag     = match.arg(branch)) {
 
   measure <- "censoring"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
@@ -43,7 +42,7 @@ aux_censoring  <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
       x       = dl,
       measure = measure,
