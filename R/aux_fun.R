@@ -244,7 +244,7 @@ aux_fun_new <- function(measure,
                         action    = c("update", "load"),
                         repo      = paste0("aux_", measure),
                         owner     = getOption("pipfun.ghowner"),
-                        branch    = paste0(release, "", identity),
+                        branch    = paste0(release, "_", identity),
                         release   = working_release$release,
                         identity  = working_release$identity,
                         maindir   = getOption("pipaux.working_dir"),
@@ -291,6 +291,7 @@ aux_fun_new <- function(measure,
     }
 
     # Recursively process dependencies
+    # use seq_along for dependencies
     for (dep in dependencies) {
       tryCatch(
         {
@@ -323,6 +324,7 @@ aux_fun_new <- function(measure,
                                maindir = maindir,
                                release = release,
                                identity = identity)
+
   update_gh <- check_status$update_gh
   update_y  <- check_status$update_y
 
@@ -336,6 +338,7 @@ aux_fun_new <- function(measure,
 
     # Update GitHub if necessary
     if (update_gh) {
+      # use branch instead of release and identity
       pipfun::sync_release_branch(
         owner      = owner,
         repo       = repo,
@@ -352,6 +355,7 @@ aux_fun_new <- function(measure,
       cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
     }
 
+    # check again where this is taken from !!
     func <- get(function_name, envir = asNamespace("pipaux"))
 
     # Build a list of all possible arguments to pass
@@ -364,8 +368,9 @@ aux_fun_new <- function(measure,
         owner = owner,
         tag = tag,
         repo = repo
-      ))  # include additional arguments from ...
+      ))  # include additional arguments ?
 
+    # check if instead of filtering you can use ...
     # Retrieve the formal arguments of the function
     formal_args <- names(formals(func))
 
@@ -385,7 +390,7 @@ aux_fun_new <- function(measure,
     #   ...
     #   #tag     = tag
     # )
-  }
+
 
   invisible(NULL)
 }
@@ -402,6 +407,8 @@ check_status <- function(measure,
                          release,
                          identity,
                          verbose    = TRUE) {
+
+  #pipfun::get_wrk_release()
 
   release_branch <- paste0(release, "_", identity)
 
@@ -420,7 +427,7 @@ check_status <- function(measure,
     update_gh <- FALSE
   } else if (release_branch %in% gh_branches$release_branches) {
 
-    # TO DO: MODIFY THIS, OR PIPFUN, TO CHECK THAT THE WORKING RELEASE BRANCH IS THERE
+    # TO DO: MODIFY THIS, OR PIPFUN, TO CHECK THAT THE WORKING RELEASE BRANCH IS THERE -> done
     #release_branch <- gh_branches$release_branch
 
     release_up_to_date <- pipfun::compare_branch_content(
@@ -434,15 +441,20 @@ check_status <- function(measure,
   }
 
   if (update_gh) {
+
     return(list(update_gh = update_gh, update_y = TRUE))
+
   } else {
+
     y_file_path <- fs::path(maindir, "aux_data", release_branch, measure, measure, ext = "qs")
 
     if (verbose) cli::cli_alert_info("Checking file: {y_file_path}")
 
     if (!fs::file_exists(y_file_path)) {
+
       cli::cli_alert_danger("File {y_file_path} does not exist.")
       return(list(update_gh = update_gh, update_y = TRUE))
+
     } else {
       gh <- qs::qattributes(y_file_path)$gh
 
@@ -458,6 +470,7 @@ check_status <- function(measure,
             branch   = gh_entry$branch,
             file_path = gh_entry$file_path
           )$sha,
+
           error = function(e) {
             if (verbose) cli::cli_alert_danger("File not found or another error occurred: {e$message}")
             NULL
@@ -474,7 +487,8 @@ check_status <- function(measure,
 
       if (verbose) cli::cli_alert_info("GitHub and Y drive SHAs: {gh_sha_list}")
 
-      fun_sha <- digest::digest(body(paste0("aux_", measure)))
+      # specify algo being used
+      fun_sha     <- digest::digest(body(paste0("aux_", measure)))
       raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
 
       if (verbose) {
@@ -482,7 +496,9 @@ check_status <- function(measure,
         cli::cli_alert_info("Stored function SHA: {raw_fun_sha}")
       }
 
-      update_y <- any(sapply(gh_sha_list, function(x) x$gh_sha != x$y_sha)) ||
+      # use vapply, not sapply
+      update_y <- any(vapply(gh_sha_list, function(x) x$gh_sha != x$y_sha,
+                             logical(1))) ||
         !(fun_sha == raw_fun_sha)
 
       # Treat NA as a FALSE - TO CHECK
