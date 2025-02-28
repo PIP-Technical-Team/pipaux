@@ -84,11 +84,6 @@ pip_gdm_update <- function(force = FALSE,
 ##  ............................................................................
 ##  Merge with PFW                                                          ####
 
-  pip_pfw(maindir = maindir,
-          force   = force,
-          owner   = owner,
-          branch  = branch,
-          tag     = tag)
 
   pfw    <-  load_aux(measure = "pfw",
                       maindir = maindir,
@@ -146,6 +141,10 @@ pip_gdm_update <- function(force = FALSE,
                  "surveyid_year",
                  "survey_acronym",
                  "survey_id")]
+  # max survey id
+  inv[, .SD[survey_id == max(survey_id)],
+      by = .(country_code, surveyid_year)]
+
 
   # Merge to add PIP survey_id
   df <- merge(df, inv,
