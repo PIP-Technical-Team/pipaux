@@ -172,12 +172,12 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Merge with inventory                                                    ####
 
-  # inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"),
-  #                      as.data.table = TRUE)
-
-  inv <- fst::read_fst(fs::path("Y:\\tefera_pipaux_test",
-                                "_inventory/inventory.fst"),
+  inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"),
                        as.data.table = TRUE)
+
+  # inv <- fst::read_fst(fs::path("Y:\\tefera_pipaux_test",
+  #                               "_inventory/inventory.fst"),
+  #                      as.data.table = TRUE)
 
   # Create survey_id column
   inv[,
