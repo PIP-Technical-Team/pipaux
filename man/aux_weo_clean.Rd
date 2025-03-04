@@ -4,11 +4,7 @@
 \alias{aux_weo_clean}
 \title{Clean WEO data}
 \usage{
-aux_weo_clean(
-  dt,
-  maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
-)
+aux_weo_clean(dt, maindir = gls$PIP_DATA_DIR, branch)
 }
 \arguments{
 \item{dt}{database with weo raw data}

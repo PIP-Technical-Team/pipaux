@@ -8,8 +8,8 @@ aux_wdi_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  branch,
+  tag = branch,
   from = c("gh", "file", "api"),
   detail = getOption("pipaux.detail.raw")
 )

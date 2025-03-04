@@ -8,7 +8,7 @@ aux_country_list(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  branch = c("DEV", "PROD", "main"),
+  branch,
   class_branch = "master",
   detail = getOption("pipaux.detail.raw")
 )

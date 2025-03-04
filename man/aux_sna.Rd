@@ -9,7 +9,7 @@ aux_sna(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
+  branch,
   tag = match.arg(branch)
 )
 }

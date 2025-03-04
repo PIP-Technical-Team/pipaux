@@ -9,8 +9,8 @@ aux_maddison(
   owner = getOption("pipfun.ghowner"),
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  branch,
+  tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }

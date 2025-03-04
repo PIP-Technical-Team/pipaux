@@ -9,7 +9,7 @@ aux_income_groups(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
+  branch,
   class_branch = "master",
   detail = getOption("pipaux.detail.raw")
 )

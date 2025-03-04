@@ -7,7 +7,7 @@
 load_aux(
   measure,
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
+  branch,
   apply_label = TRUE,
   ppp_defaults = TRUE
 )

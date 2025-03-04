@@ -9,8 +9,8 @@ aux_missing_data(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  branch,
+  tag = branch
 )
 }
 \arguments{

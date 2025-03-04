@@ -9,8 +9,8 @@ aux_weo(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  branch,
+  tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -40,6 +40,6 @@ Note that the most recent version most be downloaded from imf.org and saved
 as an .xls file in \verb{<maindir>/_aux/weo/}. The filename should be in the
 following structure \verb{WEO_<YYYY-DD-MM>.xls}. Due to potential file corruption
 the file must be opened and re-saved before it can be updated with
-\code{pip_weo()}. Hopefully in the future IMF will stop using an \code{.xls} file
+\code{aux_weo()}. Hopefully in the future IMF will stop using an \code{.xls} file
 that's not really xls.
 }

@@ -8,7 +8,7 @@ aux_ppp(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
+  branch,
   force = FALSE,
   tag = branch,
   detail = getOption("pipaux.detail.raw"),

@@ -14,9 +14,9 @@ aux_sna <- function(action          = c("update", "load"),
                     branch,
                     tag             = match.arg(branch)) {
 
-  measure    <- "sna"
-  branch <- branch
-  action <- match.arg(action)
+  measure <- "sna"
+  branch  <- branch
+  action  <- match.arg(action)
 
 
   if (action == "update") {
