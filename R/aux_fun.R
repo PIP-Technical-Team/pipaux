@@ -46,7 +46,11 @@ aux_fun <- function(measure,
   action         <- match.arg(action)
 
   # Get working release
-  pipfun::get_wrk_release()
+  # Check if wrk_release exists
+  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
+    pipfun::get_wrk_release()
+  }
+
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -68,7 +72,7 @@ aux_fun <- function(measure,
     rlang::env_poke(processed, measure, TRUE)
 
     # Debug message on processing the current measure
-    cli::cli_alert_info("Processing measure: {measure}")
+    #cli::cli_alert_info("Processing measure: {measure}")
 
     # Read all dependencies
     dependencies_all <- read_dependencies(
@@ -83,10 +87,24 @@ aux_fun <- function(measure,
       dependencies <- character(0)
     }
 
+    # Create progress bar
+    if (length(dependencies) > 0) {
+      cli::cli_progress_bar(
+        format = "Processing {dep} ({.current}/{.total})",
+        total  = length(dependencies),
+        type   = "iterator"
+      )
+    }
+
+
+
     # Recursively process dependencies
     for (i in seq_along(dependencies)) {
 
       dep <- dependencies[i]
+
+      cli::cli_progress_message("Processing {dep}...")
+
       tryCatch(
         {
           aux_fun(
@@ -106,6 +124,8 @@ aux_fun <- function(measure,
         }
       )
     } # end of dependencies loop
+    cli::cli_progress_done()
+
   }
 
   # Check update status for the current measure
@@ -193,8 +213,10 @@ check_status <- function(measure,
                          maindir    = getOption("pipaux.working_dir"),
                          verbose    = TRUE) {
 
-  # Get working release information
-  pipfun::get_wrk_release()
+  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
+    pipfun::get_wrk_release()
+  }
+
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   release_branch <- paste0(release, "_", identity)
@@ -265,16 +287,16 @@ check_status <- function(measure,
     )
   })
 
-  if (verbose) cli::cli_alert_info("GitHub and Y drive SHAs: {gh_sha_list}")
+  #if (verbose) cli::cli_alert_info("GitHub and Y drive SHAs: {gh_sha_list}")
 
   # Compute function SHA
   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
   raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
 
-  if (verbose) {
-    cli::cli_alert_info("Computed function SHA: {fun_sha}")
-    cli::cli_alert_info("Stored function SHA: {raw_fun_sha}")
-  }
+  # if (verbose) {
+  #   cli::cli_alert_info("Computed function SHA: {fun_sha}")
+  #   cli::cli_alert_info("Stored function SHA: {raw_fun_sha}")
+  # }
 
   # Determine if Y drive needs an update
   update_y <- any(vapply(gh_sha_list, function(x) x$gh_sha != x$y_sha, logical(1))) ||
