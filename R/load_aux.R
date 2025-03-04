@@ -19,6 +19,9 @@ load_aux <- function(measure,
   }
   msrdir <- fs::path(maindir, "aux_data/", branch, measure)
 
+  #msrdir <- fs::path(maindir, "_aux/", branch, measure)
+
+
   file_paths <- fs::dir_ls(msrdir,
                            type = "file",
                            regexp = glue("/{measure}\\."))

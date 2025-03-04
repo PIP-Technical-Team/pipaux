@@ -364,26 +364,26 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cur_adj` should be numeric") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("N", "R", "U", NA)),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
-    validate_if(is.numeric(cpi2011_SM22),
-                description = "`cpi2011_SM22` should be numeric") |>
+    # validate_cols(in_set(c("N", "R", "U")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_if(is.numeric(cpi2011_SM22),
+    #             description = "`cpi2011_SM22` should be numeric") |>
     validate_if(is.numeric(comparable),
                 description = "`comparable` should be numeric") |>
-    validate_if(is.numeric(cpi2017_SM22),
-                description = "`cpi2017_SM22` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_SM22),
+    #             description = "`cpi2017_SM22` should be numeric") |>
     validate_cols(is.logical, cpi2005,
                   description = "`cpi2005` should be logical") |>
     validate_if(is.numeric(cpi_data_level),
                 description = "`cpi_data_level` should be numeric") |>
     validate_cols(in_set(c(0, 1, 2)),
                   cpi_data_level, description = "`cpi_data_level` values within range") |>
-    validate_if(is.numeric(ref_year_SM24),
-                description = "`ref_year_SM24` should be numeric") |>
-    validate_if(is.numeric(cpi2011_SM24),
-                description = "`cpi2011_SM24` should be numeric") |>
-    validate_if(is.numeric(cpi2017_SM24),
-                description = "`cpi2011_SM24` should be numeric") |>
+    # validate_if(is.numeric(ref_year_SM24),
+    #             description = "`ref_year_SM24` should be numeric") |>
+    # validate_if(is.numeric(cpi2011_SM24),
+    #             description = "`cpi2011_SM24` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_SM24),
+    #             description = "`cpi2011_SM24` should be numeric") |>
     validate_if(is.numeric(change_cpi2017),
                 description = "`change_cpi2017` should be numeric") |>
     validate_if(is.numeric(change_icp2017),

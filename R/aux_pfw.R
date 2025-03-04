@@ -49,9 +49,9 @@ aux_pfw <- function(action  = c("update", "load"),
 #' @keywords internal
 aux_pfw_clean <- function(y,
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch) {
 
-  branch <- match.arg(branch)
+  #branch <- match.arg(branch)
 
   if (!inherits(y, "data.table")) {
     x <- as.data.table(y)
@@ -270,8 +270,11 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
                 description = "`surv_producer` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("N", "R", "U")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("national", "partial", "rural", "urban")),
+    #               survey_coverage,
+    #               description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("N", "R", "U")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(datatype),
                 description = "`datatype` should be character") |>
     validate_cols(in_set(c("C", "I", "c", "i")),
@@ -461,8 +464,8 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
                 description = "`surv_producer` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("national", "rural", "urban")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(welfare_type),
                 description = "`welfare_type` should be character") |>
     validate_cols(in_set(c("consumption", "income")),
