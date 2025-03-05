@@ -71,12 +71,15 @@ auto_aux_update <- function(measure = NULL,
       branch = branch
     )
 
-  old_data <- org_data %>%
-    dplyr::filter(.data$branch == branch) %>%
-    dplyr::rename(hash_original = hash)
+  br <- branch
+  old_data <- org_data |>
+    fsubset(branch == br)  |>
+    frename(hash_original = hash)
 
-  old_data <- old_data %>%
-    dplyr::inner_join(all_data, by = c("Repo", "branch"))
+  old_data <- old_data |>
+    join(all_data,
+         on = c("Repo", "branch"),
+         how = "inner")
 
   cli::cli_alert_info("Number of rows from csv file : {nrow(old_data)}")
   cli::cli_alert_info("Number of rows from Github : {nrow(all_data)}")

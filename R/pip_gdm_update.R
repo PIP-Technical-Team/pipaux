@@ -142,7 +142,8 @@ pip_gdm_update <- function(force = FALSE,
                  "survey_acronym",
                  "survey_id")]
   # max survey id
-  inv[, .SD[survey_id == max(survey_id)],
+  inv <-
+    inv[, .SD[survey_id == max(survey_id)],
       by = .(country_code, surveyid_year)]
 
 
