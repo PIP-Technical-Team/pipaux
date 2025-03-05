@@ -15,7 +15,8 @@ pip_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   # Read data
   pfw <- pipfun::load_from_gh(measure = measure,
                       owner = owner,
-                      branch = branch)
+                      branch = branch,
+                      ext = "dta")
   # Clean data
   pfw <- pip_pfw_clean(pfw,
                        maindir = maindir,
