@@ -242,7 +242,8 @@ check_status <- function(measure,
       owner    = owner,
       repo     = paste0("aux_", measure),
       branch1  = "DEV",
-      branch2  = release_branch
+      branch2  = release_branch,
+      verbose = FALSE
     )$same_content
 
     if (release_up_to_date) {
@@ -259,8 +260,15 @@ check_status <- function(measure,
   }
 
   if (update_gh) {
-    return(list(update_gh = update_gh,
-                update_y  = TRUE))
+    if (verbose) {
+      cli::cli_h1("Summary")
+      cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+      cli::cli_alert_info("Update Y drive: TRUE")
+
+    }
+
+    return(invisible(list(update_gh = update_gh,
+                update_y  = TRUE)))
   }
 
   # Check if Y drive file exists
@@ -272,8 +280,13 @@ check_status <- function(measure,
 
     cli::cli_alert_danger("File {y_file_path} does not exist.")
 
-    return(list(update_gh = update_gh,
-                update_y  = TRUE))
+    if (verbose) {
+      cli::cli_h1("Summary")
+      cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+      cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
+    }
+    return(invisible(list(update_gh = update_gh,
+                update_y  = TRUE)))
   }
 
   # Retrieve stored GitHub metadata from Y drive file
@@ -318,6 +331,14 @@ check_status <- function(measure,
   #   cli::cli_alert_info("Stored function SHA: {raw_fun_sha}")
   # }
 
+  if (verbose) {
+    if (fun_sha == raw_fun_sha) {
+      cli::cli_alert_success("Computed and stored function SHAs match. No update needed.")
+    } else {
+      cli::cli_alert_danger("Computed and stored function SHAs do NOT match. An update is required.")
+    }
+  }
+
   # Determine if Y drive needs an update
   update_y <- any(vapply(gh_sha_list,
                          function(x) x$gh_sha != x$y_sha, logical(1))) ||
@@ -331,11 +352,10 @@ check_status <- function(measure,
     cli::cli_h1("Summary")
     cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
     cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
-
   }
 
-  return(list(update_gh = update_gh,
-              update_y  = update_y))
+  return(invisible(list(update_gh = update_gh,
+              update_y  = update_y)))
 }
 
 
