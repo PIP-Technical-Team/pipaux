@@ -30,3 +30,4 @@ and \code{update_y} (logical) indicating if the Y drive needs updating.
 \description{
 Determines whether a measure needs to be updated on GitHub and/or the Y drive.
 }
+\keyword{internal}

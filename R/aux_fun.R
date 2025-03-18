@@ -1,35 +1,34 @@
 #' General auxiliary function
 #'
-#' Load or update any auxiliary data.
+#' Update any auxiliary data
 #'
-#' This function manages any auxiliary data by either loading it into memory or updating it on the system.
+#' This function updates any auxiliary data.
 #' It ensures that dependencies are processed before handling the specified measure and checks whether updates
 #' are needed for GitHub or the Y drive.
 #'
 #' @param measure character: Name of the measure to process
-#' @param action character: Either "update" or "load". Default is "update".
-#'   - If `"update"`, data will be updated on the system (GitHub and/or Y drive).
-#'   - If `"load"`, data will be loaded into memory.
-#' @param repo character: Name of the GitHub repository containing the auxiliary data.
+#' @param action character: Either "update" or "load". Default is "update"
+#'   - If `"update"`, data will be updated on the system (GitHub and/or Y drive)
+#'   (- If `"load"`, data will be loaded into memory.) TBD
+#' @param repo character: Name of the GitHub repository containing the auxiliary data
 #'   Defaults to `"aux_<measure>"` unless `measure` is `"income_groups"` or `"country_list"`, in which case it defaults to `"Class"`.
-#' @param owner character: GitHub repository owner. Default is `getOption("pipfun.ghowner")`.
-#' @param maindir character: Main directory of the project. Default is `getOption("pipaux.working_dir")`.
+#' @param owner character: GitHub repository owner. Default is `getOption("pipfun.ghowner")`
+#' @param maindir character: Main directory of the project. Default is `getOption("pipaux.working_dir")`
 #' @param processed environment: Environment that keeps track of already processed measures to avoid redundant processing.
-#'   Default is a new empty environment.
+#'   Default is a new empty environment
 #' @param force logical: If `TRUE`, forces an update even if the data appears up to date.
-#'   Default is `FALSE`.
+#'   Default is `FALSE`
 #' @param tag character: Specifies the GitHub branch tag for versioning.
-#'   Defaults to `release_branch`, which is determined from the working release.
-#' @param ... Additional arguments passed to the auxiliary function handling the measure.
+#'   Defaults to `release_branch`, which is determined from the working release
+#' @param ... Additional arguments passed to the auxiliary function handling the measure
 #'
 #' @return This function does not return a value but performs the requested action (load/update).
 #' @examples
 #' \dontrun{
-#'   # Update a specific measure (e.g., population data)
-#'   aux_fun(measure = "population", action = "update")
+#'   # Update a specific measure (e.g., gdp data)
+#'   aux_fun(measure = "gdp", action = "update")
 #'
-#'   # Load a measure into memory
-#'   aux_fun(measure = "income_groups", action = "load")
+#'
 #' }
 #' @export
 aux_fun <- function(measure,
@@ -71,9 +70,6 @@ aux_fun <- function(measure,
     # Mark this measure as processed
     rlang::env_poke(processed, measure, TRUE)
 
-    # Debug message on processing the current measure
-    #cli::cli_alert_info("Processing measure: {measure}")
-
     # Read all dependencies
     dependencies_all <- read_dependencies(
       gh_user = "https://raw.githubusercontent.com",
@@ -95,7 +91,6 @@ aux_fun <- function(measure,
         type   = "iterator"
       )
     }
-
 
 
     # Recursively process dependencies
@@ -221,9 +216,13 @@ check_status <- function(measure,
   identity       <- wrk_release$identity
   release_branch <- paste0(release, "_", identity)
 
+  if (verbose) {
+    cli::cli_h1("Checking Status for {measure}")
+  }
+
   update_gh      <- TRUE
 
-  # Retrieve GitHub branches, handling errors
+  # Retrieve GitHub branches
   gh_branches <- tryCatch(
     pipfun::get_repo_branches(owner = owner, repo = repo),
     error = function(e) {
@@ -234,8 +233,11 @@ check_status <- function(measure,
 
   # Determine if GitHub needs an update
   if (is.null(gh_branches)) {
-    update_gh <- FALSE  # Repo not found
+
+    update_gh <- FALSE  # Repo not found or error
+
   } else if (release_branch %in% gh_branches$release_branches) {
+
     release_up_to_date <- pipfun::compare_branch_content(
       owner    = owner,
       repo     = paste0("aux_", measure),
@@ -243,28 +245,45 @@ check_status <- function(measure,
       branch2  = release_branch
     )$same_content
 
+    if (release_up_to_date) {
+      if (verbose) cli::cli_alert_success(
+        "GitHub branch {.strong {release_branch}} is up to date with DEV.")
+
+    } else {
+      if (verbose) cli::cli_alert_warning(
+        "GitHub branch {.strong {release_branch}} is outdated. Update required."
+        )
+    }
+
     update_gh <- !release_up_to_date
   }
 
   if (update_gh) {
-    return(list(update_gh = update_gh, update_y = TRUE))
+    return(list(update_gh = update_gh,
+                update_y  = TRUE))
   }
 
   # Check if Y drive file exists
   y_file_path <- fs::path(maindir, "aux_data", release_branch, measure, measure, ext = "qs")
+
   if (verbose) cli::cli_alert_info("Checking file: {y_file_path}")
 
   if (!fs::file_exists(y_file_path)) {
+
     cli::cli_alert_danger("File {y_file_path} does not exist.")
-    return(list(update_gh = update_gh, update_y = TRUE))
+
+    return(list(update_gh = update_gh,
+                update_y  = TRUE))
   }
 
   # Retrieve stored GitHub metadata from Y drive file
   gh <- qs::qattributes(y_file_path)$gh
+
   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
 
   # Function to get SHA from GitHub
   get_gh_sha <- function(gh_entry) {
+
     tryCatch(
       pipfun::get_file_info_from_gh(
         owner     = gh_entry$owner,
@@ -277,6 +296,7 @@ check_status <- function(measure,
         NULL
       }
     )
+
   }
 
   # Compare SHA values between GitHub and Y drive
@@ -299,12 +319,23 @@ check_status <- function(measure,
   # }
 
   # Determine if Y drive needs an update
-  update_y <- any(vapply(gh_sha_list, function(x) x$gh_sha != x$y_sha, logical(1))) ||
-    !(fun_sha == raw_fun_sha)
+  update_y <- any(vapply(gh_sha_list,
+                         function(x) x$gh_sha != x$y_sha, logical(1))) ||
+                                     !(fun_sha == raw_fun_sha)
 
-  update_y <- ifelse(is.na(update_y), FALSE, update_y)  # Treat NA as FALSE
+  update_y <- ifelse(is.na(update_y),
+                     FALSE,
+                     update_y)  # Treat NA as FALSE
 
-  return(list(update_gh = update_gh, update_y = update_y))
+  if (verbose) {
+    cli::cli_h1("Summary")
+    cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+    cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
+
+  }
+
+  return(list(update_gh = update_gh,
+              update_y  = update_y))
 }
 
 

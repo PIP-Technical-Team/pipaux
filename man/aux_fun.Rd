@@ -19,47 +19,46 @@ aux_fun(
 \arguments{
 \item{measure}{character: Name of the measure to process}
 
-\item{action}{character: Either "update" or "load". Default is "update".
+\item{action}{character: Either "update" or "load". Default is "update"
 \itemize{
-\item If \code{"update"}, data will be updated on the system (GitHub and/or Y drive).
-\item If \code{"load"}, data will be loaded into memory.
+\item If \code{"update"}, data will be updated on the system (GitHub and/or Y drive)
+(- If \code{"load"}, data will be loaded into memory.) TBD
 }}
 
-\item{repo}{character: Name of the GitHub repository containing the auxiliary data.
+\item{repo}{character: Name of the GitHub repository containing the auxiliary data
 Defaults to \code{"aux_<measure>"} unless \code{measure} is \code{"income_groups"} or \code{"country_list"}, in which case it defaults to \code{"Class"}.}
 
-\item{owner}{character: GitHub repository owner. Default is \code{getOption("pipfun.ghowner")}.}
+\item{owner}{character: GitHub repository owner. Default is \code{getOption("pipfun.ghowner")}}
 
-\item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}.}
+\item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
 
 \item{processed}{environment: Environment that keeps track of already processed measures to avoid redundant processing.
-Default is a new empty environment.}
+Default is a new empty environment}
 
 \item{force}{logical: If \code{TRUE}, forces an update even if the data appears up to date.
-Default is \code{FALSE}.}
+Default is \code{FALSE}}
 
 \item{tag}{character: Specifies the GitHub branch tag for versioning.
-Defaults to \code{release_branch}, which is determined from the working release.}
+Defaults to \code{release_branch}, which is determined from the working release}
 
-\item{...}{Additional arguments passed to the auxiliary function handling the measure.}
+\item{...}{Additional arguments passed to the auxiliary function handling the measure}
 }
 \value{
 This function does not return a value but performs the requested action (load/update).
 }
 \description{
-Load or update any auxiliary data.
+Update any auxiliary data
 }
 \details{
-This function manages any auxiliary data by either loading it into memory or updating it on the system.
+This function updates any auxiliary data.
 It ensures that dependencies are processed before handling the specified measure and checks whether updates
 are needed for GitHub or the Y drive.
 }
 \examples{
 \dontrun{
-  # Update a specific measure (e.g., population data)
-  aux_fun(measure = "population", action = "update")
+  # Update a specific measure (e.g., gdp data)
+  aux_fun(measure = "gdp", action = "update")
 
-  # Load a measure into memory
-  aux_fun(measure = "income_groups", action = "load")
+
 }
 }

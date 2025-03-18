@@ -60,15 +60,7 @@ aux_pop_update <-  function(force   = FALSE,
   tag     <- branch
   measure <- "pop"
 
-  # Get the most recent year in PFW to filter population projection
-
-  # pfw      <- pipload::pip_load_aux("pfw",
-  #                                   #branch  = branch,
-  #                                   maindir = maindir)
-
-  # year_max <- pfw[, max(year)]
-
-  # get current year as max year
+  # Get current year as max year
 
   year_max <- Sys.Date() |>
     format("%Y") |>
@@ -170,9 +162,6 @@ aux_pop_update <-  function(force   = FALSE,
     ### Get the attributes before they get lost
     gh_spop <- attr(spop, "gh")
 
-    ## DEBUG STATEMENT
-    print(gh_spop)
-
     spop <- spop |>
       clean_names_from_wide() |>
       clean_from_wide()
@@ -185,10 +174,6 @@ aux_pop_update <-  function(force   = FALSE,
                       update_values = TRUE,
                       reportvar = FALSE,
                       verbose = FALSE)
-
-    # pop <- rbindlist(list(pop_main, spop),
-    #                       use.names = TRUE,
-    #                       fill = TRUE)
 
   }
 
