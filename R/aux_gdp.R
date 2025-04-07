@@ -14,14 +14,12 @@ aux_gdp <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     branch,
                     tag             = branch,
-                    from            = "file",
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
-  branch <- branch
-  tag <- tag
-  #branch <- match.arg(branch)
-  action <- match.arg(action)
+  branch     <- branch
+  tag        <- tag
+  action     <- match.arg(action)
 
 
   if (action == "update") {
@@ -32,7 +30,6 @@ aux_gdp <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from,
                    detail  = detail)
 
     # load raw data from gh together with its metadata
@@ -252,7 +249,6 @@ aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
                            branch,
                            tag     = branch,
-                           from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
 
   #branch <- match.arg(branch)
