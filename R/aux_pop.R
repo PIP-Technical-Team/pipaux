@@ -9,7 +9,6 @@
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
-                    from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
                     branch,
@@ -17,13 +16,11 @@ aux_pop <- function(action = c("update", "load"),
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
   branch <- branch
-  from    <- tolower(from)
   action <- match.arg(action)
 
   if (action == "update") {
     aux_pop_update(
       force   = force,
-      from    = from,
       maindir = maindir,
       owner   = owner,
       branch  = branch,
@@ -47,7 +44,6 @@ aux_pop <- function(action = c("update", "load"),
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
 aux_pop_update <-  function(force   = FALSE,
-                            from    = c("gh", "file", "api"),
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
                             branch,
@@ -55,7 +51,6 @@ aux_pop_update <-  function(force   = FALSE,
                             detail  = getOption("pipaux.detail.raw")) {
 
   # Check arguments
-  from    <- match.arg(from)
   branch  <- branch
   tag     <- branch
   measure <- "pop"
@@ -68,60 +63,7 @@ aux_pop_update <-  function(force   = FALSE,
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  if (from == "api") {
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## from API --------
-
-    pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
-    pop   <- wbstats::wb_data(indicator = pop_indicators,
-                              country = "all", # this is new
-                              lang      = "en",
-                              return_wide = FALSE) |>
-      setDT()
-
-    # validate wb pop data
-    pop_validate_raw(pop = pop, detail = detail)
-
-    # rename vars
-    pop <- pop[, c("iso3c", "date", "indicator_id", "value")]
-
-    setnames(pop,
-             new = c("country_code", "year", "coverage", "pop"))
-
-
-
-    pop[,
-        year := as.numeric(year)
-    ][,
-      pop_data_level :=
-        fcase(
-          grepl("POP", coverage), 2,
-          grepl("RUR", coverage), 0,
-          grepl("URB", coverage), 1
-        )
-    ][,
-      coverage := NULL]
-
-    ### Ger special cases ---------
-
-    spop <- pipfun::load_from_gh(
-      measure = measure,
-      filename = "spop",
-      owner  = owner,
-      branch = branch,
-      tag    = tag,
-      ext    = "csv")  |>
-      clean_names_from_wide() |>
-      clean_from_wide()
-
-
-    pop <- rbindlist(list(pop, spop),
-                     use.names = TRUE,
-                     fill = TRUE)
-
-
-  } else {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## from Emi's file --------
 
@@ -175,7 +117,6 @@ aux_pop_update <-  function(force   = FALSE,
                       reportvar = FALSE,
                       verbose = FALSE)
 
-  }
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Clean data   ---------
