@@ -13,7 +13,6 @@ aux_pce <- function(action  = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     branch,
                     tag     = branch,
-                    from    = c("gh", "file", "api"),
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pce"
@@ -25,7 +24,6 @@ aux_pce <- function(action  = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from,
                    detail  = detail)
 
   } else {
@@ -50,19 +48,11 @@ aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
                            branch,
                            tag     = branch,
-                           from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
-  from   <- match.arg(from)
 
   #   ________________________________________________________________
   #   Load data                                             ####
-
-  # Update WDI
-  # pip_wdi_update(maindir = maindir,
-  #                from    = from,
-  #                force   = force,
-  #                branch  = branch)
   #
 
   wpce   <- load_aux(measure = "wdi",
