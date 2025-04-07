@@ -11,7 +11,7 @@ aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch,
+                    branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag     = match.arg(branch),
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
@@ -46,7 +46,7 @@ aux_pop <- function(action = c("update", "load"),
 aux_pop_update <-  function(force   = FALSE,
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
-                            branch,
+                            branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                             tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {
 

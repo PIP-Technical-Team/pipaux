@@ -9,7 +9,7 @@ aux_indicators <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch  = c("DEV", "PROD", "main"),
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch)) {
   measure <- "indicators"
   branch <- match.arg(branch)

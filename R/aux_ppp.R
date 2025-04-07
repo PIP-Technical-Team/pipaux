@@ -10,7 +10,7 @@
 aux_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch,
+                    branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                     force   = FALSE,
                     tag     = branch,
                     detail  = getOption("pipaux.detail.raw"),
@@ -160,9 +160,9 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
 aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
-                           force = FALSE,
+                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch),
                            detail  = getOption("pipaux.detail.raw")) {
 

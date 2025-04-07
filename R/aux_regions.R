@@ -5,11 +5,11 @@
 #' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
 #' @export
-aux_regions <- function(action = c("update", "load"),
-                        force = FALSE,
+aux_regions <- function(action  = c("update", "load"),
+                        force   = FALSE,
                         maindir = gls$PIP_DATA_DIR,
                         owner   = getOption("pipfun.ghowner"),
-                        branch,
+                        branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                         tag     = match.arg(branch)
                         ) {
 

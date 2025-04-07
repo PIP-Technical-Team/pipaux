@@ -9,7 +9,7 @@ aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   branch,
+                   branch = paste0(wrk_release$release, "_", wrk_release$identity),
                    tag     = match.arg(branch)) {
   measure <- "cp"
   #branch <- match.arg(branch)
@@ -356,7 +356,7 @@ clean_cp_names <- function(x) {
 aux_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                           force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          branch,
+                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
                           tag     = match.arg(branch)) {
 
   measure <- "cp"

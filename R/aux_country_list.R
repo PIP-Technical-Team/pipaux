@@ -16,7 +16,7 @@
 aux_country_list <- function(action = c("update", "load"),
                              maindir = gls$PIP_DATA_DIR,
                              force   = FALSE,
-                             branch,
+                             branch = paste0(wrk_release$release, "_", wrk_release$identity),
                              class_branch = "master",
                              detail  = getOption("pipaux.detail.raw")
                              ) {
@@ -58,32 +58,6 @@ aux_country_list <- function(action = c("update", "load"),
       msrdir  = msrdir,
       force   = force
     )
-
-    # if (saved) {
-    #   cl_sha <- digest::sha1(cl)
-    #   out <- gh::gh(
-    #     "GET /repos/{owner}/{repo}/contents/{path}",
-    #     owner     = "PIP-Technical-Team",
-    #     repo      = "aux_country_list",
-    #     path      = "sha_country_list.txt",
-    #     .params   = list(ref = "DEV")
-    #   )
-    #
-    #   res <- gh::gh(
-    #     "PUT /repos/{owner}/{repo}/contents/{path}",
-    #     owner   = "PIP-Technical-Team",
-    #     repo    = "aux_country_list",
-    #     path    = "sha_country_list.txt",
-    #     .params = list(
-    #       branch  = branch,
-    #       message = paste0("update on ", prettyNum(Sys.time())),
-    #       sha     = out$sha,
-    #       content = base64enc::base64encode(charToRaw(cl_sha))
-    #     ),
-    #     .token = Sys.getenv("GITHUB_PAT")
-    #   )
-    #
-    # }
 
     return(invisible(saved))
 

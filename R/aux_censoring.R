@@ -10,7 +10,7 @@ aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch,
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch)) {
 
   measure <- "censoring"

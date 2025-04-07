@@ -11,7 +11,7 @@ aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch,
+                    branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag     = branch,
                     detail  = getOption("pipaux.detail.raw")) {
 
@@ -46,7 +46,7 @@ aux_pce <- function(action  = c("update", "load"),
 aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
+                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"

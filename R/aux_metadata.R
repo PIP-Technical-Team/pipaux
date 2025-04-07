@@ -10,7 +10,7 @@ aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
-                         branch,
+                         branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = branch,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
@@ -48,7 +48,7 @@ aux_metadata <- function(action  = c("update", "load"),
 aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
-                                branch,
+                                branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                                 tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
 
@@ -200,7 +200,7 @@ aux_metaregion <- function(action = c("update", "load"),
                            force = FALSE,
                            maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch)
 ) {
   measure <- "metaregion"

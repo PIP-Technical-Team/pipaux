@@ -11,7 +11,7 @@ aux_sna <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch,
+                    branch          = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag             = match.arg(branch)) {
 
   measure <- "sna"
@@ -158,7 +158,7 @@ fake_aux_sna <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
-                         branch  = c("DEV", "PROD", "main"),
+                         branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = match.arg(branch),
                          from    = c("gh", "file", "api")) {
 

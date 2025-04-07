@@ -11,7 +11,7 @@ aux_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
-                         branch,
+                         branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = branch,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"

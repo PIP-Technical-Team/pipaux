@@ -247,7 +247,7 @@ aux_gdp_weo <- function(action = "update",
 aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
+                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
 

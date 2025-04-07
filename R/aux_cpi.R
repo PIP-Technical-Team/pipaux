@@ -16,7 +16,7 @@ aux_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    branch,
+                    branch = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag     = match.arg(branch),
                     detail = getOption("pipaux.detail.raw")) {
 
@@ -77,7 +77,7 @@ aux_cpi <- function(action = c("update", "load"),
 aux_cpi_clean <- function(y,
                           cpivar = getOption("pipaux.cpivar"),
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch  = paste0(wrk_release$release, "_", wrk_release$identity)) {
 
   x <- data.table::as.data.table(y)
 
@@ -143,7 +143,7 @@ aux_cpi_clean <- function(y,
 aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
+                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag,
                            detail  = getOption("pipaux.detail.raw")) {
 
