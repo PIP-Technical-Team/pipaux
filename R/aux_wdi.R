@@ -14,7 +14,6 @@ aux_wdi <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     branch,
                     tag             = match.arg(branch),
-                    from            = c("gh", "file", "api"),
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "wdi"
@@ -27,7 +26,6 @@ aux_wdi <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from,
                    detail  = detail)
 
   } else {
@@ -42,7 +40,7 @@ aux_wdi <- function(action          = c("update", "load"),
 
 #' Update National accounts data from WDI
 #'
-#' GDP and HFCE data from WDI. It could be either from API or from file
+#' GDP and HFCE data from WDI.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_gdp
@@ -56,11 +54,8 @@ aux_wdi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch ,
                            tag     = branch,
-                           from    = c("gh", "file", "api"),
                            detail  = getOption("pipaux.detail.raw")) {
 
-
-  from   <- match.arg(from)
 
   #   ______________________________________________________
   #   Computations                                    ####
@@ -69,29 +64,12 @@ aux_wdi_update <- function(force   = FALSE,
   ##  ...............................................................
   ##  From file                                          ####
 
-  if (from   %in% c("file", "gh")) {
     wdi <- pipfun::load_from_gh(measure = measure,
                                 owner = owner,
                                 branch = branch,
                                 ext    = "csv")
 
-  } else {
-    ##  ........................................................................
-    ##  From API                                                            ####
-    wdi_indicators <- c("NY.GDP.PCAP.KD", "NE.CON.PRVT.PC.KD")
-    wdi   <- wbstats::wb_data(indicator = wdi_indicators,
-                              lang = "en") |>
-      setDT()
 
-    wdi[,
-        c("country", "iso2c") := NULL]
-
-    # Rename columns
-    setnames(wdi,
-             old = c("iso3c", "date"),
-             new = c("country_code", "year")
-    )
-  }
   # validate wdi raw data
   wdi_validate_raw(wdi = wdi, detail = detail)
 
