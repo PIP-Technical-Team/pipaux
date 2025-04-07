@@ -7,6 +7,11 @@
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
+#' @param branch GitHub branch to use. By default, this is the release branch set in your R session.
+#'   To ensure correct behavior, call `pipfun::setup_working_release()` once per session, followed by
+#'   `pipfun::get_wrk_release()` to retrieve the active release. These steps ensure the function uses the
+#'   correct release branch (e.g., `"release_2024Q1"`). Alternatively, you can explicitly specify other
+#'   branches among `"DEV"`, `"PROD"`, or `"main"` if needed
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table

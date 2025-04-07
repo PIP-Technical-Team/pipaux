@@ -8,6 +8,7 @@
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
 #'
 #' @export

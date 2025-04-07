@@ -6,10 +6,9 @@
 \usage{
 aux_pop_update(
   force = FALSE,
-  from = c("gh", "file", "api"),
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch,
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
@@ -17,19 +16,22 @@ aux_pop_update(
 \arguments{
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{from}{character: Source for population data.}
-
 \item{maindir}{character: Main directory of project.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
+\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
+To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
+\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
+correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
+branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
 
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{from}{character: Source for population data.}
 }
 \description{
 Update POP

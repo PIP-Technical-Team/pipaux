@@ -9,19 +9,18 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams aux_pfw
+#' @inheritParams aux_countries
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
-aux_country_list <- function(action = c("update", "load"),
-                             maindir = gls$PIP_DATA_DIR,
-                             force   = FALSE,
-                             branch = paste0(wrk_release$release, "_", wrk_release$identity),
+aux_country_list <- function(action       = c("update", "load"),
+                             maindir      = gls$PIP_DATA_DIR,
+                             force        = FALSE,
+                             branch       = paste0(wrk_release$release, "_", wrk_release$identity),
                              class_branch = "master",
-                             detail  = getOption("pipaux.detail.raw")
+                             detail       = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
-  #branch  <- match.arg(branch)
   action  <- match.arg(action)
 
   if (action == "update") {

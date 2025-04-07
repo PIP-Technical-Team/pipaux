@@ -2,14 +2,14 @@
 #'
 #' Update a list with country profiles data
 #'
-#' @inheritParams aux_cpi
+#' @inheritParams aux_countries
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                   branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                    tag     = match.arg(branch)) {
   measure <- "cp"
   #branch <- match.arg(branch)

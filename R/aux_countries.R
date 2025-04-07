@@ -2,14 +2,14 @@
 #'
 #' Update or load a dataset with countries.
 #'
-#' @inheritParams aux_cpi
+#' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,
-                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                          branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                           tag     = match.arg(branch)) {
 
   measure <- "countries"

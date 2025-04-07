@@ -8,7 +8,7 @@ aux_cpi_clean(
   y,
   cpivar = getOption("pipaux.cpivar"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
+  branch = paste0(wrk_release$release, "_", wrk_release$identity)
 )
 }
 \arguments{
@@ -19,8 +19,11 @@ aux_cpi_clean(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
+\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
+To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
+\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
+correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
+branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

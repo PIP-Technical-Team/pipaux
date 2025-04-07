@@ -8,9 +8,8 @@ aux_wdi_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch,
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = branch,
-  from = c("gh", "file", "api"),
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -22,13 +21,13 @@ aux_wdi_update(
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
+\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
+To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
+\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
+correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
+branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
@@ -36,7 +35,7 @@ and "gh" are synonymous}
 data.table with gdp and pce variables
 }
 \description{
-GDP and HFCE data from WDI. It could be either from API or from file
+GDP and HFCE data from WDI.
 }
 \examples{
 aux_wdi_update()
