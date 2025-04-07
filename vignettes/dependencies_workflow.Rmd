@@ -1,0 +1,49 @@
+---
+title: "dependencies_workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{dependencies_workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(pipaux)
+```
+
+In this vignette, we explore how to update any of the auxiliary data measures. The process is specifically designed to automatically manage all interdependencies among auxiliary data, so that when updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated first, if needed.
+
+The main function you need to use to implement the full workflow is `aux_fun`. This is a general function that works with any of the auxiliary data measures and takes care of the whole update process. The process is based on 3 key steps:
+1. checking if the measure has any dependency
+2. Checking if any of the depndencies needs to be updated in GitHub and/or the Y: drive (MEMO: add details of what this means )
+3. Update any dependency found in 2, in GitHub and/or Y: Drive  
+4. Update the original measure 
+
+## Preliminary operations
+
+Remember that in the new pipeline framework, we always work with a reference version called the "working release." Therefore, before implementing the dependency workflow, it is important to set up the working release at the beginning of each new R session:
+
+In this example, I am using a "TEST" release to demonstrate the new {pipaux} functionalities for managing dependencies with a test release of "20250203"
+
+```{r}
+
+# If no release has been created for the desired date, call pipfun::new_pip_release with the appropriate arguments to create it 
+# new_release <- pipfun::new_pip_release()
+
+# Set up the working release 
+pipfun::setup_working_release(release  = "20250203",
+                              identity = "TEST")
+
+# Get the working release 
+pipfun::get_wrk_release()
+```
+
+## Running an example
+
