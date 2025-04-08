@@ -1,8 +1,8 @@
 ---
-title: "dependencies_workflow"
+title: "Aux data - Dependencies Workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dependencies_workflow}
+  %\VignetteIndexEntry{"Aux data - Dependencies Workflow"}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,22 +15,53 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(pipaux)
+#library(pipaux)
+devtools::load_all()
 ```
 
-In this vignette, we explore how to update any of the auxiliary data measures. The process is specifically designed to automatically manage all interdependencies among auxiliary data, so that when updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated first, if needed.
+In this vignette, we explore how to update any of the auxiliary data measures. The process is specifically designed to automatically manage all interdependencies among auxiliary data, so that when you are updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated first, if needed.
 
 The main function you need to use to implement the full workflow is `aux_fun`. This is a general function that works with any of the auxiliary data measures and takes care of the whole update process. The process is based on 3 key steps:
-1. checking if the measure has any dependency
-2. Checking if any of the depndencies needs to be updated in GitHub and/or the Y: drive (MEMO: add details of what this means )
-3. Update any dependency found in 2, in GitHub and/or Y: Drive  
-4. Update the original measure 
 
+1. checking if the measure has any dependency
+
+2. Checking if any of the dependencies needs to be updated in GitHub and/or the Y: drive (MEMO: add details of what this means )
+
+3. Update any dependency found in 2, in GitHub and/or Y: Drive, and then update the original measure
+
+**More details on the update process**
+
+There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the conversion of raw data to input data, which involves formatting the raw data and saving it in the Y: drive. Although different raw datasets are processed in different ways, they all share the following characteristics:
+The raw data is 
+
+(1.) loaded from the corresponding `aux_*` measure repo in GitHub, 
+
+(2.) formatted with `{pipaux}` functions, 
+
+(3.) saved in the Y drive. 
+
+During this process, it is essential to load data from the release branch, ensuring that it is up to date with the latest changes from the `DEV` branch. Additionally, the processed data must be saved in the specific `aux_*` subfolder within the release folder on the Y: drive.
+
+*Note:* if any of the dependencies of an auxiliary measure have changed on GitHub, the original measure must also be updated accordingly.
+
+Two main functions take care of this process:
+
+* `aux_fun()`
+
+* `check_status()`
+
+More technical details about these two functions are provided below. If you don’t need this information, feel free to skip ahead to the example section further down the page.
+
+# **`aux_fun()`** and **check_status()**` explained
+
+
+
+# Working with an example
 ## Preliminary operations
 
 Remember that in the new pipeline framework, we always work with a reference version called the "working release." Therefore, before implementing the dependency workflow, it is important to set up the working release at the beginning of each new R session:
 
-In this example, I am using a "TEST" release to demonstrate the new {pipaux} functionalities for managing dependencies with a test release of "20250203"
+In this example, I am using a "TEST" release to demonstrate the new {pipaux} functionalities for managing dependencies with a release date of "20250203".
 
 ```{r}
 
@@ -45,5 +76,5 @@ pipfun::setup_working_release(release  = "20250203",
 pipfun::get_wrk_release()
 ```
 
-## Running an example
+## Updating xxxxx
 
