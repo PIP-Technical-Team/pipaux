@@ -74,15 +74,15 @@ In fact any auxiliary data measure can be of the following "status":
   
   **Under the hood**, `check_status()` performs a series of checks:
 
-It begins by checking if the corresponding release branch (e.g., `20250203_TEST`) exists on GitHub and whether it is synchronized with the `DEV` branch. This comparison is done using `pipfun::compare_branch_content()`, which verifies whether the contents of the two branches are identical; if not, `update_gh` is set to `TRUE`.
+It begins by checking if the corresponding **release branch** (e.g., `20250203_TEST`) exists on GitHub and whether it is **synchronized** with the `DEV` branch. This comparison is done using `pipfun::compare_branch_content()`, which verifies whether the contents of the two branches are identical; if not, `update_gh` is set to `TRUE`.
 
-If the GitHub release branch is up to date, the function proceeds to check the status of the Y: drive. It looks for the expected `.qs` file in the designated `aux_data` subfolder. If the file does not exist, `update_y` is set to `TRUE`. If it does exist, the function retrieves metadata attributes stored within the file, including a list of GitHub source files (`gh`) and the SHA of the function used to generate the data (`raw_sha_fun`). It then uses `pipfun::get_file_info_from_gh()` to query the current SHA values of the GitHub source files (based on file path, repo, and branch), and compares these to the previously saved SHAs in the `.qs` file. Any mismatch indicates that the source file has changed since the data was last saved, triggering `update_y = TRUE`.
+If the GitHub release branch is up to date, the function proceeds to check the **status of the Y: drive**. It looks for the expected `.qs` file in the designated `aux_data` subfolder. If the file does not exist, `update_y` is set to `TRUE`. If it does exist, the function retrieves metadata attributes stored within the file, including a list of GitHub source files (`gh`) and the SHA of the function used to generate the data (`raw_sha_fun`). It then uses `pipfun::get_file_info_from_gh()` to query the current SHA values of the GitHub source files (based on file path, repo, and branch), and compares these to the previously saved SHAs in the `.qs` file. Any mismatch indicates that the source file has changed since the data was last saved, triggering `update_y = TRUE`.
 
-Additionally, the function re-computes the SHA of the current `aux_*()` function in memory using `digest::digest(body(...))` and compares it to the stored function SHA. If the function code has changed, this also flags the need for an update on the Y: drive. Together, these SHA comparisons ensure that the data on the Y: drive remains synchronized with both the GitHub source files and the current version of the generating function.
+Additionally, the function re-computes the SHA of the current `aux_*()` function in memory using `digest::digest(body(...))` and compares it to the stored function SHA. If the function code has changed, this also flags the need for an update on the Y: drive. Together, these **SHA comparisons** ensure that the data on the Y: drive remains synchronized with both the GitHub source files and the current version of the generating function.
 
 #### `aux_fun()`
 
-The `aux_fun()` function serves as the central function for updating auxiliary data measures. Its main responsibilities are to ensure that all dependencies are processed in the correct order and to coordinate the update process across both GitHub and the Y: drive. 
+The `aux_fun()` function serves as the central function for updating auxiliary data measures. Its main responsibilities are to ensure that **all dependencies are processed** in the correct order and to coordinate the update process across both GitHub and the Y: drive. 
 
 When called, it first determines the current release and constructs the corresponding `release_branch` (e.g., `20250203_TEST`) based on global `wrk_release` object. It then checks whether the specified measure has already been processed in the current session (tracked via the `processed` environment) to avoid redundant work and potential infinite loops.
 
@@ -120,7 +120,7 @@ pipfun::get_wrk_release()
 For testing purposes, I am working on a fork of the "aux_pop" repo in my personal account 
 
 ```{r}
-measure <- "pop"
+measure <- "censoring"
 owner   <- "RossanaTat"
 
 ```
@@ -129,8 +129,8 @@ owner   <- "RossanaTat"
 aux_fun(measure = measure,
         action  = "update",
         maindir = getOption("pipaux.working_dir"),
-        owner   = owner)
-
+        owner   = owner,
+        verbose = FALSE)
 
 ```
 

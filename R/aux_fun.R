@@ -260,6 +260,9 @@ check_status <- function(measure,
   }
 
   if (update_gh) {
+
+    update_y <- TRUE
+
     if (verbose) {
       cli::cli_h1("Summary")
       cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
@@ -268,7 +271,7 @@ check_status <- function(measure,
     }
 
     return(invisible(list(update_gh = update_gh,
-                update_y  = TRUE)))
+                update_y  = update_y)))
   }
 
   # Check if Y drive file exists
@@ -280,13 +283,16 @@ check_status <- function(measure,
 
     cli::cli_alert_danger("File {y_file_path} does not exist.")
 
+    update_y <- TRUE
+
     if (verbose) {
       cli::cli_h1("Summary")
       cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
       cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
     }
+
     return(invisible(list(update_gh = update_gh,
-                update_y  = TRUE)))
+                          update_y  = update_y)))
   }
 
   # Retrieve stored GitHub metadata from Y drive file
@@ -326,10 +332,6 @@ check_status <- function(measure,
   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
   raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
 
-  # if (verbose) {
-  #   cli::cli_alert_info("Computed function SHA: {fun_sha}")
-  #   cli::cli_alert_info("Stored function SHA: {raw_fun_sha}")
-  # }
 
   if (verbose) {
     if (fun_sha == raw_fun_sha) {
@@ -360,4 +362,154 @@ check_status <- function(measure,
 
 
 
-
+########################## TEST #######################################################
+# aux_fun <- function(measure,
+#                     action    = c("update", "load"),
+#                     repo      = paste0("aux_", measure),
+#                     owner     = getOption("pipfun.ghowner"),
+#                     maindir   = getOption("pipaux.working_dir"),
+#                     processed = new.env(parent = emptyenv()),
+#                     force     = FALSE,
+#                     tag       = NULL,
+#                     ...) {
+#
+#   # Set arguments
+#   action <- match.arg(action)
+#
+#   # Get working release
+#   if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
+#     pipfun::get_wrk_release()
+#   }
+#
+#   release        <- wrk_release$release
+#   identity       <- wrk_release$identity
+#   release_branch <- paste0(release, "_", identity)
+#
+#   if (is.null(tag)) {
+#     tag <- release_branch
+#   }
+#
+#   # Set repo to "Class" if measure is "income_groups" or "country_list"
+#   repo <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+#
+#   # Read all dependencies
+#   dependencies_all <- read_dependencies(
+#     gh_user = "https://raw.githubusercontent.com",
+#     owner   = "PIP-Technical-Team"
+#   )
+#
+#   dependencies <- dependencies_all[[measure]]
+#   if (is.null(dependencies)) {
+#     dependencies <- character(0)
+#   }
+#
+#   # Create progress bar
+#   if (length(dependencies) > 0) {
+#     cli::cli_progress_bar(
+#       format = "Processing {dep} ({.current}/{.total})",
+#       total  = length(dependencies),
+#       type   = "iterator"
+#     )
+#   }
+#
+#   # Recursively process dependencies
+#   for (i in seq_along(dependencies)) {
+#     dep <- dependencies[i]
+#
+#     if (rlang::env_has(processed, dep)) {
+#       cli::cli_alert_info("{dep} has already been processed, skipping...")
+#       next
+#     }
+#
+#     cli::cli_progress_message("Processing {dep}...")
+#
+#     tryCatch(
+#       {
+#         aux_fun(
+#           measure   = dep,
+#           action    = action,
+#           repo      = paste0("aux_", dep),
+#           owner     = owner,
+#           maindir   = maindir,
+#           processed = processed,
+#           force     = force,
+#           tag       = tag,
+#           ...
+#         )
+#       },
+#       error = function(e) {
+#         cli::cli_alert_danger("Error processing {dep}: {conditionMessage(e)}")
+#       }
+#     )
+#   }
+#   cli::cli_progress_done()
+#
+#   # If measure has already been processed, skip its own update logic
+#   if (rlang::env_has(processed, measure)) {
+#     cli::cli_alert_info("{measure} has already been processed, skipping its update...")
+#     return(invisible(NULL))
+#   }
+#
+#   # Mark this measure as processed
+#   rlang::env_poke(processed, measure, TRUE)
+#
+#   # Check update status
+#   check_status <- check_status(measure = measure,
+#                                repo    = repo,
+#                                owner   = owner,
+#                                maindir = maindir)
+#
+#   update_gh <- check_status$update_gh
+#   update_y  <- check_status$update_y
+#
+#   if (!update_gh && !update_y) {
+#     cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
+#     return(invisible(NULL))
+#   }
+#
+#   # Update: GH first and then Y
+#   if (update_y) {
+#     if (update_gh) {
+#       pipfun::sync_release_branch(
+#         owner         = owner,
+#         repo          = repo,
+#         ref_branch    = "DEV",
+#         target_branch = release_branch
+#       )
+#     }
+#
+#     # Retrieve and execute the function from the pipaux namespace
+#     function_name <- paste0("aux_", measure)
+#
+#     if (!exists(function_name, envir = asNamespace("pipaux"))) {
+#       cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
+#     }
+#
+#     func <- get(function_name, envir = asNamespace("pipaux"))
+#
+#     # Build a list of all possible arguments to pass
+#     all_args <- c(
+#       list(
+#         action  = action,
+#         maindir = maindir,
+#         branch  = release_branch,
+#         force   = force,
+#         owner   = owner,
+#         tag     = tag,
+#         repo    = repo
+#       )
+#     )
+#
+#     # Retrieve the formal arguments of the function
+#     formal_args <- names(formals(func))
+#
+#     # Filter to include only matching arguments
+#     filtered_args <- all_args[names(all_args) %in% formal_args]
+#
+#     # Call the function with the filtered arguments
+#     do.call(func, filtered_args)
+#   }
+#
+#   invisible(NULL)
+# }
+#
