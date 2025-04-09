@@ -44,6 +44,9 @@ aux_fun <- function(measure,
   # Set arguments
   action         <- match.arg(action)
 
+  # # initialize an empty list to keep track of processed measure & their status
+  # summary_log = list()
+
   # Get working release
   # Check if wrk_release exists
   if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
@@ -83,14 +86,6 @@ aux_fun <- function(measure,
       dependencies <- character(0)
     }
 
-    # Create progress bar
-    if (length(dependencies) > 0) {
-      cli::cli_progress_bar(
-        format = "Processing {dep} ({.current}/{.total})",
-        total  = length(dependencies),
-        type   = "iterator"
-      )
-    }
 
     # Recursively process dependencies
     for (i in seq_along(dependencies)) {
@@ -118,7 +113,6 @@ aux_fun <- function(measure,
         }
       )
     } # end of dependencies loop
-    cli::cli_progress_done()
 
 
 
@@ -135,6 +129,10 @@ aux_fun <- function(measure,
     cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
     return(invisible(NULL))
   }
+
+  # Add result to summary log
+  # summary_log[[measure]] <- list(update_gh = update_gh,
+  #                                update_y  = update_y)
 
   # Update: GH first and then Y
   if (update_y) {
@@ -184,6 +182,11 @@ aux_fun <- function(measure,
   }
 
   } # close else
+
+  # Print summary only once (on top-level call)
+  # if (isTRUE(verbose)) {
+  #   print_summary_box(summary_log)
+  # }
 
   invisible(NULL)
 }
@@ -286,20 +289,12 @@ check_status <- function(measure,
 
     update_y <- TRUE
 
-    # if (verbose) {
-    #   cli::cli_h1("Summary")
-    #   cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
-    #   cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
-    # }
-
     if (verbose) {
-      summary_text <- c(
-        "Summary",
-        sprintf("Update GitHub: %s", cli::style_bold(update_gh)),
-        sprintf("Update Y drive: %s", cli::style_bold(update_y))
-      )
-      cli::boxx(summary_text, padding = 1, border_style = "double", align = "left")
+      cli::cli_h1("Summary")
+      cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+      cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
     }
+
 
     return(invisible(list(update_gh = update_gh,
                           update_y  = update_y)))
@@ -359,21 +354,21 @@ check_status <- function(measure,
   update_y <- ifelse(is.na(update_y),
                      FALSE,
                      update_y)  # Treat NA as FALSE
-#
-#   if (verbose) {
-#     cli::cli_h1("Summary")
-#     cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
-#     cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
-#   }
 
   if (verbose) {
-    summary_text <- c(
-      "Summary",
-      sprintf("Update GitHub: %s", cli::style_bold(update_gh)),
-      sprintf("Update Y drive: %s", cli::style_bold(update_y))
-    )
-    cli::boxx(summary_text, border_style = "double", align = "left")
+    cli::cli_h1("Summary")
+    cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+    cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
   }
+
+  # if (verbose) {
+  #   summary_text <- c(
+  #     "Summary",
+  #     sprintf("Update GitHub: %s", cli::style_bold(update_gh)),
+  #     sprintf("Update Y drive: %s", cli::style_bold(update_y))
+  #   )
+  #   cli::boxx(summary_text, border_style = "double", align = "left")
+  # }
 
   return(invisible(list(update_gh = update_gh,
               update_y  = update_y)))
