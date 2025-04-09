@@ -130,7 +130,7 @@ aux_fun(measure = measure,
         action  = "update",
         maindir = getOption("pipaux.working_dir"),
         owner   = owner,
-        verbose = FALSE)
+        verbose = T)
 
 ```
 
