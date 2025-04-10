@@ -64,6 +64,11 @@ aux_fun <- function(measure,
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+  owner <- fifelse(measure == "nan",
+                   "PIP-Technical-Team",
+                   owner)
+
+  # NOTE: temporary, because "aux_nan" is private and connt be cloned
 
   # If measure has already been processed, skip it
   if (rlang::env_has(processed, measure)) {

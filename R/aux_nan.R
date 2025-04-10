@@ -24,12 +24,13 @@ aux_nan <- function(action          = c("update", "load"),
     nan <- pipfun::load_from_gh(
       measure = "nan",
       owner  = owner,
-      branch = branch
+      branch = branch,
+      filename = "nan.csv"
     )
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     saved <- pipfun::pip_sign_save(
       x       = nan,

@@ -120,7 +120,7 @@ pipfun::get_wrk_release()
 For testing purposes, I am working on a fork of the "aux_pop" repo in my personal account 
 
 ```{r}
-measure <- "missing_data"
+measure <- "npl"
 owner   <- "RossanaTat"
 
 ```

@@ -59,7 +59,7 @@ aux_npl <- function(action  = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     saved <- pipfun::pip_sign_save(
       x       = npl,
