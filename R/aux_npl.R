@@ -17,7 +17,6 @@ aux_npl <- function(action  = c("update", "load"),
   ## setup --------
 
   measure <- "npl"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
   if (action == "update") {
