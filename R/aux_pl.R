@@ -16,7 +16,6 @@ aux_pl <- function(action = c("update", "load"),
                    ) {
 
   measure <- "pl"
-  branch <- match.arg(branch)
   action <- match.arg(action)
 
 
@@ -42,6 +41,17 @@ aux_pl <- function(action = c("update", "load"),
       branch <- ""
     }
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+  # ----- function raw sha ----------------------
+
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(dt,
+          "raw_sha_fun",
+          raw_sha_fun)
+
     saved <- pipfun::pip_sign_save(
       x       = dt,
       measure = measure,
