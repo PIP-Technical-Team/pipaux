@@ -61,6 +61,17 @@ aux_npl <- function(action  = c("update", "load"),
     }
     msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
+    # ----- function raw sha ----------------------
+
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+
+    setattr(npl,
+            "raw_sha_fun",
+            raw_sha_fun)
+
     saved <- pipfun::pip_sign_save(
       x       = npl,
       measure = measure,

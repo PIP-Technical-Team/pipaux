@@ -31,7 +31,7 @@ aux_pl <- function(action = c("update", "load"),
       ext    = "yaml"
     )
 
-    dt <- purrr::map_df(dl,pip_pl_clean)
+    dt <- purrr::map_df(dl,aux_pl_clean)
 
   # Save
 
@@ -41,7 +41,7 @@ aux_pl <- function(action = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
     saved <- pipfun::pip_sign_save(
       x       = dt,
       measure = measure,
