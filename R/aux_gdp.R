@@ -313,6 +313,14 @@ aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
     ext     = "csv"
   )
 
+  # load nowcast growth rates
+  nan <- pipfun::load_from_gh(
+    measure = "nan",
+    owner  = "PIP-Technical-Team",
+    branch = branch,
+    ext    = "csv"
+  )
+
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
