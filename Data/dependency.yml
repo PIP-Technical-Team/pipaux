@@ -1,6 +1,6 @@
 ppp : country_list
 pfw : 
-gdp : weo, maddison, wdi, country_list, sna
+gdp : weo, maddison, wdi, country_list, sna, nan
 wdi :
 weo : pop
 pop : country_list
