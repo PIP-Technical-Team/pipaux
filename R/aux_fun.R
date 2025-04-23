@@ -20,6 +20,7 @@
 #'   Default is `FALSE`
 #' @param tag character: Specifies the GitHub branch tag for versioning.
 #'   Defaults to `release_branch`, which is determined from the working release
+#' @param log logical, defaults to TRUE. Enables or disables logging in "pipaux_log"
 #' @param ... Additional arguments passed to the auxiliary function handling the measure
 #'
 #' @return This function does not return a value but performs the requested action (load/update).
@@ -39,20 +40,17 @@ aux_fun <- function(measure,
                     processed = new.env(parent = emptyenv()),
                     force     = FALSE,
                     tag       = NULL,
+                    log       = TRUE,
+                    verbose   = FALSE,
                     ...) {
 
   # Set arguments
   action         <- match.arg(action)
 
-  # # initialize an empty list to keep track of processed measure & their status
-  # summary_log = list()
-
   # Get working release
   # Check if wrk_release exists
-  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
-    pipfun::get_wrk_release()
-  }
 
+  pipfun::get_wrk_release()
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -68,7 +66,7 @@ aux_fun <- function(measure,
                    "PIP-Technical-Team",
                    owner)
 
-  # NOTE: temporary, because "aux_nan" is private and connt be cloned
+  # NOTE: temporary, because "aux_nan" is private and cannot be cloned
 
   # If measure has already been processed, skip it
   if (rlang::env_has(processed, measure)) {
@@ -97,7 +95,7 @@ aux_fun <- function(measure,
 
       dep <- dependencies[i]
 
-      cli::cli_progress_message("Processing {dep}...")
+      # log info
 
       tryCatch(
         {
@@ -114,7 +112,7 @@ aux_fun <- function(measure,
           )
         },
         error = function(e) {
-          cli::cli_alert_danger("Error processing {dep}: {conditionMessage(e)}")
+          # log error
         }
       )
     } # end of dependencies loop
@@ -131,7 +129,9 @@ aux_fun <- function(measure,
   update_y  <- check_status$update_y
 
   if (!update_gh && !update_y) {
-    cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
+    #cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
+
+    # log info
     return(invisible(NULL))
   }
 
@@ -146,15 +146,17 @@ aux_fun <- function(measure,
     if (update_gh) {
 
       pipfun::sync_release_branch(
-        owner      = owner,
-        repo       = repo,
-        ref_branch = "DEV",
-        target_branch = release_branch
+        owner         = owner,
+        repo          = repo,
+        ref_branch    = "DEV",
+        target_branch = release_branch,
+        verbose       = verbose
       )
     }
 
     # Retrieve and execute the function from the pipaux namespace
-    function_name <- paste0("aux_", measure)
+    function_name <- paste0("aux_",
+                            measure)
 
     if (!exists(function_name, envir = asNamespace("pipaux"))) {
       cli::cli_abort(paste0("Function '", function_name, "' does not exist in the 'pipaux' package."))
@@ -188,10 +190,7 @@ aux_fun <- function(measure,
 
   } # close else
 
-  # Print summary only once (on top-level call)
-  # if (isTRUE(verbose)) {
-  #   print_summary_box(summary_log)
-  # }
+  # log info of successful call to aux fun
 
   invisible(NULL)
 }

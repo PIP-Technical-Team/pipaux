@@ -30,6 +30,9 @@ pipuax_default_options <- list(
 
   # pipload::add_gls_to_env()
 
+  # Initialize a log
+  pipfun::log_init("pipaux_log", overwrite = TRUE)
+
 
   invisible()
 }
