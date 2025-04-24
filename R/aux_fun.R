@@ -60,6 +60,10 @@ aux_fun <- function(measure,
     tag <- release_branch
   }
 
+  # Initialize log
+  pipfun::log_init("pipaux_dependencies_log",
+                   overwrite = TRUE)
+
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
   owner <- fifelse(measure == "nan",
@@ -70,11 +74,13 @@ aux_fun <- function(measure,
 
   # If measure has already been processed, skip it
   if (rlang::env_has(processed, measure)) {
-    cli::cli_alert_info("{measure} has already been processed, skipping dependencies...")
+    if (verbose) cli::cli_alert_info("{measure} has already been processed, skipping dependencies...")
 
   } else {
     # Mark this measure as processed
-    rlang::env_poke(processed, measure, TRUE)
+    rlang::env_poke(processed,
+                    measure,
+                    TRUE)
 
     # Read all dependencies
     dependencies_all <- read_dependencies(
@@ -89,13 +95,18 @@ aux_fun <- function(measure,
       dependencies <- character(0)
     }
 
+    # log info - START PROCESS
+    pipfun::log_info(message = "Dependencies workflow - process started",
+                     name    = "pipaux_dependencies_log",
+                     logmeta = list(step    = "START")
+                     )
+
 
     # Recursively process dependencies
     for (i in seq_along(dependencies)) {
 
       dep <- dependencies[i]
 
-      # log info
 
       tryCatch(
         {
@@ -108,11 +119,16 @@ aux_fun <- function(measure,
             processed = processed,
             force     = force,
             tag       = tag,
+            verbose   = verbose,
             ...
           )
         },
         error = function(e) {
           # log error
+          pipfun::log_error("Failed to run aux_fun",
+                    name    = "pipaux_log",
+                    # need to add args ?
+                    logmeta = list(error = e$message))
         }
       )
     } # end of dependencies loop
@@ -120,18 +136,29 @@ aux_fun <- function(measure,
 
 
   # Check update status for the current measure
+
+  # Log info - CHECK STAGE
+  pipfun::log_info(message = paste0("checking status for measure: ",  measure),
+                   name    = "pipaux_dependencies_log",
+                   logmeta = list(step    = "CHECK")
+                   )
+
   check_status <- check_status(measure = measure,
                                repo    = repo,
                                owner   = owner,
-                               maindir = maindir)
+                               maindir = maindir,
+                               verbose = verbose)
 
   update_gh <- check_status$update_gh
   update_y  <- check_status$update_y
 
-  if (!update_gh && !update_y) {
-    #cli::cli_alert_info("No action required. GitHub and Y drive already up to date")
 
-    # log info
+  if (!update_gh && !update_y) {
+
+    pipfun::log_info(message = paste0("Measure ", measure, "processed succesfully. No update needed"),
+                     name    = "pipaux_dependencies_log",
+                     logmeta = list(step    = "END"))
+
     return(invisible(NULL))
   }
 
@@ -152,6 +179,10 @@ aux_fun <- function(measure,
         target_branch = release_branch,
         verbose       = verbose
       )
+
+      pipfun::log_info(message = paste0("Updated Github for measure: ", measure),
+                       name    = "pipaux_dependencies_log",
+                       logmeta = list(step    = "UPDATE GH"))
     }
 
     # Retrieve and execute the function from the pipaux namespace
@@ -186,11 +217,26 @@ aux_fun <- function(measure,
 
     # Call the function with the filtered arguments
     do.call(func, filtered_args)
+
+    pipfun::log_info(message = paste0("Updated Y drive for measure: ", measure),
+                     name    = "pipaux_dependencies_log",
+                     logmeta = list(step    = "UPDATE SERVER"))
   }
 
   } # close else
 
-  # log info of successful call to aux fun
+
+  # log info - END PROCESS/SUCCESS
+  if (sys.nframe() <= 2) {
+    pipfun::log_info(message = "All dependencies successfully updated",
+                     name    = "pipaux_dependencies_log",
+                     logmeta = list(step    = "END"))
+  }
+
+  # save log - only when the whole function run has completed, not just at final iteration
+  # pipfun::log_save("pipaux_log",
+  #                  path = paste0(maindir, "/", release_branch))
+
 
   invisible(NULL)
 }
