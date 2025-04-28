@@ -6,70 +6,98 @@
 # Step 3: write inventory, a dataframe
 # Step 4: save inventory
 
-inventory_aux <- function(measures     = c("cpi", "ppp", "gdp"),
-                          maindir      = getOption("pipaux.working_dir"),
-                          old_release,
-                          save_to_file = TRUE) {
+update_aux_inventory <- function(measure      = "cpi",
+                                 maindir      = getOption("pipaux.working_dir"),
+                                 old_release,
+                                 #by_vars = c("country_code", "year"),
+                                 ext = c("qs", "csv")) {
 
-  # Get current release
+  # _________________________#
+  # Get current release ####
+
   pipfun::get_wrk_release()
 
   release <- paste0(wrk_release$release,
                     "_",
                     wrk_release$identity)
 
-  # Get vars to compare by
-  byvars <- switch()
-
-  # Construct directories path
-
-  # old release
-  #aux_dirpath_old <- fs::path(auxdata_dir,
-  #                            old_release)
-
+  # _________________________#
   # Load files
 
-  current_files <- setNames(
-    lapply(measures, function(x) {
-      load_aux(measure = x,
-               maindir = maindir,
-               branch = release
-      )
-    }),
-    measures
+  new_df <- load_aux(measure = measure,
+                     maindir = maindir,
+                     branch  = release)
+
+
+  old_df <- load_aux(measure = measure,
+                     maindir = maindir,
+                     branch  = old_release)
+
+  # _________________________#
+  # Extract differences
+
+  key_cols <- joyn::possible_ids(new_df)[1][[1]]
+
+  # Run comparison
+  myr_obj <- myrror::myrror(
+              dfx                 = new_df,
+              dfy                 = old_df,
+              by                  = key_cols, # keys for matching (e.g., country and year)
+              compare_type        = FALSE,
+              compare_values      = TRUE,
+              extract_diff_values = TRUE,
+              interactive         = FALSE)
+
+  diff_df <- myrror::extract_diff_values(myrror_object = myr_obj,
+                                         output        = "simple")[[measure]]
+
+  # Add info on: files paths, name of measure
+  # Add measure name and path
+
+  new_path <- fs::path(maindir,
+                       "aux_data",
+                       release,
+                       measure,
+                       measure,
+                       ".qs")
+
+  old_path <- fs::path(maindir,
+                       "aux_data",
+                       old_release,
+                       measure,
+                       measure,
+                       ".qs")
+
+  diff_df |>
+    fmutate(measure = measure,
+            path.x  = new_path,
+            path.y  = old_path)
+
+  # If there are no differences, exit early
+  if (nrow(diff_df) == 0) {
+    cli::cli_alert_info("No differences found. Inventory not updated.")
+    return(invisible(NULL))
+  }
+
+  # _________________________#
+  # Create or update inventory
+
+  # Build inventory path and ensure directory
+  inventory_path <- fs::path(maindir,
+                             "aux_data",
+                             "_inventory_aux_changes",
+                             paste0(release, "_", old_release),
+                             paste0(measure, ".", ext)) # to fix
+
+  fs::dir_create(fs::path_dir(inventory_path))
+
+  # Save
+  switch(extension,
+         qs  = qs::qsave(diff_table, inventory_path),
+         csv = readr::write_csv(diff_table, inventory_path),
+         stop("Extension must be 'qs' or 'csv'")
   )
 
 
-  old_files <- setNames(
-    lapply(measures, function(x) {
-      load_aux(measure = x,
-               maindir = maindir,
-               branch = old_release
-      )
-    }),
-    measures
-  )
-
-  # Compare with myrror
-  myrror_report <- lapply(measures, function(x) {
-
-    # Get vars to compare by
-    byvars <- switch(x,
-                     "cpi" = c("country_code", "year"),
-                     c("country_code", "reporting_level"))
-
-    myrror::myrror(current_files$x,
-                   old_files$x)
-  })
-
-
-  names(myrror_report) <- measures
-
-
-
-
-  # Write inventory data frame
-
-  # save it
 
 }
