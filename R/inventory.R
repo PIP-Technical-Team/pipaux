@@ -26,16 +26,33 @@ update_aux_inventory <- function(measure      = "cpi",
                     wrk_release$identity)
 
   # _________________________#
-  # Load files
+  # Load files with error handling
 
-  new_df <- load_aux(measure = measure,
-                     maindir = maindir,
-                     branch  = release)
+  new_df <- tryCatch({
 
+    load_aux(measure = measure,
+             maindir = maindir,
+             branch  = release)
+  },
 
-  old_df <- load_aux(measure = measure,
-                     maindir = maindir,
-                     branch  = old_release)
+  error = function(e) {
+    cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
+    stop(e)
+  })
+
+  old_df <- tryCatch({
+
+    load_aux(measure = measure,
+             maindir = maindir,
+             branch  = old_release)
+  },
+
+  error = function(e) {
+    cli::cli_alert_warning("Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
+    return(NULL)
+  })
+
+  if (is.null(old_df)) return(invisible(NULL))
 
 
   # _________________________#
@@ -63,14 +80,16 @@ update_aux_inventory <- function(measure      = "cpi",
               interactive         = FALSE)
 
   diff_list <- myrror::extract_diff_values(myrror_object = myr_obj,
-                                           output        = "simple") #extract only changes in measure (TBC)
+                                           output        = "simple")
 
   # If there are no differences, exit early
-  # if (nrow(diff_table) == 0) {
-  #   cli::cli_alert_info("No differences found. Inventory not updated.")
-  #   return(invisible(NULL))
-  # }
+  if (length(diff_list) == 0) {
 
+    cli::cli_alert_info(
+      "No differences found for {.strong {measure}}. Inventory not updated.")
+    return(invisible(NULL))
+
+  }
   # Add info on: files paths, name of measure
   # Add measure name and path
 
@@ -118,16 +137,16 @@ update_aux_inventory <- function(measure      = "cpi",
                             paste0("from_", old_release, "_to_", release))
 
   # Ensure the folder exists
-  fs::dir_create(inventory_dir)
+  fs::dir_create(inventory_dir)  # this does nothing if folder already exists
 
   # Build file path: inventory_dir/measure.extension
   file_path <- fs::path(inventory_dir, paste0(measure, ".", ext))
 
   # Save based on extension
   if (ext == "qs") {
-    qs::qsave(diff_table, file_path)
+    qs::qsave(combined_diff_table, file_path)
   } else if (ext == "csv") {
-    readr::write_csv(diff_table, file_path)
+    readr::write_csv(combined_diff_table, file_path)
   }
 
 
