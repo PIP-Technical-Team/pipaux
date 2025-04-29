@@ -9,8 +9,12 @@
 update_aux_inventory <- function(measure      = "cpi",
                                  maindir      = getOption("pipaux.working_dir"),
                                  old_release,
-                                 #by_vars = c("country_code", "year"),
-                                 ext = c("qs", "csv")) {
+                                 key_cols.x   = NULL,
+                                 key_cols.y   = NULL,
+                                 ext          = c("qs", "csv"),
+                                 verbose      = TRUE) {
+
+  ext <- match.arg(ext)
 
   # _________________________#
   # Get current release ####
@@ -33,23 +37,39 @@ update_aux_inventory <- function(measure      = "cpi",
                      maindir = maindir,
                      branch  = old_release)
 
+
   # _________________________#
   # Extract differences
 
-  key_cols <- joyn::possible_ids(new_df)[1][[1]]
+  if (is.null(key_cols.x) || is.null(key_cols.y)) {
+
+    ids_new <- joyn::possible_ids(new_df)
+    ids_old <- joyn::possible_ids(old_df)
+
+    key_cols.x <- ids_new[[1]]
+    key_cols.y <- ids_old[[1]]
+  }
+
 
   # Run comparison
   myr_obj <- myrror::myrror(
               dfx                 = new_df,
               dfy                 = old_df,
-              by                  = key_cols, # keys for matching (e.g., country and year)
+              by.x                = key_cols.x, # keys for matching (e.g., country and year)
+              by.y                = key_cols.y, # keys for matching (e.g., country and year)
               compare_type        = FALSE,
               compare_values      = TRUE,
               extract_diff_values = TRUE,
               interactive         = FALSE)
 
-  diff_df <- myrror::extract_diff_values(myrror_object = myr_obj,
-                                         output        = "simple")[[measure]]
+  diff_list <- myrror::extract_diff_values(myrror_object = myr_obj,
+                                           output        = "simple") #extract only changes in measure (TBC)
+
+  # If there are no differences, exit early
+  # if (nrow(diff_table) == 0) {
+  #   cli::cli_alert_info("No differences found. Inventory not updated.")
+  #   return(invisible(NULL))
+  # }
 
   # Add info on: files paths, name of measure
   # Add measure name and path
@@ -58,46 +78,62 @@ update_aux_inventory <- function(measure      = "cpi",
                        "aux_data",
                        release,
                        measure,
-                       measure,
-                       ".qs")
+                       paste0(measure, ".", ext))
 
   old_path <- fs::path(maindir,
                        "aux_data",
                        old_release,
                        measure,
-                       measure,
-                       ".qs")
+                       paste0(measure, ".", ext))
 
-  diff_df |>
-    fmutate(measure = measure,
-            path.x  = new_path,
-            path.y  = old_path)
+  # diff_table <- diff_table |>
+  #   fmutate(measure = measure,
+  #           path.x  = new_path,
+  #           path.y  = old_path)
 
-  # If there are no differences, exit early
-  if (nrow(diff_df) == 0) {
-    cli::cli_alert_info("No differences found. Inventory not updated.")
-    return(invisible(NULL))
-  }
+  # For each element, add measure, path.x, path.y, and variable name
+  diff_list <- Map(function(df, varname) {
+    df |>
+      fmutate(
+        measure  = measure,
+        path.x   = new_path,
+        path.y   = old_path,
+        variable = varname
+      )
+  }, diff_list, names(diff_list))
+
+  # Combine all into one big data frame
+  combined_diff_table <- data.table::rbindlist(diff_list,
+                                               use.names = TRUE,
+                                               fill = TRUE)
 
   # _________________________#
   # Create or update inventory
 
-  # Build inventory path and ensure directory
-  inventory_path <- fs::path(maindir,
-                             "aux_data",
-                             "_inventory_aux_changes",
-                             paste0(release, "_", old_release),
-                             paste0(measure, ".", ext)) # to fix
+  # Build inventory directory (path)
+  inventory_dir <- fs::path(maindir,
+                            "aux_data",
+                            release,
+                            "_inventory_aux_changes",
+                            paste0("from_", old_release, "_to_", release))
 
-  fs::dir_create(fs::path_dir(inventory_path))
+  # Ensure the folder exists
+  fs::dir_create(inventory_dir)
 
-  # Save
-  switch(extension,
-         qs  = qs::qsave(diff_table, inventory_path),
-         csv = readr::write_csv(diff_table, inventory_path),
-         stop("Extension must be 'qs' or 'csv'")
-  )
+  # Build file path: inventory_dir/measure.extension
+  file_path <- fs::path(inventory_dir, paste0(measure, ".", ext))
+
+  # Save based on extension
+  if (ext == "qs") {
+    qs::qsave(diff_table, file_path)
+  } else if (ext == "csv") {
+    readr::write_csv(diff_table, file_path)
+  }
 
 
+  if (verbose) {cli::cli_alert_success(
+    "Inventory file succesfully updated for measure: {.strong {measure}}")}
+
+  invisible(TRUE)
 
 }
