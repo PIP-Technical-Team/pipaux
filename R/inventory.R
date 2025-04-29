@@ -8,15 +8,32 @@
 
 update_aux_inventory <- function(measure      = "cpi",
                                  maindir      = getOption("pipaux.working_dir"),
-                                 old_release,
+                                 old_release  = NULL,
                                  key_cols.x   = NULL,
                                  key_cols.y   = NULL,
                                  ext          = c("qs", "csv"),
                                  verbose      = TRUE) {
+  # _________________________#
+  # Get arguments ####
 
   ext <- match.arg(ext)
 
-  # _________________________#
+  if (is.null(old_release)) {
+    stop("Release to compare with must be provided, specifying date and identity.")
+  }
+
+  if (is.null(key_cols.x) || is.null(key_cols.y)) {
+
+    ids_new <- joyn::possible_ids(new_df,
+                                  verbose = verbose)
+    ids_old <- joyn::possible_ids(old_df,
+                                  verbose = verbose)
+
+    key_cols.x <- ids_new[[1]]
+    key_cols.y <- ids_old[[1]]
+  }
+
+
   # Get current release ####
 
   pipfun::get_wrk_release()
@@ -48,7 +65,10 @@ update_aux_inventory <- function(measure      = "cpi",
   },
 
   error = function(e) {
-    cli::cli_alert_warning("Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
+    cli::cli_alert_warning(
+      "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}.
+       Comparison will be skipped.")
+
     return(NULL)
   })
 
@@ -57,16 +77,6 @@ update_aux_inventory <- function(measure      = "cpi",
 
   # _________________________#
   # Extract differences
-
-  if (is.null(key_cols.x) || is.null(key_cols.y)) {
-
-    ids_new <- joyn::possible_ids(new_df)
-    ids_old <- joyn::possible_ids(old_df)
-
-    key_cols.x <- ids_new[[1]]
-    key_cols.y <- ids_old[[1]]
-  }
-
 
   # Run comparison
   myr_obj <- myrror::myrror(
@@ -79,19 +89,26 @@ update_aux_inventory <- function(measure      = "cpi",
               extract_diff_values = TRUE,
               interactive         = FALSE)
 
-  diff_list <- myrror::extract_diff_values(myrror_object = myr_obj,
-                                           output        = "simple")
+  # diff_list <- myrror::extract_diff_values(myrror_object = myr_obj,
+  #                                          output        = "simple")
+
+  # Extract differences in table format
+  diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
+                                           by.x          = key_cols.x,
+                                           by.y          = key_cols.y,
+                                           output        = "simple",
+                                           interactive   = FALSE)
 
   # If there are no differences, exit early
-  if (length(diff_list) == 0) {
+  if (nrow(diff_table) == 0) {
 
     cli::cli_alert_info(
       "No differences found for {.strong {measure}}. Inventory not updated.")
     return(invisible(NULL))
 
   }
-  # Add info on: files paths, name of measure
-  # Add measure name and path
+
+  # Add metadata: files paths, measure
 
   new_path <- fs::path(maindir,
                        "aux_data",
@@ -105,26 +122,10 @@ update_aux_inventory <- function(measure      = "cpi",
                        measure,
                        paste0(measure, ".", ext))
 
-  # diff_table <- diff_table |>
-  #   fmutate(measure = measure,
-  #           path.x  = new_path,
-  #           path.y  = old_path)
-
-  # For each element, add measure, path.x, path.y, and variable name
-  diff_list <- Map(function(df, varname) {
-    df |>
-      fmutate(
-        measure  = measure,
-        path.x   = new_path,
-        path.y   = old_path,
-        variable = varname
-      )
-  }, diff_list, names(diff_list))
-
-  # Combine all into one big data frame
-  combined_diff_table <- data.table::rbindlist(diff_list,
-                                               use.names = TRUE,
-                                               fill = TRUE)
+  diff_table <- diff_table |>
+    fmutate(measure = measure,
+            path.x  = new_path,
+            path.y  = old_path)
 
   # _________________________#
   # Create or update inventory
@@ -140,13 +141,14 @@ update_aux_inventory <- function(measure      = "cpi",
   fs::dir_create(inventory_dir)  # this does nothing if folder already exists
 
   # Build file path: inventory_dir/measure.extension
-  file_path <- fs::path(inventory_dir, paste0(measure, ".", ext))
+  file_path <- fs::path(inventory_dir,
+                        paste0(measure, ".", ext))
 
   # Save based on extension
   if (ext == "qs") {
-    qs::qsave(combined_diff_table, file_path)
+    qs::qsave(diff_table, file_path)
   } else if (ext == "csv") {
-    readr::write_csv(combined_diff_table, file_path)
+    readr::write_csv(diff_table, file_path)
   }
 
 
