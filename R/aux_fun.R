@@ -126,7 +126,7 @@ aux_fun <- function(measure,
         error = function(e) {
           # log error
           pipfun::log_error("Failed to run aux_fun",
-                    name    = "pipaux_log",
+                    name    = "pipaux_dependencies_log",
                     # need to add args ?
                     logmeta = list(error = e$message))
         }
