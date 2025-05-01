@@ -13,6 +13,8 @@ aux_fun(
   processed = new.env(parent = emptyenv()),
   force = FALSE,
   tag = NULL,
+  log = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -40,6 +42,8 @@ Default is \code{FALSE}}
 
 \item{tag}{character: Specifies the GitHub branch tag for versioning.
 Defaults to \code{release_branch}, which is determined from the working release}
+
+\item{log}{logical, defaults to TRUE. Enables or disables logging in "pipaux_log"}
 
 \item{...}{Additional arguments passed to the auxiliary function handling the measure}
 }
