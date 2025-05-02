@@ -253,22 +253,37 @@ aux_fun <- function(measure,
     # Filter to include only matching arguments
     filtered_args <- all_args[names(all_args) %in% formal_args]
 
+
     # Call the function with the filtered arguments
-    do.call(func, filtered_args)
 
-    # Log SUCCESS ####
-    # ~~~~~~~~~~~~~~~~ #
 
-    if (log) {
-      pipfun::log_add(
-        event   = "info",
-        message = paste0("Updated Y drive for: ", measure),
-        name    = "pipaux_dependencies_log",
-        logmeta = list(step = "UPDATE SERVER",
-                       measure = measure)
-      )
-    }
-  }
+    tryCatch({
+
+      do.call(func, filtered_args)
+
+      if (log) {
+        pipfun::log_add(
+          event   = "info",
+          message = paste0("Updated Y drive for: ", measure),
+          name    = "pipaux_dependencies_log",
+          logmeta = list(step = "UPDATE SERVER",
+                         measure = measure)
+        )
+      }
+    }, error = function(e) {
+      if (log) {
+        pipfun::log_add(
+          event   = "error",
+          message = paste0("Error updating Y drive for: ", measure, " — ", e$message),
+          name    = "pipaux_dependencies_log",
+          logmeta = list(step = "UPDATE SERVER",
+                         measure = measure)
+        )
+      }
+    })
+
+
+  } # Close if update Y is TRUE
 
   } # close else
 
