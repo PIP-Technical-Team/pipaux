@@ -87,7 +87,12 @@ get_aux_changes <- function(measure      = "cpi",
   # Key vars to compare by --- #
 
   key_cols <- intersect(key_cols,
-                        names(new_df))
+                        intersect(names(new_df), names(old_df)))
+
+  if (length(key_cols) == 0) {
+    cli::cli_abort("No common key vars found in both datasets.")
+  }
+
 
   # _______________________________________#
   # Extract differences ####
@@ -213,3 +218,45 @@ inventory_aux_changes <- function(measure     = NULL,
   return(res)
 
 }
+
+#' Get the most recent previous release of a specific identity
+#'
+#' This function searches the `aux_data` directory inside the given main directory
+#' and returns the latest available release (prior to a given current release)
+#' that matches the specified identity (e.g., `"prod"` or `"dev"`).
+#'
+#' @param maindir Character. The root directory where `aux_data` subfolder is located.
+#' @param current_release Character. Current release string in the format `"YYYYMMDD_identity"`.
+#' @param identity Character. The identity suffix to filter releases (e.g., `"prod"`).
+#'
+#' @return A character string representing the most recent previous release.
+#'
+#' @keywords internal
+get_last_release <- function(maindir = getOption("pipaux.working_dir"),
+                             current_release,
+                             identity) {
+  # Path to aux_data folder
+  aux_path <- fs::path(maindir,
+                       "aux_data")
+
+  # List release folder names only
+  release_names <- fs::dir_ls(aux_path,
+                              type = "directory",
+                              recurse = FALSE) |>
+    fs::path_file()
+
+  # Filter by identity and valid format
+  valid_releases <- release_names[
+    grepl(paste0("^\\d{8}_", identity, "$"), release_names)
+  ]
+
+  # Filter those strictly before current release
+  candidates <- sort(valid_releases[valid_releases < current_release], decreasing = TRUE)
+
+  if (length(candidates) == 0) {
+    cli::cli_abort("No older release found with identity {.strong {identity}} prior to {.strong {current_release}}.")
+  }
+
+  return(candidates[1])
+}
+

@@ -162,11 +162,7 @@ aux_fun <- function(measure,
     return(invisible(NULL))
   }
 
-  # Add result to summary log
-  # summary_log[[measure]] <- list(update_gh = update_gh,
-  #                                update_y  = update_y)
-
-  # Update: GH first and then Y
+  # Update: GH first and then Y: folder
   if (update_y) {
 
     # Update GitHub if necessary
