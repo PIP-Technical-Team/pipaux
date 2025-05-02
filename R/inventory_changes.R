@@ -10,6 +10,7 @@
 #'
 #' @inheritParams aux_fun
 #' @param old_release Character. The identifier of the previous release to compare against (e.g., `"20240101_PROD"`).
+#'        If NULL, automatically take last available release of same identity as the current working release
 #' @param key_cols Character vector. Variables used as keys to compare values between releases. Defaults to the `pipaux.key_vars` option.
 #' @param verbose Logical. If `TRUE`, displays messages in the console.
 #'
@@ -32,11 +33,6 @@ get_aux_changes <- function(measure      = "cpi",
 
   #ext <- match.arg(ext)
 
-  if (is.null(old_release)) {
-    cli::cli_abort("Release to compare with must be provided, specifying date and identity.")
-    # to do: take last available release
-  }
-
   # Get current release ####
 
   pipfun::get_wrk_release()
@@ -44,6 +40,16 @@ get_aux_changes <- function(measure      = "cpi",
   release <- paste0(wrk_release$release,
                     "_",
                     wrk_release$identity)
+
+  if (is.null(old_release)) {
+
+    old_release <- get_last_release(maindir         = maindir,
+                                    current_release = release,
+                                    identity        = wrk_release$identity)
+
+    cli::cli_alert_info("Using last available release: {.strong {old_release}}")
+  }
+
 
 
   # _______________________________________#
