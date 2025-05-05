@@ -11,14 +11,19 @@ aux_income_groups <- function(action       = c("update", "load"),
                               force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
                               maindir      = gls$PIP_DATA_DIR,
-                              branch       = paste0(wrk_release$release, "_", wrk_release$identity),
-                              class_branch = "master",
                               detail       = getOption("pipaux.detail.raw")
 ) {
 
   measure <- "income_groups"
   action <- match.arg(action)
-  #branch <- match.arg(branch)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  class_branch <- "master"
 
   if (action == "update") {
 

@@ -16,12 +16,18 @@
 aux_country_list <- function(action       = c("update", "load"),
                              maindir      = gls$PIP_DATA_DIR,
                              force        = FALSE,
-                             branch       = paste0(wrk_release$release, "_", wrk_release$identity),
-                             class_branch = "master",
                              detail       = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
   action  <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  class_branch = "master"
 
   if (action == "update") {
 

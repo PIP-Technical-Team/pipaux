@@ -11,12 +11,17 @@ aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag     = branch,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pce"
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (action == "update") {
     aux_pce_update(maindir = maindir,

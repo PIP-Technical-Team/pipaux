@@ -11,13 +11,17 @@ aux_sna <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = paste0(wrk_release$release, "_", wrk_release$identity),
                     tag             = match.arg(branch)) {
 
   measure <- "sna"
-  branch  <- branch
   action  <- match.arg(action)
 
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (action == "update") {
     # load nowcast growth rates

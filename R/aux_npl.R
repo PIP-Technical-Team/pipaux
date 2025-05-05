@@ -10,7 +10,6 @@ aux_npl <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                    tag     = match.arg(branch),
                    detail  = getOption("pipaux.detail.raw")) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,6 +17,12 @@ aux_npl <- function(action  = c("update", "load"),
 
   measure <- "npl"
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (action == "update") {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

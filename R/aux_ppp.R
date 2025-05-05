@@ -10,11 +10,16 @@
 aux_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                     force   = FALSE,
                     tag     = branch,
                     detail  = getOption("pipaux.detail.raw"),
                     ppp_defaults = TRUE) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####

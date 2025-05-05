@@ -50,7 +50,7 @@ aux_fun <- function(measure,
   # Get working release
   # Check if wrk_release exists
 
-  pipfun::get_wrk_release()
+  pipfun::get_wrk_release(verbose = verbose)
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -158,24 +158,53 @@ aux_fun <- function(measure,
     # Log CHECK ####
     # ~~~~~~~~~~~~~~~~ #
 
-    if (log) {
-      pipfun::log_add(
-        event   = "info",
-        message = paste0("Checking update status for: ", measure),
-        name    = "pipaux_dependencies_log",
-        logmeta = list(step    = "CHECK",
-                       measure = measure)
-      )
+    check_status_result <- tryCatch(
+      {
+        result <- check_status(
+          measure = measure,
+          repo    = repo,
+          owner   = owner,
+          maindir = maindir,
+          verbose = verbose
+        )
+
+        if (log) {
+          pipfun::log_add(
+            event          = "status_check",
+            message        = paste0("Check status completed for: ", measure),
+            name           = "pipaux_dependencies_log",
+            output         = result,
+            logmeta        = list(
+              step         = "CHECK",
+              measure      = measure
+            )
+          )
+        }
+
+        result
+      },
+      error = function(e) {
+        if (log) {
+          pipfun::log_add(
+            event   = "error",
+            message = paste0("Check failed for: ", measure, " - ", e$message),
+            name    = "pipaux_dependencies_log",
+            logmeta = list(
+              step    = "CHECK",
+              measure = measure
+            )
+          )
+        }
+        NULL
+      }
+    )
+
+    # Only proceed if check_status_result is not NULL
+    if (!is.null(check_status_result)) {
+      update_gh <- check_status_result$update_gh
+      update_y  <- check_status_result$update_y
     }
 
-  check_status <- check_status(measure = measure,
-                               repo    = repo,
-                               owner   = owner,
-                               maindir = maindir,
-                               verbose = verbose)
-
-  update_gh <- check_status$update_gh
-  update_y  <- check_status$update_y
 
 
   if (!update_gh && !update_y) {
@@ -185,7 +214,7 @@ aux_fun <- function(measure,
 
     if (log) {
       pipfun::log_add(
-        event   = "info",
+        event   = "success",
         message = paste0("No update needed for: ", measure),
         name    = "pipaux_dependencies_log",
         logmeta = list(step    = "END",
@@ -215,7 +244,7 @@ aux_fun <- function(measure,
 
       if (log) {
         pipfun::log_add(
-          event   = "info",
+          event   = "success",
           message = paste0("Updated GitHub for: ", measure),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE GH", measure = measure)
@@ -263,7 +292,7 @@ aux_fun <- function(measure,
 
       if (log) {
         pipfun::log_add(
-          event   = "info",
+          event   = "success",
           message = paste0("Updated Y drive for: ", measure),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE SERVER",
@@ -293,7 +322,7 @@ aux_fun <- function(measure,
 
   if (sys.nframe() <= 2 && log) {
     pipfun::log_add(
-      event   = "info",
+      event   = "success",
       message = "All dependencies successfully updated",
       name    = "pipaux_dependencies_log",
       logmeta = list(step = "END")

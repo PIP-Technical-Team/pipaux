@@ -35,7 +35,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Get current release ####
 
-  pipfun::get_wrk_release()
+  pipfun::get_wrk_release(verbose = verbose)
 
   release <- paste0(wrk_release$release,
                     "_",
@@ -47,7 +47,7 @@ get_aux_changes <- function(measure      = "cpi",
                                     current_release = release,
                                     identity        = wrk_release$identity)
 
-    cli::cli_alert_info("Using last available release: {.strong {old_release}}")
+   if (verbose) cli::cli_alert_info("Using last available release: {.strong {old_release}}")
   }
 
 

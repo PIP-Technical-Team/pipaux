@@ -2,24 +2,31 @@
 #'
 #' Load or update censoring data
 #'
+#' If `action = "update"`, the function retrieves the most recent censoring data files
+#' from the GitHub repo and saves them locally
+#' in the auxiliary data directory.
+#'
+#' If `action = "load"`, the function reads the previously saved local version of the
+#' censoring data and returns it as a list of data.tables.
+#'
 #'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
-#' @param branch GitHub branch to use. By default, this is the release branch set in your R session.
-#'   To ensure correct behavior, call `pipfun::setup_working_release()` once per session, followed by
-#'   `pipfun::get_wrk_release()` to retrieve the active release. These steps ensure the function uses the
-#'   correct release branch (e.g., `"release_2024Q1"`). Alternatively, you can explicitly specify other
-#'   branches among `"DEV"`, `"PROD"`, or `"main"` if needed
 #' @export
 aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch)) {
 
   measure <- "censoring"
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (action == "update") {
 
