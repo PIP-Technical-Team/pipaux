@@ -9,7 +9,7 @@ aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   tag     = match.arg(branch)) {
+                   tag     = NULL) {
   measure <- "cp"
   action <- match.arg(action)
 
@@ -18,6 +18,10 @@ aux_cp <- function(action  = c("update", "load"),
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     aux_cp_update(maindir = maindir,

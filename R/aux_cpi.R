@@ -17,7 +17,7 @@ aux_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    tag     = match.arg(branch),
+                    tag     = NULL,
                     detail = getOption("pipaux.detail.raw")) {
 
   pipfun::get_wrk_release(verbose = FALSE)
@@ -25,6 +25,10 @@ aux_cpi <- function(action = c("update", "load"),
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####

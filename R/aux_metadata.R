@@ -11,10 +11,14 @@ aux_metadata <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          maindir = gls$PIP_DATA_DIR,
                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
-                         tag     = branch,
+                         tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
   action <- match.arg(action)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
 

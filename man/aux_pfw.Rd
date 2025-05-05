@@ -9,7 +9,7 @@ aux_pfw(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  tag = match.arg(branch),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

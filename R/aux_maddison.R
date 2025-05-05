@@ -11,7 +11,7 @@ aux_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
-                         tag     = branch,
+                         tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
   action  <- match.arg(action)
@@ -21,6 +21,10 @@ aux_maddison <- function(action = c("update", "load"),
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     mpd <-  pipfun::load_from_gh(

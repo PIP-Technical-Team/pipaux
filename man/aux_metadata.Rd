@@ -10,7 +10,7 @@ aux_metadata(
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
   branch = paste0(wrk_release$release, "_", wrk_release$identity),
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

@@ -9,7 +9,7 @@ aux_gdp(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

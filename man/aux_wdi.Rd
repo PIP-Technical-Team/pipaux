@@ -9,7 +9,7 @@ aux_wdi(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  tag = match.arg(branch),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

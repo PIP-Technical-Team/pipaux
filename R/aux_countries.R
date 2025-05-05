@@ -9,7 +9,7 @@ aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           maindir = gls$PIP_DATA_DIR,
-                          tag     = match.arg(branch)) {
+                          tag     = NULL) {
 
   measure <- "countries"
   action <- match.arg(action)
@@ -20,6 +20,9 @@ aux_countries <- function(action  = c("update", "load"),
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
 
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
 

@@ -9,7 +9,7 @@ aux_dictionary <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            maindir = gls$PIP_DATA_DIR,
-                           tag     = match.arg(branch)) {
+                           tag     = NULL) {
   measure <- "dictionary"
 
   pipfun::get_wrk_release(verbose = FALSE)
@@ -17,6 +17,10 @@ aux_dictionary <- function(action  = c("update", "load"),
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   action <- match.arg(action)
 

@@ -9,7 +9,7 @@ aux_ppp(
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
   force = FALSE,
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw"),
   ppp_defaults = TRUE
 )

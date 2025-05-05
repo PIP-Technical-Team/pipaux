@@ -9,7 +9,7 @@ aux_cpi(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  tag = match.arg(branch),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

@@ -9,7 +9,7 @@ aux_maddison(
   owner = getOption("pipfun.ghowner"),
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

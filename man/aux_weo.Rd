@@ -9,7 +9,7 @@ aux_weo(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

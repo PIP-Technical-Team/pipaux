@@ -12,7 +12,7 @@ aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    tag             = branch,
+                    tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
@@ -23,7 +23,10 @@ aux_gdp <- function(action          = c("update", "load"),
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
 
-  tag        <- tag
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
+
   action     <- match.arg(action)
 
 
