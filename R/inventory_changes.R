@@ -124,22 +124,22 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Add metadata: files paths, measure
 
-  # new_path <- fs::path(maindir,
-  #                      "aux_data",
-  #                      release,
-  #                      measure,
-  #                      paste0(measure, ".", "qs"))
-  #
-  # old_path <- fs::path(maindir,
-  #                      "aux_data",
-  #                      old_release,
-  #                      measure,
-  #                      paste0(measure, ".", "qs"))
-  #
-  # diff_table <- diff_table |>
-  #   fmutate(measure = measure,
-  #           path.x  = new_path,
-  #           path.y  = old_path)
+  new_path <- fs::path(maindir,
+                       "aux_data",
+                       release,
+                       measure,
+                       paste0(measure, ".", "qs"))
+
+  old_path <- fs::path(maindir,
+                       "aux_data",
+                       old_release,
+                       measure,
+                       paste0(measure, ".", "qs"))
+
+  diff_table <- diff_table |>
+    fmutate(measure = measure,
+            path.x  = new_path,
+            path.y  = old_path)
 
   # _______________________________________#
   # Return ####
