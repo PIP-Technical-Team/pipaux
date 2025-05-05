@@ -18,12 +18,6 @@ aux_cpi_clean(
 "cpi2011".}
 
 \item{maindir}{character: Main directory of project.}
-
-\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
-To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
-\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
-correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
-branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

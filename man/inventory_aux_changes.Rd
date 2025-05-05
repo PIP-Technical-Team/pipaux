@@ -21,7 +21,8 @@ inventory_aux_changes(
 
 \item{owner}{GitHub owner of aux data repos. Defaults to \code{"PIP-Technical-Team"}.}
 
-\item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).}
+\item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
+If NULL, automatically take last available release of same identity as the current working release}
 
 \item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
 

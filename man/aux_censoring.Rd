@@ -9,7 +9,6 @@ aux_censoring(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = match.arg(branch)
 )
 }
@@ -24,14 +23,16 @@ aux_censoring(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
-To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
-\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
-correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
-branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
-
 \item{tag}{character: specific release to be used in the update.}
 }
 \description{
 Load or update censoring data
+}
+\details{
+If \code{action = "update"}, the function retrieves the most recent censoring data files
+from the GitHub repo and saves them locally
+in the auxiliary data directory.
+
+If \code{action = "load"}, the function reads the previously saved local version of the
+censoring data and returns it as a list of data.tables.
 }
