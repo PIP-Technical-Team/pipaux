@@ -9,7 +9,7 @@ aux_metaregion(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = match.arg(branch)
 )
 }

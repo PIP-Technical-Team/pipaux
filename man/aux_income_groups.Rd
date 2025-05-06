@@ -9,8 +9,6 @@ aux_income_groups(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  class_branch = "master",
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -25,9 +23,6 @@ memory.}
 \code{getOption("pipfun.ghowner")}}
 
 \item{maindir}{character: Main directory of project.}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

@@ -9,8 +9,7 @@ aux_regions(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch)
+  tag = NULL
 )
 }
 \arguments{
@@ -24,9 +23,6 @@ memory.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

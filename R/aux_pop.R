@@ -9,20 +9,26 @@
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
-                    from    = c("gh", "file", "api"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
-  from    <- tolower(from)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     aux_pop_update(
       force   = force,
-      from    = from,
       maindir = maindir,
       owner   = owner,
       branch  = branch,
@@ -46,85 +52,26 @@ aux_pop <- function(action = c("update", "load"),
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
 aux_pop_update <-  function(force   = FALSE,
-                            from    = c("gh", "file", "api"),
                             maindir = gls$PIP_DATA_DIR,
                             owner   = getOption("pipfun.ghowner"),
-                            branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch),
+                            branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                            tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {
 
   # Check arguments
-  from    <- match.arg(from)
-  branch <- match.arg(branch)
+  branch  <- branch
+  tag     <- branch
   measure <- "pop"
 
-  # Get the most recent year in PFW to filter population projection
+  # Get current year as max year
 
-  pfw      <- pipload::pip_load_aux("pfw",
-                                    branch  = branch,
-                                    maindir = maindir)
-  # year_max <- pfw[, max(year)]
-  # get current year as max year
   year_max <- Sys.Date() |>
     format("%Y") |>
     as.numeric()
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # From WDI   ---------
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  if (from == "api") {
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ## from API --------
-
-    pop_indicators <- c("SP.POP.TOTL", "SP.RUR.TOTL", "SP.URB.TOTL")
-    pop   <- wbstats::wb_data(indicator = pop_indicators,
-                              country = "all", # this is new
-                              lang      = "en",
-                              return_wide = FALSE) |>
-      setDT()
-
-    # validate wb pop data
-    pop_validate_raw(pop = pop, detail = detail)
-
-    # rename vars
-    pop <- pop[, c("iso3c", "date", "indicator_id", "value")]
-
-    setnames(pop,
-             new = c("country_code", "year", "coverage", "pop"))
-
-
-
-    pop[,
-        year := as.numeric(year)
-    ][,
-      pop_data_level :=
-        fcase(
-          grepl("POP", coverage), 2,
-          grepl("RUR", coverage), 0,
-          grepl("URB", coverage), 1
-        )
-    ][,
-      coverage := NULL]
-
-    ### Ger special cases ---------
-
-    spop <- pipfun::load_from_gh(
-      measure = measure,
-      filename = "spop",
-      owner  = owner,
-      branch = branch,
-      tag    = tag,
-      ext    = "csv")  |>
-      clean_names_from_wide() |>
-      clean_from_wide()
-
-
-    pop <- rbindlist(list(pop, spop),
-                     use.names = TRUE,
-                     fill = TRUE)
-
-
-  } else {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## from Emi's file --------
 
@@ -137,7 +84,15 @@ aux_pop_update <-  function(force   = FALSE,
       branch = branch,
       tag    = tag,
       ext    = "xlsx"
-    ) |>
+    )
+
+    ### Get the attributes before they get lost
+    gh_pop_main <- attr(pop_main, "gh")
+
+    ## DEBUG STATEMENT
+    print(gh_pop_main)
+
+    pop_main <- pop_main |>
       clean_names_from_wide() |>
       clean_from_wide()
 
@@ -152,7 +107,12 @@ aux_pop_update <-  function(force   = FALSE,
       branch = branch,
       tag    = tag,
       ext    = "csv"
-    )  |>
+    )
+
+    ### Get the attributes before they get lost
+    gh_spop <- attr(spop, "gh")
+
+    spop <- spop |>
       clean_names_from_wide() |>
       clean_from_wide()
 
@@ -165,11 +125,6 @@ aux_pop_update <-  function(force   = FALSE,
                       reportvar = FALSE,
                       verbose = FALSE)
 
-    # pop <- rbindlist(list(pop_main, spop),
-    #                       use.names = TRUE,
-    #                       fill = TRUE)
-
-  }
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Clean data   ---------
@@ -239,7 +194,23 @@ aux_pop_update <-  function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+  setattr(pop,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+  # Set gh attributes --------------------------------
+
+  setattr(pop,
+          "gh",
+          list(gh_spop = gh_spop,
+               gh_pop_main = gh_pop_main))
 
   saved <- pipfun::pip_sign_save(
     x       = pop,

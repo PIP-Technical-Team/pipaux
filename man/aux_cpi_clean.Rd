@@ -8,7 +8,7 @@ aux_cpi_clean(
   y,
   cpivar = getOption("pipaux.cpivar"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
+  branch = paste0(wrk_release$release, "_", wrk_release$identity)
 )
 }
 \arguments{
@@ -18,9 +18,6 @@ aux_cpi_clean(
 "cpi2011".}
 
 \item{maindir}{character: Main directory of project.}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

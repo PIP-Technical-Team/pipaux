@@ -11,13 +11,21 @@ aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
-                    from    = c("gh", "file", "api"),
+                    tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
+
   measure <- "pce"
-  branch <- match.arg(branch)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     aux_pce_update(maindir = maindir,
@@ -25,7 +33,6 @@ aux_pce <- function(action  = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from,
                    detail  = detail)
 
   } else {
@@ -48,22 +55,13 @@ aux_pce <- function(action  = c("update", "load"),
 aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
-                           from    = c("gh", "file", "api"),
+                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                           tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
-  branch <- match.arg(branch)
-  from   <- match.arg(from)
 
   #   ________________________________________________________________
   #   Load data                                             ####
-
-  # Update WDI
-  # pip_wdi_update(maindir = maindir,
-  #                from    = from,
-  #                force   = force,
-  #                branch  = branch)
   #
 
   wpce   <- load_aux(measure = "wdi",
@@ -287,7 +285,29 @@ aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(pce,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ----------------------
+
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(pce,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   saved <- pipfun::pip_sign_save(
     x       = pce,

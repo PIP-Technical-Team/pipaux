@@ -7,6 +7,9 @@ pipuax_default_options <- list(
   pipaux.popsrc  = "emi",
   pipaux.madsrc  = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
   # pipaux.maindir = gls$PIP_DATA_DIR,
+  pipaux.working_dir = "Y:/PIP_ingestion_pipeline_v2",
+  pipaux.key_vars    = c("country_code", "year", "reporting_level",
+                         "survey_acronym", "welfare_type"),
   pipfun.ghowner = "PIP-Technical-Team",
   joyn.verbose   = FALSE,
   pipfun.verbose = TRUE,
@@ -28,6 +31,10 @@ pipuax_default_options <- list(
   ## defined values --------
 
   # pipload::add_gls_to_env()
+
+  # Initialize a log
+  pipfun::log_init("pipaux_dependencies_log",
+                   overwrite = TRUE)
 
 
   invisible()

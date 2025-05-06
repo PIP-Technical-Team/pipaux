@@ -11,12 +11,20 @@ aux_nan <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = c("DEV", "PROD", "main"),
-                    tag             = match.arg(branch)) {
+                    tag             = NULL) {
 
   measure    <- "nan"
-  branch <- match.arg(branch)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
 
   if (action == "update") {
@@ -24,12 +32,24 @@ aux_nan <- function(action          = c("update", "load"),
     nan <- pipfun::load_from_gh(
       measure = "nan",
       owner  = owner,
-      branch = branch
+      branch = branch,
+      filename = "nan.csv"
     )
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+    # ----- function raw sha ----------------------
+
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+
+    setattr(nan,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = nan,

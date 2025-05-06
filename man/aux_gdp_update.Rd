@@ -8,9 +8,8 @@ aux_gdp_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
-  from = c("gh", "file", "api"),
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
+  tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -26,9 +25,6 @@ aux_gdp_update(
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

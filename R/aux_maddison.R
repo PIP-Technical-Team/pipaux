@@ -11,12 +11,20 @@ aux_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
                          maindir = gls$PIP_DATA_DIR,
-                         branch  = c("DEV", "PROD", "main"),
-                         tag     = match.arg(branch),
+                         tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
   action  <- match.arg(action)
-  branch  <- match.arg(branch)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     mpd <-  pipfun::load_from_gh(
@@ -35,13 +43,22 @@ aux_maddison <- function(action = c("update", "load"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    aux_maddison)
+  )
 
   setattr(mpd, "aux_name", "maddison")
 
   setattr(mpd,
           "aux_key",
           c("country_code", "year"))
+
+  setattr(mpd,
+          "raw_sha_fun",
+          raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x = mpd,

@@ -9,9 +9,7 @@ aux_pce(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
-  from = c("gh", "file", "api"),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -26,13 +24,7 @@ aux_pce(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
-
 \item{tag}{character: specific release to be used in the update.}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

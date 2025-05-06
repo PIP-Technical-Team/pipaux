@@ -10,11 +10,20 @@
 aux_ppp <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
                     force   = FALSE,
-                    tag     = branch,
+                    tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
                     ppp_defaults = TRUE) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -26,7 +35,7 @@ aux_ppp <- function(action = c("update", "load"),
   #   Defenses                                                                ####
   measure <- "ppp"
   action <- match.arg(action)
-  branch <- match.arg(branch)
+
 
   stopifnot( exprs = {
 
@@ -160,9 +169,9 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
 aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
-                           force = FALSE,
+                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                            tag     = match.arg(branch),
                            detail  = getOption("pipaux.detail.raw")) {
 
@@ -171,7 +180,6 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   #   set up                                                                  ####
 
   measure <- "ppp"
-  branch  <- match.arg(branch)
 
 
   #   ____________________________________________________________________________
@@ -185,20 +193,28 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     ext    = "csv"
   )
 
+  gh <- attr(ppp, "gh")
+
+  # DEBUG
+  #print(attr(ppp, "gh"))
+
   # validate ppp raw data
   ppp_validate_raw(ppp = ppp, detail = detail)
 
   #   ____________________________________________________________________________
   #   cleaning                                                                ####
 
-
   # Clean data
   ppp <- aux_ppp_clean(ppp)
+
+
 
   # Remove any non-WDI countries
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
                  branch = branch)
+
+
 
   ppp <- ppp[country_code %in% cl$country_code]
 
@@ -231,6 +247,8 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
           "aux_key",
           c("country_code", "reporting_level")) # this is going to be key variables only when PPP default year selected.
 
+  setattr(ppp, "gh", gh)
+
   # validate ppp output data
   ppp_validate_output(ppp = ppp, detail = detail)
 
@@ -238,7 +256,16 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
 
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+  setattr(ppp,
+          "raw_sha_fun",
+          raw_sha_fun)
+
+
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = ppp,

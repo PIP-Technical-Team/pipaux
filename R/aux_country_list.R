@@ -9,20 +9,25 @@
 #' The dependency on the PCN Masterfile should be changed in the future.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @inheritParams aux_pfw
+#' @inheritParams aux_countries
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
-aux_country_list <- function(action = c("update", "load"),
-                             maindir = gls$PIP_DATA_DIR,
-                             force   = FALSE,
-                             branch  = c("DEV", "PROD", "main"),
-                             class_branch = "master",
-                             detail  = getOption("pipaux.detail.raw")
+aux_country_list <- function(action       = c("update", "load"),
+                             maindir      = gls$PIP_DATA_DIR,
+                             force        = FALSE,
+                             detail       = getOption("pipaux.detail.raw")
                              ) {
   measure <- "country_list"
-  branch  <- match.arg(branch)
   action  <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  class_branch = "master"
 
   if (action == "update") {
 
@@ -36,12 +41,21 @@ aux_country_list <- function(action = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
 
   setattr(cl, "aux_name", "country_list")
   setattr(cl,
           "aux_key",
           c("country_code"))
+
+  setattr(cl,
+          "raw_sha_fun",
+          raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = cl,
@@ -49,32 +63,6 @@ aux_country_list <- function(action = c("update", "load"),
       msrdir  = msrdir,
       force   = force
     )
-
-    if (saved) {
-      cl_sha <- digest::sha1(cl)
-      out <- gh::gh(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        owner     = "PIP-Technical-Team",
-        repo      = "aux_country_list",
-        path      = "sha_country_list.txt",
-        .params   = list(ref = "DEV")
-      )
-
-      res <- gh::gh(
-        "PUT /repos/{owner}/{repo}/contents/{path}",
-        owner   = "PIP-Technical-Team",
-        repo    = "aux_country_list",
-        path    = "sha_country_list.txt",
-        .params = list(
-          branch  = branch,
-          message = paste0("update on ", prettyNum(Sys.time())),
-          sha     = out$sha,
-          content = base64enc::base64encode(charToRaw(cl_sha))
-        ),
-        .token = Sys.getenv("GITHUB_PAT")
-      )
-
-    }
 
     return(invisible(saved))
 

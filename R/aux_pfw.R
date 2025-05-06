@@ -7,6 +7,11 @@
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
+#' @param branch GitHub branch to use. By default, this is the release branch set in your R session.
+#'   To ensure correct behavior, call `pipfun::setup_working_release()` once per session, followed by
+#'   `pipfun::get_wrk_release()` to retrieve the active release. These steps ensure the function uses the
+#'   correct release branch (e.g., `"release_2024Q1"`). Alternatively, you can explicitly specify other
+#'   branches among `"DEV"`, `"PROD"`, or `"main"` if needed
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
@@ -14,12 +19,20 @@ aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     maindir = gls$PIP_DATA_DIR,
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
-  branch <- match.arg(branch)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     aux_pfw_update(maindir = maindir,
@@ -49,9 +62,9 @@ aux_pfw <- function(action  = c("update", "load"),
 #' @keywords internal
 aux_pfw_clean <- function(y,
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch) {
 
-  branch <- match.arg(branch)
+  #branch <- match.arg(branch)
 
   if (!inherits(y, "data.table")) {
     x <- as.data.table(y)
@@ -132,12 +145,11 @@ aux_pfw_clean <- function(y,
 aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
+                           branch,
                            tag     = match.arg(branch),
                            detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pfw"
-  branch <- match.arg(branch)
 
   # Read data
   pfw <- pipfun::load_from_gh(measure = measure,
@@ -159,9 +171,18 @@ aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
 
   setattr(pfw, "aux_name", "pfw")
+
+  setattr(pfw,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   saved <- pipfun::pip_sign_save(
     x       = pfw,
@@ -262,8 +283,11 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
                 description = "`surv_producer` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("N", "R", "U")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("national", "partial", "rural", "urban")),
+    #               survey_coverage,
+    #               description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("N", "R", "U")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(datatype),
                 description = "`datatype` should be character") |>
     validate_cols(in_set(c("C", "I", "c", "i")),
@@ -453,8 +477,8 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
                 description = "`surv_producer` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_cols(in_set(c("national", "rural", "urban")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(welfare_type),
                 description = "`welfare_type` should be character") |>
     validate_cols(in_set(c("consumption", "income")),

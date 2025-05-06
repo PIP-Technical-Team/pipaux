@@ -10,15 +10,23 @@ aux_npl <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    maindir = gls$PIP_DATA_DIR,
-                   branch  = c("DEV", "PROD", "main"),
-                   tag     = match.arg(branch),
+                   tag     = NULL,
                    detail  = getOption("pipaux.detail.raw")) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## setup --------
 
   measure <- "npl"
-  branch <- match.arg(branch)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   if (action == "update") {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +67,18 @@ aux_npl <- function(action  = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+    # ----- function raw sha ----------------------
+
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
+
+
+    setattr(npl,
+            "raw_sha_fun",
+            raw_sha_fun)
 
     saved <- pipfun::pip_sign_save(
       x       = npl,

@@ -8,6 +8,7 @@
 #' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
 #'
 #' @export
@@ -16,9 +17,18 @@ aux_cpi <- function(action = c("update", "load"),
                     maindir = gls$PIP_DATA_DIR,
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    branch  = c("DEV", "PROD", "main"),
-                    tag     = match.arg(branch),
+                    tag     = NULL,
                     detail = getOption("pipaux.detail.raw")) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
   #   ____________________________________________________________________________
   #   on.exit                                                                 ####
@@ -30,7 +40,6 @@ aux_cpi <- function(action = c("update", "load"),
   #   Defenses                                                                ####
   measure <- "cpi"
   action <- match.arg(action)
-  branch <- match.arg(branch)
 
   stopifnot( exprs = {
 
@@ -78,7 +87,7 @@ aux_cpi <- function(action = c("update", "load"),
 aux_cpi_clean <- function(y,
                           cpivar = getOption("pipaux.cpivar"),
                           maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
+                          branch  = paste0(wrk_release$release, "_", wrk_release$identity)) {
 
   x <- data.table::as.data.table(y)
 
@@ -144,15 +153,15 @@ aux_cpi_clean <- function(y,
 aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
+                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                           tag,
                            detail  = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
 
   measure <- "cpi"
-  branch  <- match.arg(branch)
+  tag <- branch
 
 
   #   ____________________________________________________________________________
@@ -165,6 +174,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     tag    = tag,
     ext    = "csv"
   )
+
 
   # validate cpi raw data
   cpi_validate_raw(cpi, detail = detail)
@@ -185,10 +195,19 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
 
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
   setattr(cpi, "aux_name", "cpi")
   setattr(cpi,
           "aux_key",
           c("country_code", "year", "reporting_level", "survey_acronym"))
+
+  setattr(cpi,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   # validate cpi clean data before saving it
   cpi_validate_output(cpi, detail = detail)
@@ -197,7 +216,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   saved <- pipfun::pip_sign_save(
     x       = cpi,
@@ -205,6 +224,7 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
     msrdir  = msrdir,
     force   = force
   )
+
 
   return(invisible(saved))
 }
@@ -354,26 +374,26 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cur_adj` should be numeric") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("N", "R", "U", NA)),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
-    validate_if(is.numeric(cpi2011_SM22),
-                description = "`cpi2011_SM22` should be numeric") |>
+    # validate_cols(in_set(c("N", "R", "U")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
+    # validate_if(is.numeric(cpi2011_SM22),
+    #             description = "`cpi2011_SM22` should be numeric") |>
     validate_if(is.numeric(comparable),
                 description = "`comparable` should be numeric") |>
-    validate_if(is.numeric(cpi2017_SM22),
-                description = "`cpi2017_SM22` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_SM22),
+    #             description = "`cpi2017_SM22` should be numeric") |>
     validate_cols(is.logical, cpi2005,
                   description = "`cpi2005` should be logical") |>
     validate_if(is.numeric(cpi_data_level),
                 description = "`cpi_data_level` should be numeric") |>
     validate_cols(in_set(c(0, 1, 2)),
                   cpi_data_level, description = "`cpi_data_level` values within range") |>
-    validate_if(is.numeric(ref_year_SM24),
-                description = "`ref_year_SM24` should be numeric") |>
-    validate_if(is.numeric(cpi2011_SM24),
-                description = "`cpi2011_SM24` should be numeric") |>
-    validate_if(is.numeric(cpi2017_SM24),
-                description = "`cpi2011_SM24` should be numeric") |>
+    # validate_if(is.numeric(ref_year_SM24),
+    #             description = "`ref_year_SM24` should be numeric") |>
+    # validate_if(is.numeric(cpi2011_SM24),
+    #             description = "`cpi2011_SM24` should be numeric") |>
+    # validate_if(is.numeric(cpi2017_SM24),
+    #             description = "`cpi2011_SM24` should be numeric") |>
     validate_if(is.numeric(change_cpi2017),
                 description = "`change_cpi2017` should be numeric") |>
     validate_if(is.numeric(change_icp2017),

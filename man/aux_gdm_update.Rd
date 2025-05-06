@@ -8,8 +8,8 @@ aux_gdm_update(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  branch,
+  tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -20,9 +20,6 @@ aux_gdm_update(
 \code{getOption("pipfun.ghowner")}}
 
 \item{maindir}{character: Main directory of project.}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 

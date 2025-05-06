@@ -8,8 +8,6 @@ aux_country_list(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
-  branch = c("DEV", "PROD", "main"),
-  class_branch = "master",
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -20,9 +18,6 @@ aux_country_list(
 \item{maindir}{character: Main directory of project.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

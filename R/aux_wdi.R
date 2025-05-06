@@ -12,14 +12,21 @@ aux_wdi <- function(action          = c("update", "load"),
                     force           = FALSE,
                     maindir         = gls$PIP_DATA_DIR,
                     owner           = getOption("pipfun.ghowner"),
-                    branch          = c("DEV", "PROD", "main"),
-                    tag             = match.arg(branch),
-                    from            = c("gh", "file", "api"),
+                    tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "wdi"
-  branch <- match.arg(branch)
   action <- match.arg(action)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
+
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
+  }
 
 
   if (action == "update") {
@@ -28,7 +35,6 @@ aux_wdi <- function(action          = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   from    = from,
                    detail  = detail)
 
   } else {
@@ -43,7 +49,7 @@ aux_wdi <- function(action          = c("update", "load"),
 
 #' Update National accounts data from WDI
 #'
-#' GDP and HFCE data from WDI. It could be either from API or from file
+#' GDP and HFCE data from WDI.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_gdp
@@ -55,14 +61,10 @@ aux_wdi <- function(action          = c("update", "load"),
 aux_wdi_update <- function(force   = FALSE,
                            maindir = gls$PIP_DATA_DIR,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = c("DEV", "PROD", "main"),
-                           tag     = match.arg(branch),
-                           from    = c("gh", "file", "api"),
+                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                           tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
 
-
-  from   <- match.arg(from)
-  branch <- match.arg(branch)
 
   #   ______________________________________________________
   #   Computations                                    ####
@@ -71,29 +73,12 @@ aux_wdi_update <- function(force   = FALSE,
   ##  ...............................................................
   ##  From file                                          ####
 
-  if (from   %in% c("file", "gh")) {
     wdi <- pipfun::load_from_gh(measure = measure,
                                 owner = owner,
                                 branch = branch,
                                 ext    = "csv")
 
-  } else {
-    ##  ........................................................................
-    ##  From API                                                            ####
-    wdi_indicators <- c("NY.GDP.PCAP.KD", "NE.CON.PRVT.PC.KD")
-    wdi   <- wbstats::wb_data(indicator = wdi_indicators,
-                              lang = "en") |>
-      setDT()
 
-    wdi[,
-        c("country", "iso2c") := NULL]
-
-    # Rename columns
-    setnames(wdi,
-             old = c("iso3c", "date"),
-             new = c("country_code", "year")
-    )
-  }
   # validate wdi raw data
   wdi_validate_raw(wdi = wdi, detail = detail)
 
@@ -103,12 +88,22 @@ aux_wdi_update <- function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(wdi, "aux_name", "wdi")
   setattr(wdi,
           "aux_key",
           c("country_code", "year"))
+
+  # ----- function raw sha -----------------------------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+
+  setattr(wdi,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   saved <- pipfun::pip_sign_save(
     x       = wdi,

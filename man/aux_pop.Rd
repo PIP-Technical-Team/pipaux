@@ -7,11 +7,9 @@
 aux_pop(
   action = c("update", "load"),
   force = FALSE,
-  from = c("gh", "file", "api"),
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -22,19 +20,16 @@ memory.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{from}{character: Source for population data.}
-
 \item{maindir}{character: Main directory of project.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
-
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{from}{character: Source for population data.}
 }
 \description{
 Load or update population data.

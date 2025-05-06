@@ -9,8 +9,7 @@ aux_weo(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -25,9 +24,6 @@ aux_weo(
 
 \item{maindir}{character: Main directory of project.}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
-
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
@@ -40,6 +36,6 @@ Note that the most recent version most be downloaded from imf.org and saved
 as an .xls file in \verb{<maindir>/_aux/weo/}. The filename should be in the
 following structure \verb{WEO_<YYYY-DD-MM>.xls}. Due to potential file corruption
 the file must be opened and re-saved before it can be updated with
-\code{pip_weo()}. Hopefully in the future IMF will stop using an \code{.xls} file
+\code{aux_weo()}. Hopefully in the future IMF will stop using an \code{.xls} file
 that's not really xls.
 }

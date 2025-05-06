@@ -8,7 +8,7 @@ aux_cp_update(
   maindir = gls$PIP_DATA_DIR,
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = match.arg(branch)
 )
 }
@@ -19,9 +19,6 @@ aux_cp_update(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

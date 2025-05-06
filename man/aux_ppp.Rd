@@ -8,9 +8,8 @@ aux_ppp(
   action = c("update", "load"),
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
   force = FALSE,
-  tag = branch,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw"),
   ppp_defaults = TRUE
 )
@@ -23,9 +22,6 @@ aux_ppp(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 

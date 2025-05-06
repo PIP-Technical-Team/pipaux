@@ -8,9 +8,8 @@ aux_wdi_update(
   force = FALSE,
   maindir = gls$PIP_DATA_DIR,
   owner = getOption("pipfun.ghowner"),
-  branch = c("DEV", "PROD", "main"),
-  tag = match.arg(branch),
-  from = c("gh", "file", "api"),
+  branch = paste0(wrk_release$release, "_", wrk_release$identity),
+  tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -22,13 +21,7 @@ aux_wdi_update(
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
-
 \item{tag}{character: specific release to be used in the update.}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
@@ -36,7 +29,7 @@ and "gh" are synonymous}
 data.table with gdp and pce variables
 }
 \description{
-GDP and HFCE data from WDI. It could be either from API or from file
+GDP and HFCE data from WDI.
 }
 \examples{
 aux_wdi_update()

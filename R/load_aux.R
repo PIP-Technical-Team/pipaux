@@ -8,15 +8,19 @@
 #' @export
 load_aux <- function(measure,
                      maindir = gls$PIP_DATA_DIR,
-                     branch  = c("DEV", "PROD", "main"),
+                     branch,
                      apply_label = TRUE,
                      ppp_defaults = TRUE) {
 
-  branch <- match.arg(branch)
+  branch <- branch
+
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux/", branch, measure)
+  msrdir <- fs::path(maindir, "aux_data/", branch, measure)
+
+  #msrdir <- fs::path(maindir, "_aux/", branch, measure)
+
 
   file_paths <- fs::dir_ls(msrdir,
                            type = "file",

@@ -7,7 +7,7 @@
 aux_weo_clean(
   dt,
   maindir = gls$PIP_DATA_DIR,
-  branch = c("DEV", "PROD", "main")
+  branch = paste0(wrk_release$release, "_", wrk_release$identity)
 )
 }
 \arguments{
