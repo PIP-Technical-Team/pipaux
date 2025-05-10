@@ -7,10 +7,15 @@
 #'
 #' @export
 load_aux <- function(measure,
-                     maindir = gls$PIP_DATA_DIR,
-                     branch,
+                     maindir = getOption("pipaux.working_dir"),
                      apply_label = TRUE,
                      ppp_defaults = TRUE) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   branch <- branch
 
