@@ -34,7 +34,17 @@ aux_dictionary <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # ----- function raw sha ------
+  raw_sha_fun <- digest::digest(body(
+    paste0("aux_", measure))
+  )
+
+  setattr(df,
+          "raw_sha_fun",
+          raw_sha_fun)
+
     saved <- pipfun::pip_sign_save(
       x       = df,
       measure = measure,
