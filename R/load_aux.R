@@ -9,15 +9,18 @@
 load_aux <- function(measure,
                      maindir = getOption("pipaux.working_dir"),
                      apply_label = TRUE,
-                     ppp_defaults = TRUE) {
+                     ppp_defaults = TRUE,
+                     branch = NULL) {
 
   pipfun::get_wrk_release(verbose = FALSE)
 
-  release        <- wrk_release$release
-  identity       <- wrk_release$identity
-  branch         <- paste0(release, "_", identity)
 
-  branch <- branch
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
 
   if (branch == "main") {
     branch <- ""

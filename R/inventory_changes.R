@@ -58,8 +58,7 @@ get_aux_changes <- function(measure      = "cpi",
   new_df <- tryCatch({
 
     load_aux(measure = measure,
-             maindir = maindir,
-             branch  = release)
+             maindir = maindir)
   },
 
   error = function(e) {
@@ -116,7 +115,7 @@ get_aux_changes <- function(measure      = "cpi",
   # diff_list <- myrror::extract_diff_values(myrror_object = myr_obj,
   #                                          output        = "simple")
 
-  # Extract differences in table format
+  # Extract different values in table format
   diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
                                            by            = key_cols,
                                            output        = "simple",
