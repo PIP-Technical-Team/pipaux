@@ -125,7 +125,7 @@ get_aux_changes <- function(measure      = "cpi",
   myr_obj <- tryCatch(
 
     {
-      myr_obj <- myrror::myrror(
+      myrror::myrror(
         dfx                 = new_df,
         dfy                 = old_df,
         by                  = key_cols,
@@ -145,19 +145,21 @@ get_aux_changes <- function(measure      = "cpi",
         if (verbose) cli::cli_alert_warning("The join is many-to-many using the current keys: {.val {key_cols}}.")
         if (verbose) cli::cli_alert_info("Running {.fun joyn::possible_ids} to identify better key candidates...")
 
-        new_keys <- joyn::possible_ids(new_df, max_combination_size = 4)
-
         if (length(new_keys.x) + length(new_keys.y) == 0) {
           cli::cli_abort("No unique identifiers found with {.fun joyn::possible_ids}.")
         }
 
-        new_keys.x <- joyn::possible_ids(new_df, max_combination_size = 4)[[1]]
-        new_keys.y <- joyn::possible_ids(old_df, max_combination_size = 4)[[1]]
+        new_keys.x <- joyn::possible_ids(new_df,
+                                         max_combination_size = 4,
+                                         verbose = FALSE)[[1]]
+        new_keys.y <- joyn::possible_ids(old_df,
+                                         max_combination_size = 4,
+                                         verbose = FALSE)[[1]]
 
        if (verbose) cli::cli_alert_info("Trying again with new key vars: {.val {new_keys}}")
 
         # Retry with new keys
-        myr_obj <<- myrror::myrror(
+        myrror::myrror(
           dfx                 = new_df,
           dfy                 = old_df,
           by.x                = new_keys.x,
@@ -179,7 +181,7 @@ get_aux_changes <- function(measure      = "cpi",
   diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
                                            by.x          = new_keys.x,
                                            by.y          = new_keys.y,
-                                           output        = "full",
+                                           output        = "simple",
                                            interactive   = FALSE)
 
   # Extract different rows
@@ -221,7 +223,13 @@ get_aux_changes <- function(measure      = "cpi",
     cli::cli_alert_success("Diff values extracted successfully for measure: {.strong {measure}}")
   }
 
-  return(diff_table)
+  #return(diff_table)
+  return(invisible(
+    list(
+    "diff_values" = diff_table,
+    "diff_rows"   = diff_rows
+  ))
+  )
 
 }
 
