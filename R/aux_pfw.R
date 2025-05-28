@@ -61,7 +61,7 @@ aux_pfw <- function(action  = c("update", "load"),
 #'
 #' @keywords internal
 aux_pfw_clean <- function(y,
-                          maindir = gls$PIP_DATA_DIR,
+                          maindir = getOption("pipaux.working_dir"),
                           branch) {
 
   #branch <- match.arg(branch)
@@ -124,9 +124,42 @@ aux_pfw_clean <- function(y,
         default = ""
       ),
       surveyid_year = as.integer(surveyid_year),
-      survey_year   = round(survey_year, 2)
+      survey_year   = round(survey_year, 2),
+      is_alt_welf = FALSE
     )
   ]
+
+  # ---- ADDITION: Handle alternative welfare ----
+
+  if (!all(x$oth_welfare1_type == "")) {
+
+    x_alt <- copy(x[oth_welfare1_type != ""])
+
+    x_alt[
+      ,
+      welfare_type := fcase(
+        grepl("^([Cc])", oth_welfare1_type), "consumption",
+        grepl("^([Ii])", oth_welfare1_type), "income",
+        default = ""
+      )
+    ][
+      ,
+      oth_welfare1_type := NULL
+    ][
+      ,
+      is_alt_welf := TRUE
+    ]
+
+    x <- rbindlist(list(x, x_alt), use.names = TRUE, fill = TRUE)
+
+    if (nrow(x) > nrow(unique(x, by = setdiff(names(x), "is_alt_welf")))) {
+
+      cli::cli_alert_info("More than one type of welfare")
+    }
+  }
+
+
+  # Load countries and filter
 
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
@@ -142,14 +175,15 @@ aux_pfw_clean <- function(y,
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch,
-                           tag     = match.arg(branch),
+                           branch  = NULL,
+                           tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pfw"
+  tag <- branch
 
   # Read data
   pfw <- pipfun::load_from_gh(measure = measure,
