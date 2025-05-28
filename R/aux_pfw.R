@@ -184,7 +184,7 @@ aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
           "raw_sha_fun",
           raw_sha_fun)
 
-  setattr(ppp,
+  setattr(pfw,
           "aux_key",
           c("country_code", "welfare_type", "year"))
 
