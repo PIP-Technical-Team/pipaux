@@ -89,10 +89,16 @@ get_aux_changes <- function(measure      = "cpi",
   }
 
 
-  # Key vars to compare by --- #
+  # Key vars to compare by --- ####
 
-  key_cols <- intersect(key_cols,
-                        intersect(names(new_df), names(old_df)))
+  #key_cols <- intersect(key_cols,
+  #                      intersect(names(new_df), names(old_df)))
+
+  key_cols <- attributes(new_df)$aux_key
+
+  # debug to remove
+  print(key_cols)
+
 
   if (length(key_cols) == 0) {
     cli::cli_abort("No common key vars found in both datasets.")
@@ -103,91 +109,93 @@ get_aux_changes <- function(measure      = "cpi",
   # Extract differences ####
 
   # # Run comparison
-  # myr_obj <- myrror::myrror(
-  #             dfx                 = new_df,
-  #             dfy                 = old_df,
-  #             by                  = key_cols, # keys for matching (e.g., country and year)
-  #             compare_type        = FALSE,
-  #             compare_values      = TRUE,
-  #             extract_diff_values = TRUE,
-  #             interactive         = FALSE,
-  #             verbose             = verbose)
+  myr_obj <- myrror::myrror(
+              dfx                 = new_df,
+              dfy                 = old_df,
+              by                  = key_cols, # keys for matching (e.g., country and year)
+              compare_type        = FALSE,
+              compare_values      = TRUE,
+              extract_diff_values = TRUE,
+              interactive         = FALSE,
+              verbose             = verbose)
 
-  # Key vars to compare by --- #
-  key_cols <- intersect(key_cols,
-                        intersect(names(new_df), names(old_df)))
-
-  if (length(key_cols) == 0) {
-    cli::cli_abort("No common key vars found in both datasets.")
-  }
-
-  # Attempt comparison with original keys
-  myr_obj <- tryCatch(
-
-    {
-      myrror::myrror(
-        dfx                 = new_df,
-        dfy                 = old_df,
-        by                  = key_cols,
-        compare_type        = FALSE,
-        compare_values      = TRUE,
-        extract_diff_values = TRUE,
-        interactive         = FALSE,
-        verbose             = verbose
-      )
-    },
-
-    error = function(e) {
-
-      # If many-to-many error, try with better keys
-
-
-        if (verbose) cli::cli_alert_warning("The join is many-to-many using the current keys: {.val {key_cols}}.")
-        if (verbose) cli::cli_alert_info("Running {.fun joyn::possible_ids} to identify better key candidates...")
-
-        if (length(new_keys.x) + length(new_keys.y) == 0) {
-          cli::cli_abort("No unique identifiers found with {.fun joyn::possible_ids}.")
-        }
-
-        new_keys.x <- joyn::possible_ids(new_df,
-                                         max_combination_size = 4,
-                                         verbose = FALSE)[[1]]
-        new_keys.y <- joyn::possible_ids(old_df,
-                                         max_combination_size = 4,
-                                         verbose = FALSE)[[1]]
-
-       if (verbose) cli::cli_alert_info("Trying again with new key vars: {.val {new_keys}}")
-
-        # Retry with new keys
-        myrror::myrror(
-          dfx                 = new_df,
-          dfy                 = old_df,
-          by.x                = new_keys.x,
-          by.y                = new_keys.y,
-          compare_type        = FALSE,
-          compare_values      = TRUE,
-          extract_diff_values = TRUE,
-          interactive         = FALSE,
-          verbose             = verbose
-        )
-
-
-    }
-  ) # Close Myrror tryCatch:
+  # # Key vars to compare by --- #
+  # key_cols <- intersect(key_cols,
+  #                       intersect(names(new_df), names(old_df)))
+  #
+  # if (length(key_cols) == 0) {
+  #   cli::cli_abort("No common key vars found in both datasets.")
+  # }
+  #
+  # # Attempt comparison with original keys
+  # myr_obj <- tryCatch(
+  #
+  #   {
+  #     myrror::myrror(
+  #       dfx                 = new_df,
+  #       dfy                 = old_df,
+  #       by                  = key_cols,
+  #       compare_type        = FALSE,
+  #       compare_values      = TRUE,
+  #       extract_diff_values = TRUE,
+  #       interactive         = FALSE,
+  #       verbose             = verbose
+  #     )
+  #   },
+  #
+  #   error = function(e) {
+  #
+  #     # If many-to-many error, try with better keys
+  #
+  #
+  #       if (verbose) cli::cli_alert_warning("The join is many-to-many using the current keys: {.val {key_cols}}.")
+  #       if (verbose) cli::cli_alert_info("Running {.fun joyn::possible_ids} to identify better key candidates...")
+  #
+  #       if (length(new_keys.x) + length(new_keys.y) == 0) {
+  #         cli::cli_abort("No unique identifiers found with {.fun joyn::possible_ids}.")
+  #       }
+  #
+  #       new_keys.x <- joyn::possible_ids(new_df,
+  #                                        max_combination_size = 4,
+  #                                        verbose = FALSE)[[1]]
+  #       new_keys.y <- joyn::possible_ids(old_df,
+  #                                        max_combination_size = 4,
+  #                                        verbose = FALSE)[[1]]
+  #
+  #      if (verbose) cli::cli_alert_info("Trying again with new key vars: {.val {new_keys}}")
+  #
+  #       # Retry with new keys
+  #       myrror::myrror(
+  #         dfx                 = new_df,
+  #         dfy                 = old_df,
+  #         by.x                = new_keys.x,
+  #         by.y                = new_keys.y,
+  #         compare_type        = FALSE,
+  #         compare_values      = TRUE,
+  #         extract_diff_values = TRUE,
+  #         interactive         = FALSE,
+  #         verbose             = verbose
+  #       )
+  #
+  #
+  #   }
+  #) # Close Myrror tryCatch:
         # --> myr_obj contains the comparison result
         # --> final_key_cols contains the actual keys used
 
   # Extract different values in table format
   diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
-                                           by.x          = new_keys.x,
-                                           by.y          = new_keys.y,
+                                           #by.x          = new_keys.x,
+                                           #by.y          = new_keys.y,
+                                           by = key_cols,
                                            output        = "simple",
                                            interactive   = FALSE)
 
   # Extract different rows
   diff_rows <- myrror::extract_diff_rows(myrror_object = myr_obj,
-                                         by.x          = new_keys.x,
-                                         by.y          = new_keys.y,
+                                         #by.x          = new_keys.x,
+                                         #by.y          = new_keys.y,
+                                         by = key_cols,
                                          output        = "simple",
                                          verbose       = verbose)
 
