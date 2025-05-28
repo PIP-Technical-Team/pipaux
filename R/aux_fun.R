@@ -94,6 +94,8 @@ aux_fun <- function(measure,
         name    = "pipaux_dependencies_log",
         logmeta = list(step = "START", measure = measure)
       )
+
+      cli::cli_alert_info("Log initialized: pipaux_dependencies_log")
     }
 
     # Read all dependencies

@@ -171,9 +171,19 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
-                           tag     = match.arg(branch),
+                           branch  = NULL,
+                           tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
+  tag <- branch
 
 
   #   ____________________________________________________________________________
@@ -243,15 +253,18 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                          skip_absent=TRUE)
 
   setattr(ppp, "aux_name", "ppp")
-
+  setattr(ppp, "gh", gh)
   setattr(ppp,
           "aux_key",
-          c("country_code", "reporting_level", "ppp_2017")) # this is going to be key variables only when PPP default year selected.
+          value = c("country_code",
+                    "reporting_level",
+                    "ppp_2017"))
 
-  setattr(ppp, "gh", gh)
 
   # validate ppp output data
   ppp_validate_output(ppp = ppp, detail = detail)
+
+
 
   if (branch == "main") {
     branch <- ""
@@ -275,6 +288,7 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     force   = force
   )
 
+  print(names(ppp))
 
   #   ____________________________________________________________________________
   #   PPP vintages data                                                     ####
