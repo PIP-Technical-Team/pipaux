@@ -198,9 +198,10 @@ aux_pfw_update <- function(maindir = gls$PIP_DATA_DIR,
 #' @return data.table
 #' @export
 #'
-aux_pfw_key <- function(){
+aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
 
-  pfw_temp <- load_aux("pfw", maindir = temp_fld)
+  pfw_temp <- load_aux("pfw",
+                       maindir = maindir)
 
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
@@ -208,7 +209,8 @@ aux_pfw_key <- function(){
                                   cpi_domain_var)]
 
 
-  cpi_temp <- load_aux("cpi", maindir = temp_fld)
+  cpi_temp <- load_aux("cpi",
+                       maindir = maindir)
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &
