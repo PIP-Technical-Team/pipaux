@@ -14,28 +14,21 @@ load_aux <- function(measure,
 
   pipfun::get_wrk_release(verbose = FALSE)
 
-
   if (is.null(branch)) {
     release        <- wrk_release$release
     identity       <- wrk_release$identity
     branch         <- paste0(release, "_", identity)
   }
 
-
   if (branch == "main") {
     branch <- ""
   }
+
   msrdir <- fs::path(maindir, "aux_data/", branch, measure)
-
-  #msrdir <- fs::path(maindir, "_aux/", branch, measure)
-
 
   file_paths <- fs::dir_ls(msrdir,
                            type = "file",
                            regexp = glue("/{measure}\\."))
-
-  fs::path_file(file_paths)
-
 
   fun_read <- list(
     qs   = function(path) qs::qread(path),
@@ -43,11 +36,9 @@ load_aux <- function(measure,
     rds  = function(path) readr::read_rds(path)
   )
 
-
-  fp  <- find_path(file_paths)   # preferred file path
-  ext <- fs::path_ext(fp)        # extension
-  df <- fun_read[[ext]](fp)      # read file
-
+  fp  <- find_path(file_paths)
+  ext <- fs::path_ext(fp)
+  df <- fun_read[[ext]](fp)
 
   if (apply_label) {
     df <- aux_labels_pip(df, measure = measure)
@@ -57,23 +48,31 @@ load_aux <- function(measure,
     setDT(df)
   }
 
-  if (measure == "ppp" & ppp_defaults == TRUE) {
+  if (measure == "ppp") {
 
-    df <- df[ppp_default_by_year == TRUE,
-               .(country_code, ppp_year, ppp, reporting_level)] |>
-      dcast(country_code + reporting_level ~ ppp_year,
-            value.var = "ppp")
+    if (ppp_defaults) {
+      # Keep default values only
+      df <- df[ppp_default_by_year == TRUE]
+    }
 
-    num_var_list <- grep("^[[:digit:]]", names(df))
-    var_names <- names(df)[num_var_list]
-    setnames(df,
-             var_names,
-             paste(rep("ppp", length(var_names)), var_names, sep = "_"))
+    # Build version identifier
+    df[, ppp_version := {
+      x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
+      gsub("_v", "_0", x)
+    }]
 
+    # Collect version labels as attribute
+    ppp_versions <- df[, unique(ppp_version)]
+
+    # Reshape to wide
+    df <- dcast(df,
+                formula = country_code + reporting_level ~ ppp_version,
+                value.var = "ppp")
+
+    # Set attributes
     setattr(df, "aux_name", "ppp")
-    setattr(df,
-            "aux_key",
-            c("country_code", "reporting_level"))
+    setattr(df, "aux_key", c("country_code", "reporting_level"))
+    setattr(df, "ppp_versions", ppp_versions)
   }
 
   return(df)
