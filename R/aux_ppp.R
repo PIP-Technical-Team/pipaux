@@ -243,6 +243,7 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                          skip_absent=TRUE)
 
   setattr(ppp, "aux_name", "ppp")
+
   setattr(ppp,
           "aux_key",
           c("country_code", "reporting_level")) # this is going to be key variables only when PPP default year selected.
