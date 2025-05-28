@@ -195,15 +195,23 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
 
-  # ----- function raw sha ------
+  # ----- function raw sha ------ ####
   raw_sha_fun <- digest::digest(body(
     paste0("aux_", measure))
   )
 
-  setattr(cpi, "aux_name", "cpi")
+  # Setting attributes ####
+
+  setattr(cpi,
+          "aux_name",
+          "cpi")
+
   setattr(cpi,
           "aux_key",
-          c("country_code", "year", "reporting_level", "survey_acronym"))
+          c("country_code", "
+            year",
+            "reporting_level",
+            "survey_acronym"))
 
   setattr(cpi,
           "raw_sha_fun",

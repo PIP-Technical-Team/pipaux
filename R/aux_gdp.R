@@ -64,6 +64,10 @@ aux_gdp <- function(action          = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
+    setattr(gdp,
+            "aux_key",
+            c("country_code", "reporting_level", "year"))
+
     saved <- pipfun::pip_sign_save(
       x       = gdp,
       measure = measure,
