@@ -4,7 +4,7 @@
 \alias{aux_pfw_clean}
 \title{Clean PFW}
 \usage{
-aux_pfw_clean(y, maindir = gls$PIP_DATA_DIR, branch)
+aux_pfw_clean(y, maindir = getOption("pipaux.working_dir"), branch)
 }
 \arguments{
 \item{y}{dataset with PPP data from \code{aux_pfw_update()}.}

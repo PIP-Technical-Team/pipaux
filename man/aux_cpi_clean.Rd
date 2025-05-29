@@ -7,8 +7,8 @@
 aux_cpi_clean(
   y,
   cpivar = getOption("pipaux.cpivar"),
-  maindir = gls$PIP_DATA_DIR,
-  branch = paste0(wrk_release$release, "_", wrk_release$identity)
+  maindir = getOption("pipaux.working_dir"),
+  branch = NULL
 )
 }
 \arguments{

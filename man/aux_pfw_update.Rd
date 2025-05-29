@@ -5,11 +5,11 @@
 \title{Update PFW}
 \usage{
 aux_pfw_update(
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  branch,
-  tag = match.arg(branch),
+  branch = NULL,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

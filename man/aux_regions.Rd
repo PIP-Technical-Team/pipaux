@@ -7,7 +7,7 @@
 aux_regions(
   action = c("update", "load"),
   force = FALSE,
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL
 )
