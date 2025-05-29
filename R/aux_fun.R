@@ -329,12 +329,25 @@ aux_fun <- function(measure,
       logmeta = list(step = "END")
     )
 
-    cli::cli_alert_info(
-      "Log available in {.emph pipaux_dependencies_log}.
-  Use {.code pipfun::log_get()} to access it."
+  #   cli::cli_alert_success(
+  #     "Log available: {.emph pipaux_dependencies_log}.
+  # Use {.code pipfun::log_get()} to access it."
+  #   )
+
+    cli::cli_alert_success(
+      paste0(
+        "Log available:",
+        cli::bg_br_cyan(cli::col_black("{.strong pipaux_dependencies_log}")),
+        "\n",
+        "Use {.code pipfun::log_get()} to access it"
+
+      )
     )
+
   }
-  # save log - only when the whole function run has completed, not just at final iteration
+
+  # save log?? unsure
+  # - only when the whole function run has completed, not just at final iteration
   # pipfun::log_save("pipaux_log",
   #                  path = paste0(maindir, "/", release_branch))
 

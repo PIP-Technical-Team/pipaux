@@ -64,7 +64,8 @@ aux_maddison <- function(action = c("update", "load"),
       x = mpd,
       measure = measure,
       msrdir = msrdir,
-      force = force
+      force = force,
+      verbose = FALSE
     )
     return(invisible(saved))
 

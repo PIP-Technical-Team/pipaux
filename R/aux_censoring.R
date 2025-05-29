@@ -70,11 +70,13 @@ aux_censoring  <- function(action  = c("update", "load"),
             raw_sha_fun)
 
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
     saved <- pipfun::pip_sign_save(
       x       = dl,
       measure = measure,
       msrdir  = msrdir,
-      force   = force
+      force   = force,
+      verbose = FALSE
     )
     return(invisible(saved))
 
