@@ -10,7 +10,7 @@
 aux_income_groups <- function(action       = c("update", "load"),
                               force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
-                              maindir      = gls$PIP_DATA_DIR,
+                              maindir      = getOption("pipaux.working_dir"),
                               detail       = getOption("pipaux.detail.raw")
 ) {
 

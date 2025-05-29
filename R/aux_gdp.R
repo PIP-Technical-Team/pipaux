@@ -10,7 +10,7 @@
 #' @export
 aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = gls$PIP_DATA_DIR,
+                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -100,7 +100,7 @@ aux_gdp <- function(action          = c("update", "load"),
 #' @export
 aux_gdp_weo <- function(action = "update",
                         force = FALSE,
-                        maindir = gls$PIP_DATA_DIR) {
+                        maindir = getOption("pipaux.working_dir")) {
   measure <- "weo"
   msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
 
@@ -256,7 +256,7 @@ aux_gdp_weo <- function(action = "update",
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch = paste0(wrk_release$release, "_", wrk_release$identity),

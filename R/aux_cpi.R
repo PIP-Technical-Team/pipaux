@@ -14,7 +14,7 @@
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
@@ -86,8 +86,19 @@ aux_cpi <- function(action = c("update", "load"),
 #' @keywords internal
 aux_cpi_clean <- function(y,
                           cpivar = getOption("pipaux.cpivar"),
-                          maindir = gls$PIP_DATA_DIR,
-                          branch  = paste0(wrk_release$release, "_", wrk_release$identity)) {
+                          maindir = getOption("pipaux.working_dir"),
+                          branch  = NULL) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
+
 
   x <- data.table::as.data.table(y)
 
@@ -150,15 +161,24 @@ aux_cpi_clean <- function(y,
 #'
 #' @inheritParams aux_cpi
 #' @keywords internal
-aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
-                           tag,
+                           branch  = NULL,
+                           tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+   if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+  }
 
   measure <- "cpi"
   tag <- branch

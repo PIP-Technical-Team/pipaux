@@ -10,7 +10,7 @@
 aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
@@ -52,13 +52,22 @@ aux_pce <- function(action  = c("update", "load"),
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pce_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
                            force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                           branch = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+  }
 
   #   ________________________________________________________________
   #   Load data                                             ####

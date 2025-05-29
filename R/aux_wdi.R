@@ -10,7 +10,7 @@
 #' @export
 aux_wdi <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = gls$PIP_DATA_DIR,
+                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -59,11 +59,20 @@ aux_wdi <- function(action          = c("update", "load"),
 #' @examples
 #' aux_wdi_update()
 aux_wdi_update <- function(force   = FALSE,
-                           maindir = gls$PIP_DATA_DIR,
+                           maindir = getOption("pipaux.working_dir"),
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                           branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
 
 
   #   ______________________________________________________

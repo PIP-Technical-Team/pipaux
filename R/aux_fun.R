@@ -90,12 +90,11 @@ aux_fun <- function(measure,
     if (log) {
       pipfun::log_add(
         event   = "info",
-        message = paste0("Started processing measure: ", measure),
+        message = cli::col_magenta(paste0("Start processing measure: ", measure)),
         name    = "pipaux_dependencies_log",
         logmeta = list(step = "START", measure = measure)
       )
 
-      cli::cli_alert_info("Log initialized: pipaux_dependencies_log")
     }
 
     # Read all dependencies
@@ -173,7 +172,7 @@ aux_fun <- function(measure,
         if (log) {
           pipfun::log_add(
             event          = "status_check",
-            message        = paste0("Check status completed for: ", measure),
+            message        = cli::col_green(paste0("Check status completed for: ", measure)),
             name           = "pipaux_dependencies_log",
             output         = result,
             logmeta        = list(
@@ -217,7 +216,7 @@ aux_fun <- function(measure,
     if (log) {
       pipfun::log_add(
         event   = "success",
-        message = paste0("No update needed for: ", measure),
+        message = cli::col_blue(paste0("No update needed for: ", measure)),
         name    = "pipaux_dependencies_log",
         logmeta = list(step    = "END",
                        measure = measure)
@@ -247,7 +246,7 @@ aux_fun <- function(measure,
       if (log) {
         pipfun::log_add(
           event   = "success",
-          message = paste0("Updated GitHub for: ", measure),
+          message = cli::col_blue(paste0("Updated GitHub for: ", measure)),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE GH", measure = measure)
         )
@@ -295,7 +294,7 @@ aux_fun <- function(measure,
       if (log) {
         pipfun::log_add(
           event   = "success",
-          message = paste0("Updated Y drive for: ", measure),
+          message = cli::col_blue(paste0("Updated Y drive for: ", measure)),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE SERVER",
                          measure = measure)
@@ -325,9 +324,14 @@ aux_fun <- function(measure,
   if (sys.nframe() <= 2 && log) {
     pipfun::log_add(
       event   = "success",
-      message = "All dependencies successfully updated",
+      message = cli::col_cyan("Measure and all its dependencies successfully updated"),
       name    = "pipaux_dependencies_log",
       logmeta = list(step = "END")
+    )
+
+    cli::cli_alert_info(
+      "Log available in {.emph pipaux_dependencies_log}.
+  Use {.code pipfun::log_get()} to access it."
     )
   }
   # save log - only when the whole function run has completed, not just at final iteration

@@ -48,6 +48,8 @@ load_aux <- function(measure,
     setDT(df)
   }
 
+
+  # PPP to wide
   if (measure == "ppp") {
 
     if (ppp_defaults) {
@@ -74,6 +76,28 @@ load_aux <- function(measure,
     setattr(df, "aux_key", c("country_code", "reporting_level"))
     setattr(df, "ppp_versions", ppp_versions)
   }
+
+  # CPI to long
+
+  # if (measure == "cpi") {
+  #
+  #   df <- melt(
+  #     df,
+  #     id.vars = setdiff(names(df), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+  #     measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+  #     variable.name = "cpi_year",
+  #     value.name = "cpi_value"
+  #   )
+  #
+  #   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
+  #   df[, cpi_year := as.integer(sub("cpi", "", cpi_year))]
+  #
+  #   setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
+  #
+  #   setattr(df, "aux_name", "cpi")
+  #   setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
+  # }
+
 
   return(df)
 }

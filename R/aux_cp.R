@@ -8,7 +8,7 @@
 aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
-                   maindir = gls$PIP_DATA_DIR,
+                   maindir = getOption("pipaux.working_dir"),
                    tag     = NULL) {
   measure <- "cp"
   action <- match.arg(action)
@@ -361,7 +361,7 @@ clean_cp_names <- function(x) {
 #'
 #' @inheritParams aux_cp
 #' @keywords internal
-aux_cp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
                           force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           branch = paste0(wrk_release$release, "_", wrk_release$identity),

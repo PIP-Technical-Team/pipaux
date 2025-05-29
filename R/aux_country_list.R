@@ -14,7 +14,7 @@
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),
-                             maindir      = gls$PIP_DATA_DIR,
+                             maindir      = getOption("pipaux.working_dir"),
                              force        = FALSE,
                              detail       = getOption("pipaux.detail.raw")
                              ) {

@@ -10,7 +10,7 @@
 aux_maddison <- function(action = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          force = FALSE,
-                         maindir = gls$PIP_DATA_DIR,
+                         maindir = getOption("pipaux.working_dir"),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"

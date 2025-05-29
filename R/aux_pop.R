@@ -9,7 +9,7 @@
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -52,14 +52,24 @@ aux_pop <- function(action = c("update", "load"),
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
 aux_pop_update <-  function(force   = FALSE,
-                            maindir = gls$PIP_DATA_DIR,
+                            maindir = getOption("pipaux.working_dir"),
                             owner   = getOption("pipfun.ghowner"),
-                            branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                            branch  = NULL,
                             tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {
 
   # Check arguments
-  branch  <- branch
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+
+  }
+
   tag     <- branch
   measure <- "pop"
 

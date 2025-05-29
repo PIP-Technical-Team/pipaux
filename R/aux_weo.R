@@ -16,7 +16,7 @@
 aux_weo <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
@@ -109,8 +109,18 @@ aux_weo <- function(action  = c("update", "load"),
 #' @return data.table
 #' @export
 aux_weo_clean <- function(dt,
-                          maindir = gls$PIP_DATA_DIR,
-                          branch  = paste0(wrk_release$release, "_", wrk_release$identity)) {
+                          maindir = getOption("pipaux.working_dir"),
+                          branch  = NULL) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+
+  }
 
 
 

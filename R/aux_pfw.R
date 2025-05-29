@@ -18,7 +18,7 @@
 aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
@@ -181,6 +181,17 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+
+  }
 
   measure <- "pfw"
   tag <- branch
