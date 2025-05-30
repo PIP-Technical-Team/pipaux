@@ -377,7 +377,7 @@ check_status <- function(measure,
                          verbose    = TRUE) {
 
   if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
-    pipfun::get_wrk_release()
+    pipfun::get_wrk_release(verbose = FALSE)
   }
 
   release        <- wrk_release$release
@@ -539,33 +539,3 @@ check_status <- function(measure,
 }
 
 
-
-########################## TEST #######################################################
-#AUX FUNCTION TO PRINT SUMMARY
-print_summary_box <- function(log_list) {
-  if (length(log_list) == 0) {
-    cli::cli_alert_warning("No measures were processed.")
-    return(invisible(NULL))
-  }
-
-  df_summary <- data.table::rbindlist(
-    lapply(names(log_list), function(measure) {
-      res <- log_list[[measure]]
-      data.table::data.table(
-        Measure = measure,
-        GitHub = if (isTRUE(res$update_gh)) "✔" else "✘",
-        Y_Drive = if (isTRUE(res$update_y)) "✔" else "✘"
-      )
-    })
-  )
-
-  summary_text <- c(
-    "Summary of processed measures:",
-    paste0(
-      sprintf("%-20s | GitHub: %s | Y Drive: %s",
-              df_summary$Measure, df_summary$GitHub, df_summary$Y_Drive)
-    )
-  )
-
-  cli::boxx(summary_text, padding = 1, border_style = "round", align = "left")
-}

@@ -231,7 +231,7 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
 
   setattr(pfw,
           "aux_key",
-          c("country_code", "welfare_type", "year"))
+          c("country_code", "surveyid_year", "survey_acronym"))
 
   saved <- pipfun::pip_sign_save(
     x       = pfw,
