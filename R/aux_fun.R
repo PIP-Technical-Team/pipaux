@@ -7,9 +7,6 @@
 #' are needed for GitHub or the Y drive.
 #'
 #' @param measure character: Name of the measure to process
-#' @param action character: Either "update" or "load". Default is "update"
-#'   - If `"update"`, data will be updated on the system (GitHub and/or Y drive)
-#'   (- If `"load"`, data will be loaded into memory.) TBD
 #' @param repo character: Name of the GitHub repository containing the auxiliary data
 #'   Defaults to `"aux_<measure>"` unless `measure` is `"income_groups"` or `"country_list"`, in which case it defaults to `"Class"`.
 #' @param owner character: GitHub repository owner. Default is `getOption("pipfun.ghowner")`
@@ -33,7 +30,7 @@
 #' }
 #' @export
 aux_fun <- function(measure,
-                    action    = c("update", "load"),
+                    #action    = ,
                     repo      = paste0("aux_", measure),
                     owner     = getOption("pipfun.ghowner"),
                     maindir   = getOption("pipaux.working_dir"),
@@ -45,7 +42,6 @@ aux_fun <- function(measure,
                     ...) {
 
   # Set arguments
-  action         <- match.arg(action)
 
   # Get working release
   # Check if wrk_release exists
@@ -67,15 +63,17 @@ aux_fun <- function(measure,
   }
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
-  repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
+  repo  <- if (measure %in% c("income_groups",
+                              "country_list")) "Class" else repo
+
   owner <- fifelse(measure == "nan",
                    "PIP-Technical-Team",
                    owner)
 
-  # NOTE: temporary, because "aux_nan" is private and cannot be cloned
 
   # If measure has already been processed, skip it
-  if (rlang::env_has(processed, measure)) {
+  if (rlang::env_has(processed,
+                     measure)) {
     if (verbose) cli::cli_alert_info("{measure} has already been processed, skipping dependencies...")
 
   } else {
@@ -121,7 +119,7 @@ aux_fun <- function(measure,
         {
           aux_fun(
             measure   = dep,
-            action    = action,
+            #action    = "update",
             repo      = paste0("aux_", dep),
             owner     = owner,
             maindir   = maindir,
@@ -184,7 +182,9 @@ aux_fun <- function(measure,
 
         result
       },
+
       error = function(e) {
+
         if (log) {
           pipfun::log_add(
             event   = "error",
@@ -222,6 +222,8 @@ aux_fun <- function(measure,
                        measure = measure)
       )
     }
+
+    cli::cli_alert_success("No updates needed")
 
     return(invisible(NULL))
   }
@@ -268,7 +270,7 @@ aux_fun <- function(measure,
     # Build a list of all possible arguments to pass
     all_args <- c(
       list(
-        action  = action,
+        action  = "update",
         maindir = maindir,
         branch  = release_branch,
         force   = force,
@@ -301,6 +303,7 @@ aux_fun <- function(measure,
         )
       }
     }, error = function(e) {
+
       if (log) {
         pipfun::log_add(
           event   = "error",
@@ -347,9 +350,6 @@ aux_fun <- function(measure,
   }
 
   # save log?? unsure
-  # - only when the whole function run has completed, not just at final iteration
-  # pipfun::log_save("pipaux_log",
-  #                  path = paste0(maindir, "/", release_branch))
 
 
   invisible(NULL)
@@ -524,15 +524,6 @@ check_status <- function(measure,
     cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
     cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
   }
-
-  # if (verbose) {
-  #   summary_text <- c(
-  #     "Summary",
-  #     sprintf("Update GitHub: %s", cli::style_bold(update_gh)),
-  #     sprintf("Update Y drive: %s", cli::style_bold(update_y))
-  #   )
-  #   cli::boxx(summary_text, border_style = "double", align = "left")
-  # }
 
   return(invisible(list(update_gh = update_gh,
               update_y  = update_y)))

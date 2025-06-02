@@ -7,10 +7,10 @@
 #'
 #' @export
 load_aux <- function(measure,
-                     maindir = getOption("pipaux.working_dir"),
-                     apply_label = TRUE,
+                     maindir      = getOption("pipaux.working_dir"),
+                     apply_label  = TRUE,
                      ppp_defaults = TRUE,
-                     branch = NULL) {
+                     branch       = NULL) {
 
   pipfun::get_wrk_release(verbose = FALSE)
 
