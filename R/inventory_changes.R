@@ -57,8 +57,17 @@ get_aux_changes <- function(measure      = "cpi",
 
   new_df <- tryCatch({
 
-    load_aux(measure = measure,
-             maindir = maindir)
+    # Adjustments for cpi
+    if (measure == "cpi") {
+      load_aux(measure = measure,
+               maindir = maindir) |>
+        fselect(c("country_code", "year",
+                  "reporting_level",
+                  "survey_acronym", "cpi"))
+    } else {
+      load_aux(measure = measure,
+               maindir = maindir)
+    }
   },
 
   error = function(e) {
