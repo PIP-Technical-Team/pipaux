@@ -8,7 +8,7 @@ aux_gdp_update(
   maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  branch = paste0(wrk_release$release, "_", wrk_release$identity),
+  branch = NULL,
   tag = branch,
   detail = getOption("pipaux.detail.raw")
 )

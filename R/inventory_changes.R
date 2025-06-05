@@ -161,23 +161,23 @@ get_aux_changes <- function(measure      = "cpi",
                          measure,
                          paste0(measure, ".", "qs"))
 
-#
-#     diff_table <- diff_table |>
-#       fmutate(measure = measure,
-#               path.x  = new_path,
-#               path.y  = old_path)
 
-    tidy_diff <- data.table::data.table(
-      diff_table[, ..key_cols],
-      variable    = diff_table$variable,
-      old_value   = diff_table$value.y,
-      new_value   = diff_table$value.x,
-      measure     = measure,
-      release     = release,
-      old_release = old_release,
-      path.x      = new_path,
-      path.y      = old_path
-    )
+    diff_table <- diff_table |>
+      fmutate(measure = measure,
+              new_path.x  = new_path,
+              old_path.y  = old_path)
+
+    # tidy_diff <- data.table::data.table(
+    #   diff_table[, ..key_cols],
+    #   variable    = diff_table$variable,
+    #   old_value   = diff_table$value.y,
+    #   new_value   = diff_table$value.x,
+    #   measure     = measure,
+    #   release     = release,
+    #   old_release = old_release,
+    #   path.x      = new_path,
+    #   path.y      = old_path
+    # )
   }
 
   if (!is.null(diff_rows)) {
@@ -210,8 +210,8 @@ get_aux_changes <- function(measure      = "cpi",
   #return(diff_table)
   return(invisible(
     list(
-    #"diff_values" = diff_table,
-    "diff_values" = tidy_diff,
+    "diff_values" = diff_table,
+    #"diff_values" = tidy_diff,
     "diff_rows"   = diff_rows
   ))
   )
@@ -236,13 +236,13 @@ get_aux_changes <- function(measure      = "cpi",
 #' \dontrun{
 #' inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
 #' }
-inventory_aux_changes <- function(measure     = NULL,
-                                  maindir     = getOption("pipaux.working_dir"),
-                                  owner       = "PIP-Technical-Team",
-                                  old_release = NULL,
-                                  verbose     = FALSE,
-                                  key_cols    = getOption("pipaux.key_vars"),
-                                  ...) {
+compare_aux_releases <- function(measure     = NULL,
+                                    maindir     = getOption("pipaux.working_dir"),
+                                    owner       = "PIP-Technical-Team",
+                                    old_release = NULL,
+                                    verbose     = FALSE,
+                                    key_cols    = getOption("pipaux.key_vars"),
+                                    ...) {
 
   # _______________________________________#
   # Get arguments ####
@@ -332,3 +332,92 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
   return(candidates[1])
 }
 
+
+# Compare files within release TESTING ####
+
+compare_vintage_versions <- function(measure,
+                                     root_dir = Sys.getenv("PIP_ROOT_DIR"),
+                                     maindir = pip_create_globals(root_dir)$PIP_DATA_DIR,
+                                     key_cols = getOption("pipaux.key_vars"),
+                                     verbose = TRUE) {
+  # _______________________________________#
+  # Load last two vintage versions using pip_load_aux ####
+
+  # Load most recent version (0)
+  new_df <- tryCatch({
+    pip_load_aux(
+      measure   = measure,
+      root_dir  = root_dir,
+      maindir   = maindir,
+      version   = 0,
+      verbose   = verbose
+    )
+  }, error = function(e) {
+    cli::cli_alert_danger("Failed to load latest version of {.strong {measure}}.")
+    stop(e)
+  })
+
+  # Load previous version (-1)
+  old_df <- tryCatch({
+    pip_load_aux(
+      measure   = measure,
+      root_dir  = root_dir,
+      maindir   = maindir,
+      version   = -1,
+      verbose   = verbose
+    )
+  }, error = function(e) {
+    cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
+    return(NULL)
+  })
+
+  if (is.null(old_df)) return(invisible(NULL))
+
+  # _______________________________________#
+  # Get key columns ####
+
+  key_cols <- attributes(new_df)$aux_key %||% key_cols
+
+  if (length(key_cols) == 0) {
+    cli::cli_abort("No key columns found in data or options.")
+  }
+
+  setorderv(new_df, key_cols)
+  setorderv(old_df, key_cols)
+
+  # _______________________________________#
+  # Compare with myrror ####
+
+  myr <- myrror::myrror(
+    dfx = new_df,
+    dfy = old_df,
+    by  = key_cols,
+    compare_type = FALSE,
+    compare_values = TRUE,
+    extract_diff_values = TRUE,
+    interactive = FALSE,
+    verbose = verbose
+  )
+
+  diff_vals <- myrror::extract_diff_table(myr, by = key_cols, output = "simple")
+  diff_rows <- myrror::extract_diff_rows(myr, by = key_cols, output = "simple")
+
+  if (!is.null(diff_rows)) {
+    diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
+    setorderv(diff_rows, c("change_type", key_cols))
+  }
+
+  # _______________________________________#
+  # Return ####
+
+  if (verbose) {
+    cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}.")
+  }
+
+  return(
+    list(
+      "diff_values" = diff_vals,
+      "diff_rows"   = diff_rows
+    )
+  )
+}
