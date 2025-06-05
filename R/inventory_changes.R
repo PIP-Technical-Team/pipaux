@@ -337,18 +337,17 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 
 compare_vintage_versions <- function(measure,
                                      root_dir = Sys.getenv("PIP_ROOT_DIR"),
-                                     maindir = pip_create_globals(root_dir)$PIP_DATA_DIR,
-                                     key_cols = getOption("pipaux.key_vars"),
+                                     maindir = getOption("pipaux.working_dir"),
+                                     #key_cols = getOption("pipaux.key_vars"),
                                      verbose = TRUE) {
   # _______________________________________#
   # Load last two vintage versions using pip_load_aux ####
 
   # Load most recent version (0)
   new_df <- tryCatch({
-    pip_load_aux(
+    pipload::pip_load_aux(
       measure   = measure,
-      root_dir  = root_dir,
-      maindir   = maindir,
+      # dirs
       version   = 0,
       verbose   = verbose
     )
@@ -359,10 +358,10 @@ compare_vintage_versions <- function(measure,
 
   # Load previous version (-1)
   old_df <- tryCatch({
-    pip_load_aux(
+    pipload::pip_load_aux(
       measure   = measure,
-      root_dir  = root_dir,
-      maindir   = maindir,
+      # root_dir  = root_dir,
+      # maindir   = maindir,
       version   = -1,
       verbose   = verbose
     )
@@ -376,14 +375,16 @@ compare_vintage_versions <- function(measure,
   # _______________________________________#
   # Get key columns ####
 
-  key_cols <- attributes(new_df)$aux_key %||% key_cols
+  key_cols <- attributes(new_df)$aux_key
 
   if (length(key_cols) == 0) {
-    cli::cli_abort("No key columns found in data or options.")
+    cli::cli_abort("No key columns found in data attributes.")
   }
 
-  setorderv(new_df, key_cols)
-  setorderv(old_df, key_cols)
+  setorderv(new_df,
+            key_cols)
+  setorderv(old_df,
+            key_cols)
 
   # _______________________________________#
   # Compare with myrror ####
@@ -399,12 +400,19 @@ compare_vintage_versions <- function(measure,
     verbose = verbose
   )
 
-  diff_vals <- myrror::extract_diff_table(myr, by = key_cols, output = "simple")
-  diff_rows <- myrror::extract_diff_rows(myr, by = key_cols, output = "simple")
+  diff_vals <- myrror::extract_diff_table(myrror_object  = myr,
+                                          by             = key_cols,
+                                          output         = "simple")
+  diff_rows <- myrror::extract_diff_rows(myrror_object = myr,
+                                         by            = key_cols,
+                                         output        = "simple")
 
   if (!is.null(diff_rows)) {
-    diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
-    setorderv(diff_rows, c("change_type", key_cols))
+    diff_rows[, change_type := fifelse(df == "dfx",
+                                       "added",
+                                       "removed")]
+    setorderv(diff_rows, c("change_type",
+                           key_cols))
   }
 
   # _______________________________________#
@@ -414,10 +422,10 @@ compare_vintage_versions <- function(measure,
     cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}.")
   }
 
-  return(
+  return(invisible(
     list(
       "diff_values" = diff_vals,
       "diff_rows"   = diff_rows
-    )
+    ))
   )
 }

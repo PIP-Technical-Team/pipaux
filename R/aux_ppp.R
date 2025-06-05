@@ -257,8 +257,7 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   setattr(ppp,
           "aux_key",
           value = c("country_code",
-                    "reporting_level",
-                    "ppp_2017"))
+                    "reporting_level"))
 
 
   # validate ppp output data
