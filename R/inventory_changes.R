@@ -161,11 +161,11 @@ get_aux_changes <- function(measure      = "cpi",
                          measure,
                          paste0(measure, ".", "qs"))
 
-
-    # diff_table <- diff_table |>
-    #   fmutate(measure = measure,
-    #           path.x  = new_path,
-    #           path.y  = old_path)
+#
+#     diff_table <- diff_table |>
+#       fmutate(measure = measure,
+#               path.x  = new_path,
+#               path.y  = old_path)
 
     tidy_diff <- data.table::data.table(
       diff_table[, ..key_cols],
@@ -180,6 +180,25 @@ get_aux_changes <- function(measure      = "cpi",
     )
   }
 
+  if (!is.null(diff_rows)) {
+    diff_rows[, change_type := fifelse(df == "dfx",
+                                       "added",
+                                       "removed")]
+    diff_rows[, `:=`(
+      measure     = measure,
+      release     = release,
+      old_release = old_release
+    )]
+
+    # Optionally reorder for clarity
+    setcolorder(diff_rows, c("change_type",
+                             key_cols,
+                             "df"))
+    setorderv(diff_rows, c("change_type",
+                           key_cols))
+  }
+
+
 
   # _______________________________________#
   # Return ####
@@ -191,6 +210,7 @@ get_aux_changes <- function(measure      = "cpi",
   #return(diff_table)
   return(invisible(
     list(
+    #"diff_values" = diff_table,
     "diff_values" = tidy_diff,
     "diff_rows"   = diff_rows
   ))
