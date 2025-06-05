@@ -161,12 +161,23 @@ get_aux_changes <- function(measure      = "cpi",
                          measure,
                          paste0(measure, ".", "qs"))
 
-    print(class(diff_table))
 
-    diff_table <- diff_table |>
-      fmutate(measure = measure,
-              path.x  = new_path,
-              path.y  = old_path)
+    # diff_table <- diff_table |>
+    #   fmutate(measure = measure,
+    #           path.x  = new_path,
+    #           path.y  = old_path)
+
+    tidy_diff <- data.table::data.table(
+      diff_table[, ..key_cols],
+      variable    = diff_table$variable,
+      old_value   = diff_table$value.y,
+      new_value   = diff_table$value.x,
+      measure     = measure,
+      release     = release,
+      old_release = old_release,
+      path.x      = new_path,
+      path.y      = old_path
+    )
   }
 
 
@@ -180,7 +191,7 @@ get_aux_changes <- function(measure      = "cpi",
   #return(diff_table)
   return(invisible(
     list(
-    "diff_values" = diff_table,
+    "diff_values" = tidy_diff,
     "diff_rows"   = diff_rows
   ))
   )
