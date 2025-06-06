@@ -8,7 +8,7 @@
 #' @export
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     owner   = getOption("pipfun.ghowner"),
                     force   = FALSE,
                     tag     = NULL,
@@ -168,7 +168,7 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #'
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
@@ -205,9 +205,6 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
 
   gh <- attr(ppp, "gh")
 
-  # DEBUG
-  #print(attr(ppp, "gh"))
-
   # validate ppp raw data
   ppp_validate_raw(ppp = ppp, detail = detail)
 
@@ -223,8 +220,6 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   cl <- load_aux(maindir = maindir,
                  measure = "country_list",
                  branch = branch)
-
-
 
   ppp <- ppp[country_code %in% cl$country_code]
 
@@ -250,19 +245,12 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   ppp <- ppp[, -c("ppp_domain")]
 
   ppp <- ppp |> setnames("ppp_data_level", "reporting_level",
-                         skip_absent=TRUE)
+                         skip_absent = TRUE)
 
-  setattr(ppp, "aux_name", "ppp")
   setattr(ppp, "gh", gh)
-  setattr(ppp,
-          "aux_key",
-          value = c("country_code",
-                    "reporting_level"))
-
 
   # validate ppp output data
   ppp_validate_output(ppp = ppp, detail = detail)
-
 
 
   if (branch == "main") {
@@ -273,12 +261,21 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
   raw_sha_fun <- digest::digest(body(
     paste0("aux_", measure))
   )
+
   setattr(ppp,
           "raw_sha_fun",
           raw_sha_fun)
 
-
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+
+  # Set other attributes
+  setattr(df, "aux_name", "ppp")
+  setattr(df, "aux_key", c("country_code", "reporting_level"))
+  #setattr(df, "ppp_versions", ppp_versions)
+
+  # _____________________ #####
+  # Saving ####
 
   saved <- pipfun::pip_sign_save(
     x       = ppp,
@@ -287,7 +284,6 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     force   = force
   )
 
-  print(names(ppp))
 
   #   ____________________________________________________________________________
   #   PPP vintages data                                                     ####
@@ -299,13 +295,7 @@ aux_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
                        old = c("release_version", "adaptation_version"),
                        new = c("ppp_rv", "ppp_av"))
 
-  # ppp_vintage <- ppp_vintage |> setnames("ppp_data_level", "reporting_level",
-  #                        skip_absent=TRUE)
-  #
-  # setattr(ppp_vintage, "aux_name", "ppp")
-  # setattr(ppp_vintage,
-  #         "aux_key",
-  #         c("country_code", "reporting_level"))
+
 
   # Save
   pipfun::pip_sign_save(

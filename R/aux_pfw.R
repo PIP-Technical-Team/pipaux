@@ -210,7 +210,8 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
                        branch = branch)
 
   # validate pfw raw data
-  pfw_validate_output(pfw = pfw, detail = detail)
+  pfw_validate_output(pfw    = pfw,
+                      detail = detail)
 
   # Save dataset
   if (branch == "main") {
@@ -231,7 +232,7 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
 
   setattr(pfw,
           "aux_key",
-          c("country_code", "surveyid_year", "survey_acronym"))
+          c("country_code", "surveyid_year", "welfare_type"))
 
   saved <- pipfun::pip_sign_save(
     x       = pfw,

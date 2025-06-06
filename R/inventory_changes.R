@@ -116,6 +116,10 @@ get_aux_changes <- function(measure      = "cpi",
   setorderv(new_df, key_cols)
   setorderv(old_df, key_cols)
 
+  if (verbose) {
+    cli::cli_alert_info("Keys used for comparison {key_cols}")
+  }
+
   # Extract differences ####
 
   # # Run comparison
@@ -345,12 +349,12 @@ compare_vintage_versions <- function(measure,
 
   # Load most recent version (0)
   new_df <- tryCatch({
-    pipload::pip_load_aux(
-      measure   = measure,
-      # dirs
-      version   = 0,
-      verbose   = verbose
-    )
+
+    load_aux(measure = measure,
+             maindir = maindir)
+
+
+
   }, error = function(e) {
     cli::cli_alert_danger("Failed to load latest version of {.strong {measure}}.")
     stop(e)
@@ -358,6 +362,7 @@ compare_vintage_versions <- function(measure,
 
   # Load previous version (-1)
   old_df <- tryCatch({
+
     pipload::pip_load_aux(
       measure   = measure,
       # root_dir  = root_dir,
@@ -365,6 +370,31 @@ compare_vintage_versions <- function(measure,
       version   = -1,
       verbose   = verbose
     )
+
+
+    # if (measure == "ppp") {
+    #
+    #   # Build version identifier
+    #   df[, ppp_version := {
+    #     x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
+    #     gsub("_v", "_0", x)
+    #   }]
+    #
+    #   # Collect version labels as attribute
+    #   ppp_versions <- df[, unique(ppp_version)]
+    #
+    #   # Reshape to wide
+    #   df <- dcast(df,
+    #               formula = country_code + reporting_level ~ ppp_version,
+    #               value.var = "ppp")
+    #
+    #   # Set attributes
+    #   setattr(df, "aux_name", "ppp")
+    #   setattr(df, "aux_key", c("country_code", "reporting_level"))
+    #   setattr(df, "ppp_versions", ppp_versions)
+    # }
+
+
   }, error = function(e) {
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
     return(NULL)
