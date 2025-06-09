@@ -85,6 +85,96 @@ simulate_old_release <- function(base_dir        = getOption("pipaux.working_dir
 }
 
 
+#' Simulate changes in a vintage data file
+#'
+#' Introduces small random changes to an existing file to simulate an updated or modified version.
+#' Overwrites the original file with the modified data.
+#'
+#' @param file_path Character. Full path to the file to be modified (supported: .qs, .rds, .csv).
+#' @param seed Optional integer. Random seed for reproducibility.
+#'
+#' @return Invisibly returns the modified `data.table`. The original file is overwritten.
+#' @keywords internal
+simulate_file_changes <- function(file_path,
+                                  seed = 123
+                                  ) {
+
+  stopifnot(file.exists(file_path))
+
+  # Load data depending on extension
+  ext <- tools::file_ext(file_path)
+
+  dt <- switch(ext,
+               qs  = qs::qread(file_path),
+               rds = readRDS(file_path),
+               csv = data.table::fread(file_path),
+               stop("Unsupported file extension: ", ext))
+
+  if (!data.table::is.data.table(dt))
+
+    dt <- data.table::as.data.table(dt)
+
+  if (nrow(dt) < 2) {
+
+    cli::cli_alert_warning("Data has fewer than 2 rows, skipping changes.")
+    return(invisible(dt))
+
+  }
+
+  set.seed(seed)
+
+  # --- 1. Modify "year" column if it exists ---
+  if ("year" %in% names(dt)) {
+
+    idx <- sample(seq_len(nrow(dt)),
+                  min(3,
+                      nrow(dt)))
+
+    dt[idx, year := year + sample(c(-1, 1),
+                                  length(idx),
+                                  replace = TRUE)]
+    message("Modified 'year' in ",
+            length(idx),
+            " rows.")
+  }
+
+  # --- 2. Modify a numeric column ---
+  num_cols <- names(dt)[sapply(dt, is.numeric)]
+
+  if (length(num_cols) > 0) {
+
+    col_to_change <- sample(num_cols, 1)
+
+    idx <- sample(seq_len(nrow(dt)),
+                  min(3, nrow(dt)))
+
+    dt[idx, (col_to_change) := get(col_to_change) * runif(length(idx),
+                                                          0.9, 1.1)]
+    message("Modified '",
+            col_to_change, "' in ",
+            length(idx), " rows.")
+
+  }
+
+  # --- 3. Structural changes (optional) ---
+  dt <- dt[-.N]                      # Remove last row
+  dt[, simulated_flag := TRUE]      # Add dummy column
+
+  # --- 4. Save the modified version ---
+
+
+  switch(ext,
+         qs  = qs::qsave(dt,
+                         file_path),
+         rds = saveRDS(dt,
+                       file_path),
+         csv = data.table::fwrite(dt,
+                                  file_path))
+
+  cli::cli_alert_success("Saved modified file as: {file_path}")
+  invisible(dt)
+}
+
 
 
 
