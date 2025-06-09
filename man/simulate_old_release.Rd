@@ -7,18 +7,19 @@
 simulate_old_release(
   base_dir = getOption("pipaux.working_dir"),
   root_dir = Sys.getenv("PIP_ROOT_DIR"),
-  version = "20250101_TEST",
-  current_version = "20250203_TEST",
+  old_release = "20250101_TEST",
   measure,
   seed = 123
 )
 }
 \arguments{
-\item{base_dir}{Root directory containing the version folders}
+\item{base_dir}{Base directory containing the version folders}
 
-\item{version}{The name of the current release folder}
+\item{root_dir}{Root directory of PIP data. Defaults tpo \code{Sys.getenv("PIP_ROOT_DIR")}}
 
-\item{measure}{The name of the measure folder (e.g. "gdp")}
+\item{old_release}{The name of the old release folder to simulate changes in}
+
+\item{measure}{Character. The name of the measure folder (e.g. "gdp")}
 
 \item{seed}{An optional seed for reproducibility}
 }
