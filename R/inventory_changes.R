@@ -447,6 +447,15 @@ compare_vintage_versions <- function(measure,
                                          by            = key_cols,
                                          output        = "simple")
 
+
+  col_diff <- list(
+    "added_columns"   = setdiff(names(new_df),
+                                names(old_df)),
+    "removed_columns" = setdiff(names(old_df),
+                                names(new_df))
+  )
+
+
   if (!is.null(diff_rows)) {
     diff_rows[, change_type := fifelse(df == "dfx",
                                        "added",
@@ -467,7 +476,8 @@ compare_vintage_versions <- function(measure,
   return(invisible(
     list(
       "diff_values" = diff_vals,
-      "diff_rows"   = diff_rows
+      "diff_rows"   = diff_rows,
+      "diff_cols"   = col_diff
     ))
   )
 }
