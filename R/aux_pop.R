@@ -99,9 +99,6 @@ aux_pop_update <-  function(force   = FALSE,
     ### Get the attributes before they get lost
     gh_pop_main <- attr(pop_main, "gh")
 
-    ## DEBUG STATEMENT
-    print(gh_pop_main)
-
     pop_main <- pop_main |>
       clean_names_from_wide() |>
       clean_from_wide()
