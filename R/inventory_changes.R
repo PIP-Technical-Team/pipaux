@@ -337,12 +337,34 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 }
 
 
-# Compare files within release TESTING ####
-
+#' Compare two vintage versions of an auxiliary data file
+#'
+#' Compares the most recent version of an auxiliary data file with an earlier "vintage" version,
+#' identifying differences in values, rows, and columns. This is useful for tracking changes
+#' within a release, especially during development or validation.
+#'
+#' @param measure Character. The name of the auxiliary measure to compare (e.g., "gdp", "pop").
+#' @param root_dir Character. Root directory where the release data is stored. Defaults to the `PIP_ROOT_DIR` environment variable.
+#' @param maindir Character. Path to the main auxiliary data directory. Defaults to the `pipaux.working_dir` option.
+#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed.
+#' @param version Integer. A negative number indicating how many versions before the latest one to compare with.
+#'   For example, `-1` compares the current version with the one just before it, `-2` goes two versions back, and so on.
+#' @param ... Additional arguments passed to the data loading functions.
+#'
+#' @return (Invisibly) A list with three elements:
+#' \describe{
+#'   \item{diff_values}{A data table showing differences in values across matched rows and columns.}
+#'   \item{diff_rows}{A data table showing rows added or removed between versions.}
+#'   \item{diff_cols}{A list with added or removed columns.}
+#' }
+#'
+#' @seealso [pipload::pip_load_aux()], [myrror::myrror()]
+#' @export
 compare_vintage_versions <- function(measure,
                                      root_dir = Sys.getenv("PIP_ROOT_DIR"),
                                      maindir  = getOption("pipaux.working_dir"),
                                      verbose  = FALSE,
+                                     version  = -1,
                                      ...) {
 
   # _____________________________________________________________#
@@ -374,7 +396,7 @@ compare_vintage_versions <- function(measure,
 
       df <- pipload::pip_load_aux(
         measure = measure,
-        version = -1,
+        version = version,
         verbose = verbose
       )
 
