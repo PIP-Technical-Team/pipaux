@@ -57,6 +57,8 @@ load_aux <- function(measure,
       df <- df[ppp_default_by_year == TRUE]
     }
 
+    # Q: do we need to keep the def and def by year vars after filtering?
+
     # Build version identifier
     df[, ppp_version := {
       x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)

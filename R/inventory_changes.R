@@ -341,17 +341,23 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 
 compare_vintage_versions <- function(measure,
                                      root_dir = Sys.getenv("PIP_ROOT_DIR"),
-                                     maindir = getOption("pipaux.working_dir"),
-                                     #key_cols = getOption("pipaux.key_vars"),
-                                     verbose = TRUE) {
-  # _______________________________________#
+                                     maindir  = getOption("pipaux.working_dir"),
+                                     verbose  = TRUE,
+                                     ...) {
+
+  # _____________________________________________________________#
   # Load last two vintage versions using pip_load_aux ####
+  # _____________________________________________________________#
+
 
   # Load most recent version (0)
+  # ______________________________ #
+
   new_df <- tryCatch({
 
     load_aux(measure = measure,
-             maindir = maindir)
+             maindir = maindir,
+             apply_label = apply_label)
 
 
 
@@ -361,43 +367,45 @@ compare_vintage_versions <- function(measure,
   })
 
   # Load previous version (-1)
+  # ______________________________ #
+
   old_df <- tryCatch({
+    if (measure == "ppp") {
 
-    pipload::pip_load_aux(
-      measure   = measure,
-      # root_dir  = root_dir,
-      # maindir   = maindir,
-      version   = -1,
-      verbose   = verbose
-    )
+      df <- pipload::pip_load_aux(
+        measure = measure,
+        version = -1,
+        verbose = verbose
+      )
 
+      df[, ppp_version := {
+        x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
+        gsub("_v", "_0", x)
+      }]
 
-    # if (measure == "ppp") {
-    #
-    #   # Build version identifier
-    #   df[, ppp_version := {
-    #     x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
-    #     gsub("_v", "_0", x)
-    #   }]
-    #
-    #   # Collect version labels as attribute
-    #   ppp_versions <- df[, unique(ppp_version)]
-    #
-    #   # Reshape to wide
-    #   df <- dcast(df,
-    #               formula = country_code + reporting_level ~ ppp_version,
-    #               value.var = "ppp")
-    #
-    #   # Set attributes
-    #   setattr(df, "aux_name", "ppp")
-    #   setattr(df, "aux_key", c("country_code", "reporting_level"))
-    #   setattr(df, "ppp_versions", ppp_versions)
-    # }
+      ppp_versions <- df[, unique(ppp_version)]
 
+      df <- dcast(df,
+                  formula = country_code + reporting_level ~ ppp_version,
+                  value.var = "ppp")
 
+      setattr(df, "aux_name", "ppp")
+      setattr(df, "aux_key", c("country_code", "reporting_level"))
+      setattr(df, "ppp_versions", ppp_versions)
+
+      df
+
+    } else {
+
+      pipload::pip_load_aux(
+        measure = measure,
+        version = -1,
+        verbose = verbose
+      )
+    }
   }, error = function(e) {
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
-    return(NULL)
+    NULL
   })
 
   if (is.null(old_df)) return(invisible(NULL))
@@ -418,16 +426,18 @@ compare_vintage_versions <- function(measure,
 
   # _______________________________________#
   # Compare with myrror ####
+  # _______________________________________#
+
 
   myr <- myrror::myrror(
-    dfx = new_df,
-    dfy = old_df,
-    by  = key_cols,
-    compare_type = FALSE,
-    compare_values = TRUE,
+    dfx                 = new_df,
+    dfy                 = old_df,
+    by                  = key_cols,
+    compare_type        = FALSE,
+    compare_values      = TRUE,
     extract_diff_values = TRUE,
-    interactive = FALSE,
-    verbose = verbose
+    interactive         = FALSE,
+    verbose             = verbose
   )
 
   diff_vals <- myrror::extract_diff_table(myrror_object  = myr,
@@ -447,6 +457,8 @@ compare_vintage_versions <- function(measure,
 
   # _______________________________________#
   # Return ####
+  # _______________________________________#
+
 
   if (verbose) {
     cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}.")
