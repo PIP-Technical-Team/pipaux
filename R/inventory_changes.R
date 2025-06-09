@@ -241,12 +241,12 @@ get_aux_changes <- function(measure      = "cpi",
 #' inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
 #' }
 compare_aux_releases <- function(measure     = NULL,
-                                    maindir     = getOption("pipaux.working_dir"),
-                                    owner       = "PIP-Technical-Team",
-                                    old_release = NULL,
-                                    verbose     = FALSE,
-                                    key_cols    = getOption("pipaux.key_vars"),
-                                    ...) {
+                                 maindir     = getOption("pipaux.working_dir"),
+                                 owner       = "PIP-Technical-Team",
+                                 old_release = NULL,
+                                 verbose     = FALSE,
+                                 key_cols    = getOption("pipaux.key_vars"),
+                                 ...) {
 
   # _______________________________________#
   # Get arguments ####

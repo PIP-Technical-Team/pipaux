@@ -1,15 +1,14 @@
 #' Simulate an "old" version by modifying a measure's data file
 #'
 #' @param base_dir Root directory containing the version folders
-#' @param version The name of the version folder to simulate changes in
+#' @param version The name of the old release folder to simulate changes in
+#' @param version The name of the current release folder
 #' @param measure The name of the measure folder (e.g. "gdp")
 #' @param seed An optional seed for reproducibility
 #'
 #' @return Invisibly returns the modified data.table
-#' @importFrom data.table data.table
-#' @importFrom qs qread qsave
 #' @keywords internal
-simulate_old_version <- function(base_dir = getOption("pipaux.working_dir"),
+simulate_old_release <- function(base_dir = getOption("pipaux.working_dir"),
                                  root_dir = Sys.getenv("PIP_ROOT_DIR"),
                                  version = "20250101_TEST",
                                  current_version = "20250203_TEST",
