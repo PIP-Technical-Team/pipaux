@@ -1,0 +1,19 @@
+---
+title: "comparing_aux_files"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{comparing_aux_files}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(pipaux)
+```

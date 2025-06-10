@@ -30,7 +30,6 @@
 #' }
 #' @export
 aux_fun <- function(measure,
-                    #action    = ,
                     repo      = paste0("aux_", measure),
                     owner     = getOption("pipfun.ghowner"),
                     maindir   = getOption("pipaux.working_dir"),
@@ -58,8 +57,10 @@ aux_fun <- function(measure,
 
   # Initialize log only at top level
   if (sys.nframe() <= 2 && log) {
+
     pipfun::log_init("pipaux_dependencies_log",
                      overwrite = TRUE)
+
   }
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
@@ -495,8 +496,6 @@ check_status <- function(measure,
     )
   })
 
-  #if (verbose) cli::cli_alert_info("GitHub and Y drive SHAs: {gh_sha_list}")
-
   # Compute function SHA
   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
   raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
@@ -529,4 +528,85 @@ check_status <- function(measure,
               update_y  = update_y)))
 }
 
+# Wrapper test 1 ####################################
+
+update_all_aux <- function(measures = NULL,
+                           verbose  = TRUE,
+                           log      = TRUE,
+                           ...) {
+
+  # Optional: define all known measures if not provided
+  # Get all measures from repos in PIP-Technical-Team that start with "aux_"
+
+  all_measures <- gh::gh("GET /users/{username}/repos",
+                         username = owner) |>
+    vapply("[[", "", "name") |>
+    grep("^aux_", x = _, value = TRUE) |>
+    (\(x) sub("^aux_", "", x))()
+
+  if (!is.null(measure)) {
+    all_measures <- all_measures[all_measures %in% measure]
+  }
+
+
+  if (log) {
+    pipfun::log_init("pipaux_summary_log", overwrite = TRUE)
+  }
+
+  for (m in measures) {
+    status <- tryCatch({
+      aux_fun(
+        measure        = m,
+        log            = log,
+        verbose        = verbose,
+        ...
+      )
+
+      if (log) {
+        pipfun::log_add(
+          event   = "success",
+          message = cli::col_green(paste0("Completed: ", m)),
+          name    = "pipaux_summary_log",
+          logmeta = list(measure = m, status = "success")
+        )
+      }
+
+      "success"
+    },
+
+    error = function(e) {
+
+      if (log) {
+        pipfun::log_add(
+          event   = "error",
+          message = cli::col_red(paste0("Failed: ", m, " — ", e$message)),
+          name    = "pipaux_summary_log",
+          logmeta = list(measure = m, status = "error", error = e$message)
+        )
+      }
+
+      "error"
+    })
+  }
+
+  if (log) {
+    cli::cli_alert_success(
+      paste0(
+        "Summary log available: ",
+        cli::bg_br_cyan(cli::col_black("{.strong pipaux_summary_log}")),
+        "\nUse {.code pipfun::log_get(\"pipaux_summary_log\")} to access it"
+      )
+    )
+
+    cli::cli_alert_info(
+      paste0(
+        "Detailed dependency log available: ",
+        cli::bg_br_blue(cli::col_black("{.strong pipaux_dependencies_log}")),
+        "\nUse {.code pipfun::log_get(\"pipaux_dependencies_log\")} to access it"
+      )
+    )
+  }
+
+  invisible(NULL)
+}
 

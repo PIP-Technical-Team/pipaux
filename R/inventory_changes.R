@@ -491,9 +491,14 @@ compare_vintage_versions <- function(measure,
   # _______________________________________#
 
 
-    if (!is.null(diff_vals) || !is.null(diff_rows) || !is.null(col_diff)) {
+    if (!is.null(diff_vals) ||
+        !is.null(diff_rows) ||
+        !is.null(col_diff)) {
+
       cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. Differences detected.")
-    } else {
+    }
+
+  else {
       cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. No differences found.")
     }
 
