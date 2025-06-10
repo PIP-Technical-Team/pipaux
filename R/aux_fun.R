@@ -57,10 +57,12 @@ aux_fun <- function(measure,
   }
 
   # Initialize log only at top level
-  if (sys.nframe() <= 2 && log && log_overwrite) {
+  if (sys.nframe() <= 2 && log) {
 
-    pipfun::log_init("pipaux_dependencies_log",
-                     overwrite = TRUE)
+    if (log_overwrite) {
+      pipfun::log_init("pipaux_update_log",
+                       overwrite = log_overwrite)
+    } else skip
 
   }
 
@@ -91,7 +93,7 @@ aux_fun <- function(measure,
       pipfun::log_add(
         event   = "info",
         message = cli::col_magenta(paste0("Start processing measure: ", measure)),
-        name    = "pipaux_dependencies_log",
+        name    = "pipaux_update_log",
         logmeta = list(step = "START", measure = measure)
       )
 
@@ -142,7 +144,7 @@ aux_fun <- function(measure,
             pipfun::log_add(
               event   = "error",
               message = paste0("Failed to run aux_fun for: ", dep),
-              name    = "pipaux_dependencies_log",
+              name    = "pipaux_update_log",
               logmeta = list(measure = dep,
                              error   = e$message)
 
@@ -173,7 +175,7 @@ aux_fun <- function(measure,
           pipfun::log_add(
             event          = "status_check",
             message        = cli::col_green(paste0("Check status completed for: ", measure)),
-            name           = "pipaux_dependencies_log",
+            name           = "pipaux_update_log",
             output         = result,
             logmeta        = list(
               step         = "CHECK",
@@ -191,7 +193,7 @@ aux_fun <- function(measure,
           pipfun::log_add(
             event   = "error",
             message = paste0("Check failed for: ", measure, " - ", e$message),
-            name    = "pipaux_dependencies_log",
+            name    = "pipaux_update_log",
             logmeta = list(
               step    = "CHECK",
               measure = measure
@@ -219,13 +221,25 @@ aux_fun <- function(measure,
       pipfun::log_add(
         event   = "update",
         message = cli::col_blue(paste0("No update needed for: ", measure)),
-        name    = "pipaux_dependencies_log",
+        name    = "pipaux_update_log",
         logmeta = list(step    = "END",
                        measure = measure)
       )
     }
 
     cli::cli_alert_success("No updates needed")
+
+    if (log) {
+      cli::cli_alert_success(
+        paste0(
+          "Log available:",
+          cli::bg_br_cyan(cli::col_black("{.strong pipaux_dependencies_log}")),
+          "\n",
+          "Use {.code pipfun::log_get()} to access it"
+
+        )
+      )
+    }
 
     return(invisible(NULL))
   }
@@ -251,7 +265,7 @@ aux_fun <- function(measure,
         pipfun::log_add(
           event   = "update",
           message = cli::col_blue(paste0("Updated GitHub for: ", measure)),
-          name    = "pipaux_dependencies_log",
+          name    = "pipaux_update_log",
           logmeta = list(step = "UPDATE GH", measure = measure)
         )
       }
@@ -299,7 +313,7 @@ aux_fun <- function(measure,
         pipfun::log_add(
           event   = "update",
           message = cli::col_blue(paste0("Updated Y drive for: ", measure)),
-          name    = "pipaux_dependencies_log",
+          name    = "pipaux_update_log",
           logmeta = list(step = "UPDATE SERVER",
                          measure = measure)
         )
@@ -310,7 +324,7 @@ aux_fun <- function(measure,
         pipfun::log_add(
           event   = "error",
           message = paste0("Error updating Y drive for: ", measure, " — ", e$message),
-          name    = "pipaux_dependencies_log",
+          name    = "pipaux_update_log",
           logmeta = list(step = "UPDATE SERVER",
                          measure = measure)
         )
@@ -330,14 +344,10 @@ aux_fun <- function(measure,
     pipfun::log_add(
       event   = "success",
       message = cli::col_cyan("Measure and all its dependencies successfully updated"),
-      name    = "pipaux_dependencies_log",
+      name    = "pipaux_update_log",
       logmeta = list(step = "END")
     )
 
-  #   cli::cli_alert_success(
-  #     "Log available: {.emph pipaux_dependencies_log}.
-  # Use {.code pipfun::log_get()} to access it."
-  #   )
 
     cli::cli_alert_success(
       paste0(
@@ -531,7 +541,24 @@ check_status <- function(measure,
 update_all_aux <- function(measures = NULL,
                            verbose  = FALSE,
                            log      = TRUE,
+                           log_save = FALSE,
                            ...) {
+
+  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
+    pipfun::get_wrk_release(verbose = FALSE)
+  }
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  release_branch <- paste0(release, "_", identity)
+
+  # Initialize log only at top level
+  if (sys.nframe() <= 2 && log) {
+
+    pipfun::log_init("pipaux_update_log",
+                     overwrite = T)
+
+  }
 
   # Add log ####
 
@@ -556,6 +583,7 @@ update_all_aux <- function(measures = NULL,
               verbose   = verbose,
               log       = log,
               ...) # Additional args passed through update_all_aux
+
       return(list(measure = msr,
                   success = TRUE,
                   error = NULL))
@@ -566,6 +594,13 @@ update_all_aux <- function(measures = NULL,
                   error = e$message))
     })
   })
+
+  # Save log if log save is TRUE
+  pipfun::log_save(name = "pipaux_update_log",
+                   path = fs::path(getOption("pipaux.log_directory"),
+                                   release_branch,
+                                   "pipaux_update_log"))
+
 
   invisible(status)
 }

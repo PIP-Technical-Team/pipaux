@@ -8,6 +8,7 @@ pipuax_default_options <- list(
   pipaux.madsrc        = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
   # pipaux.maindir     = gls$PIP_DATA_DIR,
   pipaux.working_dir   = "Y:/PIP_ingestion_pipeline_v2",
+  pipaux.log_directory = "Y:/PIP_ingestion_pipeline_v2/aux_data",
   pipaux.key_vars      = c("country_code", "year", "reporting_level",
                          "survey_acronym", "welfare_type"),
   pipfun.ghowner       = "PIP-Technical-Team",
