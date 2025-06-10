@@ -50,34 +50,34 @@ load_aux <- function(measure,
 
 
   # PPP to wide
-  if (measure == "ppp") {
-
-    if (ppp_defaults) {
-      # Keep default values only
-      df <- df[ppp_default_by_year == TRUE]
-    }
-
-    # Q: do we need to keep the def and def by year vars after filtering?
-
-    # Build version identifier
-    df[, ppp_version := {
-      x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
-      gsub("_v", "_0", x)
-    }]
-
-    # Collect version labels as attribute
-    ppp_versions <- df[, unique(ppp_version)]
-
-    # Reshape to wide
-    df <- dcast(df,
-                formula = country_code + reporting_level ~ ppp_version,
-                value.var = "ppp")
-
-    # Set attributes
-    setattr(df, "aux_name", "ppp")
-    setattr(df, "aux_key", c("country_code", "reporting_level"))
-    setattr(df, "ppp_versions", ppp_versions)
-  }
+  # if (measure == "ppp") {
+  #
+  #   if (ppp_defaults) {
+  #     # Keep default values only
+  #     df <- df[ppp_default_by_year == TRUE]
+  #   }
+  #
+  #   # Q: do we need to keep the def and def by year vars after filtering?
+  #
+  #   # Build version identifier
+  #   df[, ppp_version := {
+  #     x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
+  #     gsub("_v", "_0", x)
+  #   }]
+  #
+  #   # Collect version labels as attribute
+  #   ppp_versions <- df[, unique(ppp_version)]
+  #
+  #   # Reshape to wide
+  #   df <- dcast(df,
+  #               formula = country_code + reporting_level ~ ppp_version,
+  #               value.var = "ppp")
+  #
+  #   # Set attributes
+  #   setattr(df, "aux_name", "ppp")
+  #   setattr(df, "aux_key", c("country_code", "reporting_level"))
+  #   setattr(df, "ppp_versions", ppp_versions)
+  # }
 
   # CPI to long
 
