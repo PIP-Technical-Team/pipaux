@@ -233,7 +233,7 @@ aux_fun <- function(measure,
       cli::cli_alert_success(
         paste0(
           "Log available:",
-          cli::bg_br_cyan(cli::col_black("{.strong pipaux_dependencies_log}")),
+          cli::bg_br_cyan(cli::col_black("{.strong pipaux_update_log}")),
           "\n",
           "Use {.code pipfun::log_get()} to access it"
 
@@ -352,7 +352,7 @@ aux_fun <- function(measure,
     cli::cli_alert_success(
       paste0(
         "Log available:",
-        cli::bg_br_cyan(cli::col_black("{.strong pipaux_dependencies_log}")),
+        cli::bg_br_cyan(cli::col_black("{.strong pipaux_update_log}")),
         "\n",
         "Use {.code pipfun::log_get()} to access it"
 

@@ -207,13 +207,16 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                        maindir = maindir,
                        branch = branch)
 
-  # drop cpi_domain
-  cpi <- cpi[, -c("cpi_domain")]
-
   # changae cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
+
+  # drop unnecessary variables
+
+  cpi <- cpi[, -c("cpi_domain"
+                  )]
+
 
   # ----- function raw sha ------ ####
   raw_sha_fun <- digest::digest(body(
@@ -238,6 +241,21 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
 
   # validate cpi clean data before saving it
   cpi_validate_output(cpi, detail = detail)
+
+  cpi <- cpi[, -c("cpi_domain",
+                  "cpi2021_unadj",
+                  "cpi2017_unadj",
+                  "cpi2011_unadj",
+                  "cpi_replication",
+                  "cpi2011_AM24",
+                  "cpi2017_AM24",
+                  "cpi",
+                  "cpi_domain_value",
+                  "change_cpi2011",
+                  "cpi_domain_var"
+
+  )]
+
 
   # Save
   if (branch == "main") {
