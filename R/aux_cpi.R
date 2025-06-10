@@ -231,7 +231,7 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
 
   setattr(cpi,
           "aux_key",
-          c("country_code", "year",
+          c("country_code", "survey_year", "cpi_year",
             "reporting_level",
             "survey_acronym"))
 
@@ -252,7 +252,8 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                   "cpi",
                   "cpi_domain_value",
                   "change_cpi2011",
-                  "cpi_domain_var"
+                  "cpi_domain_var",
+                  "cpi_id"
 
   )]
 
