@@ -37,6 +37,7 @@ aux_fun <- function(measure,
                     force     = FALSE,
                     tag       = NULL,
                     log       = TRUE,
+                    log_overwrite = FALSE,
                     verbose   = FALSE,
                     ...) {
 
@@ -56,7 +57,7 @@ aux_fun <- function(measure,
   }
 
   # Initialize log only at top level
-  if (sys.nframe() <= 2 && log) {
+  if (sys.nframe() <= 2 && log && log_overwrite) {
 
     pipfun::log_init("pipaux_dependencies_log",
                      overwrite = TRUE)
@@ -216,7 +217,7 @@ aux_fun <- function(measure,
 
     if (log) {
       pipfun::log_add(
-        event   = "success",
+        event   = "update",
         message = cli::col_blue(paste0("No update needed for: ", measure)),
         name    = "pipaux_dependencies_log",
         logmeta = list(step    = "END",
@@ -248,7 +249,7 @@ aux_fun <- function(measure,
 
       if (log) {
         pipfun::log_add(
-          event   = "success",
+          event   = "update",
           message = cli::col_blue(paste0("Updated GitHub for: ", measure)),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE GH", measure = measure)
@@ -296,7 +297,7 @@ aux_fun <- function(measure,
 
       if (log) {
         pipfun::log_add(
-          event   = "success",
+          event   = "update",
           message = cli::col_blue(paste0("Updated Y drive for: ", measure)),
           name    = "pipaux_dependencies_log",
           logmeta = list(step = "UPDATE SERVER",
@@ -349,9 +350,6 @@ aux_fun <- function(measure,
     )
 
   }
-
-  # save log?? unsure
-
 
   invisible(NULL)
 }
@@ -534,6 +532,8 @@ update_all_aux <- function(measures = NULL,
                            verbose  = FALSE,
                            log      = TRUE,
                            ...) {
+
+  # Add log ####
 
   # Optional: define all known measures if not provided
   all_measures <- gh::gh("GET /users/{username}/repos",
