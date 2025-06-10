@@ -1,5 +1,6 @@
 ---
-title: "Aux data - Dependencies Workflow"
+title: "Aux data - Updating GitHub and the Y Drive"
+subtitle: "Implementing the Dependency Workflow"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{"Aux data - Dependencies Workflow"}
@@ -19,9 +20,25 @@ knitr::opts_chunk$set(
 devtools::load_all()
 ```
 
-In this vignette, we explore how to update any of the auxiliary data measures. The process is specifically designed to automatically manage all interdependencies among auxiliary data, so that when you are updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated first, if needed.
 
-The main function you need to use to implement the full workflow is `aux_fun`. This is a general function that works with any of the auxiliary data measures and takes care of the whole update process. The process is based on 3 key steps:
+### Overview 
+
+- **Objective**: Making sure auxiliary data files are up to date both in Github and our network Drive
+
+- **Key Outputs**: Branches updated in Github, all aux data files saved in the Y drive. Notwe that the current folder storing files of hte new pipeline is saved in the option `getOption("pipaux.working_dir")`, i.e., `"Y:/PIP_ingestion_pipeline_v2"`
+
+- **Key steps**: 
+  1. Set Up the Working release 
+  2. Run the Update function
+  3. Explore the log to see more details of what went wrong, what worked, what checks have been carried out 
+
+### Explanation
+
+In this vignette, we explore the process of keeping any of the auxiliary data measures up to date with the latest changes. The process is designed in a way that it automatically manages all interdependencies among auxiliary data. This means that, when you updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated as well, if needed.
+
+You can read these dependencies in the yml file stored in pipaux metadata branch in folder Data/dependency.yml
+
+The main function you need to use **to implement the full workflow** is `aux_fun`. This is a general function that works with any of the auxiliary data measures and takes care of the whole update process. The process is based on 3 key steps:
 
 1. checking if the measure has any dependency
 
@@ -29,7 +46,7 @@ The main function you need to use to implement the full workflow is `aux_fun`. T
 
 3. Update any dependency found in 2, in GitHub and/or Y: Drive, and then update the original measure
 
-**More details on the update process**
+#### More technical details on the update process 
 
 There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the conversion of raw data to input data, which involves formatting the raw data and saving it in the Y: drive. Although different raw datasets are processed in different ways, they all share the following characteristics:
 The raw data is 
@@ -117,7 +134,7 @@ pipfun::get_wrk_release()
 ```
 
 #### Step 2: Updating population data 
-For testing purposes, I am working on a fork of the "aux_pop" repo in my personal account 
+For testing purposes, I am working on a fork of the "aux_censoring" repo in my personal account 
 
 ```{r}
 measure <- "censoring"
@@ -134,5 +151,5 @@ aux_fun(measure = measure,
 
 ```
 
-
+## Step 3: Cehcking the log of results 
 

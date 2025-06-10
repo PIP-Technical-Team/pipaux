@@ -531,82 +531,43 @@ check_status <- function(measure,
 # Wrapper test 1 ####################################
 
 update_all_aux <- function(measures = NULL,
-                           verbose  = TRUE,
+                           verbose  = FALSE,
                            log      = TRUE,
                            ...) {
 
   # Optional: define all known measures if not provided
-  # Get all measures from repos in PIP-Technical-Team that start with "aux_"
-
   all_measures <- gh::gh("GET /users/{username}/repos",
-                         username = owner) |>
+                         username = getOption("pipfun.ghowner")) |>
     vapply("[[", "", "name") |>
     grep("^aux_", x = _, value = TRUE) |>
     (\(x) sub("^aux_", "", x))()
 
-  if (!is.null(measure)) {
-    all_measures <- all_measures[all_measures %in% measure]
+  # Filter measures if user provides a subset
+  if (!is.null(measures)) {
+    all_measures <- all_measures[all_measures %in% measures]
   }
 
+  # Track update status for each measure
+  status <- lapply(all_measures,
+                   function(msr) {
 
-  if (log) {
-    pipfun::log_init("pipaux_summary_log", overwrite = TRUE)
-  }
+    tryCatch({
+      aux_fun(measure   = msr,
+              verbose   = verbose,
+              log       = log,
+              ...) # Additional args passed through update_all_aux
+      return(list(measure = msr,
+                  success = TRUE,
+                  error = NULL))
 
-  for (m in measures) {
-    status <- tryCatch({
-      aux_fun(
-        measure        = m,
-        log            = log,
-        verbose        = verbose,
-        ...
-      )
-
-      if (log) {
-        pipfun::log_add(
-          event   = "success",
-          message = cli::col_green(paste0("Completed: ", m)),
-          name    = "pipaux_summary_log",
-          logmeta = list(measure = m, status = "success")
-        )
-      }
-
-      "success"
-    },
-
-    error = function(e) {
-
-      if (log) {
-        pipfun::log_add(
-          event   = "error",
-          message = cli::col_red(paste0("Failed: ", m, " — ", e$message)),
-          name    = "pipaux_summary_log",
-          logmeta = list(measure = m, status = "error", error = e$message)
-        )
-      }
-
-      "error"
+    }, error = function(e) {
+      return(list(measure = msr,
+                  success = FALSE,
+                  error = e$message))
     })
-  }
+  })
 
-  if (log) {
-    cli::cli_alert_success(
-      paste0(
-        "Summary log available: ",
-        cli::bg_br_cyan(cli::col_black("{.strong pipaux_summary_log}")),
-        "\nUse {.code pipfun::log_get(\"pipaux_summary_log\")} to access it"
-      )
-    )
-
-    cli::cli_alert_info(
-      paste0(
-        "Detailed dependency log available: ",
-        cli::bg_br_blue(cli::col_black("{.strong pipaux_dependencies_log}")),
-        "\nUse {.code pipfun::log_get(\"pipaux_dependencies_log\")} to access it"
-      )
-    )
-  }
-
-  invisible(NULL)
+  invisible(status)
 }
+
 
