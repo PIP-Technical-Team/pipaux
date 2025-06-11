@@ -18,3 +18,122 @@ knitr::opts_chunk$set(
 devtools::load_all()
 #library(pipaux)
 ```
+
+### Overview
+
+-   **Objectives**: Update Auxiliary Data Files and Compare both across different releases and within a release
+
+-   **Key functions**:
+
+    -   `update_all_aux()`: update all auxiliary data automatically
+    -   `compare_aux_releases()`
+    -   `compare_vintage_versions()`
+
+-   **Key Outputs**:
+
+    -   Updated branches on GitHub and all auxiliary data files saved to the Y drive.\
+        Note that the current folder used to store files from the new pipeline is defined by the option `getOption("pipaux.working_dir")`, which currently points to `"Y:/PIP_ingestion_pipeline_v2"`.
+
+    -   Data tables showing changes between files in current release or bw diff releases
+
+-   **Key Steps**:
+
+    1.  Set up the working release
+    2.  Update auxiliary data: in github and the Y drive
+    3.  Compare auxiliary data files to identify changes
+
+## STEP 1 - SETUP WORKING RELEASE
+
+in the new pipeline framework, we always work with a reference version called the "working release." Therefore, we need to set up the working release at the beginning of each new R session:
+
+In this example, I am using a "TEST" release with a release date of "20250203". However, if no release has been created for the desired date, call `pipfun::new_pip_release` with the appropriate arguments to create it.
+
+``` r
+# Set up the working release 
+pipfun::setup_working_release(release  = "20250203",
+                              identity = "TEST")
+```
+
+## STEP 2 - UPDATE ALL (OR SOME) AUXILIARY DATA
+
+**Update**
+
+``` r
+# Update auxiliary data
+
+# For the scope of this example I will rely on aux data repos in my GH account , thus I set owner "RossanaTat"
+
+update <- update_all_aux(measures = c("maddison",
+                                      "censoring",
+                                      "pop"),
+                         owner = "RossanaTat",
+                         log = TRUE,
+                         log_save = TRUE)
+```
+
+**Inspect log**
+
+``` r
+# Read log directly
+
+pipfun::log_get(name = "pipaux_update_log")[]
+
+# Interact with the log, e.g., filter certain events
+
+pipfun::log_get(name = "pipaux_update_log")[event =="success"]
+
+# Or you can read the log file saved in the folder
+```
+
+## Notes (for your reference or future modifications):
+
+-   At this stage, I am working with auxiliary data repositories under my GitHub account. Once testing is complete, we will run the functions on the actual folders under the **"PIP-Technical-Team"** organization.
+
+-   Additional functions to facilitate log interaction are under development. For now, we use those already available in the `{pipfun}` package.
+
+    -   See the Log Vignette (here)[<https://pip-technical-team.github.io/pipfun/articles/log.html>]
+
+## STEP 3 - COMPARE AUXILIARY DATA FILES (ACROSS RELEASES AND VERSIONS)
+
+In this section, we explore how to identify changes in auxiliary data files. We focus on the following measures for this example: **cpi**, **pop**, **ppp**, **gdp**, and **pfw**.\
+
+The current release used here is `"20250101_TEST"`.
+
+**Compare between releases**
+
+If `old_release = NULL`, the function will automatically detect the previous release.\
+
+Alternatively, you can provide a specific release name, e.g., `"20250203_TEST"`.
+
+``` r
+
+# Identify changes in gdp
+
+changes_gdp <- compare_aux_releases(measure = "gdp",
+                                    old_release = NULL)
+
+names(changes_gdp)
+
+```
+
+**Compare within releases**
+
+By default, this compares the current file in the `aux_` folder with the previous version.\
+
+Check the `version` argument documentation for more details.
+
+``` r
+changes_version_gdp <- compare_vintage_versions(measure = "gdp", version = -1)
+```
+
+## Notes (for your reference or future modifications):
+
+These functions compare auxiliary data files either between releases or within the same release (i.e., across versions).
+
+They are intended for use with files structured and saved through the new pipeline framework.
+
+Since we haven’t run the full pipeline yet, I simulated changes (e.g., modified values, new rows or columns) in older files using helper functions for testing purposes.
+
+As a result, the output values shown here are not real and stem from the simulated changes.
+
+

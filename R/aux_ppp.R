@@ -271,7 +271,7 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
 
   # Set other attributes
   setattr(ppp, "aux_name", "ppp")
-  setattr(ppp, "aux_key", c("country_code", "reporting_level"))
+  setattr(ppp, "aux_key", c("country_code", "reporting_level", "ppp_year"))
 
   # _____________________ #####
   # Saving ####

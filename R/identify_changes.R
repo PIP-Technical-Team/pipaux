@@ -365,6 +365,7 @@ compare_vintage_versions <- function(measure,
                                      maindir  = getOption("pipaux.working_dir"),
                                      verbose  = FALSE,
                                      version  = -1,
+                                     apply_label = TRUE,
                                      ...) {
 
   # _____________________________________________________________#
@@ -392,39 +393,13 @@ compare_vintage_versions <- function(measure,
   # ______________________________ #
 
   old_df <- tryCatch({
-    if (measure == "ppp") {
-
-      df <- pipload::pip_load_aux(
-        measure = measure,
-        version = version,
-        verbose = verbose
-      )
-
-      df[, ppp_version := {
-        x <- paste0("ppp_", ppp_year, "_", release_version, "_", adaptation_version)
-        gsub("_v", "_0", x)
-      }]
-
-      ppp_versions <- df[, unique(ppp_version)]
-
-      df <- dcast(df,
-                  formula = country_code + reporting_level ~ ppp_version,
-                  value.var = "ppp")
-
-      setattr(df, "aux_name", "ppp")
-      setattr(df, "aux_key", c("country_code", "reporting_level"))
-      setattr(df, "ppp_versions", ppp_versions)
-
-      df
-
-    } else {
 
       pipload::pip_load_aux(
         measure = measure,
         version = -1,
         verbose = verbose
       )
-    }
+
   }, error = function(e) {
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
     NULL
