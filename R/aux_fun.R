@@ -57,11 +57,11 @@ aux_fun <- function(measure,
   }
 
   # Initialize log only at top level
-  if (sys.nframe() <= 2 && log) {
+  if (sys.nframe() <= 2 && log == TRUE) {
 
-    if (log_overwrite) {
+    if (log_overwrite | !rlang::env_has(env = .piplogenv, nms = "pipaux_update_log")) {
       pipfun::log_init("pipaux_update_log",
-                       overwrite = log_overwrite)
+                       overwrite = T)
     } else skip
 
   }

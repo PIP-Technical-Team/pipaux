@@ -3,7 +3,7 @@ title: "Aux data - Updating GitHub and the Y Drive"
 subtitle: "Implementing the Dependency Workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"Aux data - Dependencies Workflow"}
+  %\VignetteIndexEntry{"Aux data - Updating GitHub and the Y Drive"}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,23 +18,28 @@ knitr::opts_chunk$set(
 ```{r setup}
 #library(pipaux)
 devtools::load_all()
+pipfun::log_init(name = "pipaux_update_log",
+                 overwrite = TRUE)
+
 ```
 
 
 ### Overview 
 
-- **Objective**: Making sure auxiliary data files are up to date both in Github and our network Drive
+- **Objective**: Ensure that auxiliary data files are up to date both on GitHub and on the network drive.
 
-- **Key Outputs**: Branches updated in Github, all aux data files saved in the Y drive. Notwe that the current folder storing files of hte new pipeline is saved in the option `getOption("pipaux.working_dir")`, i.e., `"Y:/PIP_ingestion_pipeline_v2"`
+- **Key Outputs**: Updated branches on GitHub and all auxiliary data files saved to the Y drive.  
+  Note that the current folder used to store files from the new pipeline is defined by the option `getOption("pipaux.working_dir")`, which currently points to `"Y:/PIP_ingestion_pipeline_v2"`.
 
-- **Key steps**: 
-  1. Set Up the Working release 
-  2. Run the Update function
-  3. Explore the log to see more details of what went wrong, what worked, what checks have been carried out 
+- **Key Steps**:  
+  1. Set up the working release.  
+  2. Run the update function.  
+  3. Explore the log to review what failed, what was successfully updated, and which checks were performed.
+
 
 ### Explanation
 
-In this vignette, we explore the process of keeping any of the auxiliary data measures up to date with the latest changes. The process is designed in a way that it automatically manages all interdependencies among auxiliary data. This means that, when you updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated as well, if needed.
+In this vignette, we explore the process of keeping any of the auxiliary data measures up to date with the latest changes. The process is designed in a way that it automatically manages all interdependencies among auxiliary data. This means that, when you updating a specific measure—such as `ppp`—all of its dependencies—such as `country_list`—are automatically updated as well, if needed. 
 
 You can read these dependencies in the yml file stored in pipaux metadata branch in folder Data/dependency.yml
 
@@ -42,20 +47,20 @@ The main function you need to use **to implement the full workflow** is `aux_fun
 
 1. checking if the measure has any dependency
 
-2. Checking if any of the dependencies needs to be updated in GitHub and/or the Y: drive (MEMO: add details of what this means )
+2. Checking if any of the dependencies needs to be updated in GitHub and/or the Y: drive 
 
 3. Update any dependency found in 2, in GitHub and/or Y: Drive, and then update the original measure
 
-#### More technical details on the update process 
+#### Some details on the update process 
 
-There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the conversion of raw data to input data, which involves formatting the raw data and saving it in the Y: drive. Although different raw datasets are processed in different ways, they all share the following characteristics:
+There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the formatting of raw data and subsequent the raw data and saving in the Y: drive. Although different raw datasets are processed in different ways, they all share the following characteristics:
 The raw data is 
 
 (1.) loaded from the corresponding `aux_*` measure repo in GitHub, 
 
 (2.) formatted with `{pipaux}` functions, 
 
-(3.) saved in the Y drive. 
+(3.) saved in the our network drive
 
 During this process, it is essential to load data from the release branch, ensuring that it is up to date with the latest changes from the `DEV` branch. Additionally, the processed data must be saved in the specific `aux_*` subfolder within the release folder on the Y: drive.
 
@@ -67,7 +72,8 @@ Two main functions take care of this process:
 
 * `check_status()`
 
-More **technical details** about these two functions are provided below. If you don’t need this information, **feel free to skip ahead to the example section further down the page**.
+More **technical details** about these two functions are provided below. If you don’t need this information, feel free to **skip ahead to the [example section](#example-section)**.
+ 
 
 ## **`aux_fun()`** and **`check_status()`** explained
 
@@ -101,7 +107,7 @@ Additionally, the function re-computes the SHA of the current `aux_*()` function
 
 The `aux_fun()` function serves as the central function for updating auxiliary data measures. Its main responsibilities are to ensure that **all dependencies are processed** in the correct order and to coordinate the update process across both GitHub and the Y: drive. 
 
-When called, it first determines the current release and constructs the corresponding `release_branch` (e.g., `20250203_TEST`) based on global `wrk_release` object. It then checks whether the specified measure has already been processed in the current session (tracked via the `processed` environment) to avoid redundant work and potential infinite loops.
+When called, it first determines the current release and constructs the corresponding `release_branch` (e.g., `20250203_TEST`). It then checks whether the specified measure has already been processed in the current session (tracked via the `processed` environment) to avoid redundant work and potential infinite loops.
 
 Next, `aux_fun()` reads the full dependency graph using `read_dependencies()`, isolates the dependencies specific to the selected measure, and recursively calls itself to process each one.
 
@@ -111,7 +117,8 @@ Once GitHub is up to date, `aux_fun()` retrieves and executes the appropriate `a
 
 Altogether, `aux_fun()` provides a mechanism to keep all auxiliary data measures current and in sync across systems.
 
-# Working with an example
+## Example {#example-section}
+
 ## Preliminary operations
 
 #### Step 1: Create or setup the working release
@@ -129,27 +136,62 @@ In this example, I am using a "TEST" release to demonstrate the new {pipaux} fun
 pipfun::setup_working_release(release  = "20250203",
                               identity = "TEST")
 
-# Get the working release 
-pipfun::get_wrk_release()
 ```
 
 #### Step 2: Updating population data 
 For testing purposes, I am working on a fork of the "aux_censoring" repo in my personal account 
 
 ```{r}
-measure <- "censoring"
+measure <- "maddison"
 owner   <- "RossanaTat"
 
 ```
 
 ```{r}
 aux_fun(measure = measure,
-        action  = "update",
         maindir = getOption("pipaux.working_dir"),
         owner   = owner,
-        verbose = T)
+        verbose = FALSE,
+        log     = TRUE)
+
+# Notice that when log == TRUE, a log of results is available for your information
 
 ```
 
-## Step 3: Cehcking the log of results 
+#### Step 3: Checking the Log of Results
+
+The log stores five main types of events:
+
+- **Info**: Indicates which measure is being processed. This is useful to confirm that all dependencies are being handled.
+
+- **Status_check**: Reports the synchronization status of both GitHub and the Y drive—for example, whether either or both need to be updated.
+
+- **Error**: Indicates a failure in one of the steps.
+
+- **Update**: Confirms that an update to GitHub and/or the Y drive was successfully executed.
+
+- **Success**: Signals that the entire workflow was completed successfully.
+
+
+```{r}
+
+pipfun::log_get(name = "pipaux_update_log")
+
+# Filter a specific type of event 
+pipfun::log_get(name = "pipaux_update_log")[]
+
+pipfun:::log_filter(name = "pipaux_update_log",
+                    event = "info")
+
+pipfun:::log_filter(name = "pipaux_update_log",
+                    event = "status_check")
+
+# You can also inspct the output of the status check process with
+pipfun::log_get(name = "pipaux_update_log")[event == "status_check"][.N][, output]
+
+
+
+```
+
+
 

@@ -1,0 +1,20 @@
+---
+title: "Aux data -Pipeline Overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{auxdata-pipeline-overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::load_all()
+#library(pipaux)
+```
