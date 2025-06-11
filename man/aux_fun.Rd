@@ -13,6 +13,7 @@ aux_fun(
   force = FALSE,
   tag = NULL,
   log = TRUE,
+  log_overwrite = FALSE,
   verbose = FALSE,
   ...
 )

@@ -151,7 +151,7 @@ update_all_aux(measures = NULL,
 
 ```
 
-If `log = TRUE` and `log_save = TRUE`, the function will save some details, outputs, metadata on the process in a log file. This log file is saved in the same release folder as the current one you are working with 
+If `log = TRUE` and `log_save = TRUE`, the function will save some details, outputs, metadata on the process in a log file. This log file is saved in the same release folder as the current one you are working with, in the format   `paste0("pipaux_update_log_", format(Sys.time(), "%Y%m%d_%H%M%S"))`
 
 ## Technical Details {#technical-details-section}
 

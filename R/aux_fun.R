@@ -536,13 +536,55 @@ check_status <- function(measure,
               update_y  = update_y)))
 }
 
-# Wrapper test 1 ####################################
-
+#' Automatically Update All Auxiliary Data Files
+#'
+#' This function updates all or a selected subset of auxiliary data measures,
+#' ensuring that both the corresponding GitHub repositories and the network
+#' drive (Y drive) are synchronized.
+#'
+#' When `measures = NULL`, all known auxiliary data measures (i.e., all GitHub
+#' repos starting with `"aux_"`) are processed. Otherwise, provide a character
+#' vector of specific measures to process selectively.
+#'
+#' The function logs the update status, captures any errors, and optionally
+#' saves the log to a file. This is useful for tracking the status of each
+#' update and debugging if needed.
+#'
+#' @param measures A character vector of auxiliary data measures to update.
+#'   If `NULL`, all known measures will be updated.
+#' @param verbose Logical; whether to print informative messages to the console.
+#' @param log Logical; whether to log the update process.
+#' @param log_save Logical; whether to save the log file to disk.
+#' @inheritParams aux_fun
+#' @inheritDotParams aux_fun owner repo verbose processed force maindir tag log log_overwrite
+#'
+#' @return A list containing the update status for each measure. Each element
+#'   is a list with the components: `measure` (character), `success` (logical),
+#'   and `error` (character or `NULL`).
+#'
+#' @seealso [aux_fun()] for the function that performs the update of a single measure.
+#'
+#' @examples
+#' \dontrun{
+#' # Update all measures and save the log
+#' update_all_aux(log = TRUE, log_save = TRUE)
+#'
+#' # Update only specific measures
+#' update_all_aux(measures = c("cpi", "gdp"), verbose = TRUE)
+#' }
+#'
+#' @export
 update_all_aux <- function(measures = NULL,
                            verbose  = FALSE,
                            log      = TRUE,
                            log_save = FALSE,
                            ...) {
+
+  # Check that `measures` is either NULL or a character vector
+  if (!is.null(measures) &&
+      !is.character(measures)) {
+    cli::cli_abort("{.arg measures} must be a character vector or NULL.")
+  }
 
   if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
     pipfun::get_wrk_release(verbose = FALSE)
