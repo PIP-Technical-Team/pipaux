@@ -59,7 +59,7 @@ aux_fun <- function(measure,
   # Initialize log only at top level
   if (sys.nframe() <= 2 && log == TRUE) {
 
-    if (log_overwrite | !rlang::env_has(env = .piplogenv, nms = "pipaux_update_log")) {
+    if (log_overwrite) {
       pipfun::log_init("pipaux_update_log",
                        overwrite = T)
     } else skip
@@ -596,10 +596,20 @@ update_all_aux <- function(measures = NULL,
   })
 
   # Save log if log save is TRUE
-  pipfun::log_save(name = "pipaux_update_log",
-                   path = fs::path(getOption("pipaux.log_directory"),
-                                   release_branch,
-                                   "pipaux_update_log"))
+
+  if (log_save == TRUE) {
+
+    pipfun::log_save(
+      name = "pipaux_update_log",
+      path = fs::path(
+        getOption("pipaux.log_directory"),
+        release_branch,
+        paste0("pipaux_update_log_", format(Sys.time(), "%Y%m%d_%H%M%S"))
+      )
+    )
+
+
+  }
 
 
   invisible(status)
