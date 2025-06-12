@@ -3,7 +3,7 @@ title: "Aux data -Pipeline Overview"
 author: Rossana Tatulli
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{auxdata-pipeline-overview}
+  %\VignetteIndexEntry{Aux data -Pipeline Overview}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
