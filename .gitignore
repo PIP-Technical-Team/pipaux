@@ -3,8 +3,6 @@
 .RData
 .Ruserdata
 .vscode
-inst/doc
-docs
 tmp/
 renv/
 /sessionInfoLog
