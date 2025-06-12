@@ -402,11 +402,31 @@ compare_vintage_versions <- function(measure,
 
   old_df <- tryCatch({
 
-      pipload::pip_load_aux(
-        measure = measure,
-        version = -1,
-        verbose = verbose
+    df <- pipload::pip_load_aux(
+      measure = measure,
+      version = -1,
+      verbose = verbose
+    )
+
+    if (measure == "cpi") {
+
+      df <- melt(
+        df,
+        id.vars = setdiff(names(df), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+        measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+        variable.name = "cpi_year",
+        value.name = "cpi_value"
       )
+
+      df[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
+
+      setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
+
+      setattr(df, "aux_name", "cpi")
+      setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
+    }
+
+    df
 
   }, error = function(e) {
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
