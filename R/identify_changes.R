@@ -516,27 +516,34 @@ compare_vintage_versions <- function(measure,
 #' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
 #' }
 compare_aux_vintages <- function(measures,
-                                 version      = -1,
-                                 root_dir     = Sys.getenv("PIP_ROOT_DIR"),
-                                 maindir      = getOption("pipaux.working_dir"),
-                                 verbose      = FALSE,
-                                 apply_label  = TRUE,
-                                 ...) {
+                                  version      = -1,
+                                  root_dir     = Sys.getenv("PIP_ROOT_DIR"),
+                                  maindir      = getOption("pipaux.working_dir"),
+                                  verbose      = FALSE,
+                                  apply_label  = TRUE,
+                                  ...) {
 
-  results <- lapply(measures,
-                    \(m) {
-
-    compare_vintage_versions(measure      = m,
-                             version      = version,
-                             root_dir     = root_dir,
-                             maindir      = maindir,
-                             verbose      = verbose,
-                             apply_label  = apply_label,
-                             ...)
+  results <- lapply(measures, function(m) {
+    tryCatch({
+      res <- compare_vintage_versions(measure      = m,
+                                      version      = version,
+                                      root_dir     = root_dir,
+                                      maindir      = maindir,
+                                      verbose      = verbose,
+                                      apply_label  = apply_label,
+                                      ...)
+      if (is.null(res)) {
+        if (verbose) message(sprintf("No previous version found for measure '%s'. Skipping.", m))
+        return(NULL)
+      }
+      return(res)
+    }, error = function(e) {
+      if (verbose) message(sprintf("Error comparing measure '%s': %s", m, e$message))
+      return(NULL)
+    })
   })
 
   names(results) <- measures
-
   invisible(results)
 }
 
