@@ -77,7 +77,7 @@ simulate_old_release <- function(base_dir        = getOption("pipaux.working_dir
   # SAve modified data
   pipfun::pip_sign_save(x       = dt,
                         measure = measure,
-                        msrdir  = fs::path(maindir, "aux_data", old_release, measure))
+                        msrdir  = fs::path(base_dir, "aux_data", old_release, measure))
 
   message("Modified and saved simulated old version at: ", file_path)
 

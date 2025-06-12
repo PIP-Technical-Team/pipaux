@@ -57,14 +57,14 @@ aux_fun <- function(measure,
   }
 
   # Initialize log only at top level
-  if (sys.nframe() <= 2 && log == TRUE) {
+  if (sys.nframe() <= 2 && log) {
+    log_exists <- rlang::env_has(.piplogenv, "pipaux_update_log")
 
-    if (log_overwrite) {
-      pipfun::log_init("pipaux_update_log",
-                       overwrite = T)
-    } else skip
-
+    if (log_overwrite || !log_exists) {
+      pipfun::log_init("pipaux_update_log", overwrite = log_overwrite)
+    }
   }
+
 
   # Set repo to "Class" if measure is "income_groups" or "country_list"
   repo  <- if (measure %in% c("income_groups",

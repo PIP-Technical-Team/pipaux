@@ -223,18 +223,6 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
     paste0("aux_", measure))
   )
 
-  # Setting attributes ####
-
-  setattr(cpi,
-          "aux_name",
-          "cpi")
-
-  setattr(cpi,
-          "aux_key",
-          c("country_code", "survey_year", "cpi_year",
-            "reporting_level",
-            "survey_acronym"))
-
   setattr(cpi,
           "raw_sha_fun",
           raw_sha_fun)
@@ -263,6 +251,30 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
     branch <- ""
   }
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  cpi <- melt(
+    cpi,
+    id.vars = setdiff(names(cpi), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+    measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+    variable.name = "cpi_year",
+    value.name = "cpi_value"
+  )
+
+  # Convert 'cpi_year' from 'cpi2011' → numeric 2011
+  cpi[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
+
+  setcolorder(cpi, c("country_code", "year", "cpi_year", "cpi_value"))
+
+  setattr(cpi, "aux_name", "cpi")
+
+  setattr(cpi,
+          "aux_key",
+          c("country_code", "survey_year", "cpi_year",
+            "reporting_level",
+            "survey_acronym"))
+
+
+
 
   saved <- pipfun::pip_sign_save(
     x       = cpi,

@@ -57,17 +57,9 @@ get_aux_changes <- function(measure      = "cpi",
 
   new_df <- tryCatch({
 
-    # Adjustments for cpi
-    if (measure == "cpi") {
-      load_aux(measure = measure,
-               maindir = maindir) |>
-        fselect(c("country_code", "year",
-                  "reporting_level",
-                  "survey_acronym", "cpi"))
-    } else {
       load_aux(measure = measure,
                maindir = maindir)
-    }
+
   },
 
   error = function(e) {
@@ -113,9 +105,19 @@ get_aux_changes <- function(measure      = "cpi",
   # _______________________________________#
 
   # Sort both datasets by key columns
-  setorderv(new_df, key_cols)
-  setorderv(old_df, key_cols)
+  if (measure == "cpi") {
+    setorderv(new_df, c("country_code", "survey_year", "reporting_level"))
+  } else {
+    setorderv(new_df, key_cols)
 
+  }
+
+  if (measure == "cpi") {
+    setorderv(old_df, c("country_code", "survey_year", "reporting_level"))
+  } else {
+    setorderv(old_df, key_cols)
+
+  }
   if (verbose) {
     cli::cli_alert_info("Keys used for comparison {key_cols}")
   }
@@ -408,23 +410,23 @@ compare_vintage_versions <- function(measure,
       verbose = verbose
     )
 
-    if (measure == "cpi") {
-
-      df <- melt(
-        df,
-        id.vars = setdiff(names(df), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
-        measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
-        variable.name = "cpi_year",
-        value.name = "cpi_value"
-      )
-
-      df[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
-
-      setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
-
-      setattr(df, "aux_name", "cpi")
-      setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
-    }
+    # if (measure == "cpi") {
+    #
+    #   df <- melt(
+    #     df,
+    #     id.vars = setdiff(names(df), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+    #     measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+    #     variable.name = "cpi_year",
+    #     value.name = "cpi_value"
+    #   )
+    #
+    #   df[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
+    #
+    #   setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
+    #
+    #   setattr(df, "aux_name", "cpi")
+    #   setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
+    # }
 
     df[]
 
