@@ -70,7 +70,7 @@ load_aux <- function(measure,
     )
 
     # Convert 'cpi_year' from 'cpi2011' → numeric 2011
-    #df[, cpi_year := as.integer(sub("cpi", "", cpi_year))]
+    df[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
 
     setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
 
