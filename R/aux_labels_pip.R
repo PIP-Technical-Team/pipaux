@@ -14,7 +14,7 @@ aux_labels_pip <- function(x, measure) {
     # attr(x$reporting, "label") <- "Values to use as keys to join with cpi_domain_var"
     # attr(x$cpi_year,  "label") <- "CPI year" #"Year of survey ID"
     attr(x$ccf, "label") <- "Currency conversion factor"
-    attr(x$cpi, "label") <- "Consumer Price Index (Based on 2011)."
+    #attr(x$cpi, "label") <- "Consumer Price Index (Based on 2011)."
   } else if (measure == "ppp") {
     ppp_year <- unique(x[x$ppp_default == TRUE, "ppp_year"])
 

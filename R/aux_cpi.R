@@ -14,7 +14,7 @@
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
@@ -86,8 +86,19 @@ aux_cpi <- function(action = c("update", "load"),
 #' @keywords internal
 aux_cpi_clean <- function(y,
                           cpivar = getOption("pipaux.cpivar"),
-                          maindir = gls$PIP_DATA_DIR,
-                          branch  = paste0(wrk_release$release, "_", wrk_release$identity)) {
+                          maindir = getOption("pipaux.working_dir"),
+                          branch  = NULL) {
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
+
 
   x <- data.table::as.data.table(y)
 
@@ -150,15 +161,24 @@ aux_cpi_clean <- function(y,
 #'
 #' @inheritParams aux_cpi
 #' @keywords internal
-aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
-                           tag,
+                           branch  = NULL,
+                           tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+   if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+
+  }
 
   measure <- "cpi"
   tag <- branch
@@ -187,23 +207,21 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
                        maindir = maindir,
                        branch = branch)
 
-  # drop cpi_domain
-  cpi <- cpi[, -c("cpi_domain")]
-
   # changae cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
                          skip_absent=TRUE)
 
-  # ----- function raw sha ------
+  # drop unnecessary variables
+
+  cpi <- cpi[, -c("cpi_domain"
+                  )]
+
+
+  # ----- function raw sha ------ ####
   raw_sha_fun <- digest::digest(body(
     paste0("aux_", measure))
   )
-
-  setattr(cpi, "aux_name", "cpi")
-  setattr(cpi,
-          "aux_key",
-          c("country_code", "year", "reporting_level", "survey_acronym"))
 
   setattr(cpi,
           "raw_sha_fun",
@@ -212,11 +230,51 @@ aux_cpi_update <- function(maindir = gls$PIP_DATA_DIR,
   # validate cpi clean data before saving it
   cpi_validate_output(cpi, detail = detail)
 
+  cpi <- cpi[, -c("cpi_domain",
+                  "cpi2021_unadj",
+                  "cpi2017_unadj",
+                  "cpi2011_unadj",
+                  "cpi_replication",
+                  "cpi2011_AM24",
+                  "cpi2017_AM24",
+                  "cpi",
+                  "cpi_domain_value",
+                  "change_cpi2011",
+                  "cpi_domain_var",
+                  "cpi_id"
+
+  )]
+
+
   # Save
   if (branch == "main") {
     branch <- ""
   }
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  cpi <- melt(
+    cpi,
+    id.vars = setdiff(names(cpi), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+    measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+    variable.name = "cpi_year",
+    value.name = "cpi_value"
+  )
+
+  # Convert 'cpi_year' from 'cpi2011' → numeric 2011
+  cpi[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
+
+  setcolorder(cpi, c("country_code", "year", "cpi_year", "cpi_value"))
+
+  setattr(cpi, "aux_name", "cpi")
+
+  setattr(cpi,
+          "aux_key",
+          c("country_code", "survey_year", "cpi_year",
+            "reporting_level",
+            "survey_acronym"))
+
+
+
 
   saved <- pipfun::pip_sign_save(
     x       = cpi,

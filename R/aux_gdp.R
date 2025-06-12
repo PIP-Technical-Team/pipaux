@@ -10,7 +10,7 @@
 #' @export
 aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = gls$PIP_DATA_DIR,
+                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -64,6 +64,10 @@ aux_gdp <- function(action          = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
+    setattr(gdp,
+            "aux_key",
+            c("country_code", "reporting_level", "year"))
+
     saved <- pipfun::pip_sign_save(
       x       = gdp,
       measure = measure,
@@ -96,9 +100,9 @@ aux_gdp <- function(action          = c("update", "load"),
 #' @export
 aux_gdp_weo <- function(action = "update",
                         force = FALSE,
-                        maindir = gls$PIP_DATA_DIR) {
+                        maindir = getOption("pipaux.working_dir")) {
   measure <- "weo"
-  msrdir <- fs::path(maindir, "_aux/", measure) # measure dir
+  msrdir <- fs::path(maindir, "aux_data/", measure) # measure dir
 
   if (action == "update") {
 
@@ -221,12 +225,36 @@ aux_gdp_weo <- function(action = "update",
     dt <- dt[, c("country_code", "year", "weo_gdp")]
 
     # Save dataset
-    aux_sign_save(
-      x = dt,
-      measure = measure,
-      msrdir = msrdir,
-      force = force
+    # ----- function raw sha ------
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
     )
+
+    setattr(dt, "aux_name", "pfw")
+
+    setattr(dt,
+            "raw_sha_fun",
+            raw_sha_fun)
+
+    # aux_sign_save(
+    #   x = dt,
+    #   measure = measure,
+    #   msrdir = msrdir,
+    #   force = force
+    # )
+
+    saved <- pipfun::pip_sign_save(
+      x       = dt,
+      measure = measure,
+      msrdir  = msrdir,
+      force   = force
+    )
+
+    return(
+      invisible(saved)
+    )
+
+
   } else if (action == "load") {
     dt <- load_aux(
       maindir = maindir,
@@ -252,15 +280,24 @@ aux_gdp_weo <- function(action = "update",
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                           branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
 
   #branch <- match.arg(branch)
   measure <- "gdp"
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
 
   #   _________________________________________
   #   Update data                                 ####
@@ -540,7 +577,8 @@ aux_gdp_update <- function(maindir = gls$PIP_DATA_DIR,
                           by =  byvars,
                           match_type = "m:1",
                           keep = "left",
-                          reportvar = FALSE) |>
+                          reportvar = FALSE,
+                          verbose = FALSE) |>
     fsubset(year > last_year)
 
   # Prepare for cumulative growth calculation

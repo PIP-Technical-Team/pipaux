@@ -6,7 +6,7 @@
 \usage{
 aux_country_list(
   action = c("update", "load"),
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   detail = getOption("pipaux.detail.raw")
 )

@@ -7,32 +7,28 @@
 #'
 #' @export
 load_aux <- function(measure,
-                     maindir = getOption("pipaux.working_dir"),
-                     apply_label = TRUE,
-                     ppp_defaults = TRUE) {
+                     maindir      = getOption("pipaux.working_dir"),
+                     apply_label  = TRUE,
+                     ppp_defaults = TRUE,
+                     branch       = NULL) {
 
   pipfun::get_wrk_release(verbose = FALSE)
 
-  release        <- wrk_release$release
-  identity       <- wrk_release$identity
-  branch         <- paste0(release, "_", identity)
-
-  branch <- branch
+  if (is.null(branch)) {
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
 
   if (branch == "main") {
     branch <- ""
   }
+
   msrdir <- fs::path(maindir, "aux_data/", branch, measure)
-
-  #msrdir <- fs::path(maindir, "_aux/", branch, measure)
-
 
   file_paths <- fs::dir_ls(msrdir,
                            type = "file",
                            regexp = glue("/{measure}\\."))
-
-  fs::path_file(file_paths)
-
 
   fun_read <- list(
     qs   = function(path) qs::qread(path),
@@ -40,11 +36,9 @@ load_aux <- function(measure,
     rds  = function(path) readr::read_rds(path)
   )
 
-
-  fp  <- find_path(file_paths)   # preferred file path
-  ext <- fs::path_ext(fp)        # extension
-  df <- fun_read[[ext]](fp)      # read file
-
+  fp  <- find_path(file_paths)
+  ext <- fs::path_ext(fp)
+  df <- fun_read[[ext]](fp)
 
   if (apply_label) {
     df <- aux_labels_pip(df, measure = measure)
@@ -54,24 +48,38 @@ load_aux <- function(measure,
     setDT(df)
   }
 
-  if (measure == "ppp" & ppp_defaults == TRUE) {
 
-    df <- df[ppp_default_by_year == TRUE,
-               .(country_code, ppp_year, ppp, reporting_level)] |>
-      dcast(country_code + reporting_level ~ ppp_year,
-            value.var = "ppp")
+  # PPP to wide
+  if (measure == "ppp") {
 
-    num_var_list <- grep("^[[:digit:]]", names(df))
-    var_names <- names(df)[num_var_list]
-    setnames(df,
-             var_names,
-             paste(rep("ppp", length(var_names)), var_names, sep = "_"))
+    if (ppp_defaults) {
+      # Keep default values only
+      df <- df[ppp_default_by_year == TRUE]
+    }}
 
-    setattr(df, "aux_name", "ppp")
-    setattr(df,
-            "aux_key",
-            c("country_code", "reporting_level"))
-  }
+  # CPI to long
+
+  # if (measure == "cpi") {
+  #
+  #   df <- melt(
+  #     df,
+  #     id.vars = setdiff(names(df), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+  #     measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+  #     variable.name = "cpi_year",
+  #     value.name = "cpi_value"
+  #   )
+  #
+  #   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
+  #   df[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
+  #
+  #   setcolorder(df, c("country_code", "year", "cpi_year", "cpi_value"))
+  #
+  #   setattr(df, "aux_name", "cpi")
+  #   setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
+  #
+  #   return(df[])
+  # }
+
 
   return(df)
 }

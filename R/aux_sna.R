@@ -9,7 +9,7 @@
 #' @export
 aux_sna <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = gls$PIP_DATA_DIR,
+                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL) {
 
@@ -165,7 +165,7 @@ sna_fy_validate_raw <- function(sna_fy, detail = getOption("pipaux.detail.raw"))
 fake_aux_sna <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
-                         maindir = gls$PIP_DATA_DIR,
+                         maindir = getOption("pipaux.working_dir"),
                          branch  = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = match.arg(branch),
                          from    = c("gh", "file", "api")) {

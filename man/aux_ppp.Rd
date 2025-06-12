@@ -6,7 +6,7 @@
 \usage{
 aux_ppp(
   action = c("update", "load"),
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   force = FALSE,
   tag = NULL,

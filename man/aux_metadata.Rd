@@ -8,7 +8,7 @@ aux_metadata(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   branch = paste0(wrk_release$release, "_", wrk_release$identity),
   tag = NULL,
   detail = getOption("pipaux.detail.raw")

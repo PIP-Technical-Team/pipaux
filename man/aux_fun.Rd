@@ -6,7 +6,6 @@
 \usage{
 aux_fun(
   measure,
-  action = c("update", "load"),
   repo = paste0("aux_", measure),
   owner = getOption("pipfun.ghowner"),
   maindir = getOption("pipaux.working_dir"),
@@ -14,18 +13,13 @@ aux_fun(
   force = FALSE,
   tag = NULL,
   log = TRUE,
+  log_overwrite = FALSE,
   verbose = FALSE,
   ...
 )
 }
 \arguments{
 \item{measure}{character: Name of the measure to process}
-
-\item{action}{character: Either "update" or "load". Default is "update"
-\itemize{
-\item If \code{"update"}, data will be updated on the system (GitHub and/or Y drive)
-(- If \code{"load"}, data will be loaded into memory.) TBD
-}}
 
 \item{repo}{character: Name of the GitHub repository containing the auxiliary data
 Defaults to \code{"aux_<measure>"} unless \code{measure} is \code{"income_groups"} or \code{"country_list"}, in which case it defaults to \code{"Class"}.}

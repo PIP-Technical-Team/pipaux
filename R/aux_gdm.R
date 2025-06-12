@@ -16,7 +16,7 @@
 aux_gdm <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = gls$PIP_DATA_DIR,
+                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
@@ -60,7 +60,7 @@ aux_gdm <- function(action  = c("update", "load"),
 #' @keywords internal
 aux_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = gls$PIP_DATA_DIR,
+                           maindir = getOption("pipaux.working_dir"),
                            branch,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {

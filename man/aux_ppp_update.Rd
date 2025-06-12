@@ -5,11 +5,11 @@
 \title{Update PPP}
 \usage{
 aux_ppp_update(
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  branch = paste0(wrk_release$release, "_", wrk_release$identity),
-  tag = match.arg(branch),
+  branch = NULL,
+  tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
 }

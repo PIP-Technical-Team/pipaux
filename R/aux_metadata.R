@@ -9,7 +9,7 @@
 aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
-                         maindir = gls$PIP_DATA_DIR,
+                         maindir = getOption("pipaux.working_dir"),
                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
@@ -49,14 +49,23 @@ aux_metadata <- function(action  = c("update", "load"),
 #' @inheritParams aux_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
-aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
+aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
                                 force = FALSE,
                                 owner   = getOption("pipfun.ghowner"),
-                                branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                                branch  = NULL,
                                 tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
 
   #   ____________________________________________________________________________
   #   Computations                                                            ####
@@ -202,14 +211,24 @@ aux_metadata_update <- function(maindir = gls$PIP_DATA_DIR,
 #' @export
 aux_metaregion <- function(action = c("update", "load"),
                            force = FALSE,
-                           maindir = gls$PIP_DATA_DIR,
+                           maindir = getOption("pipaux.working_dir"),
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = paste0(wrk_release$release, "_", wrk_release$identity),
+                           branch  = NULL,
                            tag     = match.arg(branch)
 ) {
   measure <- "metaregion"
   action  <- match.arg(action)
-  #branch  <- match.arg(branch)
+
+  pipfun::get_wrk_release(verbose = FALSE)
+
+
+  if (is.null(branch)) {
+
+    release        <- wrk_release$release
+    identity       <- wrk_release$identity
+    branch         <- paste0(release, "_", identity)
+  }
+
 
   if (action == "update") {
     mr <- pipfun::load_from_gh(measure = measure,

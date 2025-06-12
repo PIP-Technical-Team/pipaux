@@ -6,7 +6,7 @@
 \usage{
 aux_cpi(
   action = c("update", "load"),
-  maindir = gls$PIP_DATA_DIR,
+  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
