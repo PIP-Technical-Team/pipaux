@@ -4,7 +4,7 @@
 \alias{aux_pfw_key}
 \title{Generate a dataset that contains pfw keys}
 \usage{
-aux_pfw_key()
+aux_pfw_key(maindir = getOption("pipaux.working_dir"))
 }
 \value{
 data.table

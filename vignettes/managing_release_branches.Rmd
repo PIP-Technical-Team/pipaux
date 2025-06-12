@@ -1,6 +1,7 @@
 ---
 title: "Auxiliary Data - Version Control"
 subtitle: "Release branch management"
+author: Rossana Tatulli
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Auxiliary Data - Version Control}
@@ -17,7 +18,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 #library(pipaux)
-devtools::load_all(".")
+#devtools::load_all(".")
+library(pipaux)
 ```
 
 The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 

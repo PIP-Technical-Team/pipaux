@@ -1,6 +1,7 @@
 ---
 title: "Aux data - Updating GitHub and the Y Drive"
 output: rmarkdown::html_vignette
+author: Rossana Tatulli
 vignette: >
   %\VignetteIndexEntry{"Aux data - Updating GitHub and the Y Drive"}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,7 +17,9 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 #library(pipaux)
-devtools::load_all()
+#devtools::load_all()
+
+library(pipaux)
 
 # Initialize log for subsequent use 
 pipfun::log_init(name = "pipaux_update_log",

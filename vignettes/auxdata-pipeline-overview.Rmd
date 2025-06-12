@@ -1,5 +1,6 @@
 ---
 title: "Aux data -Pipeline Overview"
+author: Rossana Tatulli
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{auxdata-pipeline-overview}
@@ -15,11 +16,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::load_all()
+#devtools::load_all()
 
 # Initialize log to make it available in this vignette
 pipfun::log_init("pipaux_update_log", overwrite = T)
-#library(pipaux)
+library(pipaux)
 ```
 
 ### Overview
