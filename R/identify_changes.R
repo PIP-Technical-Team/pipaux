@@ -194,6 +194,14 @@ get_aux_changes <- function(measure      = "cpi",
       old_release = old_release
     )]
 
+
+    col_diff <- list(
+      "added_columns"   = setdiff(names(new_df),
+                                  names(old_df)),
+      "removed_columns" = setdiff(names(old_df),
+                                  names(new_df))
+    )
+
     # Optionally reorder for clarity
     setcolorder(diff_rows, c("change_type",
                              key_cols,
@@ -215,8 +223,8 @@ get_aux_changes <- function(measure      = "cpi",
   return(invisible(
     list(
     "diff_values" = diff_table,
-    #"diff_values" = tidy_diff,
-    "diff_rows"   = diff_rows
+    "diff_rows"   = diff_rows,
+    "diff_cols"   = col_diff
   ))
   )
 
@@ -486,3 +494,49 @@ compare_vintage_versions <- function(measure,
     ))
   )
 }
+
+#' Compare Vintage Versions for Multiple Auxiliary Data Files
+#'
+#' This function wraps around [compare_vintage_versions()] to apply it across multiple auxiliary data measures.
+#' It is useful for tracking within-release changes across several files.
+#'
+#' @param measures Character vector. Names of auxiliary data measures to compare (e.g., `c("gdp", "pop", "pfw")`).
+#' @param version Integer. Indicates how many versions before the latest to compare with (e.g., `-1` for previous).
+#' @param root_dir Character. Root directory where the release data is stored. Defaults to `Sys.getenv("PIP_ROOT_DIR")`.
+#' @param maindir Character. Path to the main auxiliary data directory. Defaults to the `pipaux.working_dir` option.
+#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed.
+#' @param apply_label Logical. Whether to apply labels when loading data. Defaults to `TRUE`.
+#' @param ... Additional arguments passed to `compare_vintage_versions()`.
+#'
+#' @return (Invisibly) A named list of results from [compare_vintage_versions()], one per measure.
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
+#' }
+compare_aux_vintages <- function(measures,
+                                 version      = -1,
+                                 root_dir     = Sys.getenv("PIP_ROOT_DIR"),
+                                 maindir      = getOption("pipaux.working_dir"),
+                                 verbose      = FALSE,
+                                 apply_label  = TRUE,
+                                 ...) {
+
+  results <- lapply(measures,
+                    \(m) {
+
+    compare_vintage_versions(measure      = m,
+                             version      = version,
+                             root_dir     = root_dir,
+                             maindir      = maindir,
+                             verbose      = verbose,
+                             apply_label  = apply_label,
+                             ...)
+  })
+
+  names(results) <- measures
+
+  invisible(results)
+}
+
