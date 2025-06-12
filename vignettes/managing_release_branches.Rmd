@@ -71,7 +71,7 @@ pipfun::get_repo_branches(repo  = "aux_ppp",
 
 pipfun::compare_branch_content(repo    = "aux_test",
                                branch1 = "DEV",
-                               branch2 = "20241005")
+                               branch2 = "main")
 
 ```
 
@@ -83,15 +83,15 @@ In this case, given that the release branch has just been created, it is up to d
 ```{r}
 
 # Option 1: Make release branch point to the latest commit as in DEV
-pipfun::update_branches(repo    = "aux_test",
-                        branch1 = "DEV",
-                        branch2 = "20241005")
+# pipfun::update_branches(repo    = "aux_test",
+#                         branch1 = "DEV",
+#                         branch2 = "20241005")
 
 # Option 2: Merge DEV into release branch
 
-pipfun::merge_branch_into(repo          = "aux_test",
-                          source_branch = "DEV",
-                          target_branch = "20241005")
+# pipfun::merge_branch_into(repo          = "aux_test",
+#                           source_branch = "DEV",
+#                           target_branch = "20241005")
 ```
 
 
