@@ -426,7 +426,7 @@ compare_vintage_versions <- function(measure,
       setattr(df, "aux_key", c("country_code", "year", "cpi_year"))
     }
 
-    df
+    df[]
 
   }, error = function(e) {
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
