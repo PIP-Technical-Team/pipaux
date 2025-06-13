@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 # Initialize log to make it available in this vignette
 pipfun::log_init("pipaux_update_log", overwrite = T)
+#pipfun::setup_working_release(release = "20250203")
 library(pipaux)
 ```
 
@@ -55,8 +56,8 @@ In this example, I am using a "TEST" release with a release date of "20250203". 
 
 ```{r}
 # Set up the working release 
-pipfun::setup_working_release(release  = "20250203",
-                              identity = "TEST")
+# pipfun::setup_working_release(release  = "20250203",
+#                               identity = "TEST")
 ```
 
 ## 2️⃣ STEP 2 - UPDATE ALL (OR SOME) AUXILIARY DATA
