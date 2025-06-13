@@ -16,11 +16,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#devtools::load_all()
+devtools::load_all()
 
 # Initialize log to make it available in this vignette
 pipfun::log_init("pipaux_update_log", overwrite = T)
-library(pipaux)
+#library(pipaux)
 ```
 
 ### Overview
@@ -65,13 +65,13 @@ pipfun::setup_working_release(release  = "20250203",
 
 ```{r}
 update <- update_all_aux(
-  measures = c("maddison", "censoring", "pop"),
+  measures = c("maddison", "cpi"),
   owner    = "RossanaTat",
   log      = TRUE,         # Enable logging
   log_save = TRUE          # Optionally save the log as a .qs file in the current release folder
 )
 
-names(update)
+update
 
 ```
 
@@ -124,14 +124,13 @@ The `compare_aux_releases()` function compares the contents of auxiliary data fi
 You can run the function for a single measure or for all available measures. If `old_release = NULL`, the function will automatically use the most recent available release that shares the same identity (e.g., TEST) of the current working release.
 
 ```{r}
-# Compare GDP data between the current release and a previous one
-changes_gdp <- compare_aux_releases(
-  measure     = "gdp",  # you can pass one or more measures through character vector
-  old_release = "20250101_PROD"
+# Compare pop data between the current release and a previous one
+changes_pop <- compare_aux_releases(
+  measure     = "pop"  # you can pass one or more measures through character vector
 )
 
 # Inspect structure of the output
-names(changes_gdp)
+names(changes_pop)
 
 ```
 
@@ -155,13 +154,13 @@ Check the `version` argument documentation for more details.
 
 ```{r}
 
-# Compare the current GDP file with its previous version
-vintage_changes_gdp <- compare_aux_vintages(
+# Compare the current POP file with its previous version
+vintage_changes_pop <- compare_aux_vintages(
   measures = "pop",
   version = -1
 )
 
-
+names(vintage_changes_pop)
 ```
 
 Each element in the returned (invisible) list corresponds to a measure provided in the measures argument. The result for each measure includes the differences in values, rows, and columns (as returned by the internal function `compare_vintage_versions()`).
