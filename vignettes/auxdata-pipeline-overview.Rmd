@@ -65,6 +65,9 @@ In this example, I am using a "TEST" release with a release date of "20250203". 
 **Update** In this example, we update a selection of auxiliary data measures. The repositories used are hosted on my GitHub account, so we specify the owner as "RossanaTat".
 
 ```{r}
+
+pipfun::setup_working_release(release = "20250203")
+
 update <- update_all_aux(
   measures = c("maddison", "cpi"),
   owner    = "RossanaTat",
