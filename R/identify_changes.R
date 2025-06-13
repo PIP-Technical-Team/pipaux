@@ -105,19 +105,9 @@ get_aux_changes <- function(measure      = "cpi",
   # _______________________________________#
 
   # Sort both datasets by key columns
-  if (measure == "cpi") {
-    setorderv(new_df, c("country_code", "survey_year", "reporting_level"))
-  } else {
-    setorderv(new_df, key_cols)
+  setorderv(new_df, key_cols)
+  setorderv(old_df, key_cols)
 
-  }
-
-  if (measure == "cpi") {
-    setorderv(old_df, c("country_code", "survey_year", "reporting_level"))
-  } else {
-    setorderv(old_df, key_cols)
-
-  }
   if (verbose) {
     cli::cli_alert_info("Keys used for comparison {key_cols}")
   }
@@ -196,13 +186,9 @@ get_aux_changes <- function(measure      = "cpi",
       old_release = old_release
     )]
 
+    added <- setdiff(names(new_df), names(old_df))
+    removed <- setdiff(names(old_df), names(new_df))
 
-    col_diff <- list(
-      "added_columns"   = setdiff(names(new_df),
-                                  names(old_df)),
-      "removed_columns" = setdiff(names(old_df),
-                                  names(new_df))
-    )
 
     # Optionally reorder for clarity
     setcolorder(diff_rows, c("change_type",
@@ -210,6 +196,20 @@ get_aux_changes <- function(measure      = "cpi",
                              "df"))
     setorderv(diff_rows, c("change_type",
                            key_cols))
+  }
+
+  added   <- setdiff(names(new_df),
+                     names(old_df))
+  removed <- setdiff(names(old_df),
+                     names(new_df))
+
+  diff_cols <- if (length(added) > 0 || length(removed) > 0) {
+    list(
+      added_columns   = if (length(added) > 0) added else NULL,
+      removed_columns = if (length(removed) > 0) removed else NULL
+    )
+  } else {
+    "NA"
   }
 
 
@@ -226,7 +226,7 @@ get_aux_changes <- function(measure      = "cpi",
     list(
     "diff_values" = diff_table,
     "diff_rows"   = diff_rows,
-    "diff_cols"   = col_diff
+    "diff_cols"   = diff_cols
   ))
   )
 
