@@ -1,9 +1,9 @@
 ---
-title: "Aux data - Updating GitHub and the Y Drive"
+title: "Aux data: Updating GitHub and the Y Drive"
 output: rmarkdown::html_vignette
 author: Rossana Tatulli
 vignette: >
-  %\VignetteIndexEntry{"Aux data - Updating GitHub and the Y Drive"}
+  %\VignetteIndexEntry{Aux data: Updating GitHub and the Y Drive}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

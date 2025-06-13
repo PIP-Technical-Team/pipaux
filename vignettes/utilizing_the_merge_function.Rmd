@@ -2,6 +2,8 @@
 title: "Utilizing the merge function"
 author: Tefera
 output: rmarkdown::html_vignette
+internal: true
+eval: FALSE
 vignette: >
   %\VignetteIndexEntry{Utilizing the merge function}
   %\VignetteEngine{knitr::rmarkdown}
