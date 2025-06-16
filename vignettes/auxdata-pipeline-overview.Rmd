@@ -16,12 +16,14 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#devtools::load_all()
+devtools::load_all()
+
+#library(pipaux)
 
 # Initialize log to make it available in this vignette
 pipfun::log_init("pipaux_update_log", overwrite = T)
 #pipfun::setup_working_release(release = "20250203")
-library(pipaux)
+
 ```
 
 ### Overview
@@ -56,8 +58,8 @@ In this example, I am using a "TEST" release with a release date of "20250203". 
 
 ```{r}
 # Set up the working release 
-# pipfun::setup_working_release(release  = "20250203",
-#                               identity = "TEST")
+pipfun::setup_working_release(release  = "20250203",
+                              identity = "TEST")
 ```
 
 ## 2️⃣ STEP 2 - UPDATE ALL (OR SOME) AUXILIARY DATA
@@ -85,6 +87,8 @@ The output of `update_all_aux()` is a named list, with each element correspondin
 
 -   error: either `NULL` if there was no error, or the error message if something went wrong.
 
+As explained in the [**"update_workflow"** vignette](../articles/update_workflow.html), the update process ensures that each auxiliary data measure is kept up to date with the latest changes. This means that the GitHub branches are updated with the most recent version of the DEV branch, and that the corresponding files are saved to the Y drive accordingly.
+
 To better understand what happened during the update process, you should inspect the **log**. The log is stored as a data.table, and can be accessed using **{pipfun}** functions or read directly from the .qs file saved in current release folder (if log_save = TRUE). **Note:** The logging functions from the `{pipfun}` package are explained in the [Log vignette](https://pip-technical-team.github.io/pipfun/articles/log.html).
 
 **Inspect result** 👀
@@ -107,7 +111,7 @@ pipfun::log_get(name = "pipaux_update_log")[event == "status_check"][.N, output]
 
 **Under the hood** The `update_all_aux()` function internally calls an auxiliary function named `aux_fun()` for each specified measure. This function manages the full update workflow — from checking synchronization status between GitHub and the network drive (Y:) to updating all interdependencies among auxiliary data measures.
 
-To learn more about this process and the logic behind it, please refer to the dedicated vignette: [Update Workflow](update-workflow.html) vignette for more details.
+To learn more about this process and the logic behind it, please refer to the dedicated article "Aux Data: Updating GitHub and the Y drive" .
 
 ## Notes (for your reference or future modifications):
 

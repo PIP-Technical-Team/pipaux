@@ -617,25 +617,25 @@ update_all_aux <- function(measures = NULL,
   }
 
   # Track update status for each measure
-  status <- lapply(all_measures,
-                   function(msr) {
-
+  status <- setNames(lapply(all_measures,
+                            function(msr) {
     tryCatch({
-      aux_fun(measure   = msr,
-              verbose   = verbose,
-              log       = log,
-              ...) # Additional args passed through update_all_aux
+      aux_fun(measure = msr,
+              verbose = verbose,
+              log = log,
+              ...)
 
-      return(list(measure = msr,
-                  success = TRUE,
-                  error = NULL))
+      list(measure = msr,
+           success = TRUE,
+           error = NULL)
 
     }, error = function(e) {
-      return(list(measure = msr,
-                  success = FALSE,
-                  error = e$message))
+      list(measure = msr,
+           success = FALSE,
+           error = e$message)
     })
-  })
+  }), all_measures)
+
 
   # Save log if log save is TRUE
 
