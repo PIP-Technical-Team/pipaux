@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 #library(pipaux)
-#devtools::load_all()
+devtools::load_all()
 
-library(pipaux)
+#library(pipaux)
 
 # Initialize log for subsequent use 
 pipfun::log_init(name = "pipaux_update_log",
@@ -85,7 +85,7 @@ pipfun::setup_working_release(release  = "20250203",
 
 ```
 
-#### Step 2: Updating population data 
+#### Step 2: Updating an aux data measure 
 For testing purposes, I am working on a fork of the "aux_censoring" repo in my personal account 
 
 ```{r}
@@ -159,7 +159,7 @@ If `log = TRUE` and `log_save = TRUE`, the function will save some details, outp
 
 #### Some info on the update process 
 
-There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the formatting of raw data and subsequent the raw data and saving in the Y: drive. Although different raw datasets are processed in different ways, they all share the following characteristics:
+There are three types of auxiliary data, i.e., *raw*, *input* and *output*, and different sources of auxiliary data, e.g., from WDI, POV GP, external data etc.. In this vignette, we focus on the formatting of raw data and subsequent saving in the Y: drive. Although different aux data measures are processed in different ways, they all share the following characteristics:
 The raw data is 
 
 (1.) loaded from the corresponding `aux_*` measure repo in GitHub, 
