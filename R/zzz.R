@@ -20,7 +20,9 @@ pipuax_default_options <- list(
   pipaux.detail.raw    = FALSE,
   pipaux.detail.output = FALSE,
   pipfun.verbose       = FALSE,
-  joyn.reportvar       = "report"
+  #joyn.reportvar       = "report"
+  joyn.reportvar       = ".joyn"
+
 )
 
 .onLoad <- function(libname, pkgname) {

@@ -125,21 +125,27 @@ get_aux_changes <- function(measure      = "cpi",
               interactive         = FALSE,
               verbose             = verbose)
 
-  # Extract different values in table format
-  diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
-                                           #by.x          = new_keys.x,
-                                           #by.y          = new_keys.y,
-                                           by            = key_cols,
-                                           output        = "simple",
-                                           interactive   = FALSE)
+  if (!is.null(myr_obj)) {
+    diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
+                                             by            = key_cols,
+                                             output        = "simple",
+                                             interactive   = FALSE)
 
-  # Extract different rows
-  diff_rows <- myrror::extract_diff_rows(myrror_object  = myr_obj,
-                                         #by.x          = new_keys.x,
-                                         #by.y          = new_keys.y,
-                                         by = key_cols,
-                                         output        = "simple",
-                                         verbose       = verbose)
+    # Extract different rows
+    diff_rows <- myrror::extract_diff_rows(myrror_object  = myr_obj,
+                                           by             = key_cols,
+                                           output         = "simple",
+                                           verbose        = verbose)
+
+
+  }
+
+  else {
+    diff_table <- NULL
+    diff_rows <- NULL
+
+  }
+
 
   # Add metadata: files paths, measure
 
@@ -209,7 +215,7 @@ get_aux_changes <- function(measure      = "cpi",
       removed_columns = if (length(removed) > 0) removed else NULL
     )
   } else {
-    "NA"
+    NULL
   }
 
 
