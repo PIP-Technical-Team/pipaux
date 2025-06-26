@@ -219,6 +219,12 @@ aux_file_last_updated <- function(data_dir, aux_files, branch) {
 
 }
 
+# memo:
+# read_dependencies(
+# gh_user = "https://raw.githubusercontent.com",
+# owner   = "PIP-Technical-Team"
+# )
+
 read_dependencies <- function(gh_user, owner) {
   dependencies <- paste(gh_user,
                         owner,
@@ -226,11 +232,18 @@ read_dependencies <- function(gh_user, owner) {
                         sep = "/") |>
     yaml::read_yaml()
 
-  sapply(dependencies, \(x) if (length(x))
-    strsplit(x, ",\\s+")[[1]]
-    else
-      character())
+  result <- sapply(dependencies, \(x) {
+    if (length(x)) {
+      strsplit(x, ",\\s*")[[1]]
+    } else {
+      character()
+    }
+  }, simplify = FALSE)
+
+  # Sort by number of dependencies (in increasing order)
+  result[order(lengths(result))]
 }
+
 
 read_signature_file <- function(aux_file, maindir, branch) {
   # Construct the path to data signature aux file

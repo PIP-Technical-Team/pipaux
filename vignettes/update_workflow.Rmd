@@ -17,9 +17,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(pipaux)
-#devtools::load_all()
-
-#library(pipaux)
 
 # Initialize log for subsequent use 
 pipfun::log_init(name = "pipaux_update_log",

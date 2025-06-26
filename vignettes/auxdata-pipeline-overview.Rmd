@@ -100,13 +100,15 @@ To better understand what happened during the update process, you should inspect
 # Read the entire log into memory
 #pipfun::log_get(name = "pipaux_update_log")[]
 
-# Filter log entries to show only successful operations
-pipfun::log_get(name = "pipaux_update_log")[event == "success"]
+# Filter log entries 
 
-# Show all update-related events
+## Show info messages
+pipfun::log_get(name = "pipaux_update_log")[event == "info"]
+
+## Show all update-related events
 pipfun::log_get(name = "pipaux_update_log")[event == "update"]
 
-# Extract the output of the most recent status check
+## Extract the output of the most recent status check
 pipfun::log_get(name = "pipaux_update_log")[event == "status_check"][.N, output]
 
 ```
@@ -140,7 +142,9 @@ changes_pop <- compare_aux_releases(
 )
 
 # Inspect structure of the output
-names(changes_pop)
+names(changes_pop$pop)
+
+changes_pop
 
 ```
 
@@ -171,6 +175,8 @@ vintage_changes_pop <- compare_aux_vintages(
 )
 
 names(vintage_changes_pop)
+
+vintage_changes_pop
 ```
 
 Each element in the returned (invisible) list corresponds to a measure provided in the measures argument. The result for each measure includes the differences in values, rows, and columns (as returned by the internal function `compare_vintage_versions()`).
@@ -183,7 +189,7 @@ Note that if no vintage versions are found, the function will warn you and retur
 # Compare the current GDP file with its previous version
 vintage_changes_gdp <- compare_aux_vintages(
   measures = "gdp",
-  version = -1
+  version  = -1
 )
 
 ```

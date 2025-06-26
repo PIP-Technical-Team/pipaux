@@ -465,11 +465,18 @@ compare_vintage_versions <- function(measure,
 
 
   col_diff <- list(
-    "added_columns"   = setdiff(names(new_df),
-                                names(old_df)),
-    "removed_columns" = setdiff(names(old_df),
-                                names(new_df))
+    "added_columns" = {
+      diff <- setdiff(names(new_df),
+                      names(old_df))
+      if (length(diff) == 0) NULL else diff
+    },
+
+    "removed_columns" = {
+      diff <- setdiff(names(old_df), names(new_df))
+      if (length(diff) == 0) NULL else diff
+    }
   )
+
 
 
   if (!is.null(diff_rows)) {
