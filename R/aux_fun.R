@@ -604,14 +604,37 @@ update_all_aux <- function(measures = NULL,
 
   # Add log ####
 
-  # Optional: define all known measures if not provided
-  all_measures <- gh::gh("GET /users/{username}/repos",
-                         username = getOption("pipfun.ghowner")) |>
+  # # Optional: define all known measures if not provided
+  # all_measures <- gh::gh("GET /users/{username}/repos",
+  #                        username = getOption("pipfun.ghowner")) |>
+  #   vapply("[[", "", "name") |>
+  #   grep("^aux_", x = _, value = TRUE) |>
+  #   (\(x) sub("^aux_", "", x))()
+  #
+  # # Filter measures if user provides a subset
+  # if (!is.null(measures)) {
+  #   all_measures <- all_measures[all_measures %in% measures]
+  # }
+
+
+  # Get measures ####
+  all_measures_raw <- gh::gh("GET /users/{username}/repos",
+                             username = getOption("pipfun.ghowner")) |>
     vapply("[[", "", "name") |>
     grep("^aux_", x = _, value = TRUE) |>
     (\(x) sub("^aux_", "", x))()
 
-  # Filter measures if user provides a subset
+  # Step 2: Get measures sorted by number of dependencies
+  dependency_order <- names(read_dependencies(
+    gh_user = "https://raw.githubusercontent.com",
+    owner   = getOption("pipfun.ghowner")
+  ))
+
+  # Step 3: Keep only known measures, in sorted dependency order
+  all_measures <- intersect(dependency_order,
+                            all_measures_raw)
+
+  # Step 4: If user provided a subset, filter while preserving order
   if (!is.null(measures)) {
     all_measures <- all_measures[all_measures %in% measures]
   }
