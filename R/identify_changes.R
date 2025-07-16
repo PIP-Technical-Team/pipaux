@@ -253,7 +253,6 @@ compare_aux_releases <- function(measure     = NULL,
                                  owner       = "PIP-Technical-Team",
                                  old_release = NULL,
                                  verbose     = FALSE,
-                                 key_cols    = getOption("pipaux.key_vars"),
                                  ...) {
 
   # _______________________________________#

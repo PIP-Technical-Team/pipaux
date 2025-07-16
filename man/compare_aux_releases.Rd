@@ -10,7 +10,6 @@ compare_aux_releases(
   owner = "PIP-Technical-Team",
   old_release = NULL,
   verbose = FALSE,
-  key_cols = getOption("pipaux.key_vars"),
   ...
 )
 }
@@ -25,8 +24,6 @@ compare_aux_releases(
 If NULL, automatically take last available release of same identity as the current working release}
 
 \item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
-
-\item{key_cols}{Character vector. Variables used as keys to compare values between releases. Defaults to the \code{pipaux.key_vars} option.}
 
 \item{...}{Additional arguments passed to \code{get_aux_changes()}.}
 }
