@@ -4,7 +4,7 @@
 #' @param measure type of data frame, e.g., "cpi" or "PPP".
 #'
 #' @keywords internal
-aux_labels_pip <- function(x, measure) {
+aux_labels_pip <- function(x, measure, verbose = FALSE) {
   if (measure == "cpi") {
 
     # Label variables
@@ -64,7 +64,7 @@ aux_labels_pip <- function(x, measure) {
     attr(x$pop, "label") <- "Population"
     # attr(x$pop_domain, "label") <- "Population domain to join with microdata"
   } else {
-    cli::cli_inform("no labels available for measure {.code {measure}}")
+    if (verbose) cli::cli_inform("no labels available for measure {.code {measure}}")
   }
 
   return(x)
