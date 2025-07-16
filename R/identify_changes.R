@@ -169,17 +169,6 @@ get_aux_changes <- function(measure      = "cpi",
               new_path.x  = new_path,
               old_path.y  = old_path)
 
-    # tidy_diff <- data.table::data.table(
-    #   diff_table[, ..key_cols],
-    #   variable    = diff_table$variable,
-    #   old_value   = diff_table$value.y,
-    #   new_value   = diff_table$value.x,
-    #   measure     = measure,
-    #   release     = release,
-    #   old_release = old_release,
-    #   path.x      = new_path,
-    #   path.y      = old_path
-    # )
   }
 
   if (!is.null(diff_rows)) {
@@ -227,14 +216,17 @@ get_aux_changes <- function(measure      = "cpi",
     cli::cli_alert_success("Diff values extracted successfully for measure: {.strong {measure}}")
   }
 
-  #return(diff_table)
-  return(invisible(
-    list(
+  result <- list(
     "diff_values" = diff_table,
     "diff_rows"   = diff_rows,
     "diff_cols"   = diff_cols
-  ))
   )
+
+  setattr(result,
+          "key_cols",
+          key_cols)
+
+  return(invisible(result))
 
 }
 
