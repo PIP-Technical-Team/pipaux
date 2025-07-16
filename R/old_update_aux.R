@@ -258,7 +258,7 @@ read_signature_file <- function(aux_file, maindir, branch) {
 }
 
 
-#' Update Auxiliary data. Wrapper of measure-specific functions.
+#' OLD - Update Auxiliary data. Wrapper of measure-specific functions.
 #'
 #' @inheritParams aux_labels_pip
 #' @inheritParams aux_cpi

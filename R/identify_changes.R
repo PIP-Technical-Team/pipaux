@@ -368,10 +368,10 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 #' @seealso [pipload::pip_load_aux()], [myrror::myrror()]
 #' @export
 compare_vintage_versions <- function(measure,
-                                     root_dir = Sys.getenv("PIP_ROOT_DIR"),
-                                     maindir  = getOption("pipaux.working_dir"),
-                                     verbose  = FALSE,
-                                     version  = -1,
+                                     root_dir    = Sys.getenv("PIP_ROOT_DIR"),
+                                     maindir     = getOption("pipaux.working_dir"),
+                                     verbose     = FALSE,
+                                     version     = -1,
                                      apply_label = TRUE,
                                      ...) {
 
@@ -385,8 +385,8 @@ compare_vintage_versions <- function(measure,
 
   new_df <- tryCatch({
 
-    load_aux(measure = measure,
-             maindir = maindir,
+    load_aux(measure     = measure,
+             maindir     = maindir,
              apply_label = apply_label)
 
 
@@ -404,13 +404,15 @@ compare_vintage_versions <- function(measure,
     df <- pipload::pip_load_aux(
       measure = measure,
       version = -1,
-      verbose = verbose
+      verbose = verbose,
+      maindir = "PIP_ingestion_pipeline_v2" # to change??
     )
 
 
     df[]
 
   }, error = function(e) {
+
     cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
     NULL
   })
@@ -454,6 +456,10 @@ compare_vintage_versions <- function(measure,
                                          by            = key_cols,
                                          output        = "simple")
 
+  if (nrow(diff_rows) == 0) {
+    diff_rows <- NULL
+  }
+
 
   col_diff <- list(
     "added_columns" = {
@@ -478,29 +484,38 @@ compare_vintage_versions <- function(measure,
                            key_cols))
   }
 
+
+
+    if (!is.null(diff_vals) ||
+        !is.null(diff_rows) ||
+        !is.null(col_diff$added_columns) ||
+        !is.null(col_diff$removed_columns)) {
+
+      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. Differences detected.")
+
+      result <- list(
+        "diff_values" = diff_vals,
+        "diff_rows"   = diff_rows,
+        "diff_cols"   = col_diff
+      )
+
+      setattr(result, "key_cols", key_cols)
+    }
+
+  else {
+
+      result <- NULL
+
+      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. No differences found.")
+    }
+
   # _______________________________________#
   # Return ####
   # _______________________________________#
 
 
-    if (!is.null(diff_vals) ||
-        !is.null(diff_rows) ||
-        !is.null(col_diff)) {
-
-      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. Differences detected.")
-    }
-
-  else {
-      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. No differences found.")
-    }
-
-
   return(invisible(
-    list(
-      "diff_values" = diff_vals,
-      "diff_rows"   = diff_rows,
-      "diff_cols"   = col_diff
-    ))
+    result)
   )
 }
 

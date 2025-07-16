@@ -186,9 +186,9 @@ If no previous version is found for a given measure, or if an error occurs durin
 Note that if no vintage versions are found, the function will warn you and return NULL as in this example:
 
 ```{r}
-# Compare the current GDP file with its previous version
-vintage_changes_gdp <- compare_aux_vintages(
-  measures = "gdp",
+# Compare the current CPI file with its previous version
+vintage_changes_cpi <- compare_aux_vintages(
+  measures = "cpi",
   version  = -1
 )
 

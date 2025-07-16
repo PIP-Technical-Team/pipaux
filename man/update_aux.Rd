@@ -2,7 +2,7 @@
 % Please edit documentation in R/old_update_aux.R
 \name{update_aux}
 \alias{update_aux}
-\title{Update Auxiliary data. Wrapper of measure-specific functions.}
+\title{OLD - Update Auxiliary data. Wrapper of measure-specific functions.}
 \usage{
 update_aux(
   measure,
@@ -32,5 +32,5 @@ will be used to update either the development server or production.}
 \item{verbose}{logical : Do you want verbose output?}
 }
 \description{
-Update Auxiliary data. Wrapper of measure-specific functions.
+OLD - Update Auxiliary data. Wrapper of measure-specific functions.
 }
