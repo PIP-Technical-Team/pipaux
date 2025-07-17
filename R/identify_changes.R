@@ -4,7 +4,7 @@
 #' Compare auxiliary data files across releases
 #'
 #' This function compares the contents of auxiliary data files between the current and a specified previous release.
-#' It identifies differences in values for specified key variables
+#' It identifies differences for specified key variables
 #'
 #' The release identifiers must follow the format `"YYYYMMDD_identity"` (e.g., `"20250101_TEST"`).
 #'
@@ -30,8 +30,6 @@ get_aux_changes <- function(measure      = "cpi",
 
   # _______________________________________#
   # Get arguments ####
-
-  #ext <- match.arg(ext)
 
   # Get current release ####
 
@@ -90,10 +88,7 @@ get_aux_changes <- function(measure      = "cpi",
   }
 
 
-  # Key vars to compare by --- ####
-
-  #key_cols <- intersect(key_cols,
-  #                      intersect(names(new_df), names(old_df)))
+  # Key vars to compare by ______ ####
 
   key_cols <- attributes(new_df)$aux_key
 
@@ -105,16 +100,20 @@ get_aux_changes <- function(measure      = "cpi",
   # _______________________________________#
 
   # Sort both datasets by key columns
-  setorderv(new_df, key_cols)
-  setorderv(old_df, key_cols)
+
+  setorderv(new_df,
+            cols = key_cols)
+  setorderv(old_df,
+            cols = key_cols)
 
   if (verbose) {
     cli::cli_alert_info("Keys used for comparison {key_cols}")
   }
 
-  # Extract differences ####
+  # Extract differences __________ ####
 
-  # # Run comparison
+  ## Run comparison
+
   myr_obj <- myrror::myrror(
               dfx                 = new_df,
               dfy                 = old_df,
@@ -124,6 +123,8 @@ get_aux_changes <- function(measure      = "cpi",
               extract_diff_values = TRUE,
               interactive         = FALSE,
               verbose             = verbose)
+
+  ## Extract different values and different rows
 
   if (!is.null(myr_obj)) {
     diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
@@ -143,7 +144,6 @@ get_aux_changes <- function(measure      = "cpi",
   else {
     diff_table <- NULL
     diff_rows <- NULL
-
   }
 
 
@@ -181,17 +181,19 @@ get_aux_changes <- function(measure      = "cpi",
       old_release = old_release
     )]
 
-    added <- setdiff(names(new_df), names(old_df))
+    added  <- setdiff(names(new_df), names(old_df))
     removed <- setdiff(names(old_df), names(new_df))
 
 
-    # Optionally reorder for clarity
-    setcolorder(diff_rows, c("change_type",
-                             key_cols,
-                             "df"))
-    setorderv(diff_rows, c("change_type",
-                           key_cols))
+    # # Optionally reorder for clarity
+    # setcolorder(diff_rows, c("change_type",
+    #                          key_cols,
+    #                          "df"))
+    # setorderv(diff_rows, c("change_type",
+    #                        key_cols))
   }
+
+  # Get info on added or removed column names
 
   added   <- setdiff(names(new_df),
                      names(old_df))
@@ -206,7 +208,6 @@ get_aux_changes <- function(measure      = "cpi",
   } else {
     NULL
   }
-
 
 
   # _______________________________________#
@@ -232,7 +233,7 @@ get_aux_changes <- function(measure      = "cpi",
 
 #' Inventory of changes in auxiliary data across measures
 #'
-#' Compares auxiliary data files between the current and a specified previous release across one or more measures.
+#' Compares auxiliary data files between the current and a previous release across one or more measures.
 #'
 #' @param measure Optional character vector. Specific measures to check (e.g., `c("cpi", "gdp")`). If `NULL`, all available measures are included.
 #' @param maindir Path to the local auxiliary data directory. Defaults to `getOption("pipaux.working_dir")`.
@@ -324,7 +325,7 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 
   # List release folder names only
   release_names <- fs::dir_ls(aux_path,
-                              type = "directory",
+                              type    = "directory",
                               recurse = FALSE) |>
     fs::path_file()
 
@@ -334,7 +335,8 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
   ]
 
   # Filter those strictly before current release
-  candidates <- sort(valid_releases[valid_releases < current_release], decreasing = TRUE)
+  candidates <- sort(valid_releases[valid_releases < current_release],
+                     decreasing = TRUE)
 
   if (length(candidates) == 0) {
     cli::cli_abort("No older release found with identity {.strong {identity}} prior to {.strong {current_release}}.")
@@ -429,9 +431,9 @@ compare_vintage_versions <- function(measure,
   }
 
   setorderv(new_df,
-            key_cols)
+            cols = key_cols)
   setorderv(old_df,
-            key_cols)
+            cols = key_cols)
 
   # _______________________________________#
   # Compare with myrror ####
@@ -475,7 +477,6 @@ compare_vintage_versions <- function(measure,
   )
 
 
-
   if (!is.null(diff_rows)) {
     diff_rows[, change_type := fifelse(df == "dfx",
                                        "added",
@@ -483,7 +484,6 @@ compare_vintage_versions <- function(measure,
     setorderv(diff_rows, c("change_type",
                            key_cols))
   }
-
 
 
     if (!is.null(diff_vals) ||
@@ -539,7 +539,7 @@ compare_vintage_versions <- function(measure,
 #' \dontrun{
 #' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
 #' }
-compare_aux_vintages <- function(measures,
+compare_aux_vintages <- function(measures      = NULL,
                                   version      = -1,
                                   root_dir     = Sys.getenv("PIP_ROOT_DIR"),
                                   maindir      = getOption("pipaux.working_dir"),
@@ -548,6 +548,7 @@ compare_aux_vintages <- function(measures,
                                   ...) {
 
   results <- lapply(measures, function(m) {
+
     tryCatch({
       res <- compare_vintage_versions(measure      = m,
                                       version      = version,
@@ -561,13 +562,16 @@ compare_aux_vintages <- function(measures,
         return(NULL)
       }
       return(res)
-    }, error = function(e) {
+    },
+
+    error = function(e) {
       if (verbose) message(sprintf("Error comparing measure '%s': %s", m, e$message))
       return(NULL)
     })
   })
 
   names(results) <- measures
+
   invisible(results)
 }
 

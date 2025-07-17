@@ -10,12 +10,12 @@
 #' @keywords internal
 simulate_old_release <- function(base_dir        = getOption("pipaux.working_dir"),
                                  root_dir        = Sys.getenv("PIP_ROOT_DIR"),
-                                 old_release      = "20250101_TEST",
+                                 old_release     = "20250101_TEST",
                                  measure,
                                  seed            = 123) {
 
   pipfun::get_wrk_release(verbose = FALSE)
-  release <- wrk_release$release
+  release  <- wrk_release$release
   identity <- wrk_release$identity
 
   current_version <- paste0(release, "_", identity)

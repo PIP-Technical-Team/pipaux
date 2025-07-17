@@ -5,7 +5,7 @@
 \title{Compare Vintage Versions for Multiple Auxiliary Data Files}
 \usage{
 compare_aux_vintages(
-  measures,
+  measures = NULL,
   version = -1,
   root_dir = Sys.getenv("PIP_ROOT_DIR"),
   maindir = getOption("pipaux.working_dir"),

@@ -247,10 +247,12 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
   ppp <- ppp |> setnames("ppp_data_level", "reporting_level",
                          skip_absent = TRUE)
 
-  setattr(ppp, "gh", gh)
+  setattr(ppp,
+          "gh", gh)
 
   # validate ppp output data
-  ppp_validate_output(ppp = ppp, detail = detail)
+  ppp_validate_output(ppp = ppp,
+                      detail = detail)
 
 
   if (branch == "main") {
@@ -269,9 +271,23 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
 
-  # Set other attributes
+  # Set other attributes ________________ #
+
+  # Aux measure name
   setattr(ppp, "aux_name", "ppp")
-  setattr(ppp, "aux_key", c("country_code", "reporting_level", "ppp_year"))
+
+  # Keys identifying the data
+  keys <-  c("country_code", "reporting_level", "ppp_year")
+
+  setattr(ppp,
+          "aux_key",
+          keys)
+
+  setorderv(ppp,
+           c("country_code", "reporting_level", "ppp_year"))
+
+
+
 
   # _____________________ #####
   # Saving ####

@@ -4,7 +4,7 @@
 \alias{aux_labels_pip}
 \title{PIP Auxiliary Labels}
 \usage{
-aux_labels_pip(x, measure)
+aux_labels_pip(x, measure, verbose = FALSE)
 }
 \arguments{
 \item{x}{Data frame to be labeled.}

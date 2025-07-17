@@ -31,7 +31,7 @@ If NULL, automatically take last available release of same identity as the curre
 Named list of data frames with value differences for each measure. Measures with no differences or errors return \code{NULL}.
 }
 \description{
-Compares auxiliary data files between the current and a specified previous release across one or more measures.
+Compares auxiliary data files between the current and a previous release across one or more measures.
 }
 \examples{
 \dontrun{

@@ -29,7 +29,7 @@ A data frame with detected differences in values, grouped by the specified key v
 }
 \description{
 This function compares the contents of auxiliary data files between the current and a specified previous release.
-It identifies differences in values for specified key variables
+It identifies differences for specified key variables
 }
 \details{
 The release identifiers must follow the format \code{"YYYYMMDD_identity"} (e.g., \code{"20250101_TEST"}).
