@@ -96,7 +96,8 @@ aux_fun(measure = measure,
         maindir = getOption("pipaux.working_dir"),
         owner   = owner,
         verbose = FALSE,
-        log     = TRUE)
+        log_overwrite = FALSE,
+        log     = FALSE)
 
 # Notice that when log == TRUE, a log of results is available for your information
 
@@ -117,7 +118,7 @@ The log stores five main types of events:
 - **Success**: Signals that the entire workflow was completed successfully.
 
 
-```{r}
+```{r, eval = FALSE}
 
 pipfun::log_get(name = "pipaux_update_log")
 
@@ -126,12 +127,6 @@ pipfun::log_get(name = "pipaux_update_log")[]
 
 pipfun:::log_filter(name = "pipaux_update_log",
                     event = "info")
-
-pipfun:::log_filter(name = "pipaux_update_log",
-                    event = "status_check")
-
-# You can also inspct the output of the status check process with
-pipfun::log_get(name = "pipaux_update_log")[event == "status_check"][.N][, output]
 
 
 

@@ -171,18 +171,18 @@ aux_fun <- function(measure,
           verbose = verbose
         )
 
-        if (log) {
-          pipfun::log_add(
-            event          = "status_check",
-            message        = cli::col_green(paste0("Check status completed for: ", measure)),
-            name           = "pipaux_update_log",
-            output         = result,
-            logmeta        = list(
-              step         = "CHECK",
-              measure      = measure
-            )
-          )
-        }
+        # if (log) {
+        #   pipfun::log_add(
+        #     event          = "status_check",
+        #     message        = cli::col_green(paste0("Check status completed for: ", measure)),
+        #     name           = "pipaux_update_log",
+        #     output         = result,
+        #     # logmeta        = list(
+        #     #   step         = "CHECK",
+        #     #   measure      = measure
+        #     # )
+        #   )
+        # }
 
         result
       },
