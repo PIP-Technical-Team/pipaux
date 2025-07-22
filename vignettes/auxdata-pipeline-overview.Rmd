@@ -11,24 +11,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
-```
-
-```{r setup-fake-root, include=FALSE}
-# Create a fake root structure inside tempdir
-fake_root <- file.path(tempdir(), "root")
-dir.create(file.path(fake_root, "pip_ingestion_pipeline"), recursive = TRUE, showWarnings = FALSE)
-
-# Override '/' by changing the working directory
-old_wd <- setwd(fake_root)
-
-# When knitting finishes, reset the working dir
-knitr::knit_hooks$set(document = function(x) {
-  setwd(old_wd)
-  x
-})
-
 ```
 
 
@@ -124,8 +109,6 @@ pipfun::log_get(name = "pipaux_update_log")[event == "info"]
 ## Show all update-related events
 pipfun::log_get(name = "pipaux_update_log")[event == "update"]
 
-## Extract the output of the most recent status check
-pipfun::log_get(name = "pipaux_update_log")[event == "status_check"][.N, output]
 
 ```
 
