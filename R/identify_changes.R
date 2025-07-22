@@ -171,43 +171,43 @@ get_aux_changes <- function(measure      = "cpi",
 
   }
 
-  if (!is.null(diff_rows)) {
-    diff_rows[, change_type := fifelse(df == "dfx",
-                                       "added",
-                                       "removed")]
-    diff_rows[, `:=`(
-      measure     = measure,
-      release     = release,
-      old_release = old_release
-    )]
-
-    added  <- setdiff(names(new_df), names(old_df))
-    removed <- setdiff(names(old_df), names(new_df))
-
-
-    # # Optionally reorder for clarity
-    # setcolorder(diff_rows, c("change_type",
-    #                          key_cols,
-    #                          "df"))
-    # setorderv(diff_rows, c("change_type",
-    #                        key_cols))
-  }
-
-  # Get info on added or removed column names
-
-  added   <- setdiff(names(new_df),
-                     names(old_df))
-  removed <- setdiff(names(old_df),
-                     names(new_df))
-
-  diff_cols <- if (length(added) > 0 || length(removed) > 0) {
-    list(
-      added_columns   = if (length(added) > 0) added else NULL,
-      removed_columns = if (length(removed) > 0) removed else NULL
-    )
-  } else {
-    NULL
-  }
+  # if (!is.null(diff_rows)) {
+  #   diff_rows[, change_type := fifelse(df == "dfx",
+  #                                      "added",
+  #                                      "removed")]
+  #   diff_rows[, `:=`(
+  #     measure     = measure,
+  #     release     = release,
+  #     old_release = old_release
+  #   )]
+  #
+  #   added  <- setdiff(names(new_df), names(old_df))
+  #   removed <- setdiff(names(old_df), names(new_df))
+  #
+  #
+  #   # # Optionally reorder for clarity
+  #   # setcolorder(diff_rows, c("change_type",
+  #   #                          key_cols,
+  #   #                          "df"))
+  #   # setorderv(diff_rows, c("change_type",
+  #   #                        key_cols))
+  # }
+  #
+  # # Get info on added or removed column names
+  #
+  # added   <- setdiff(names(new_df),
+  #                    names(old_df))
+  # removed <- setdiff(names(old_df),
+  #                    names(new_df))
+  #
+  # diff_cols <- if (length(added) > 0 || length(removed) > 0) {
+  #   list(
+  #     added_columns   = if (length(added) > 0) added else NULL,
+  #     removed_columns = if (length(removed) > 0) removed else NULL
+  #   )
+  # } else {
+  #   NULL
+  # }
 
 
   # _______________________________________#
@@ -219,8 +219,8 @@ get_aux_changes <- function(measure      = "cpi",
 
   result <- list(
     "diff_values" = diff_table,
-    "diff_rows"   = diff_rows,
-    "diff_cols"   = diff_cols
+    "diff_rows"   = diff_rows
+   # "diff_cols"   = diff_cols
   )
 
   setattr(result,
