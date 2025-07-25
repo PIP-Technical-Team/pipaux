@@ -258,19 +258,19 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Get info on added or removed column names
 
-  added   <- setdiff(names(new_df),
-                     names(old_df))
-  removed <- setdiff(names(old_df),
-                     names(new_df))
-
-  diff_cols <- if (length(added) > 0 || length(removed) > 0) {
-    list(
-      added_columns   = if (length(added) > 0) added else NULL,
-      removed_columns = if (length(removed) > 0) removed else NULL
-    )
-  } else {
-    NULL
-  }
+  # added   <- setdiff(names(new_df),
+  #                    names(old_df))
+  # removed <- setdiff(names(old_df),
+  #                    names(new_df))
+  #
+  # diff_cols <- if (length(added) > 0 || length(removed) > 0) {
+  #   list(
+  #     added_columns   = if (length(added) > 0) added else NULL,
+  #     removed_columns = if (length(removed) > 0) removed else NULL
+  #   )
+  # } else {
+  #   NULL
+  # }
 
 
   # _______________________________________#
@@ -526,18 +526,18 @@ compare_vintage_versions <- function(measure,
   }
 
 
-  col_diff <- list(
-    "added_columns" = {
-      diff <- setdiff(names(new_df),
-                      names(old_df))
-      if (length(diff) == 0) NULL else diff
-    },
-
-    "removed_columns" = {
-      diff <- setdiff(names(old_df), names(new_df))
-      if (length(diff) == 0) NULL else diff
-    }
-  )
+  # col_diff <- list(
+  #   "added_columns" = {
+  #     diff <- setdiff(names(new_df),
+  #                     names(old_df))
+  #     if (length(diff) == 0) NULL else diff
+  #   },
+  #
+  #   "removed_columns" = {
+  #     diff <- setdiff(names(old_df), names(new_df))
+  #     if (length(diff) == 0) NULL else diff
+  #   }
+  # )
 
 
   if (!is.null(diff_rows)) {
@@ -621,8 +621,8 @@ compare_vintage_versions <- function(measure,
 
       result <- list(
         "diff_values" = diff_vals,
-        "diff_rows"   = diff_rows,
-        "diff_cols"   = col_diff
+        "diff_rows"   = diff_rows
+        #"diff_cols"   = col_diff
       )
 
       setattr(result, "key_cols", key_cols)

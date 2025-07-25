@@ -661,3 +661,76 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
   }
 
 }
+
+# New function to add reporting level var to pfw
+
+pfw_report_lvl <- function(cpfw) {
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # computations   ---------
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    dcols <- c(
+      "cpi_domain",
+      "ppp_domain",
+      "gdp_domain",
+      "pce_domain",
+      "pop_domain"
+    )
+
+
+    cpfw <-
+      cpfw[
+        # filter inpovcal data
+        inpovcal == 1
+      ][,
+        # Find MAX domain per obs
+        reporting_level := apply(.SD, MARGIN = 1,
+                                 function(x) {
+                                   y <- max(x)
+                                   as.character(y)
+                                 }),
+        .SDcols = dcols
+      ]
+
+
+    n_cpfw_wt <- length(unique(cpfw$welfare_type))
+
+
+    if(nrow(cpfw)==0){
+
+
+      rlang::abort(message = "PFW does not contains info for country, surveyid year, and survey_acronym",
+                   class = c("piperr","info_pfw"),
+                   use_cli_format = TRUE)
+
+
+    }else if(nrow(cpfw) > 1 & n_cpfw_wt ==1){
+
+
+      rlang::abort(message = "PFW is not unique for country, surveyid year, and survey_acronym",
+                   class = c("piperr", "no_unq_pfw"),
+                   use_cli_format = TRUE)
+
+
+    }else if(nrow(cpfw)>1){
+
+
+      rlang::inform(message = "More than one value for country/year PFW",
+                    class = c("pipinf", "othr_wlf_inf"),
+                    use_cli_format = TRUE)
+    }
+
+    # Return   ---------
+    return(cpfw)
+
+}
+
+
+
+
+
+
+
