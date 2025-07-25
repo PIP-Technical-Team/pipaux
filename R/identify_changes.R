@@ -138,6 +138,69 @@ get_aux_changes <- function(measure      = "cpi",
                                            output         = "simple",
                                            verbose        = verbose)
 
+    #### --------------- TEMPORARY FIX -------- ####
+
+    ## cpi     ##
+    ## ________ #
+
+    # diff values
+
+    if (measure == "cpi") {
+      # diff_table <- diff_table |>
+      #   frename(reporting_level = year.new,
+      #           year = survey_acronym.new,
+      #           survey_acronym = reporting_level.new)
+      #
+      # diff_table <- diff_table |>
+      #   frename(year.new            = year,
+      #           survey_acronym.new  = survey_acronym,
+      #           reporting_level.new = reporting_level
+      #   )
+
+      # diff rows
+
+      diff_rows <- diff_rows |>
+        frename(reporting_level = year.new,
+                year = survey_acronym.new,
+                survey_acronym = reporting_level.new)
+
+      diff_rows <- diff_rows |>
+        frename(year.new = year,
+                survey_acronym.new = survey_acronym,
+                reporting_level.new = reporting_level
+        )
+
+    }
+
+    ## ppp     ##
+    ## ________ #
+
+
+    if (measure == "ppp") {
+
+      diff_table <- diff_table |>
+        frename(reporting_level = ppp_year.new,
+                ppp_year = reporting_level.new)
+
+      diff_table <- diff_table |>
+        frename(ppp_year.new            = ppp_year,
+                reporting_level.new = reporting_level
+        )
+
+      # diff rows
+
+      diff_rows <- diff_rows |>
+        frename(reporting_level = ppp_year.new,
+                ppp_year = reporting_level.new)
+
+      diff_rows <- diff_rows |>
+        frename(ppp_year.new = ppp_year,
+                reporting_level.new = reporting_level
+        )
+
+    }
+    #### --------------------------------------- ####
+
 
   }
 
@@ -171,43 +234,43 @@ get_aux_changes <- function(measure      = "cpi",
 
   }
 
-  # if (!is.null(diff_rows)) {
-  #   diff_rows[, change_type := fifelse(df == "dfx",
-  #                                      "added",
-  #                                      "removed")]
-  #   diff_rows[, `:=`(
-  #     measure     = measure,
-  #     release     = release,
-  #     old_release = old_release
-  #   )]
-  #
-  #   added  <- setdiff(names(new_df), names(old_df))
-  #   removed <- setdiff(names(old_df), names(new_df))
-  #
-  #
-  #   # # Optionally reorder for clarity
-  #   # setcolorder(diff_rows, c("change_type",
-  #   #                          key_cols,
-  #   #                          "df"))
-  #   # setorderv(diff_rows, c("change_type",
-  #   #                        key_cols))
-  # }
-  #
-  # # Get info on added or removed column names
-  #
-  # added   <- setdiff(names(new_df),
-  #                    names(old_df))
-  # removed <- setdiff(names(old_df),
-  #                    names(new_df))
-  #
-  # diff_cols <- if (length(added) > 0 || length(removed) > 0) {
-  #   list(
-  #     added_columns   = if (length(added) > 0) added else NULL,
-  #     removed_columns = if (length(removed) > 0) removed else NULL
-  #   )
-  # } else {
-  #   NULL
-  # }
+  if (!is.null(diff_rows)) {
+    diff_rows[, change_type := fifelse(df == "dfx",
+                                       "added",
+                                       "removed")]
+    diff_rows[, `:=`(
+      measure     = measure,
+      release     = release,
+      old_release = old_release
+    )]
+
+    added  <- setdiff(names(new_df), names(old_df))
+    removed <- setdiff(names(old_df), names(new_df))
+
+
+    # # Optionally reorder for clarity
+    # setcolorder(diff_rows, c("change_type",
+    #                          key_cols,
+    #                          "df"))
+    # setorderv(diff_rows, c("change_type",
+    #                        key_cols))
+  }
+
+  # Get info on added or removed column names
+
+  added   <- setdiff(names(new_df),
+                     names(old_df))
+  removed <- setdiff(names(old_df),
+                     names(new_df))
+
+  diff_cols <- if (length(added) > 0 || length(removed) > 0) {
+    list(
+      added_columns   = if (length(added) > 0) added else NULL,
+      removed_columns = if (length(removed) > 0) removed else NULL
+    )
+  } else {
+    NULL
+  }
 
 
   # _______________________________________#
@@ -495,6 +558,9 @@ compare_vintage_versions <- function(measure,
 
       #### --------------- TEMPORARY FIX -------- ####
 
+      ## cpi     ##
+      ## ________ #
+
       # diff values
 
       if (measure == "cpi") {
@@ -504,8 +570,8 @@ compare_vintage_versions <- function(measure,
                   survey_acronym = reporting_level.new)
 
         diff_vals <- diff_vals |>
-          frename(year.new = year,
-                  survey_acronym.new = survey_acronym,
+          frename(year.new            = year,
+                  survey_acronym.new  = survey_acronym,
                   reporting_level.new = reporting_level
           )
 
@@ -522,9 +588,35 @@ compare_vintage_versions <- function(measure,
                   reporting_level.new = reporting_level
           )
 
-
       }
 
+        ## ppp     ##
+        ## ________ #
+
+
+      if (measure == "ppp") {
+
+        diff_vals <- diff_vals |>
+          frename(reporting_level = ppp_year.new,
+                  ppp_year = reporting_level.new)
+
+        diff_vals <- diff_vals |>
+          frename(ppp_year.new            = ppp_year,
+                  reporting_level.new = reporting_level
+          )
+
+        # diff rows
+
+        diff_rows <- diff_rows |>
+          frename(reporting_level = ppp_year.new,
+                  ppp_year = reporting_level.new)
+
+        diff_rows <- diff_rows |>
+          frename(ppp_year.new = ppp_year,
+                  reporting_level.new = reporting_level
+          )
+
+      }
       #### --------------------------------------- ####
 
       result <- list(

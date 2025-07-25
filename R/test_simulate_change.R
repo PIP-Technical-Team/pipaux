@@ -40,7 +40,10 @@ simulate_old_release <- function(base_dir        = getOption("pipaux.working_dir
 
   if (measure == "ppp") {
 
-    skip
+    col_to_change <- "ppp"
+    idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
+    dt[idx, (col_to_change) := get(col_to_change) * runif(length(idx), 0.9, 1.1)]
+    message("Modified column: ", col_to_change, " in ", length(idx), " rows.")
 
 
   } else {
@@ -77,6 +80,7 @@ simulate_old_release <- function(base_dir        = getOption("pipaux.working_dir
   # SAve modified data
   pipfun::pip_sign_save(x       = dt,
                         measure = measure,
+                        force = TRUE,
                         msrdir  = fs::path(base_dir, "aux_data", old_release, measure))
 
   message("Modified and saved simulated old version at: ", file_path)
