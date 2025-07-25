@@ -405,7 +405,7 @@ compare_vintage_versions <- function(measure,
 
     df <- pipload::pip_load_aux(
       measure = measure,
-      version = -1,
+      version = version,
       verbose = verbose,
       maindir = "PIP_ingestion_pipeline_v2" # to change??
     )
@@ -492,6 +492,40 @@ compare_vintage_versions <- function(measure,
         !is.null(col_diff$removed_columns)) {
 
       cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. Differences detected.")
+
+      #### --------------- TEMPORARY FIX -------- ####
+
+      # diff values
+
+      if (measure == "cpi") {
+        diff_vals <- diff_vals |>
+          frename(reporting_level = year.new,
+                  year = survey_acronym.new,
+                  survey_acronym = reporting_level.new)
+
+        diff_vals <- diff_vals |>
+          frename(year.new = year,
+                  survey_acronym.new = survey_acronym,
+                  reporting_level.new = reporting_level
+          )
+
+        # diff rows
+
+        diff_rows <- diff_rows |>
+          frename(reporting_level = year.new,
+                  year = survey_acronym.new,
+                  survey_acronym = reporting_level.new)
+
+        diff_rows <- diff_rows |>
+          frename(year.new = year,
+                  survey_acronym.new = survey_acronym,
+                  reporting_level.new = reporting_level
+          )
+
+
+      }
+
+      #### --------------------------------------- ####
 
       result <- list(
         "diff_values" = diff_vals,
