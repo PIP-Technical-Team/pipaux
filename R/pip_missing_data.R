@@ -149,12 +149,10 @@ pip_missing_data <- function(action  = c("update", "load"),
     # as well Those that are in NAC but are not ingrid are those without survey,
     # which we took care above
 
-    ct_nonac <- joyn::joyn(ct_sv, nac,
+    ct_nonac <- joyn::joyn(ct_sv, nac[!is.na(gdp) | !is.na(pce)],
                             by = c("country_code", "year"),
                             match_type = "1:m",
                             verbose = FALSE)
-
-
     ct_nonac <-
       ct_nonac[.joyn == "x"
                ][,
