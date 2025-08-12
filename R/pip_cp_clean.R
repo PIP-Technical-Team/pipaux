@@ -1,17 +1,15 @@
 #' Clean country profile data
 #'
-#' @param x database from pip_cp_update
-#' @param file_names character: vector with names of files
+#' @param x list of data from pip_cp_update
 #'
 #' @return data.table
-pip_cp_clean <- function(x,
-                         file_names) {
+pip_cp_clean <- function(x) {
 
   #   ____________________________________________________________________
   #   Computations                                                    ####
 
   ## cleanup names -----------
-
+  file_names <- names(x)
   dl <- purrr::map(x, clean_cp_names)
   names(dl) <- gsub("(indicator_values_country_)(.*)", "\\2", file_names)
 
@@ -102,19 +100,17 @@ pip_cp_clean <- function(x,
       by = c("country_code")
     ]
 
-  key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
-    x <- x %>%
-      dplyr::filter(!is.na(x[, 3])) %>%
-      dplyr::group_by(country_code) %>%
-      dplyr::slice_tail(n = 2) %>%
-      dplyr::mutate(
-        latest =
-          dplyr::if_else(reporting_year == max(reporting_year),
-                         TRUE, FALSE
-          )
-      ) %>%
-      dplyr::ungroup() %>%
-      data.table::as.data.table()
+  to_clean <- c("gni", "gdp_growth")
+
+  key_indicators[to_clean] <- lapply(to_clean,
+                                     function(i) {
+    y <- key_indicators[[i]]
+    y[!is.na(get(i))
+             ][,
+               tail(.SD, 2),
+               by = country_code
+             ][, latest := reporting_year == max(reporting_year),
+                 by = country_code]
   })
 
 
@@ -146,21 +142,21 @@ pip_cp_clean <- function(x,
 
   ki4$year1 <- sapply(strsplit(ki4$year_range, "-"), \(x) x[[1]])
   ki4$year2 <- sapply(strsplit(ki4$year_range, "-"), \(x) x[[2]])
-  ki4 <- ki4 %>%
-    dplyr::group_by(country_code, ppp_year) %>%
-    dplyr::filter(distribution %in% c("b40", "tot")) %>%
-    dplyr::filter(year2 == max(year2)) %>%
-    dplyr::filter(year1 == max(year1)) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(country_code,
-                  year_range,
-                  distribution,
-                  shared_prosperity,
-                  ppp_year) %>%
-    data.table::as.data.table() %>%
-    data.table::dcast(country_code + ppp_year + year_range ~ distribution,
-                      value.var = "shared_prosperity"
-    )
+  ki4 <- ki4[
+    distribution %in% c("b40", "tot"),
+    .SD[year2 == max(year2) & year1 == max(year1)],
+    by = .(country_code, ppp_year)
+    ][,
+      .(country_code,
+        year_range,
+        distribution,
+        shared_prosperity,
+        ppp_year)
+      ][,
+    dcast(.SD,
+          country_code + ppp_year + year_range ~ distribution,
+          value.var = "shared_prosperity")]
+
 
   setnames(x = ki4,
           old = c("b40", "tot"),
@@ -233,7 +229,8 @@ pip_cp_clean <- function(x,
                         "shared_prosperity",
                         "ppp_year",
                         "reporting_level")
-                    ]
+                    ],
+    venn = dl$chart5_venn_mrv
   ) ## end of chart lists
 
   cp <- list(key_indicators = key_indicators, charts = charts)
@@ -260,7 +257,7 @@ clean_cp_names <- function(x) {
   x <- setnames(
     x,
     skip_absent = TRUE,
-    c(
+    old = c(
       "country", "requestyear", "datayear", "welfaretype",
       "coverage", "interpolation", "survname", "comparability",
       "comparable_spell", "povertyline", "yearrange", "si_pov_all_poor",
@@ -269,7 +266,7 @@ clean_cp_names <- function(x) {
       "si_mpm_educ", "si_mpm_edue", "si_mpm_elec", "si_mpm_imps",
       "si_mpm_impw", "si_mpm_mdhc", "si_mpm_poor", "si_spr_pcap_zg", "pppyear"
     ),
-    c(
+    new = c(
       "country_code", "reporting_year", "survey_year", "welfare_type",
       "survey_coverage", "is_interpolated", "survey_acronym",
       "survey_comparability", "comparable_spell",
@@ -296,6 +293,7 @@ clean_cp_names <- function(x) {
         survey_coverage == "N", "national",
         survey_coverage == "R", "rural",
         survey_coverage == "U", "urban",
+        survey_coverage == "O", "other",
         default = ""
       )
       )]

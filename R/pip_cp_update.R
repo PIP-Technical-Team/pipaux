@@ -24,7 +24,8 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
       "indicator_values_country_chart5",
       "indicator_values_country_chart3",
       "indicator_values_country_chart6_KI4",
-      "indicator_values_country_KI5_KI6_KI7"
+      "indicator_values_country_KI5_KI6_KI7",
+      "indicator_values_country_chart5_venn_mrv"
     )
 
 
@@ -35,11 +36,13 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                               owner  = owner,
                               branch = branch,
                               filename = .x)
-                          })
+                          }) |>
+    setNames(file_names)
 
 
-  dl <- pip_cp_clean(raw_files,
-                     file_names)
+
+  dl <- pip_cp_clean(raw_files)
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## download files --------
   fl_files <- c("flat_cp", "flat_shp")
@@ -54,8 +57,9 @@ pip_cp_update <- function(maindir = gls$PIP_DATA_DIR,
                               ext = "dta")
                             setnames(x, "year", "reporting_year",
                                      skip_absent=TRUE)
-                          })
-  names(raw_fl) <- fl_files
+                          }) |>
+    setNames(fl_files)
+
   dl <- append(dl, list(flat = raw_fl))
 
 
