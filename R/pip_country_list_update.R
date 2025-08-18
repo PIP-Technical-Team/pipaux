@@ -167,35 +167,6 @@ pip_country_list_update <-
   ]
 
 
-  # fix "Not classified"
-  # ff <- copy(rg)
-
-  # rg <- copy(ff)
-
-  # not_class <- function(x) {
-  #   y <- deparse(substitute(x))
-  #   fifelse(test = grepl("classified", x),
-  #           paste(x, "by",  y),
-  #           x)
-  # }
-  #
-  # rg[, (vars) := lapply(.SD,not_class), .SDcols = vars]
-  #
-  #
-  # rg[, (vars) := lapply(.SD,
-  #                       \(x){
-  #                         y <- deparse(substitute(x))
-  #                         # y <- ..x
-  #                         fifelse(test = grepl("classified", x),
-  #                                 paste(x, "by",  y),
-  #                                 x)
-  #                         })]
-  #
-  #
-  # rg[lending_type_code == "LNX", unique(lending_type)]
-  #
-
-
 
   rg[, lending_type := fifelse(grepl("classified", lending_type),
                                paste(lending_type, "by", "lending type"),
