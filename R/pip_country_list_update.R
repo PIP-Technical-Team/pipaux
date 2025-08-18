@@ -60,13 +60,6 @@ pip_country_list_update <-
   #   ____________________________________________________________________________
   #   Read data from CLASS.dta file                                           ####
 
-  ## Special national accounts --------
-  byv <-
-    c(
-      "code",
-      "region_SSA",
-      "fcv_current",
-      "region_pip")
 
   dt <- pipfun::load_from_gh(
     measure  = measure,
@@ -106,7 +99,8 @@ pip_country_list_update <-
     joyn::joyn(dt, wdi,
                by = "code",
                match_type = "1:1",
-               reportvar = FALSE)
+               reportvar = FALSE,
+               verbose =  FALSE)
 
 
   #   ____________________________________________________________________________
@@ -116,7 +110,7 @@ pip_country_list_update <-
 
   rg[,
      pip_region := region
-  ][pip_region_code == "OHI",
+     ][pip_region_code == "OHI",
     pip_region := "Other High Income Countries"]
 
 
@@ -231,8 +225,8 @@ pip_country_list_update <-
   #   Clean and Save                                                    ####
 
 
-  rg[,
-     c( "pip_region", "pip_region_code") := .(region, region_code)]
+  # rg[,
+  #    c( "pip_region", "pip_region_code") := .(region, region_code)]
 
 
   setnames(x = rg,
