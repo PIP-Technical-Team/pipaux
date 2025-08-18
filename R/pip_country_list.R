@@ -59,8 +59,7 @@ pip_country_list <- function(action = c("update", "load"),
           message = paste0("update on ", prettyNum(Sys.time())),
           sha     = out$sha,
           content = base64enc::base64encode(charToRaw(cl_sha))
-        ),
-        .token = Sys.getenv("GITHUB_PAT")
+        )
       )
 
     }
