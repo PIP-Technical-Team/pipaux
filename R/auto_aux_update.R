@@ -36,7 +36,8 @@ auto_aux_update <- function(measure = NULL,
                      owner,
                      "pipaux/metadata/Data/git_metadata.csv",
                      sep = "/")  |>
-    readr::read_csv(show_col_types = FALSE)
+    readr::read_csv(show_col_types = FALSE) |>
+    setDT()
 
 
   dependencies <- read_dependencies(gh_user, owner)
@@ -65,7 +66,7 @@ auto_aux_update <- function(measure = NULL,
 
   # Get the latest hash of the repo
   all_data <-
-    dplyr::tibble(
+    data.table(
       Repo = glue::glue("{owner}/{all_repos}"),
       hash = hash,
       branch = branch
@@ -76,23 +77,38 @@ auto_aux_update <- function(measure = NULL,
     fsubset(branch == br)  |>
     frename(hash_original = hash)
 
+
+  repos_in_all <- all_data[, Repo] |>
+    sort() |>
+    fs::path_file()
+
+  repos_in_old <- old_data[, Repo] |>
+    sort() |>
+    fs::path_file()
+
+
+  diff_text <- list("Repos not available in git_metadata.csv",
+                    "Aux measures that do not have a corresponding repository")
+  diffs  <- list(setdiff(repos_in_all, repos_in_old), setdiff(repos_in_old, repos_in_all))
+  ldiffs <- sapply(diffs, length)
+
+  if (any(ldiffs != 0) ) {
+    wdiffs <- which(ldiffs != 0)
+    cli::cli_alert_danger("{diff_text[[wdiffs]]}: {.field {diffs[[wdiffs]]}}")
+    cli::cli_alert_info("Both the numbers above should be equal or else some
+                      debugging is required.", wrap = TRUE)
+  }
+
+
   old_data <- old_data |>
     join(all_data,
          on = c("Repo", "branch"),
          how = "inner")
 
-  cli::cli_alert_info("Number of rows from csv file : {nrow(old_data)}")
-  cli::cli_alert_info("Number of rows from Github : {nrow(all_data)}")
-  cli::cli_alert_info("Both the numbers above should be equal or else some
-                      debugging is required.", wrap = TRUE)
-
-  new_data <- old_data %>%
-    dplyr::filter(.data$hash != .data$hash_original |
-                    is.na(.data$hash_original) |
-                    is.na(.data$hash))
-
-  # all_data <- dplyr::rows_update(org_data, all_data, by = c("Repo", "branch"))
-
+  new_data <- old_data |>
+    fsubset(hash != hash_original |
+                    is.na(hash_original) |
+                    is.na(hash))
 
 
   # Remove everything till the last underscore so

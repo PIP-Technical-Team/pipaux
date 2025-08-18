@@ -46,6 +46,11 @@ pip_country_list_update <-
 
   setnames(wdi, owdi, nwdi)
 
+  # Manually change SOM name
+
+  wdi[code == "SOM",
+      country := "Federal Republic of Somalia"]
+
 
   # Add "(excluding high income)" to South Asia
   wdi[, admin_region  := fifelse(test = grepl("income", admin_region) | is.na(admin_region),
@@ -71,9 +76,18 @@ pip_country_list_update <-
     filename = "OutputData/CLASS",
     ext      = "dta"
   ) |>
-    as.data.table() |>
-    unique(by = byv) |>
-    (\(.){.[, ..byv]})()  # select just these variables
+    as.data.table()
+
+
+  # collapse table to unique identifiers by country, NOT by country/year
+  rm_names <- grep("year|historical", names(dt), value = TRUE)
+
+  dt <- dt[, (rm_names) := NULL] |>
+    unique()
+
+  dt[code == "SOM",
+     economy := "Federal Republic of Somalia"]
+
 
 
   dt_o <- names(dt)
@@ -92,8 +106,7 @@ pip_country_list_update <-
     joyn::joyn(dt, wdi,
                by = "code",
                match_type = "1:1",
-               reportvar = FALSE,
-               verbose =  FALSE)
+               reportvar = FALSE)
 
 
   #   ____________________________________________________________________________
@@ -101,10 +114,10 @@ pip_country_list_update <-
 
   # PIP region
 
-  rg[, pip_region := fifelse(pip_region_code == "OHI",
-                             yes = "Other High Income Countries",
-                             no  = region)
-  ]
+  rg[,
+     pip_region := region
+  ][pip_region_code == "OHI",
+    pip_region := "Other High Income Countries"]
 
 
 
@@ -219,12 +232,12 @@ pip_country_list_update <-
 
 
   rg[,
-     c( "region_code", "region") := NULL]
+     c( "pip_region", "pip_region_code") := .(region, region_code)]
 
 
   setnames(x = rg,
-           old = c("code", "country", "pip_region", "pip_region_code"),
-           new = c("country_code", "country_name", "region", "region_code") )
+           old = c("code", "country" ),
+           new = c("country_code", "country_name") )
 
 
 
@@ -244,7 +257,10 @@ pip_country_list_update <-
     paste0("_code") |>
     c(rm_agg)
 
-  rg[, (to_rm) := NULL]
+  # let'st not remove now
+  # rg[, (to_rm) := NULL]
+
+  rg[, economy := NULL]
 
 
   # hardcode fixing of TWN's name
