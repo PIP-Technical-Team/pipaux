@@ -437,6 +437,28 @@ save_aux_to_gh <- function(df,
                      ...)
 }
 
+#' Extract value from `.pipaux` environment
+#'
+#' @param key Value to be extracted from `.pipaux` environment
+#'
+#' @returns Value for the key or NULL if key is not found
+#'
+get_from_auxenv <- \(key) {
+  rlang::env_get(.pipaux, key, default = NULL) # Returns NULL if key doesn't exist
+}
+
+#' Save data to the pinned site
+#'
+#' @param x Data to be saved
+#' @param pin_name Name of the pin
+#'
+#' @returns Fully qualified name of the new pin, invisibly
+#'
+pip_aux_save <- \(x, pin_name) {
+  board <- get_from_auxenv("aux_data_board")
+  pipload::pip_write(board = board, x = x,
+                     pin_name = pin_name)
+}
 
 # data.table is generally careful to minimize the scope for namespace
 # conflicts (i.e., functions with the same name as in other packages);
