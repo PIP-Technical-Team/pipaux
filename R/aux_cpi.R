@@ -41,11 +41,6 @@ aux_cpi <- function(action = c("update", "load"),
   measure <- "cpi"
   action <- match.arg(action)
 
-  stopifnot( exprs = {
-
-  }
-  )
-
   #   ____________________________________________________________________________
   #   Early returns                                                           ####
   if (FALSE) {
