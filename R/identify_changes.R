@@ -114,6 +114,15 @@ get_aux_changes <- function(measure      = "cpi",
 
   ## Run comparison
 
+  # first, align columns
+  # Find common columns
+  common_cols <- intersect(names(new_df),
+                           names(old_df))
+
+  # Subset and order columns identically
+  new_df <- new_df[, common_cols, with = FALSE]
+  old_df <- old_df[, common_cols, with = FALSE]
+
   myr_obj <- myrror::myrror(
               dfx                 = new_df,
               dfy                 = old_df,
@@ -145,32 +154,20 @@ get_aux_changes <- function(measure      = "cpi",
 
     # diff values
 
-    if (measure == "cpi") {
-      # diff_table <- diff_table |>
-      #   frename(reporting_level = year.new,
-      #           year = survey_acronym.new,
-      #           survey_acronym = reporting_level.new)
-      #
-      # diff_table <- diff_table |>
-      #   frename(year.new            = year,
-      #           survey_acronym.new  = survey_acronym,
-      #           reporting_level.new = reporting_level
-      #   )
-
-      # diff rows
-
-      diff_rows <- diff_rows |>
-        frename(reporting_level = year.new,
-                year = survey_acronym.new,
-                survey_acronym = reporting_level.new)
-
-      diff_rows <- diff_rows |>
-        frename(year.new = year,
-                survey_acronym.new = survey_acronym,
-                reporting_level.new = reporting_level
-        )
-
-    }
+    # if (measure == "cpi") {
+    #
+    #   diff_rows <- diff_rows |>
+    #     frename(reporting_level = year.new,
+    #             year = survey_acronym.new,
+    #             survey_acronym = reporting_level.new)
+    #
+    #   diff_rows <- diff_rows |>
+    #     frename(year.new = year,
+    #             survey_acronym.new = survey_acronym,
+    #             reporting_level.new = reporting_level
+    #     )
+    #
+    # }
 
     ## ppp     ##
     ## ________ #

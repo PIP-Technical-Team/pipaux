@@ -163,9 +163,13 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
+  measure <- "cpi"
+  tag     <- branch
+
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
 
+  # Get working release
   pipfun::get_wrk_release(verbose = FALSE)
 
    if (is.null(branch)) {
@@ -173,10 +177,12 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
     identity       <- wrk_release$identity
     branch         <- paste0(release, "_", identity)
 
-  }
+   }
 
-  measure <- "cpi"
-  tag <- branch
+  # Get pins board
+  pipfun::get_pins_boards()
+
+  aux_data_board <- pins_boards$aux_data
 
 
   #   ____________________________________________________________________________
@@ -184,10 +190,10 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
 
   cpi <- pipfun::load_from_gh(
     measure = measure,
-    owner  = owner,
-    branch = branch,
-    tag    = tag,
-    ext    = "csv"
+    owner   = owner,
+    branch  = branch,
+    tag     = tag,
+    ext     = "csv"
   )
 
 
@@ -202,10 +208,10 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
                        maindir = maindir,
                        branch = branch)
 
-  # changae cpi_year and cpi_data_level to year and reporting_level
+  # change cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
-                         skip_absent=TRUE)
+                         skip_absent = TRUE)
 
   # drop unnecessary variables
 
@@ -245,14 +251,18 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
+
   msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
+  # Long format
 
   cpi <- melt(
     cpi,
-    id.vars = setdiff(names(cpi), c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
-    measure.vars = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
+    id.vars       = setdiff(names(cpi),
+                            c("cpi2005", "cpi2011", "cpi2017", "cpi2021")),
+    measure.vars  = c("cpi2005", "cpi2011", "cpi2017", "cpi2021"),
     variable.name = "cpi_year",
-    value.name = "cpi_value"
+    value.name    = "cpi_value"
   )
 
   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
@@ -271,7 +281,6 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
           key_cols)
 
   setorderv(cpi, key_cols)
-
 
 
   saved <- pipfun::pip_sign_save(
@@ -299,11 +308,12 @@ aux_cpi_vintage <- function(msrdir = fs::path(gls$PIP_DATA_DIR, "_aux/", measure
   measure <- "cpi"
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  #---------   Prepar3 date   ---------
+  #---------   Prepare date   ---------
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # get directories
-  cpi_files <- fs::dir_ls(dlwdir, regexp = "GMD_CPI\\.dta$", recurse = TRUE, type = "file")
+  cpi_files <- fs::dir_ls(dlwdir,
+                          regexp = "GMD_CPI\\.dta$", recurse = TRUE, type = "file")
 
   # load data
   last_file <- max(cpi_files)
