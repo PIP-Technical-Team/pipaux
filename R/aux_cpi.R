@@ -283,13 +283,17 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
   setorderv(cpi, key_cols)
 
 
-  saved <- pipfun::pip_sign_save(
-    x       = cpi,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  # Create function pip_aux_save to retrieve board using rlang (use pipfun for reference)
+  # saved <- pipfun::pip_sign_save(
+  #   x       = cpi,
+  #   measure = measure,
+  #   msrdir  = msrdir,
+  #   force   = force
+  # )
+  saved <- pip_aux_save(
+    x = cpi,
+    pin_name = measure
   )
-
 
   return(invisible(saved))
 }

@@ -33,11 +33,11 @@ pipuax_default_options <- list(
   op    <- options()
   toset <- !(names(pipuax_default_options) %in% names(op))
   if (any(toset)) options(pipuax_default_options[toset])
-
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ## defined values --------
-
-  # pipload::add_gls_to_env()
+  # Copy the pins_board from pipenv environment to pipaux environment
+  br <- pipfun::get_from_pipenv("pins_boards")
+  if (is.null(br)) stop("Cannot find pins_boards in the environment.")
+  abr <- pipfun::get_pins_boards("aux_data")
+  rlang::env_poke(.pipaux, "aux_data_board", abr)
 
   # Initialize a log
   pipfun::log_init("pipaux_dependencies_log",
