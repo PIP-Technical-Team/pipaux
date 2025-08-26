@@ -454,10 +454,18 @@ get_from_auxenv <- \(key) {
 #'
 #' @returns Fully qualified name of the new pin, invisibly
 #'
-pip_aux_save <- \(x, pin_name) {
+pip_aux_save <- \(x,
+                  pin_name,
+                  metadata,
+                  force) {
+
   board <- get_from_auxenv("aux_data_board")
-  pipload::pip_write(board = board, x = x,
-                     pin_name = pin_name)
+
+  pipload::pip_write(board                 = board,
+                     x                     = x,
+                     pin_name              = pin_name,
+                     force_identical_write = force,
+                     metadata              = metadata)
 }
 
 # data.table is generally careful to minimize the scope for namespace

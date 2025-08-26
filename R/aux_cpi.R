@@ -5,16 +5,13 @@
 #' @param action character: Either "load" or "update". Default is "update". If
 #'   "update" data will be updated on the system. If "load" data is loaded in
 #'   memory.
-#' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
-#' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
 #'
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),
-                    maindir = getOption("pipaux.working_dir"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
@@ -156,15 +153,14 @@ aux_cpi_clean <- function(y,
 #'
 #' @inheritParams aux_cpi
 #' @keywords internal
-aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force   = FALSE,
+#'
+aux_cpi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = NULL,
-                           tag     = NULL,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail = getOption("pipaux.detail.raw")
+                           #branch  = NULL,
+                           ) {
 
   measure <- "cpi"
-  tag     <- branch
 
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
@@ -178,12 +174,6 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
     branch         <- paste0(release, "_", identity)
 
    }
-
-  # Get pins board
-  pipfun::get_pins_boards()
-
-  aux_data_board <- pins_boards$aux_data
-
 
   #   ____________________________________________________________________________
   #   load raw data                                                           ####
@@ -206,27 +196,30 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
   # Clean data
   cpi <- aux_cpi_clean(cpi,
                        maindir = maindir,
-                       branch = branch)
+                       branch  = branch)
 
   # change cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
                          c("year", "reporting_level"),
                          skip_absent = TRUE)
 
-  # drop unnecessary variables
 
-  cpi <- cpi[, -c("cpi_domain"
-                  )]
+  #   ____________________________________________________________________________
+  #   Metadata                                                                ####
 
-
-  # ----- function raw sha ------ ####
   raw_sha_fun <- digest::digest(body(
     paste0("aux_", measure))
   )
 
-  setattr(cpi,
-          "raw_sha_fun",
-          raw_sha_fun)
+  key_cols <- c("country_code", "cpi_year",
+                "reporting_level", "year",
+                "survey_acronym")
+
+  cpi_metadata <- list(raw_sha_fun = raw_sha_fun,
+                       key_col     = key_cols)
+
+  #   ____________________________________________________________________________
+  #   Saving                                                                ####
 
   # validate cpi clean data before saving it
   cpi_validate_output(cpi, detail = detail)
@@ -246,16 +239,7 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
 
   )]
 
-
-  # Save
-  if (branch == "main") {
-    branch <- ""
-  }
-
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
   # Long format
-
   cpi <- melt(
     cpi,
     id.vars       = setdiff(names(cpi),
@@ -268,31 +252,21 @@ aux_cpi_update <- function(maindir = getOption("pipaux.working_dir"),
   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
   cpi[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
 
-  setcolorder(cpi, c("country_code", "year", "cpi_year", "cpi_value"))
-
-  setattr(cpi, "aux_name", "cpi")
-
-  key_cols <- c("country_code", "cpi_year",
-                "reporting_level", "year",
-                "survey_acronym")
-
-  setattr(cpi,
-          "aux_key",
-          key_cols)
+  # Order rows and columns
+  setcolorder(cpi,
+              c("country_code", "year", "cpi_year", "cpi_value"))
 
   setorderv(cpi, key_cols)
 
 
-  # Create function pip_aux_save to retrieve board using rlang (use pipfun for reference)
-  # saved <- pipfun::pip_sign_save(
-  #   x       = cpi,
-  #   measure = measure,
-  #   msrdir  = msrdir,
-  #   force   = force
-  # )
+  #   ____________________________________________________________________________
+  #   Return                                                                ####
+
   saved <- pip_aux_save(
-    x = cpi,
-    pin_name = measure
+    x        = cpi,
+    pin_name = measure,
+    metadata = cpi_metadata,
+    force    = force
   )
 
   return(invisible(saved))

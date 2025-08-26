@@ -1,5 +1,3 @@
-
-# gls <- pipfun::pip_create_globals()
 pipuax_default_options <- list(
   pipaux.cpivar        = "cpi2017",
   pipaux.pppvar        = "icp2017",
@@ -20,7 +18,6 @@ pipuax_default_options <- list(
   pipaux.detail.raw    = FALSE,
   pipaux.detail.output = FALSE,
   pipfun.verbose       = FALSE,
-  #joyn.reportvar       = "report"
   joyn.reportvar       = ".joyn"
 
 )
@@ -32,7 +29,9 @@ pipuax_default_options <- list(
 
   op    <- options()
   toset <- !(names(pipuax_default_options) %in% names(op))
+
   if (any(toset)) options(pipuax_default_options[toset])
+
   # Copy the pins_board from pipenv environment to pipaux environment
   br <- pipfun::get_from_pipenv("pins_boards")
   if (is.null(br)) stop("Cannot find pins_boards in the environment.")
