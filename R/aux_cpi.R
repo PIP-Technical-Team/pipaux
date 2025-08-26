@@ -55,11 +55,15 @@ aux_cpi <- function(action = c("update", "load"),
                    detail  = detail)
   }
   else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    # dt <- load_aux(
+    #   maindir = maindir,
+    #   measure = measure,
+    #   branch  = branch
+    # )
+
+    dt <- pipload::load_aux_data(measure = measure,
+                                 version = version,
+                                 hash    = hash)
     return(dt)
   }
 
@@ -168,12 +172,11 @@ aux_cpi_update <- function(force   = FALSE,
   # Get working release
   pipfun::get_wrk_release(verbose = FALSE)
 
-   if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
-   }
+
 
   #   ____________________________________________________________________________
   #   load raw data                                                           ####
@@ -182,7 +185,7 @@ aux_cpi_update <- function(force   = FALSE,
     measure = measure,
     owner   = owner,
     branch  = branch,
-    tag     = tag,
+    #tag     = tag,
     ext     = "csv"
   )
 
@@ -193,7 +196,8 @@ aux_cpi_update <- function(force   = FALSE,
   #   ____________________________________________________________________________
   #   Cleaning                                                                ####
 
-  # Clean data
+  # Clean data - to modify load aux first
+
   cpi <- aux_cpi_clean(cpi,
                        maindir = maindir,
                        branch  = branch)
@@ -222,7 +226,8 @@ aux_cpi_update <- function(force   = FALSE,
   #   Saving                                                                ####
 
   # validate cpi clean data before saving it
-  cpi_validate_output(cpi, detail = detail)
+  cpi_validate_output(cpi,
+                      detail = detail)
 
   cpi <- cpi[, -c("cpi_domain",
                   "cpi2021_unadj",
