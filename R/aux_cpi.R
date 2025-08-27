@@ -15,9 +15,11 @@ aux_cpi <- function(action = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw")) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  #pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
+
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -47,8 +49,7 @@ aux_cpi <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    aux_cpi_update(maindir = maindir,
-                   force   = force,
+    aux_cpi_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
@@ -170,7 +171,9 @@ aux_cpi_update <- function(force   = FALSE,
   #   Set up                                                                  ####
 
   # Get working release
-  pipfun::get_wrk_release(verbose = FALSE)
+  # pipfun::get_wrk_release(verbose = FALSE)
+
+  wrk_release <- get_from_auxenv("wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity

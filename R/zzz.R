@@ -34,9 +34,15 @@ pipuax_default_options <- list(
 
   # Copy the pins_board from pipenv environment to pipaux environment
   br <- pipfun::get_from_pipenv("pins_boards")
+  wrk_release <- pipfun::get_wrk_release(verbose = FALSE)
+
+
   if (is.null(br)) stop("Cannot find pins_boards in the environment.")
+
   abr <- pipfun::get_pins_boards("aux_data")
   rlang::env_poke(.pipaux, "aux_data_board", abr)
+
+  rlang::env_poke(.pipaux, "wrk_release", wrk_release)
 
   # Initialize a log
   pipfun::log_init("pipaux_dependencies_log",
