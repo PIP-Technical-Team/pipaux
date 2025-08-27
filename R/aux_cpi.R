@@ -55,9 +55,9 @@ aux_cpi <- function(action = c("update", "load"),
   }
   else {
 
-    dt <- pipload::load_aux_data(measure = measure,
-                                 version = version,
-                                 hash    = hash)
+    # By def load most recent version
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 

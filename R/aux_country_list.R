@@ -14,14 +14,17 @@
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),
-                             maindir      = getOption("pipaux.working_dir"),
                              force        = FALSE,
                              detail       = getOption("pipaux.detail.raw")
                              ) {
+
+  #   ____________________________________________________________________________
+  #   Defenses                                                                ####
+
   measure <- "country_list"
   action  <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -34,43 +37,36 @@ aux_country_list <- function(action       = c("update", "load"),
     ## Special national accounts --------
     cl <- aux_country_list_update(class_branch = class_branch)
 
-  # validate country list raw data
+    #validate country list raw data
     cl_validate_raw(cl, detail = detail)
 
-    # Save
-    if (branch == "main") {
-    branch <- ""
-  }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
+    #   ____________________________________________________________________________
+    #   Metadata        -stored under $user in pin metadata                                                       ####
 
-  setattr(cl, "aux_name", "country_list")
-  setattr(cl,
-          "aux_key",
-          c("country_code"))
+    raw_sha_fun <- digest::digest(body(
+      paste0("aux_", measure))
+    )
 
-  setattr(cl,
-          "raw_sha_fun",
-          raw_sha_fun)
+    key_cols <- c("country_code")
 
-    saved <- pipfun::pip_sign_save(
-      x       = cl,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    cl_metadata <- list(raw_sha_fun = raw_sha_fun,
+                        key_col     = key_cols)
+
+
+    saved <- pip_aux_save(
+      x        = cl,
+      pin_name = measure,
+      metadata = cl_metadata,
+      force    = force
     )
 
     return(invisible(saved))
 
   } else {
 
-    df <- load_aux(maindir = maindir,
-                   measure = measure,
-                   branch  = branch)
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 }
