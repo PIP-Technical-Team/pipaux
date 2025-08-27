@@ -17,9 +17,7 @@ aux_cpi <- function(action = c("update", "load"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
-  #pipfun::get_wrk_release(verbose = FALSE)
   wrk_release <- get_from_auxenv(key = "wrk_release")
-
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -56,11 +54,6 @@ aux_cpi <- function(action = c("update", "load"),
                    detail  = detail)
   }
   else {
-    # dt <- load_aux(
-    #   maindir = maindir,
-    #   measure = measure,
-    #   branch  = branch
-    # )
 
     dt <- pipload::load_aux_data(measure = measure,
                                  version = version,
@@ -82,22 +75,12 @@ aux_cpi <- function(action = c("update", "load"),
 #'
 #' @keywords internal
 aux_cpi_clean <- function(y,
-                          cpivar = getOption("pipaux.cpivar"),
-                          maindir = getOption("pipaux.working_dir"),
-                          branch  = NULL) {
+                          cpivar = getOption("pipaux.cpivar")) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
+  if (!inherits(y, "data.table")) {
+    cli::cli_abort("cpi input data must be a data.table")
   }
 
-
-
-  x <- data.table::as.data.table(y)
 
   # vars to keep
   keep_vars <- c(
@@ -144,9 +127,7 @@ aux_cpi_clean <- function(y,
   x <- unique(x) # remove duplicates
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   x <- x[country_code %in% cl$country_code]
 
@@ -161,8 +142,9 @@ aux_cpi_clean <- function(y,
 #'
 aux_cpi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           detail = getOption("pipaux.detail.raw")
-                           #branch  = NULL,
+                           detail  = getOption("pipaux.detail.raw"),
+                           branch  = NULL,
+                           tag = tag,
                            ) {
 
   measure <- "cpi"
@@ -170,40 +152,28 @@ aux_cpi_update <- function(force   = FALSE,
   #   ____________________________________________________________________________
   #   Set up                                                                  ####
 
-  # Get working release
-  # pipfun::get_wrk_release(verbose = FALSE)
-
-  wrk_release <- get_from_auxenv("wrk_release")
-
-  release        <- wrk_release$release
-  identity       <- wrk_release$identity
-  branch         <- paste0(release, "_", identity)
-
-
-
   #   ____________________________________________________________________________
   #   load raw data                                                           ####
 
   cpi <- pipfun::load_from_gh(
     measure = measure,
+    filename = measure,
     owner   = owner,
     branch  = branch,
-    #tag     = tag,
     ext     = "csv"
   )
 
 
   # validate cpi raw data
-  cpi_validate_raw(cpi, detail = detail)
+  cpi_validate_raw(cpi,
+                   detail = detail)
 
   #   ____________________________________________________________________________
   #   Cleaning                                                                ####
 
   # Clean data - to modify load aux first
 
-  cpi <- aux_cpi_clean(cpi,
-                       maindir = maindir,
-                       branch  = branch)
+  cpi <- aux_cpi_clean(cpi)
 
   # change cpi_year and cpi_data_level to year and reporting_level
   cpi <- cpi |> setnames(c("cpi_year", "cpi_data_level"),
@@ -212,7 +182,7 @@ aux_cpi_update <- function(force   = FALSE,
 
 
   #   ____________________________________________________________________________
-  #   Metadata                                                                ####
+  #   Metadata        -stored under $user in pin metadata                                                       ####
 
   raw_sha_fun <- digest::digest(body(
     paste0("aux_", measure))
@@ -228,7 +198,7 @@ aux_cpi_update <- function(force   = FALSE,
   #   ____________________________________________________________________________
   #   Saving                                                                ####
 
-  # validate cpi clean data before saving it
+  # validate cpi and clean data before saving it
   cpi_validate_output(cpi,
                       detail = detail)
 
@@ -426,10 +396,6 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cur_adj` should be numeric") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    # validate_cols(in_set(c("N", "R", "U")),
-    #               survey_coverage, description = "`survey_coverage` values within range") |>
-    # validate_if(is.numeric(cpi2011_SM22),
-    #             description = "`cpi2011_SM22` should be numeric") |>
     validate_if(is.numeric(comparable),
                 description = "`comparable` should be numeric") |>
     # validate_if(is.numeric(cpi2017_SM22),
@@ -440,12 +406,6 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cpi_data_level` should be numeric") |>
     validate_cols(in_set(c(0, 1, 2)),
                   cpi_data_level, description = "`cpi_data_level` values within range") |>
-    # validate_if(is.numeric(ref_year_SM24),
-    #             description = "`ref_year_SM24` should be numeric") |>
-    # validate_if(is.numeric(cpi2011_SM24),
-    #             description = "`cpi2011_SM24` should be numeric") |>
-    # validate_if(is.numeric(cpi2017_SM24),
-    #             description = "`cpi2011_SM24` should be numeric") |>
     validate_if(is.numeric(change_cpi2017),
                 description = "`change_cpi2017` should be numeric") |>
     validate_if(is.numeric(change_icp2017),
@@ -519,20 +479,12 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                 description = "`cpi2011` should be numeric") |>
     validate_if(is.numeric(cpi2017),
                 description = "`cpi2017` should be numeric") |>
-    # validate_if(is.numeric(cpi2011_SM22),
-    #             description = "`cpi2011_SM22` should be numeric") |>
-    # validate_if(is.numeric(cpi2017_SM22),
-    #             description = "`cpi2017_SM22` should be numeric") |>
     validate_cols(is.logical, cpi2005,
                   description = "`cpi2005` should be logical") |>
     validate_if(is.character(reporting_level),
                 description = "`reporting_level` should be character") |>
     validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
                   description = "`reporting_level` values within range") |>
-    # validate_if(is.numeric(cpi2011_AM23),
-    #             description = "`cpi2011_AM23` should be numeric") |>
-    # validate_if(is.numeric(cpi2017_AM23),
-    #             description = "`cpi2017_AM23` should be numeric") |>
     validate_if(is.character(cpi_id),
                 description = "`cpi_id` should be character") |>
     validate_cols(not_na, country_code, year, survey_acronym, reporting_level,
