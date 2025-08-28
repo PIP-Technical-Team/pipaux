@@ -192,8 +192,16 @@ aux_cpi_update <- function(force   = FALSE,
                 "reporting_level", "year",
                 "survey_acronym")
 
-  cpi_metadata <- list(raw_sha_fun = raw_sha_fun,
-                       key_col     = key_cols)
+  # cpi_metadata <- list(raw_sha_fun = raw_sha_fun,
+  #                      key_col     = key_cols)
+
+  setattr(cpi,
+          "aux_key",
+          key_cols)
+
+  setattr(cpi,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   #   ____________________________________________________________________________
   #   Saving                                                                ####

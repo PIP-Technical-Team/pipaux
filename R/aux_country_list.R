@@ -50,8 +50,16 @@ aux_country_list <- function(action       = c("update", "load"),
 
     key_cols <- c("country_code")
 
-    cl_metadata <- list(raw_sha_fun = raw_sha_fun,
-                        key_col     = key_cols)
+    # cl_metadata <- list(raw_sha_fun = raw_sha_fun,
+    #                     key_col     = key_cols)
+
+    setattr(cl,
+            "aux_key",
+            key_cols)
+
+    setattr(cl,
+            "raw_sha_fun",
+            raw_sha_fun)
 
 
     saved <- pip_aux_save(
