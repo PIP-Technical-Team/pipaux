@@ -8,17 +8,17 @@
 aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          maindir = getOption("pipaux.working_dir"),
                           tag     = NULL) {
 
   measure <- "countries"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
 
   if (is.null(tag)) {
     tag <- paste0(release, "_", identity)
@@ -27,13 +27,9 @@ aux_countries <- function(action  = c("update", "load"),
   if (action == "update") {
 
     ## Special national accounts --------
-    cl <- load_aux(maindir = maindir,
-                   measure = "country_list",
-                   branch  = branch)
+    cl <- pipload::load_aux_data(measure = "country_list")
 
-    pfw <- load_aux(measure = "pfw",
-                    maindir = maindir,
-                    branch  = branch)
+    pfw <- pipload::load_aux_data(measure = "pfw")
 
 
     pfw <- pfw[inpovcal == 1,
@@ -53,7 +49,6 @@ aux_countries <- function(action  = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     setattr(countries, "aux_name", "countries")
     setattr(countries,
@@ -69,17 +64,15 @@ aux_countries <- function(action  = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
-    pipfun::pip_sign_save(
-      x = countries,
-      measure = measure,
-      msrdir = msrdir,
-      force = force
+    pip_aux_save(
+      x        = countries,
+      pin_name = measure,
+      force    = force
     )
+
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure
-    )
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 }
