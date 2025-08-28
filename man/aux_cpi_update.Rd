@@ -5,25 +5,20 @@
 \title{Update CPI}
 \usage{
 aux_cpi_update(
-  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
+  detail = getOption("pipaux.detail.raw"),
   branch = NULL,
-  tag = NULL,
-  detail = getOption("pipaux.detail.raw")
+  tag = tag
 )
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
-
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
 Update CPI

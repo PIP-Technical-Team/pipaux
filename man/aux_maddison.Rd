@@ -22,8 +22,6 @@ aux_maddison(
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}

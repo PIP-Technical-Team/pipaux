@@ -4,20 +4,13 @@
 \alias{aux_cpi_clean}
 \title{Clean CPI data}
 \usage{
-aux_cpi_clean(
-  y,
-  cpivar = getOption("pipaux.cpivar"),
-  maindir = getOption("pipaux.working_dir"),
-  branch = NULL
-)
+aux_cpi_clean(x, cpivar = getOption("pipaux.cpivar"))
 }
 \arguments{
-\item{y}{dataset with CPI data from \code{aux_cpi_update()}.}
-
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}
 
-\item{maindir}{character: Main directory of project.}
+\item{y}{dataset with CPI data from \code{aux_cpi_update()}.}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

@@ -4,18 +4,10 @@
 \alias{aux_pfw_clean}
 \title{Clean PFW}
 \usage{
-aux_pfw_clean(y, maindir = getOption("pipaux.working_dir"), branch)
+aux_pfw_clean(y)
 }
 \arguments{
 \item{y}{dataset with PPP data from \code{aux_pfw_update()}.}
-
-\item{maindir}{character: Main directory of project.}
-
-\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
-To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
-\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
-correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
-branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
 }
 \description{
 Clean PFW data from Datalibweb to meet PIP protocols.

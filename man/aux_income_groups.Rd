@@ -22,8 +22,6 @@ memory.}
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{

@@ -34,6 +34,8 @@ pipuax_default_options <- list(
 
   # Copy the pins_board from pipenv environment to pipaux environment
   br <- pipfun::get_from_pipenv("pins_boards")
+
+  # pipfun::setup_working_release(release = "20250203")
   wrk_release <- pipfun::get_wrk_release(verbose = FALSE)
 
 

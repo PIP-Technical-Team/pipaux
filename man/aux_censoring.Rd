@@ -8,7 +8,6 @@ aux_censoring(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   tag = NULL
 )
 }
@@ -20,8 +19,6 @@ aux_censoring(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

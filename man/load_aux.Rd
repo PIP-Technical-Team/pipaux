@@ -15,17 +15,12 @@ load_aux(
 \arguments{
 \item{measure}{character: measure to be loaded}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{apply_label}{logical: If TRUE, predefined labels will applied.}
 
 \item{ppp_defaults}{logical: If TRUE, wider format ppp data will be returned}
 
-\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
-To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
-\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
-correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
-branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 }
 \description{
 Load any auxiliary data

@@ -5,26 +5,19 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
-#' @param maindir character: Main directory of project.
 #' @param force logical: If TRUE data will be overwritten.
-#' @param branch GitHub branch to use. By default, this is the release branch set in your R session.
-#'   To ensure correct behavior, call `pipfun::setup_working_release()` once per session, followed by
-#'   `pipfun::get_wrk_release()` to retrieve the active release. These steps ensure the function uses the
-#'   correct release branch (e.g., `"release_2024Q1"`). Alternatively, you can explicitly specify other
-#'   branches among `"DEV"`, `"PROD"`, or `"main"` if needed
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pfw"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -35,8 +28,7 @@ aux_pfw <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pfw_update(maindir = maindir,
-                   force   = force,
+    aux_pfw_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
@@ -44,11 +36,8 @@ aux_pfw <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -57,12 +46,9 @@ aux_pfw <- function(action  = c("update", "load"),
 #' Clean PFW data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with PPP data from `aux_pfw_update()`.
-#' @inheritParams load_aux
 #'
 #' @keywords internal
-aux_pfw_clean <- function(y,
-                          maindir = getOption("pipaux.working_dir"),
-                          branch) {
+aux_pfw_clean <- function(y) {
 
   #branch <- match.arg(branch)
 
@@ -161,9 +147,8 @@ aux_pfw_clean <- function(y,
 
   # Load countries and filter
 
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
+
   x <- x[country_code %in% cl$country_code]
 
   x <- unique(x) # remove duplicates
@@ -175,23 +160,11 @@ aux_pfw_clean <- function(y,
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force = FALSE,
+aux_pfw_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-
-  }
 
   measure <- "pfw"
   tag <- branch
@@ -205,9 +178,7 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
   pfw_validate_raw(pfw = pfw, detail = detail)
 
   # Clean data
-  pfw <- aux_pfw_clean(pfw,
-                       maindir = maindir,
-                       branch = branch)
+  pfw <- aux_pfw_clean(pfw)
 
   # validate pfw raw data
   pfw_validate_output(pfw    = pfw,
@@ -217,7 +188,6 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha ------
   raw_sha_fun <- digest::digest(body(
@@ -234,12 +204,12 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
           "aux_key",
           c("country_code", "surveyid_year", "welfare_type"))
 
-  saved <- pipfun::pip_sign_save(
-    x       = pfw,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <- pip_aux_save(
+    x        = pfw,
+    pin_name = measure,
+    force    = force
   )
+
   return(invisible(saved))
 }
 

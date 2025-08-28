@@ -20,8 +20,6 @@ memory.}
 
 \item{force}{logical: If TRUE data will be overwritten.}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 

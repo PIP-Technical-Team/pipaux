@@ -22,8 +22,6 @@ them}
 
 \item{from}{character: Source for population data.}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
