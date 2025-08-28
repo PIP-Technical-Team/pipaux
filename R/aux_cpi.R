@@ -144,7 +144,7 @@ aux_cpi_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            detail  = getOption("pipaux.detail.raw"),
                            branch  = NULL,
-                           tag = tag,
+                           tag = tag
                            ) {
 
   measure <- "cpi"
