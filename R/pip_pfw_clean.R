@@ -37,7 +37,7 @@ pip_pfw_clean <- function(y,
   new_var <-
     c(
       "wb_region_code",
-      "pcn_region_code",
+      "region_code",
       "country_code",
       "survey_year",
       "survey_acronym",

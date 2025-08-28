@@ -36,9 +36,7 @@ pip_countries <- function(action  = c("update", "load"),
 
 
     countries <- cl[country_code %in% pfw$country_code
-                    ][,
-                      c("pcn_region", "pcn_region_code") := NULL]
-
+                    ]
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
 
