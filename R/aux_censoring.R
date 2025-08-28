@@ -16,13 +16,12 @@
 aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
                            tag     = NULL) {
 
   measure <- "censoring"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -69,24 +68,18 @@ aux_censoring  <- function(action  = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-    saved <- pipfun::pip_sign_save(
-      x       = dl,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force,
-      verbose = FALSE
+    saved <- pip_aux_save(
+      x        = dl,
+      pin_name = measure,
+      force    = force
     )
+
     return(invisible(saved))
 
   } else {
 
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
 
   }

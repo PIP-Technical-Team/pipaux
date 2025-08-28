@@ -456,7 +456,7 @@ get_from_auxenv <- \(key) {
 #'
 pip_aux_save <- \(x,
                   pin_name,
-                  metadata,
+                  #metadata ,
                   force) {
 
   board <- get_from_auxenv("aux_data_board")
@@ -464,8 +464,8 @@ pip_aux_save <- \(x,
   pipload::pip_write(board                 = board,
                      x                     = x,
                      pin_name              = pin_name,
-                     force_identical_write = force,
-                     metadata              = metadata)
+                     force_identical_write = force)
+                     #metadata              = metadata)
 }
 
 # data.table is generally careful to minimize the scope for namespace

@@ -74,10 +74,10 @@ aux_cpi <- function(action = c("update", "load"),
 #' @inheritParams aux_cpi_update
 #'
 #' @keywords internal
-aux_cpi_clean <- function(y,
+aux_cpi_clean <- function(x,
                           cpivar = getOption("pipaux.cpivar")) {
 
-  if (!inherits(y, "data.table")) {
+  if (!inherits(x, "data.table")) {
     cli::cli_abort("cpi input data must be a data.table")
   }
 
@@ -251,7 +251,7 @@ aux_cpi_update <- function(force   = FALSE,
   saved <- pip_aux_save(
     x        = cpi,
     pin_name = measure,
-    metadata = cpi_metadata,
+    #metadata = cpi_metadata,
     force    = force
   )
 
