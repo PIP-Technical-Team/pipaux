@@ -20,4 +20,5 @@ npl :
 sna :
 income_groups : 
 indicators :
-dictionary : 
+dictionary :
+nan :
