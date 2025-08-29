@@ -8,11 +8,10 @@
 aux_dictionary <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
                            tag     = NULL) {
   measure <- "dictionary"
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -35,7 +34,6 @@ aux_dictionary <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha ------
   raw_sha_fun <- digest::digest(body(
@@ -46,20 +44,17 @@ aux_dictionary <- function(action  = c("update", "load"),
           "raw_sha_fun",
           raw_sha_fun)
 
-    saved <- pipfun::pip_sign_save(
-      x       = df,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = df,
+      pin_name = measure,
+      #metadata = cl_metadata,
+      force    = force
     )
 
     return(invisible(saved))
 
   } else {
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
+
   }
 }
