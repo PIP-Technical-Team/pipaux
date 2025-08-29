@@ -8,12 +8,11 @@
 aux_cp <- function(action  = c("update", "load"),
                    force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
-                   maindir = getOption("pipaux.working_dir"),
                    tag     = NULL) {
   measure <- "cp"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -24,18 +23,14 @@ aux_cp <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_cp_update(maindir = maindir,
-                  force   = force,
+    aux_cp_update(force   = force,
                   owner   = owner,
                   branch  = branch,
                   tag     = tag)
   } else {
 
-    dl <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dl <- pipload::load_aux_data(measure = measure)
+
     return(dl)
   }
 }
@@ -102,24 +97,6 @@ aux_cp_clean <- function(x,
                                     "reporting_year",
                                     "gdp_growth")]
   )
-
-  # kg1 <- c("headcount_national", "mpm_headcount", "reporting_pop")
-
-  #
-  # for (i in seq_along(kg1)) {
-  #
-  #   var <- kg1[i]
-  #
-  #   key_indicators[[var]] <-
-  #     key_indicators[[var]] %>%
-  #   # ff <- key_indicators[[var]] %>%
-  #       dplyr::filter(!is.na(.data[[var]])) %>%
-  #       dplyr::group_by(country_code, ppp_year) %>%
-  #       dplyr::filter(reporting_year == max(reporting_year)) %>%
-  #       dplyr::ungroup() %>%
-  #       data.table::as.data.table()
-  #
-  # }
 
   kg1 <- c("headcount_national", "mpm_headcount")
   for (i in seq_along(kg1)) {
@@ -361,14 +338,13 @@ clean_cp_names <- function(x) {
 #'
 #' @inheritParams aux_cp
 #' @keywords internal
-aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
-                          force = FALSE,
+aux_cp_update <- function(force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           branch = paste0(wrk_release$release, "_", wrk_release$identity),
                           tag     = match.arg(branch)) {
 
   measure <- "cp"
-  #branch  <- match.arg(branch)
+
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## chart files --------
 
@@ -424,7 +400,6 @@ aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha ----------------------
 
@@ -437,11 +412,10 @@ aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
           "raw_sha_fun",
           raw_sha_fun)
 
-  saved <- pipfun::pip_sign_save(
-    x       = dl,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <- pip_aux_save(
+    x        = dl,
+    pin_name = measure,
+    force    = force
   )
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
