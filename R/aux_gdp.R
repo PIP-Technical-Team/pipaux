@@ -10,14 +10,13 @@
 #' @export
 aux_gdp <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -33,8 +32,7 @@ aux_gdp <- function(action          = c("update", "load"),
   if (action == "update") {
 
     # Get raw data from various sources, format it, and push it to github
-    aux_gdp_update(maindir = maindir,
-                   force   = force,
+    aux_gdp_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
@@ -53,7 +51,6 @@ aux_gdp <- function(action          = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     # ----- function raw sha ------
     raw_sha_fun <- digest::digest(body(
@@ -68,19 +65,16 @@ aux_gdp <- function(action          = c("update", "load"),
             "aux_key",
             c("country_code", "reporting_level", "year"))
 
-    saved <- pipfun::pip_sign_save(
-      x       = gdp,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = gdp,
+      pin_name = measure,
+      force    = force
     )
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 } # end of aux_gdp
@@ -280,8 +274,7 @@ aux_gdp_weo <- function(action = "update",
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force   = FALSE,
+aux_gdp_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
@@ -289,15 +282,6 @@ aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
 
   #branch <- match.arg(branch)
   measure <- "gdp"
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
-
 
   #   _________________________________________
   #   Update data                                 ####
@@ -323,19 +307,12 @@ aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
   #   ____________________________________________________________________________
   #   Load Data                                                               ####
 
-  madd   <- load_aux(measure = "maddison",
-                     maindir = maindir,
-                     branch = branch)
+  madd   <- pipload::load_aux_data(measure = "maddison")
+
+  weo    <-  pipload::load_aux_data(measure = "weo")
 
 
-  weo    <-  load_aux(measure = "weo",
-                      maindir = maindir,
-                      branch = branch)
-
-
-  wgdp   <- load_aux(measure = "wdi",
-                     maindir = maindir,
-                     branch = branch)
+  wgdp   <- pipload::load_aux_data(measure = "wdi")
 
   setnames(wgdp, "NY.GDP.PCAP.KD", "wdi_gdp")
 
@@ -367,9 +344,7 @@ aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
   )
 
 
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
 
 
   #   ____________________________________________________________________________
@@ -448,27 +423,11 @@ aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
                              rep_var = weo_gdp),
       by = country_code]
 
-
-  # gdp <- chain_values(
-  #   gdp,
-  #   base_var = "wdi_gdp",
-  #   replacement_var = "weo_gdp",
-  #   new_name = "new_gdp",
-  #   by = "country_code"
-  # )
-
   # Chain Maddison on new GDP column
   gdp[, gdp := chain_val(ori_var = new_gdp,
                          rep_var = mpd_gdp),
       by = country_code]
 
-  # gdp <- chain_values(
-  #   gdp,
-  #   base_var = "new_gdp",
-  #   replacement_var = "mpd_gdp",
-  #   new_name = "gdp",
-  #   by = "country_code"
-  # )
 
   # Select columns
   gdp <- gdp[, c("country_code", "year", "gdp")]
@@ -620,16 +579,6 @@ aux_gdp_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-
-  #msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-  # saved <- pipfun::pip_sign_save(
-  #   x       = gdp,
-  #   measure = measure,
-  #   msrdir  = msrdir,
-  #   force   = force
-  # )
-  # Push data (gdp) to GitHub as gdp.csv
 
   save_aux_to_gh(df        = gdp,
                  owner     = owner,

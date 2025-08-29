@@ -84,164 +84,88 @@ aux_country_list <- function(action       = c("update", "load"),
 #' @param class_branch character: names of branch of GPID-WB/class repo. Default
 #'   if master
 #' @keywords internal
-aux_country_list_update <- function(class_branch = "master") {
+aux_country_list_update <-
+  function(class_branch = "master") {
 
-  measure <- "country_list"
+    # Check arguments
+    measure <- "country_list"
+    #   ____________________________________________________________________________
+    #   Read data from CLASS.dta file                                           ####
 
-  #   ____________________________________________________________________________
-  #   Read Data from WDI                                                      ####
 
-  wdi <-
-    wbstats::wb_countries()  |>
-    as.data.table() |>
-    {
-      \(.) {
-        iso2 <- grep("_iso2c", names(.), value = TRUE)
-        x    <- .[, !..iso2]
-        iso3 <- grep("_iso3c", names(x), value = TRUE)
-        withiso <- gsub("_iso3c", "", iso3) |>
-          paste0(collapse = "|") |>
-          grep(names(x), value = TRUE)
-        tokeep <- c("country", "iso3c", withiso)
-        x[region != "Aggregates"
-        ][,
-          ..tokeep
-        ]
-      }
-    }()
+    dt <- pipfun::load_from_gh(
+      measure  = measure,
+      owner    = "GPID-WB",
+      repo     = "Class",
+      branch   = class_branch,
+      filename = "OutputData/CLASS",
+      ext      = "dta"
+    ) |>
+      setDT()
 
-  # rename iso3c
-  owdi <- names(wdi)
-  nwdi <- gsub("iso3c", "code", names(wdi))
-  setnames(wdi, owdi, nwdi)
 
-  # Add "(excluding high income)" to South Asia
-  wdi[, admin_region  := fifelse(test = grepl("income", admin_region) | is.na(admin_region),
-                                 yes  = admin_region ,
-                                 no   = paste(admin_region , "(excluding high income)"))]
+    # collapse table to unique identifiers by country, NOT by country/year
+    rm_names <- grep("year|historical", names(dt), value = TRUE)
 
-  #   ____________________________________________________________________________
-  #   Read data from CLASS.dta file                                           ####
+    dt <- dt[,
+             # max year per country to get current classifications
+             .SD[year_data == fmax(year_data)], by = code
+    ][,
+      # Remove year variables
+      (rm_names) := NULL] |>
+      funique()
 
-  byv <- c(
-    "code",
-    "regionssa_code",
-    "fcv",
-    "regionpcn_code"
-  )
+    setnames(x = dt,
+             old = c("code", "economy" ),
+             new = c("country_code", "country_name") )
 
-  dt <- pipfun::load_from_gh(
-    measure  = measure,
-    owner    = "GPID-WB",
-    repo     = "Class",
-    branch   = class_branch,
-    filename = "OutputData/CLASS.dta"
-  )
 
-  # After loading dt:
-  dt <- dt[dt[, .I[which.max(year_data)], by = code]$V1]
+    dt[country_code == "SOM",
+       country_name := "Federal Republic of Somalia"]
 
-  dt <- dt |>
-    as.data.table() |>
-    unique(by = byv) |>
-    (\(.){.[, ..byv]})()
+    # hardcode fixing of TWN's name
+    dt[country_code == "TWN",
+       country_name  := "Taiwan, China"]
 
-  setnames(dt,
-           old = c("regionssa_code", "regionpcn_code"),
-           new = c("africa_split_code", "pip_region_code"))
 
-  #   ____________________________________________________________________________
-  #   Merge wdi and CLASS                                                     ####
 
-  rg <- joyn::joyn(dt, wdi,
-                   by = "code",
-                   match_type = "1:1",
-                   reportvar = FALSE,
-                   verbose =  FALSE)
 
-  #   ____________________________________________________________________________
-  #   Clean Data                                                              ####
+    ssa_old <- grep("regionssa", names(dt), value = TRUE)
+    ssa_news <- gsub("regionssa", "africa_split", ssa_old)
 
-  # PIP region
-  rg[, pip_region := fifelse(pip_region_code == "OHI",
-                             yes = "Other High Income Countries",
-                             no  = region)
-  ]
 
-  # East and West Africa
-  rg[,
-     africa_split :=  fcase(
-       africa_split_code == "", "",
-       africa_split_code == "AFE", "Eastern and Southern Africa",
-       africa_split_code == "AFW", "Western and Central Africa",
-       default = "")
-  ][,
-    africa_split_code := fifelse(test = africa_split_code == "",
-                                 yes  = "",
-                                 no   =   africa_split_code)
-  ]
+    setnames(dt,
+             old = ssa_old,
+             new = ssa_news)
 
-  # Fragile countries
-  rg[,
-     fcv_code := fifelse(fcv == "Yes", "FCVT", "FCVF")
-  ][,
-    fcv := fifelse(fcv == "Yes", "Fragile", "Not-fragile")]
+    # Fragile countries
+    dt[,
+       fcv := fifelse(fcv == "Yes", "Fragile", "Not-fragile")]
 
-  # Admin regions
-  rg[,
-     admin_region_code := fifelse(
-       admin_region_code == "" | is.na(admin_region_code),
-       NA_character_,
-       paste0(admin_region_code, "-AD"))]
 
-  # Add PCN region temporarily
-  rg[,
-     `:=`(
-       pcn_region = pip_region,
-       pcn_region_code = pip_region_code
-     )]
+    # Convert empty strings to NA
+    recode_char(dt, `^$` = NA_character_,  regex = TRUE, set = TRUE)
 
-  # Convert empty strings to NA
-  vars <- names(rg)
-  names(vars) <- vars
-  rg[, (vars) := lapply(.SD,
-                        \(x) {
-                          fifelse(x == "" | is.na(x), NA_character_, x)
-                        }
-  )
-  ]
+    # Create the World
 
-  # Create the World
-  rg[, `:=`(
-    world      = "World",
-    world_code =  "WLD"
-  )]
+    dt[, `:=`(
+      world      = "World",
+      world_code =  "WLD"
+    )]
 
-  #   ____________________________________________________________________________
-  #   Clean and Save                                                    ####
 
-  rg[, c("region_code", "region") := NULL]
 
-  setnames(x = rg,
-           old = c("code", "country", "pip_region", "pip_region_code"),
-           new = c("country_code", "country_name", "region", "region_code") )
+    ## Order columns alphabetically ------------
+    varn <- names(dt)
+    setcolorder(dt, sort(varn))
+    setcolorder(dt, c("country_code", "country_name",
+                      "region", "region_code"))
 
-  # Order columns alphabetically
-  varn <- names(rg)
-  setcolorder(rg, sort(varn))
-  setcolorder(rg, c("country_code", "country_name"))
 
-  # Remove categories that we don't need
-  rm_agg <- c("fcv", "income_level", "lending_type", "admin_region")
-  to_rm <- c(rm_agg, paste0(rm_agg, "_code"))
-  rg[, (to_rm) := NULL]
 
-  # hardcode fixing of TWN's name
-  rg[country_code == "TWN",
-     country_name  := "Taiwan, China"]
+    dt
 
-  rg
-}
+  }
 
 #' Validate raw country list data
 #'
