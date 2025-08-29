@@ -57,7 +57,8 @@ Imports:
 VignetteBuilder: knitr
 Remotes: 
     github::PIP-Technical-Team/pipload@ongoing,
-    github::PIP-Technical-Team/pipfun@DEV
+    github::PIP-Technical-Team/pipfun@DEV,
+    github::nset-ornl/wbstats
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3
 ByteCompile: true

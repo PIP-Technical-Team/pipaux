@@ -18,6 +18,8 @@ auto_aux_update <- function(measure = NULL,
   from      <- match.arg(from)
   files_changed <- FALSE
 
+  cli::cli_progress_step("Retrieving information from Github")
+
   isgls <- ls(sys.frame(), pattern = "^gls$") |>
     length() > 0
 
@@ -63,6 +65,8 @@ auto_aux_update <- function(measure = NULL,
                  )
                }) |>
     purrr::map_chr( ~ .x[["sha"]])
+
+  cli::cli_progress_step("Comparing dependencies")
 
   # Get the latest hash of the repo
   all_data <-
@@ -118,16 +122,19 @@ auto_aux_update <- function(measure = NULL,
     intersect(names(dependencies))
 
   # For each auxiliary data to be updated
-  cli::cli_alert_info("Updating data for {length(aux_fns)} files.")
+  cli::cli_alert_info("Updating data for {length(aux_fns)} file{?s}.
+                      {.field {aux_fns}}")
   for (aux in aux_fns) {
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
+    fn <- ""
+    # cli::cli_progress_message("updating {aux} -- dependency: {fn}")
     list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
 
     for (fn in list_of_funcs) {
+      # cli::cli_progress_update()
 
       aux_file <- sub("pip_", "", fn)
-      cli::cli_alert_info("Running function {fn} for aux file {aux}.")
 
       before_hash <- read_signature_file(aux_file, maindir, branch)
       # Run the pip_.* function
@@ -137,7 +144,6 @@ auto_aux_update <- function(measure = NULL,
 
       if (before_hash != after_hash) {
 
-        cli::cli_alert_info("Updating csv for {fn}")
         files_changed <- TRUE
 
         # find rows of of org to be modified
@@ -158,8 +164,11 @@ auto_aux_update <- function(measure = NULL,
 
     } # end of list_of_funcs loop
   } # end of aux_fns loop
+
+  cli::cli_progress_step("Update SHAs and git_metadata")
   last_updated_time <-
     aux_file_last_updated(maindir, names(dependencies), branch)
+
   if (length(aux_fns) > 0 && files_changed) {
     # Write the latest auxiliary file and corresponding hash to csv
     # Always save at the end.
