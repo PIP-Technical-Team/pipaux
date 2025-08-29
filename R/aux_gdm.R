@@ -16,14 +16,13 @@
 aux_gdm <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -36,18 +35,15 @@ aux_gdm <- function(action  = c("update", "load"),
   if (action == "update") {
 
     aux_gdm_update(force   = force,
-                   maindir = maindir,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -60,7 +56,6 @@ aux_gdm <- function(action  = c("update", "load"),
 #' @keywords internal
 aux_gdm_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
                            branch,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -143,9 +138,8 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Merge with PFW                                                          ####
 
-  pfw    <-  load_aux(measure = "pfw",
-                      maindir = maindir,
-                      branch = branch)
+  pfw    <-  pipload::load_aux_data(measure = "pfw")
+
   # Subset columns
   pfw <-
     pfw[, c(
@@ -181,12 +175,8 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Merge with inventory                                                    ####
 
-  inv <- fst::read_fst(fs::path(maindir, "_inventory/inventory.fst"),
+  inv <- fst::read_fst(fs::path(getOption("pipaux.working_dir"), "_inventory/inventory.fst"),
                        as.data.table = TRUE)
-
-  # inv <- fst::read_fst(fs::path("Y:\\tefera_pipaux_test",
-  #                               "_inventory/inventory.fst"),
-  #                      as.data.table = TRUE)
 
   # Create survey_id column
   inv[,
@@ -247,13 +237,10 @@ aux_gdm_update <- function(force = FALSE,
   ##  ............................................................................
   ##  Remove any non-WDI countries                                            ####
 
-  aux_country_list(maindir = maindir,
-                   force   = force,
-                   branch  = branch)
+  # aux_country_list(force   = force,
+  #                  branch  = branch)
 
-  cl   <- load_aux(measure = "country_list",
-                   maindir = maindir,
-                   branch = branch)
+  cl   <- pipload::load_aux_data(measure = "country_list")
 
   df <- df[country_code %in% cl$country_code]
 
@@ -291,17 +278,18 @@ aux_gdm_update <- function(force = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   ##  ----------------------------------------------------------
   ##  Save file                                           ####
 
-  saved <- pipfun::pip_sign_save(
-    x       = df,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+
+  saved <- pip_aux_save(
+    x        = df,
+    pin_name = measure,
+    #metadata = cl_metadata,
+    force    = force
   )
+
   return(invisible(saved))
 }
 
