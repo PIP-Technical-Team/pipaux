@@ -9,7 +9,6 @@
 aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
-                         maindir = getOption("pipaux.working_dir"),
                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
@@ -33,11 +32,7 @@ aux_metadata <- function(action  = c("update", "load"),
 
   } else {
 
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
 
   }
 }
@@ -49,23 +44,13 @@ aux_metadata <- function(action  = c("update", "load"),
 #' @inheritParams aux_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
-aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
+aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
                                 force = FALSE,
-                                owner   = getOption("pipfun.ghowner"),
                                 branch  = NULL,
                                 tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
 
   #   ____________________________________________________________________________
   #   Computations                                                            ####
@@ -83,11 +68,7 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
   metadata_validate_raw(metadata = df, detail = detail)
 
   # Load pfw
-  pfw <- load_aux(measure = "pfw",
-                  maindir = maindir,
-                  branch = branch)
-
-
+  pfw <- pipload::load_aux_data(measure = "pfw")
 
   # Create distribution type column (data type)
 
@@ -175,7 +156,6 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha -----------------------------
   raw_sha_fun <- digest::digest(body(
@@ -189,11 +169,10 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
 
   setattr(df, "gh", gh)
 
-  saved <- pipfun::pip_sign_save(
-    x       = df,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <-  pip_aux_save(
+    x        = df,
+    pin_name = measure,
+    force    = force
   )
 
   #   ____________________________________________________________________________
