@@ -19,7 +19,6 @@ aux_countries <- function(action  = c("update", "load"),
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
 
-
   if (is.null(tag)) {
     tag <- paste0(release, "_", identity)
   }
