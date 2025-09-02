@@ -73,7 +73,7 @@ if (getRversion() >= "2.15.1") {
       "patterns",
       "pce_data_level",
       "pce_domain",
-      "pcn_region_code",
+      "region_code",
       "pop_data_level",
       "pop_domain",
       "ppp_data_level",

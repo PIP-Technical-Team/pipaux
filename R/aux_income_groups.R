@@ -10,14 +10,13 @@
 aux_income_groups <- function(action       = c("update", "load"),
                               force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
-                              maindir      = getOption("pipaux.working_dir"),
                               detail       = getOption("pipaux.detail.raw")
 ) {
 
   measure <- "income_groups"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
