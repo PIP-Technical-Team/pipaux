@@ -10,14 +10,13 @@
 aux_pce <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pce"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -28,19 +27,16 @@ aux_pce <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pce_update(maindir = maindir,
-                   force   = force,
+    aux_pce_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -52,30 +48,18 @@ aux_pce <- function(action  = c("update", "load"),
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force = FALSE,
+aux_pce_update <- function(force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
 
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-  }
-
   #   ________________________________________________________________
   #   Load data                                             ####
   #
 
-  wpce   <- load_aux(measure = "wdi",
-                     maindir = maindir,
-                     branch = branch)
+  wpce   <- pipload::load_aux_data(measure = "wdi")
 
   setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
 
@@ -269,10 +253,7 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
-
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   pce <- pce[country_code %in% cl$country_code]
 
@@ -305,8 +286,6 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
           "raw_sha_fun",
           raw_sha_fun)
 
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
   # ----- function raw sha ----------------------
 
   raw_sha_fun <- digest::digest(body(
@@ -318,11 +297,10 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
           "raw_sha_fun",
           raw_sha_fun)
 
-  saved <- pipfun::pip_sign_save(
-    x       = pce,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <-  pip_aux_save(
+    x        = pce,
+    pin_name = measure,
+    force    = force
   )
 
   return(invisible(saved))
