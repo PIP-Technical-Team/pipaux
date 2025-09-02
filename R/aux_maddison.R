@@ -7,16 +7,15 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
-aux_maddison <- function(action = c("update", "load"),
+aux_maddison <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
-                         force = FALSE,
-                         maindir = getOption("pipaux.working_dir"),
+                         force   = FALSE,
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
   action  <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -29,10 +28,10 @@ aux_maddison <- function(action = c("update", "load"),
   if (action == "update") {
     mpd <-  pipfun::load_from_gh(
       measure = measure,
-      owner  = owner,
-      branch = branch,
-      tag    = tag,
-      ext    = "csv"
+      owner   = owner,
+      branch  = branch,
+      tag     = tag,
+      ext     = "csv"
     )
   # validate raw data
     mpd_validate_raw(mpd = mpd, detail = detail)
@@ -43,7 +42,6 @@ aux_maddison <- function(action = c("update", "load"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha ------
   raw_sha_fun <- digest::digest(body(
@@ -60,21 +58,18 @@ aux_maddison <- function(action = c("update", "load"),
           "raw_sha_fun",
           raw_sha_fun)
 
-    saved <- pipfun::pip_sign_save(
-      x = mpd,
-      measure = measure,
-      msrdir = msrdir,
-      force = force,
-      verbose = FALSE
+    saved <-  pip_aux_save(
+      x        = mpd,
+      pin_name = measure,
+      force    = force
     )
+
     return(invisible(saved))
 
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 }
