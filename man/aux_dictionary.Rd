@@ -8,7 +8,6 @@ aux_dictionary(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   tag = NULL
 )
 }

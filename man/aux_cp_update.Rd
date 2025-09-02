@@ -5,7 +5,6 @@
 \title{Update Country Profiles}
 \usage{
 aux_cp_update(
-  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = paste0(wrk_release$release, "_", wrk_release$identity),

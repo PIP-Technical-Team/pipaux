@@ -8,7 +8,6 @@ aux_income_groups(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   detail = getOption("pipaux.detail.raw")
 )
 }

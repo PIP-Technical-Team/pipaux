@@ -8,7 +8,6 @@
 #' @param dlwdir character: Datalibweb directory.
 #' @param force logical: If TRUE data will be overwritten.
 #'
-#' @export
 #' @import data.table
 # aux_prices <- function(measure = NULL,
 #                        action = "update",

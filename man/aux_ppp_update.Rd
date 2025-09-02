@@ -5,7 +5,6 @@
 \title{Update PPP}
 \usage{
 aux_ppp_update(
-  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,

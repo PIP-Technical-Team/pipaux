@@ -5,7 +5,6 @@
 \title{Update GDP}
 \usage{
 aux_gdp_update(
-  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,

@@ -7,7 +7,6 @@
 aux_gdm_update(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   branch,
   tag = branch,
   detail = getOption("pipaux.detail.raw")

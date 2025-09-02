@@ -7,7 +7,6 @@
 aux_gdp(
   action = c("update", "load"),
   force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   detail = getOption("pipaux.detail.raw")

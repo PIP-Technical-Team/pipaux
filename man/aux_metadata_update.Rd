@@ -5,19 +5,18 @@
 \title{Update metadata file}
 \usage{
 aux_metadata_update(
-  maindir = getOption("pipaux.working_dir"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
+  force = FALSE,
   branch = NULL,
   tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
+
+\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

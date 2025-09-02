@@ -90,7 +90,6 @@ aux_gdp <- function(action          = c("update", "load"),
 #' `aux_gdp_weo()`. Hopefully in the future IMF will stop using an `.xls` file
 #' that's not really xls.
 #'
-#' @inheritParams aux_prices
 #' @export
 aux_gdp_weo <- function(action = "update",
                         force = FALSE,

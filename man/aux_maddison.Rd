@@ -8,7 +8,6 @@ aux_maddison(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
   force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )

@@ -5,7 +5,6 @@
 \title{Update PCE}
 \usage{
 aux_pce_update(
-  maindir = getOption("pipaux.working_dir"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,

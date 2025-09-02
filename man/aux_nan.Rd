@@ -7,7 +7,6 @@
 aux_nan(
   action = c("update", "load"),
   force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL
 )

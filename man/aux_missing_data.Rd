@@ -8,7 +8,6 @@ aux_missing_data(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   tag = NULL
 )
 }

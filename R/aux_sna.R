@@ -9,15 +9,13 @@
 #' @export
 aux_sna <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL) {
 
   measure <- "sna"
   action  <- match.arg(action)
 
-
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -38,7 +36,6 @@ aux_sna <- function(action          = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
     # ----- function raw sha ------
     raw_sha_fun <- digest::digest(body(
@@ -49,19 +46,17 @@ aux_sna <- function(action          = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
-    saved <- pipfun::pip_sign_save(
-      x       = sna,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = sna,
+      pin_name = measure,
+      force    = force
     )
 
+
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 } # end
