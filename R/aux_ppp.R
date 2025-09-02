@@ -8,14 +8,13 @@
 #' @export
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),
-                    maindir = getOption("pipaux.working_dir"),
                     owner   = getOption("pipfun.ghowner"),
                     force   = FALSE,
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
                     ppp_defaults = TRUE) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -51,20 +50,15 @@ aux_ppp <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    aux_ppp_update(maindir = maindir,
-                   force   = force,
+
+    aux_ppp_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
   }
   else {
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch,
-      ppp_defaults = ppp_defaults
-    )
+    pipload::load_aux_data(measure = measure)
   }
 
 
@@ -168,23 +162,13 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #'
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force   = FALSE,
+aux_ppp_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
-
   tag <- branch
-
 
   #   ____________________________________________________________________________
   #   set up                                                                  ####
@@ -217,9 +201,7 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   ppp <- ppp[country_code %in% cl$country_code]
 
@@ -268,9 +250,6 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
           "raw_sha_fun",
           raw_sha_fun)
 
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-
   # Set other attributes ________________ #
 
   # Aux measure name
@@ -292,11 +271,10 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
   # _____________________ #####
   # Saving ####
 
-  saved <- pipfun::pip_sign_save(
-    x       = ppp,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <-  pip_aux_save(
+    x        = ppp,
+    pin_name = measure,
+    force    = force
   )
 
 
@@ -313,11 +291,10 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
   # Save
-  pipfun::pip_sign_save(
-    x = ppp_vintage,
-    measure = "ppp_vintage",
-    msrdir = msrdir,
-    force = force
+  pip_aux_save(
+    x        = ppp_vintage,
+    pin_name = "ppp_vintage",
+    force    = force
   )
 
   return(invisible(saved))
