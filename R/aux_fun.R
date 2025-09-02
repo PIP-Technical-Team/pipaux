@@ -32,7 +32,7 @@
 aux_fun <- function(measure,
                     repo      = paste0("aux_", measure),
                     owner     = getOption("pipfun.ghowner"),
-                    maindir   = getOption("pipaux.working_dir"),
+                    #maindir   = getOption("pipaux.working_dir"),
                     processed = new.env(parent = emptyenv()),
                     force     = FALSE,
                     tag       = NULL,
@@ -41,16 +41,12 @@ aux_fun <- function(measure,
                     verbose   = FALSE,
                     ...) {
 
-  # Set arguments
-
   # Get working release
-  # Check if wrk_release exists
-
-  pipfun::get_wrk_release(verbose = verbose)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  release_branch <- paste0(release, "_", identity)
+  branch         <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
     tag <- release_branch
@@ -70,6 +66,7 @@ aux_fun <- function(measure,
   repo  <- if (measure %in% c("income_groups",
                               "country_list")) "Class" else repo
 
+  # Set owner to "PIP-Technical-Team" if measure is "nan"
   owner <- fifelse(measure == "nan",
                    "PIP-Technical-Team",
                    owner)
@@ -81,6 +78,7 @@ aux_fun <- function(measure,
     if (verbose) cli::cli_alert_info("{measure} has already been processed, skipping dependencies...")
 
   } else {
+
     # Mark this measure as processed
     rlang::env_poke(processed,
                     measure,
@@ -123,10 +121,9 @@ aux_fun <- function(measure,
         {
           aux_fun(
             measure   = dep,
-            #action    = "update",
             repo      = paste0("aux_", dep),
             owner     = owner,
-            maindir   = maindir,
+            #maindir   = maindir,
             processed = processed,
             force     = force,
             tag       = tag,
@@ -287,7 +284,7 @@ aux_fun <- function(measure,
     all_args <- c(
       list(
         action  = "update",
-        maindir = maindir,
+        #maindir = maindir,
         branch  = release_branch,
         force   = force,
         owner   = owner,
