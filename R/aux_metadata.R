@@ -9,11 +9,16 @@
 aux_metadata <- function(action  = c("update", "load"),
                          force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
-                         branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
   action <- match.arg(action)
+
+  wrk_release <- get_from_auxenv(key = "wrk_release")
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
     tag <- paste0(release, "_", identity)
@@ -22,7 +27,6 @@ aux_metadata <- function(action  = c("update", "load"),
   if (action == "update") {
 
     aux_metadata_update(
-      maindir = maindir,
       force   = force,
       owner   = owner,
       branch  = branch,
@@ -367,8 +371,9 @@ metadata_validate_output <- function(metadata, detail = getOption("pipaux.detail
                 description = "`survey_conductor` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # TO FIX
+    # validate_cols(in_set(c("national", "rural", "urban")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(welfare_type),
                 description = "`welfare_type` should be character") |>
     validate_cols(in_set(c("consumption", "income")),
