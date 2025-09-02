@@ -71,6 +71,7 @@ aux_countries <- function(action  = c("update", "load"),
     )
 
   } else {
+
     df <- pipload::load_aux_data(measure = measure)
 
     return(df)

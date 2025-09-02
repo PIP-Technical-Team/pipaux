@@ -10,7 +10,6 @@
 #' @export
 aux_wdi <- function(action          = c("update", "load"),
                     force           = FALSE,
-                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -18,7 +17,7 @@ aux_wdi <- function(action          = c("update", "load"),
   measure    <- "wdi"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -30,22 +29,20 @@ aux_wdi <- function(action          = c("update", "load"),
 
 
   if (action == "update") {
-    aux_wdi_update(maindir = maindir,
-                   force   = force,
+    aux_wdi_update(force   = force,
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
-} # end of pip_wdi
+}
+
 
 #' Update National accounts data from WDI
 #'
@@ -59,20 +56,10 @@ aux_wdi <- function(action          = c("update", "load"),
 #' @examples
 #' aux_wdi_update()
 aux_wdi_update <- function(force   = FALSE,
-                           maindir = getOption("pipaux.working_dir"),
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
 
 
   #   ______________________________________________________
@@ -97,7 +84,6 @@ aux_wdi_update <- function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(wdi, "aux_name", "wdi")
   setattr(wdi,
@@ -114,12 +100,10 @@ aux_wdi_update <- function(force   = FALSE,
           "raw_sha_fun",
           raw_sha_fun)
 
-  saved <- pipfun::pip_sign_save(
-    x       = wdi,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force,
-    save_dta = FALSE
+  saved <-  pip_aux_save(
+    x        = wdi,
+    pin_name = measure,
+    force    = force
   )
 
   return(invisible(saved))
