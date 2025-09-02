@@ -9,14 +9,13 @@
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     force   = FALSE,
-                    maindir = getOption("pipaux.working_dir"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
   measure <- "pop"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -29,7 +28,6 @@ aux_pop <- function(action = c("update", "load"),
   if (action == "update") {
     aux_pop_update(
       force   = force,
-      maindir = maindir,
       owner   = owner,
       branch  = branch,
       tag     = tag,
@@ -37,9 +35,7 @@ aux_pop <- function(action = c("update", "load"),
 
   } else {
 
-    df <- load_aux(maindir = maindir,
-                   measure = measure,
-                   branch = branch)
+    df <- pipload::load_aux_data(measure = measure)
 
     return(df)
   }
@@ -52,23 +48,11 @@ aux_pop <- function(action = c("update", "load"),
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
 aux_pop_update <-  function(force   = FALSE,
-                            maindir = getOption("pipaux.working_dir"),
                             owner   = getOption("pipfun.ghowner"),
                             branch  = NULL,
                             tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {
 
-  # Check arguments
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-
-  }
 
   tag     <- branch
   measure <- "pop"
@@ -171,9 +155,7 @@ aux_pop_update <-  function(force   = FALSE,
 
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   setDT(cl)
   pop <- pop[country_code %in% cl$country_code] |>
@@ -201,7 +183,6 @@ aux_pop_update <-  function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   # ----- function raw sha -----------------------------
   raw_sha_fun <- digest::digest(body(
@@ -219,12 +200,12 @@ aux_pop_update <-  function(force   = FALSE,
           list(gh_spop = gh_spop,
                gh_pop_main = gh_pop_main))
 
-  saved <- pipfun::pip_sign_save(
-    x       = pop,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <- pip_aux_save(
+    x        = pop,
+    pin_name = measure,
+    force    = force
   )
+
 
   return(invisible(saved))
 
