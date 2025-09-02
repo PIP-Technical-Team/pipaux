@@ -7,7 +7,6 @@
 #' @export
 aux_regions <- function(action  = c("update", "load"),
                         force   = FALSE,
-                        maindir = getOption("pipaux.working_dir"),
                         owner   = getOption("pipfun.ghowner"),
                         tag     = NULL
                         ) {
@@ -16,7 +15,7 @@ aux_regions <- function(action  = c("update", "load"),
   measure <- "regions"
   action  <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -31,9 +30,7 @@ aux_regions <- function(action  = c("update", "load"),
     ##  ............................................................................
     ##  Load country_list table                                                 ####
 
-    cl <- load_aux(maindir = maindir,
-                   measure = "country_list",
-                   branch  = branch)
+    cl <- pipload::load_aux_data(measure = "country_list")
 
     setnames(cl, "country_code", "id") # to make it work w/o problems
 
@@ -89,7 +86,6 @@ aux_regions <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
   setattr(dt, "aux_name", "regions")
   setattr(dt,
@@ -101,30 +97,27 @@ aux_regions <- function(action  = c("update", "load"),
     paste0("aux_", measure))
   )
 
-
    setattr(dt,
           "raw_sha_fun",
           raw_sha_fun)
 
-    saved <- pipfun::pip_sign_save(
-      x       = dt,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = dt,
+      pin_name = measure,
+      force    = force
     )
+
     return(invisible(saved))
 
 
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 
-} # end of function
+}
 
 
 
