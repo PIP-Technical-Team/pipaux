@@ -468,6 +468,50 @@ pip_aux_save <- \(x,
                      #metadata              = metadata)
 }
 
+#' Read attributes from pins
+#'
+#' Read attributes of qs object not stored as pins metadata
+#'
+#' @param board board
+#' @param pin name
+#'
+#'
+#'
+# Usage example
+# board <- pins::board_local() # or pins::board_folder("path/to/pins")
+# attrs <- read_qs_attributes_from_pin(board, "country_list")
+# str(attrs)
+
+qattr_from_pin <- function(board,
+                           pin_name) {
+
+  # Get pin metadata to locate the file
+  ### By default get latest version of pin
+
+  meta <- pins::pin_meta(board,
+                         pin_name)
+
+  # Find the .qs file path
+  qs_path <- meta$local$dir
+
+  # If the pin is a folder, find the .qs file inside
+
+  if (dir.exists(qs_path)) {
+
+    qs_path <- list.files(qs_path,
+                          pattern = "\\.qs$",
+                          full.names = TRUE)
+
+    if (length(qs_file) == 0) cli::cli_abort("No .qs file found in pin folder.")
+    qs_file <- qs_file[1]
+  }
+
+  # Read only the attributes without loading file
+  attrs <- qs::qattributes(qs_file)
+
+  return(attrs)
+}
+
 # data.table is generally careful to minimize the scope for namespace
 # conflicts (i.e., functions with the same name as in other packages);
 # a more conservative approach using @importFrom should be careful to

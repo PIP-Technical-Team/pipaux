@@ -11,7 +11,7 @@ aux_countries <- function(action  = c("update", "load"),
                           tag     = NULL) {
 
   measure <- "countries"
-  action <- match.arg(action)
+  action  <- match.arg(action)
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -51,6 +51,7 @@ aux_countries <- function(action  = c("update", "load"),
     }
 
     setattr(countries, "aux_name", "countries")
+
     setattr(countries,
             "aux_key",
             c("country_code"))

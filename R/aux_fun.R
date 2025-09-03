@@ -379,16 +379,14 @@ aux_fun <- function(measure,
 check_status <- function(measure,
                          repo       = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
-                         maindir    = getOption("pipaux.working_dir"),
+                         #maindir    = getOption("pipaux.working_dir"),
                          verbose    = TRUE) {
 
-  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
-    pipfun::get_wrk_release(verbose = FALSE)
-  }
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  release_branch <- paste0(release, "_", identity)
+  branch         <- paste0(release, "_", identity)
 
   if (verbose) {
     cli::cli_h1("Checking Status for {measure}")
@@ -448,15 +446,20 @@ check_status <- function(measure,
                 update_y  = update_y)))
   }
 
-  # Check if Y drive file exists
-  y_file_path <- fs::path(maindir, "aux_data", release_branch, measure, measure, ext = "qs")
+  # Check if Y drive file exists -if not, update_y is TRUE and return
 
-  if (verbose) cli::cli_alert_info("Checking file: {y_file_path}")
+  aux_data_exists <- TRUE
 
-  if (!fs::file_exists(y_file_path)) {
+  tryCatch(
+    pipload::load_aux_data(measure = measure),
 
-    cli::cli_alert_danger("File {y_file_path} does not exist.")
+    error = function(e) {
+      aux_data_exists <<- FALSE
+      if (verbose) cli::cli_alert_danger("Aux data for measure '{measure}' not found: {e$message}")
+    }
+  )
 
+  if (!aux_data_exists) {
     update_y <- TRUE
 
     if (verbose) {
@@ -465,10 +468,19 @@ check_status <- function(measure,
       cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
     }
 
-
     return(invisible(list(update_gh = update_gh,
                           update_y  = update_y)))
   }
+
+  # Construct file path to be able to read attributes directly from .qs file
+
+  # -- get aux data board --- #
+  abr     <- get_from_auxenv("aux_data_board")
+  dirpath <- abr$path
+
+
+
+  y_file_path <-
 
   # Retrieve stored GitHub metadata from Y drive file
   gh <- qs::qattributes(y_file_path)$gh
