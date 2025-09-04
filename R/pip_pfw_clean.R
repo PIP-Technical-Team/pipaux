@@ -23,9 +23,7 @@ pip_pfw_clean <- function(y,
 
   # change variable names
   old_var <-
-    c(
-      "region",
-      "code",
+    c("code",
       "ref_year",
       "survname",
       "comparability",
@@ -34,9 +32,7 @@ pip_pfw_clean <- function(y,
     )
 
   new_var <-
-    c(
-      "wb_region_code",
-      "country_code",
+    c("country_code",
       "survey_year",
       "survey_acronym",
       "survey_comparability",
