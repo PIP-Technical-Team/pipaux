@@ -386,7 +386,7 @@ check_status <- function(measure,
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  branch         <- paste0(release, "_", identity)
+  release_branch         <- paste0(release, "_", identity)
 
   if (verbose) {
     cli::cli_h1("Checking Status for {measure}")
@@ -451,7 +451,7 @@ check_status <- function(measure,
   aux_data_exists <- TRUE
 
   tryCatch(
-    pipload::load_aux_data(measure = measure),
+    pipload::load_aux_data(measure = measure), #Todo silent output
 
     error = function(e) {
       aux_data_exists <<- FALSE
@@ -480,7 +480,9 @@ check_status <- function(measure,
 
 
 
-  y_file_path <-
+  # y_file_path <-
+
+  # TODO use aux fun to read attr
 
   # Retrieve stored GitHub metadata from Y drive file
   gh <- qs::qattributes(y_file_path)$gh
