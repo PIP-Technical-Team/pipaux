@@ -474,18 +474,24 @@ check_status <- function(measure,
 
   # Construct file path to be able to read attributes directly from .qs file
 
-  # -- get aux data board --- #
-  abr     <- get_from_auxenv("aux_data_board")
-  dirpath <- abr$path
+  # # -- get aux data board --- #
+  # abr     <- get_from_auxenv("aux_data_board")
+  # dirpath <- abr$path
 
 
 
   # y_file_path <-
 
-  # TODO use aux fun to read attr
+  # TODO use aux fun to read attributes
 
-  # Retrieve stored GitHub metadata from Y drive file
-  gh <- qs::qattributes(y_file_path)$gh
+  ### Retrieve stored GitHub metadata from Y drive file ####
+
+  attr_list <- qattr_from_pin(board    = get_from_auxenv("aux_data_board"),
+                              pin_name = measure)
+
+  # gh <- qs::qattributes(y_file_path)$gh
+
+  gh <- attr_list$gh
 
   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
 
@@ -515,10 +521,11 @@ check_status <- function(measure,
     )
   })
 
-  # Compute function SHA
+  # Compute current function SHA
   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
-  raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
+  # raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
 
+  raw_fun_sha <- attr_list$raw_sha_fun
 
   if (verbose) {
     if (fun_sha == raw_fun_sha) {

@@ -473,15 +473,10 @@ pip_aux_save <- \(x,
 #' Read attributes of qs object not stored as pins metadata
 #'
 #' @param board board
-#' @param pin name
+#' @param pin_name character. Name of pin
 #'
 #'
 #'
-# Usage example
-# board <- pins::board_local() # or pins::board_folder("path/to/pins")
-# attrs <- read_qs_attributes_from_pin(board, "country_list")
-# str(attrs)
-
 qattr_from_pin <- function(board,
                            pin_name) {
 
@@ -498,7 +493,7 @@ qattr_from_pin <- function(board,
 
   if (dir.exists(qs_path)) {
 
-    qs_path <- list.files(qs_path,
+    qs_file <- list.files(qs_path,
                           pattern = "\\.qs$",
                           full.names = TRUE)
 
