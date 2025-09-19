@@ -188,12 +188,48 @@ pip_missing_data <- function(action  = c("update", "load"),
       pop[ct_miss_data,
           on = c("country_code", "year")]
 
+
+# Add welfare type -------------
+
+    dt <- pipfun::load_from_gh(
+      measure  = "country_list",
+      owner    = "GPID-WB",
+      repo     = "Class",
+      branch   = "master",
+      filename = "OutputData/CLASS",
+      ext      = "dta"
+    ) |>
+      setDT() |>
+      setorder(code, year_data) |>
+      fselect(year = year_data,
+              country_code = code,
+              incgroup_code)
+
+    md <- joyn::joyn(pop_md, dt,
+                     by = c("country_code", "year"),
+                     match_type = "1:1",
+                     keep = "left",
+                     reportvar = FALSE)
+
+    md[, incgroup_code := na_focb(incgroup_code),
+       by = country_code
+       ][, incgroup_code := na_locf(incgroup_code),
+         by = country_code
+       ][,
+         welfare_type := fifelse(incgroup_code == "HIC",
+                                 "income", "consumption")
+         ][,
+           incgroup_code := NULL]
+
+
+
+
 #  .................................................................
 ##  Save data                                                    ####
     msrdir  <- fs::path(maindir, "_aux/", branch, measure)
 
     saved <- pipfun::pip_sign_save(
-      x       = pop_md,
+      x       = md,
       measure = measure,
       msrdir  = msrdir,
       force   = force

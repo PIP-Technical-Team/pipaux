@@ -45,6 +45,10 @@ pip_country_list_update <-
   dt[country_code == "TWN",
      country_name  := "Taiwan, China"]
 
+  # Hard code fix of SAS to SAR
+  dt[regionpcn_code == "SAS",
+     regionpcn_code := "SAR"]
+
 
 
 

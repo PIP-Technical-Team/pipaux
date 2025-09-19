@@ -29,47 +29,20 @@ pip_regions <- function(action = c("update", "load"),
 
     setnames(cl, "country_code", "id") # to make it work w/o problems
 
-    ##  ............................................................................
-    ##  get code variables                                                      ####
 
+    vars_code <- grep("_code", names(cl), value = TRUE)
+    vars      <- gsub("_code", "", vars_code)
 
-    ml <- melt(cl,
-               id.vars         = c("id"),
-               measure.vars    = patterns("code$"),
-               variable.factor = FALSE,
-               value.factor    = FALSE,
-               value.name      = "region_code",
-               variable.name   = "grouping_type")
-
-    ml[,
-       grouping_type := gsub("_code", "", grouping_type)]
-
-    ##  ............................................................................
-    ##  Get label variables                                                     ####
-
-    grs <- ml[, unique(grouping_type) ] |>
-      {\(.) c("id",.) }()
-
-    ml2 <- melt(cl[, ..grs],
-                id.vars         = c("id"),
-                variable.factor = FALSE,
-                value.factor    = FALSE,
-                value.name      = "region",
-                variable.name   = "grouping_type")
-    ##  ............................................................................
-    ##  Merge ml and ml2                                                        ####
-
-    dt <- joyn::merge(ml, ml2,
-                      by         = c("id", "grouping_type"),
-                      match_type = "1:1",
-                      verbose    = FALSE)
-
-    ### . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ..
-    ### Get unique database                                                     ####
-
-    byv <- c("region", "region_code", "grouping_type")
-    dt <- unique(dt[, ..byv], by = byv)
-    dt <- dt[grouping_type != "region" & region_code != ""]
+    dt <- lapply(seq_along(vars), \(.) {
+      vc <- vars_code[.]
+      vn <- vars[.]
+      CD <- cl[, mget(c(vc, vn))] |>
+        unique()
+      setnames(CD, new = c("region_code", "region"))
+      CD[, grouping_type := vn]
+    }) |>
+      rbindlist(fill = TRUE) |>
+      na_omit()
     setorder(dt, grouping_type, region_code)
 
 
