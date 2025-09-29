@@ -130,7 +130,7 @@ auto_aux_update <- function(measure = NULL,
     # Add pip_ suffix so that it becomes function name
     fn <- ""
     # cli::cli_progress_message("updating {aux} -- dependency: {fn}")
-    list_of_funcs <- paste0("pip_", dependencies[[aux]])
+    list_of_funcs <- paste0("pip_", c(dependencies[[aux]], aux))
 
     for (fn in list_of_funcs) {
       # cli::cli_progress_update()
