@@ -8,7 +8,6 @@ aux_fun(
   measure,
   repo = paste0("aux_", measure),
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   processed = new.env(parent = emptyenv()),
   force = FALSE,
   tag = NULL,
@@ -26,8 +25,6 @@ Defaults to \code{"aux_<measure>"} unless \code{measure} is \code{"income_groups
 
 \item{owner}{character: GitHub repository owner. Default is \code{getOption("pipfun.ghowner")}}
 
-\item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
-
 \item{processed}{environment: Environment that keeps track of already processed measures to avoid redundant processing.
 Default is a new empty environment}
 
@@ -40,6 +37,8 @@ Defaults to \code{release_branch}, which is determined from the working release}
 \item{log}{logical, defaults to TRUE. Enables or disables logging in "pipaux_log"}
 
 \item{...}{Additional arguments passed to the auxiliary function handling the measure}
+
+\item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
 }
 \value{
 This function does not return a value but performs the requested action (load/update).

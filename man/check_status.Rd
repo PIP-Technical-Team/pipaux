@@ -8,7 +8,6 @@ check_status(
   measure,
   repo = paste0("aux_", measure),
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   verbose = TRUE
 )
 }
@@ -19,9 +18,9 @@ check_status(
 
 \item{owner}{Character: GitHub repository owner. Defaults to \code{getOption("pipfun.ghowner")}.}
 
-\item{maindir}{Character: Main directory path. Defaults to \code{getOption("pipaux.working_dir")}.}
-
 \item{verbose}{Logical: If TRUE, prints messages about the status. Default is TRUE.}
+
+\item{maindir}{Character: Main directory path. Defaults to \code{getOption("pipaux.working_dir")}.}
 }
 \value{
 A list with \code{update_gh} (logical) indicating if GitHub needs updating,

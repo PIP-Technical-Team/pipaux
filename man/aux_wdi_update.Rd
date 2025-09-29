@@ -6,7 +6,6 @@
 \usage{
 aux_wdi_update(
   force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = branch,

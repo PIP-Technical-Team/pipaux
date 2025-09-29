@@ -475,37 +475,69 @@ pip_aux_save <- \(x,
 #' @param board board
 #' @param pin_name character. Name of pin
 #'
+#' @keywords internal
 #'
 #'
-qattr_from_pin <- function(board,
-                           pin_name) {
+qattr_from_pin <- function(board, pin_name, version = NULL) {
 
-  # Get pin metadata to locate the file
-  ### By default get latest version of pin
+  # Download the pin to a temp dir (or versioned dir if specified)
 
-  meta <- pins::pin_meta(board,
-                         pin_name)
+  qs_path <- pins::pin_download(board = board,
+                                name = pin_name,
+                                version = version)
 
-  # Find the .qs file path
-  qs_path <- meta$local$dir
+  # If it's a directory, look for .qs file inside
+#
+#   if (dir.exists(qs_path)) {
+#     qs_file <- list.files(qs_path, pattern = "\.qs$", full.names = TRUE)
+#     if (length(qs_file) == 0) {
+#       cli::cli_abort("No .qs file found in pin '{pin_name}'.")
+#     }
+#     qs_file <- qs_file[1]
+#   } else {
+#     qs_file <- qs_path
+#   }
 
-  # If the pin is a folder, find the .qs file inside
+  # Read attributes only
 
-  if (dir.exists(qs_path)) {
-
-    qs_file <- list.files(qs_path,
-                          pattern = "\\.qs$",
-                          full.names = TRUE)
-
-    if (length(qs_file) == 0) cli::cli_abort("No .qs file found in pin folder.")
-    qs_file <- qs_file[1]
-  }
-
-  # Read only the attributes without loading file
-  attrs <- qs::qattributes(qs_file)
+  attrs <- qs::qattributes(qs_path)
 
   return(attrs)
 }
+
+
+
+
+
+# qattr_from_pin <- function(board,
+#                            pin_name) {
+#
+#   # Get pin metadata to locate the file
+#   ### By default get latest version of pin
+#
+#   meta <- pins::pin_meta(board,
+#                          pin_name)
+#
+#   # Find the .qs file path
+#   qs_path <- meta$local$dir
+#
+#   # If the pin is a folder, find the .qs file inside
+#
+#   if (dir.exists(qs_path)) {
+#
+#     qs_file <- list.files(qs_path,
+#                           pattern = "\\.qs$",
+#                           full.names = TRUE)
+#
+#     if (length(qs_file) == 0) cli::cli_abort("No .qs file found in pin folder.")
+#     qs_file <- qs_file[1]
+#   }
+#
+#   # Read only the attributes without loading file
+#   attrs <- qs::qattributes(qs_file)
+#
+#   return(attrs)
+# }
 
 # data.table is generally careful to minimize the scope for namespace
 # conflicts (i.e., functions with the same name as in other packages);

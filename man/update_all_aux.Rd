@@ -28,7 +28,6 @@ If \code{NULL}, all known measures will be updated.}
     \item{\code{repo}}{character: Name of the GitHub repository containing the auxiliary data
 Defaults to \code{"aux_<measure>"} unless \code{measure} is \code{"income_groups"} or \code{"country_list"}, in which case it defaults to \code{"Class"}.}
     \item{\code{owner}}{character: GitHub repository owner. Default is \code{getOption("pipfun.ghowner")}}
-    \item{\code{maindir}}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
     \item{\code{processed}}{environment: Environment that keeps track of already processed measures to avoid redundant processing.
 Default is a new empty environment}
     \item{\code{force}}{logical: If \code{TRUE}, forces an update even if the data appears up to date.

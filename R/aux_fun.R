@@ -386,7 +386,7 @@ check_status <- function(measure,
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  release_branch         <- paste0(release, "_", identity)
+  release_branch   <- paste0(release, "_", identity)
 
   if (verbose) {
     cli::cli_h1("Checking Status for {measure}")
@@ -472,27 +472,22 @@ check_status <- function(measure,
                           update_y  = update_y)))
   }
 
-  # Construct file path to be able to read attributes directly from .qs file
-
-  # # -- get aux data board --- #
-  # abr     <- get_from_auxenv("aux_data_board")
-  # dirpath <- abr$path
-
-
-
-  # y_file_path <-
-
-  # TODO use aux fun to read attributes
-
+  # Read attributes directly from .qs file
   ### Retrieve stored GitHub metadata from Y drive file ####
 
-  attr_list <- qattr_from_pin(board    = get_from_auxenv("aux_data_board"),
-                              pin_name = measure)
+  aux_board <- get_from_auxenv("aux_data_board")
+  # qattr_from_pin(board    = aux_board,
+  #                pin_name = measure) |>
+  #   print()
 
   # gh <- qs::qattributes(y_file_path)$gh
 
+  attr_list <- qattr_from_pin(board = aux_board,
+                              pin_name = measure)
+
   gh <- attr_list$gh
 
+  # Normalize structure of gh, ensuirng it's always a list for subsequent iteration
   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
 
   # Function to get SHA from GitHub
@@ -529,9 +524,9 @@ check_status <- function(measure,
 
   if (verbose) {
     if (fun_sha == raw_fun_sha) {
-      cli::cli_alert_success("Computed and stored function SHAs match. No update needed.")
+      cli::cli_alert_success("Current and prev. stored function SHAs match. No update needed.")
     } else {
-      cli::cli_alert_danger("Computed and stored function SHAs do NOT match. An update is required.")
+      cli::cli_alert_danger("Current and prev. stored function SHAs do NOT match. An update is required.")
     }
   }
 
@@ -574,7 +569,7 @@ check_status <- function(measure,
 #' @param log Logical; whether to log the update process.
 #' @param log_save Logical; whether to save the log file to disk.
 #' @inheritParams aux_fun
-#' @inheritDotParams aux_fun owner repo verbose processed force maindir tag log log_overwrite
+#' @inheritDotParams aux_fun owner repo verbose processed force tag log log_overwrite
 #'
 #' @return A list containing the update status for each measure. Each element
 #'   is a list with the components: `measure` (character), `success` (logical),
@@ -649,7 +644,7 @@ update_all_aux <- function(measures = NULL,
   ))
 
   # Step 3: Keep only known measures, in sorted dependency order
-  all_measures <- intersect(dependency_order,
+  all_measures     <- intersect(dependency_order,
                             all_measures_raw)
 
   # Step 4: If user provided a subset, filter while preserving order
@@ -663,17 +658,17 @@ update_all_aux <- function(measures = NULL,
     tryCatch({
       aux_fun(measure = msr,
               verbose = verbose,
-              log = log,
+              log     = log,
               ...)
 
       list(measure = msr,
            success = TRUE,
-           error = NULL)
+           error   = NULL)
 
     }, error = function(e) {
       list(measure = msr,
            success = FALSE,
-           error = e$message)
+           error   = e$message)
     })
   }), all_measures)
 
@@ -697,5 +692,4 @@ update_all_aux <- function(measures = NULL,
 
   invisible(status)
 }
-
 
