@@ -124,12 +124,13 @@ auto_aux_update <- function(measure = NULL,
   # For each auxiliary data to be updated
   cli::cli_alert_info("Updating data for {length(aux_fns)} file{?s}.
                       {.field {aux_fns}}")
+
   for (aux in aux_fns) {
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
     fn <- ""
     # cli::cli_progress_message("updating {aux} -- dependency: {fn}")
-    list_of_funcs <- paste0("pip_", return_value(aux, dependencies))
+    list_of_funcs <- paste0("pip_", dependencies[[aux]])
 
     for (fn in list_of_funcs) {
       # cli::cli_progress_update()
@@ -252,7 +253,7 @@ aux_file_last_updated <- function(data_dir, aux_files, branch) {
 read_dependencies <- function(gh_user, owner) {
   dependencies <- paste(gh_user,
                         owner,
-                        "pipaux/metadata/Data/dependency.yml",
+                        "pipaux/metadata/Data/new_dependency.yml",
                         sep = "/") |>
     yaml::read_yaml()
 
