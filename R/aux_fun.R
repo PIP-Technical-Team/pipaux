@@ -123,7 +123,6 @@ aux_fun <- function(measure,
             measure   = dep,
             repo      = paste0("aux_", dep),
             owner     = owner,
-            #maindir   = maindir,
             processed = processed,
             force     = force,
             tag       = tag,
@@ -164,7 +163,6 @@ aux_fun <- function(measure,
           measure = measure,
           repo    = repo,
           owner   = owner,
-          maindir = maindir,
           verbose = verbose
         )
 
@@ -590,9 +588,7 @@ update_all_aux <- function(measures = NULL,
     cli::cli_abort("{.arg measures} must be a character vector or NULL.")
   }
 
-  if (!rlang::env_has(.GlobalEnv, "wrk_release")) {
-    pipfun::get_wrk_release(verbose = FALSE)
-  }
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -670,13 +666,8 @@ update_all_aux <- function(measures = NULL,
 
     pipfun::log_save(
       name = "pipaux_update_log",
-      path = fs::path(
-        getOption("pipaux.log_directory"),
-        release_branch,
-        paste0("pipaux_update_log_", format(Sys.time(), "%Y%m%d_%H%M%S"))
-      )
+      board = get_from_auxenv("aux_metadata_board")
     )
-
 
   }
 
