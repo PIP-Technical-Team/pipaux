@@ -44,6 +44,10 @@ pipuax_default_options <- list(
   abr <- pipfun::get_pins_boards("aux_data")
   rlang::env_poke(.pipaux, "aux_data_board", abr)
 
+  ameta_br <- pipfun::get_pins_boards("aux_metadata")
+  rlang::env_poke(.pipaux, "aux_metadata_board", ameta_br)
+
+
   rlang::env_poke(.pipaux, "wrk_release", wrk_release)
 
   # Initialize a log

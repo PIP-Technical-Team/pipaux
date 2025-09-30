@@ -30,15 +30,14 @@
 #' }
 #' @export
 aux_fun <- function(measure,
-                    repo      = paste0("aux_", measure),
-                    owner     = getOption("pipfun.ghowner"),
-                    #maindir   = getOption("pipaux.working_dir"),
-                    processed = new.env(parent = emptyenv()),
-                    force     = FALSE,
-                    tag       = NULL,
-                    log       = TRUE,
+                    repo          = paste0("aux_", measure),
+                    owner         = getOption("pipfun.ghowner"),
+                    processed     = new.env(parent = emptyenv()),
+                    force         = FALSE,
+                    tag           = NULL,
+                    log           = TRUE,
                     log_overwrite = FALSE,
-                    verbose   = FALSE,
+                    verbose       = FALSE,
                     ...) {
 
   # Get working release
@@ -54,7 +53,8 @@ aux_fun <- function(measure,
 
   # Initialize log only at top level
   if (sys.nframe() <= 2 && log) {
-    log_exists <- rlang::env_has(.piplogenv, "pipaux_update_log")
+    log_exists <- rlang::env_has(.piplogenv,
+                                 "pipaux_update_log")
 
     if (log_overwrite || !log_exists) {
       pipfun::log_init("pipaux_update_log", overwrite = log_overwrite)
@@ -379,13 +379,12 @@ aux_fun <- function(measure,
 check_status <- function(measure,
                          repo       = paste0("aux_", measure),
                          owner      = getOption("pipfun.ghowner"),
-                         #maindir    = getOption("pipaux.working_dir"),
                          verbose    = TRUE) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
-  release        <- wrk_release$release
-  identity       <- wrk_release$identity
+  release          <- wrk_release$release
+  identity         <- wrk_release$identity
   release_branch   <- paste0(release, "_", identity)
 
   if (verbose) {
@@ -476,18 +475,12 @@ check_status <- function(measure,
   ### Retrieve stored GitHub metadata from Y drive file ####
 
   aux_board <- get_from_auxenv("aux_data_board")
-  # qattr_from_pin(board    = aux_board,
-  #                pin_name = measure) |>
-  #   print()
-
-  # gh <- qs::qattributes(y_file_path)$gh
-
-  attr_list <- qattr_from_pin(board = aux_board,
+  attr_list <- qattr_from_pin(board    = aux_board,
                               pin_name = measure)
 
   gh <- attr_list$gh
 
-  # Normalize structure of gh, ensuirng it's always a list for subsequent iteration
+  # Normalize structure of gh, ensuring it's always a list for subsequent iteration
   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
 
   # Function to get SHA from GitHub
@@ -518,8 +511,6 @@ check_status <- function(measure,
 
   # Compute current function SHA
   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
-  # raw_fun_sha <- qs::qattributes(y_file_path)$raw_sha_fun
-
   raw_fun_sha <- attr_list$raw_sha_fun
 
   if (verbose) {
@@ -546,7 +537,7 @@ check_status <- function(measure,
   }
 
   return(invisible(list(update_gh = update_gh,
-              update_y  = update_y)))
+                        update_y  = update_y)))
 }
 
 #' Automatically Update All Auxiliary Data Files
