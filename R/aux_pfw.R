@@ -155,7 +155,7 @@ aux_pfw_clean <- function(y) {
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pfw_update <- function(force = FALSE,
+aux_pfw_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
@@ -458,7 +458,7 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
     validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
-                  pcn_region_code, description = "`pcn_region_code` values within range") |>
+                  reg_pcn, description = "`reg_pcn` values within range") |>
     validate_if(is.character(ctryname),
                 description = "`ctryname` should be character") |>
     validate_if(is.numeric(year),
