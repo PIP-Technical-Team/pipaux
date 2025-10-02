@@ -45,7 +45,7 @@ aux_fun <- function(measure,
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  branch         <- paste0(release, "_", identity)
+  release_branch         <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
     tag <- release_branch
@@ -146,6 +146,7 @@ aux_fun <- function(measure,
 
             )
           }
+          stop(e)  # rethrow error after logging
         }
       )
     } # end of dependencies loop
@@ -296,7 +297,6 @@ aux_fun <- function(measure,
     # Filter to include only matching arguments
     filtered_args <- all_args[names(all_args) %in% formal_args]
 
-
     # Call the function with the filtered arguments
 
 
@@ -324,6 +324,7 @@ aux_fun <- function(measure,
                          measure = measure)
         )
       }
+      stop(e)
     })
 
 

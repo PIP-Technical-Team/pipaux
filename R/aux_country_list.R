@@ -195,17 +195,18 @@ cl_validate_raw <- function(cl, detail = getOption("pipaux.detail.raw")){
                 description = "`africa_split_code` should be character") |>
     validate_cols(in_set(c("AFE", "AFW", NA)),
                   africa_split_code, description = "`africa_split_code` values within range") |>
-    validate_if(is.character(pcn_region),
-                description = "`pcn_region` should be character") |>
-    validate_if(is.character(pcn_region_code),
-                description = "`pcn_region_code` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
-                  pcn_region_code, description = "`pcn_region_code` values within range") |>
+    validate_if(is.character(regionpcn),
+                description = "`regionpcn
+                ` should be character") |>
+    validate_if(is.character(regionpcn_code),
+                description = "`regionpcn_code` should be character") |>
+    validate_cols(in_set(c("SSA", "OHI", "SAS", "ECA", "LAC", "EAP", "MNA")),
+                  regionpcn_code, description = "`regionpcn_code` values within range") |>
     validate_if(is.character(region),
                 description = "`region` should be character") |>
     validate_if(is.character(region_code),
                 description = "`region_code` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
+    validate_cols(in_set(c( "SSF", "LCN", "MEA", "ECS", "EAS", "SAS", "NAC")),
                   region_code, description = "`region_code` values within range") |>
     validate_if(is.character(world),
                 description = "`world` should be character") |>
