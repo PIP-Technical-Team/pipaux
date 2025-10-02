@@ -165,6 +165,18 @@ aux_country_list_update <-
 
     dt
 
+    ## order data to get the right unicode
+    setorder(dt, country_code)
+
+    priority <- c("CIV","STP","CUW","TUR")
+
+    wp  <- which( dt$country_code %in% priority)
+    wnp <- which(!dt$country_code %in% priority)
+
+    new_order <- c(wp, wnp)
+
+    dt[new_order]
+
   }
 
 #' Validate raw country list data
