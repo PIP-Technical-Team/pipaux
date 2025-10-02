@@ -63,8 +63,7 @@ aux_pfw_clean <- function(y) {
 
   # change variable names
   old_var <-
-    c("reg_pcn",
-      "code",
+    c("code",
       "ref_year",
       "survname",
       "comparability",
@@ -73,15 +72,14 @@ aux_pfw_clean <- function(y) {
     )
 
   new_var <-
-    c(#"pcn_region_code",
-      "region_code",
-      "country_code",
+    c("country_code",
       "survey_year",
       "survey_acronym",
       "survey_comparability",
       "welfare_type",
       "reporting_year"
     )
+
 
   setnames(x,
            old = old_var,
@@ -262,7 +260,8 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
   validate(pfw, name = "PFW raw data validation") |>
     validate_if(is.character(region),
                 description = "`region` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
+    validate_cols(in_set(c("Sub-Saharan Africa", "Europe & Central Asia", "Middle East, North Africa, Afghanistan & Pakistan",
+                           "Middle East, North Africa, Afghanistan & Pakistan", "Latin America & Caribbean", "East Asia & Pacific", "South Asia", "North America")),
                   region, description = "`region` values within range") |>
     validate_if(is.character(code),
                 description = "`code` should be character") |>
@@ -305,8 +304,8 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
     # validate_cols(in_set(c("national", "partial", "rural", "urban")),
     #               survey_coverage,
     #               description = "`survey_coverage` values within range") |>
-    # validate_cols(in_set(c("N", "R", "U")),
-    #               survey_coverage, description = "`survey_coverage` values within range") |>
+    validate_cols(in_set(c("N", "U", "R")),
+                  survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(datatype),
                 description = "`datatype` should be character") |>
     validate_cols(in_set(c("C", "I", "c", "i")),
@@ -454,14 +453,10 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
   report <- data_validation_report()
 
   validate(pfw, name = "PFW output data validation") |>
-    validate_if(is.character(wb_region_code),
-                description = "`wb_region_code` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
-                  wb_region_code, description = "`wb_region_code` values within range") |>
+    validate_cols(in_set(c( "SSF", "ECS", "MEA", "LCN", "EAS", "SAS", "NAC")),
+                  region_code, description = "`wb_region_code` values within range") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_if(is.character(pcn_region_code),
-                description = "`pcn_region_code` should be character") |>
     validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
                   pcn_region_code, description = "`pcn_region_code` values within range") |>
     validate_if(is.character(ctryname),
