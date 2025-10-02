@@ -63,9 +63,7 @@ aux_pfw_clean <- function(y) {
 
   # change variable names
   old_var <-
-    c(
-      "region",
-      "reg_pcn",
+    c("reg_pcn",
       "code",
       "ref_year",
       "survname",
@@ -75,9 +73,7 @@ aux_pfw_clean <- function(y) {
     )
 
   new_var <-
-    c(
-      "wb_region_code",
-      #"pcn_region_code",
+    c(#"pcn_region_code",
       "region_code",
       "country_code",
       "survey_year",

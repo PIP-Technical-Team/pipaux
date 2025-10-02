@@ -72,11 +72,8 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     cl <- cl[, c("country_code", "region_code")]
 
-    gr <-
-      expand.grid(country_code = cl$country_code,
-                  year = ref_years,
-                  stringsAsFactors = FALSE) |>
-      as.data.table()
+    gr <- CJ(cl$country_code, ref_years)
+    setnames(gr, c("country_code", "year"))
 
     setorder(gr, country_code, year)
 
