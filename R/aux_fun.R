@@ -37,8 +37,8 @@ aux_fun <- function(measure,
                     tag           = NULL,
                     log           = TRUE,
                     log_overwrite = FALSE,
-                    verbose       = FALSE,
-                    ...) {
+                    verbose       = FALSE){
+                    #...) {
 
   # Get working release
   wrk_release <- get_from_auxenv(key = "wrk_release")
@@ -126,8 +126,8 @@ aux_fun <- function(measure,
             processed = processed,
             force     = force,
             tag       = tag,
-            verbose   = verbose,
-            ...
+            verbose   = verbose
+            #...
           )
         },
         error = function(e) {
@@ -146,7 +146,7 @@ aux_fun <- function(measure,
 
             )
           }
-          stop(e)  # rethrow error after logging
+          #stop(e)  # rethrow error after logging
         }
       )
     } # end of dependencies loop
@@ -299,7 +299,6 @@ aux_fun <- function(measure,
 
     # Call the function with the filtered arguments
 
-
     tryCatch({
 
       do.call(func, filtered_args)
@@ -309,10 +308,11 @@ aux_fun <- function(measure,
           event   = "update",
           message = cli::col_blue(paste0("Updated Y drive for: ", measure)),
           name    = "pipaux_update_log",
-          logmeta = list(step = "UPDATE SERVER",
-                         measure = measure)
+          args    = list()
+          # logmeta = list(step = "UPDATE SERVER", measure = measure)
         )
       }
+
     }, error = function(e) {
 
       if (log) {
@@ -320,12 +320,15 @@ aux_fun <- function(measure,
           event   = "error",
           message = paste0("Error updating Y drive for: ", measure, " — ", e$message),
           name    = "pipaux_update_log",
-          logmeta = list(step = "UPDATE SERVER",
-                         measure = measure)
+          args    = list()
+          # logmeta = list(step = "UPDATE SERVER", measure = measure)
         )
       }
+
       stop(e)
+
     })
+
 
 
   } # Close if update Y is TRUE
