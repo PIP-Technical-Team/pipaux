@@ -33,7 +33,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Get current release ####
 
-  pipfun::get_wrk_release(verbose = verbose)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release <- paste0(wrk_release$release,
                     "_",
@@ -376,25 +376,25 @@ compare_aux_releases <- function(measure     = NULL,
 #' @return A character string representing the most recent previous release.
 #'
 #' @keywords internal
-get_last_release <- function(maindir = getOption("pipaux.working_dir"),
+get_last_release <- function(board,
                              current_release,
                              identity) {
-  # Path to aux_data folder
-  aux_path <- fs::path(maindir,
-                       "aux_data")
 
-  # List release folder names only
+  # Go up from current release folder to aux_data
+  aux_path <- fs::path_dir(board$path)
+
+  # List all release folders under aux_data
   release_names <- fs::dir_ls(aux_path,
-                              type    = "directory",
+                              type = "directory",
                               recurse = FALSE) |>
     fs::path_file()
 
-  # Filter by identity and valid format
+  # Keep only folders matching pattern YYYYMMDD_identity
   valid_releases <- release_names[
     grepl(paste0("^\\d{8}_", identity, "$"), release_names)
   ]
 
-  # Filter those strictly before current release
+  # Sort and pick the one just before current_release
   candidates <- sort(valid_releases[valid_releases < current_release],
                      decreasing = TRUE)
 
@@ -404,6 +404,7 @@ get_last_release <- function(maindir = getOption("pipaux.working_dir"),
 
   return(candidates[1])
 }
+
 
 
 #' Compare two vintage versions of an auxiliary data file
