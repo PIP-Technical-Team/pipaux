@@ -23,9 +23,9 @@
 #' get_aux_changes(measure = "cpi", old_release = "20240101_PROD")
 #' }
 get_aux_changes <- function(measure      = "cpi",
-                            maindir      = getOption("pipaux.working_dir"),
+                            #maindir      = getOption("pipaux.working_dir"),
                             old_release  = NULL,
-                            key_cols     = getOption("pipaux.key_vars"),
+                            #key_cols     = getOption("pipaux.key_vars"),
                             verbose      = TRUE) {
 
   # _______________________________________#
@@ -310,7 +310,7 @@ get_aux_changes <- function(measure      = "cpi",
 #' inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
 #' }
 compare_aux_releases <- function(measure     = NULL,
-                                 maindir     = getOption("pipaux.working_dir"),
+                                 #maindir     = getOption("pipaux.working_dir"),
                                  owner       = "PIP-Technical-Team",
                                  old_release = NULL,
                                  verbose     = FALSE,
