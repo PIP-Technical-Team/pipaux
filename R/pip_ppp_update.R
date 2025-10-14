@@ -23,7 +23,8 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     measure = measure,
     owner  = owner,
     branch = branch,
-    tag    = tag
+    tag    = tag,
+    ext = "csv"
   )
 
 
@@ -62,6 +63,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     branch <- ""
   }
   msrdir <- fs::path(maindir, "_aux", branch, measure) # measure dir
+
   saved <- pipfun::pip_sign_save(
     x       = ppp,
     measure = measure,
@@ -87,7 +89,7 @@ pip_ppp_update <- function(maindir = gls$PIP_DATA_DIR,
     force = force
   )
   pipfun::save_to_gh(ppp_vintage,
-                     measure = measure,
+                     repo = paste0("aux_", measure),
                      branch = branch,
                      filename = "ppp_vintage")
 
