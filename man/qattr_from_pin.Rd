@@ -4,10 +4,10 @@
 \alias{qattr_from_pin}
 \title{Read attributes from pins}
 \usage{
-qattr_from_pin(board, pin_name)
+qattr_from_pin(board, pin_name, version = NULL)
 }
 \arguments{
-\item{board}{board}
+\item{board}{board name}
 
 \item{pin_name}{character. Name of pin}
 }

@@ -4,25 +4,17 @@
 \alias{get_aux_changes}
 \title{Compare auxiliary data files across releases}
 \usage{
-get_aux_changes(
-  measure = "cpi",
-  maindir = getOption("pipaux.working_dir"),
-  old_release = NULL,
-  key_cols = getOption("pipaux.key_vars"),
-  verbose = TRUE
-)
+get_aux_changes(measure = "cpi", old_release = NULL, verbose = TRUE)
 }
 \arguments{
 \item{measure}{character: Name of the measure to process}
 
-\item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
-
 \item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
 If NULL, automatically take last available release of same identity as the current working release}
 
-\item{key_cols}{Character vector. Variables used as keys to compare values between releases. Defaults to the \code{pipaux.key_vars} option.}
-
 \item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
+
+\item{key_cols}{Character vector. Variables used as keys to compare values between releases. Defaults to the \code{pipaux.key_vars} option.}
 }
 \value{
 A data frame with detected differences in values, grouped by the specified key variables.

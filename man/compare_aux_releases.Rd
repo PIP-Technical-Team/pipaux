@@ -6,7 +6,6 @@
 \usage{
 compare_aux_releases(
   measure = NULL,
-  maindir = getOption("pipaux.working_dir"),
   owner = "PIP-Technical-Team",
   old_release = NULL,
   verbose = FALSE,
@@ -16,8 +15,6 @@ compare_aux_releases(
 \arguments{
 \item{measure}{Optional character vector. Specific measures to check (e.g., \code{c("cpi", "gdp")}). If \code{NULL}, all available measures are included.}
 
-\item{maindir}{Path to the local auxiliary data directory. Defaults to \code{getOption("pipaux.working_dir")}.}
-
 \item{owner}{GitHub owner of aux data repos. Defaults to \code{"PIP-Technical-Team"}.}
 
 \item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
@@ -26,6 +23,8 @@ If NULL, automatically take last available release of same identity as the curre
 \item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
 
 \item{...}{Additional arguments passed to \code{get_aux_changes()}.}
+
+\item{maindir}{Path to the local auxiliary data directory. Defaults to \code{getOption("pipaux.working_dir")}.}
 }
 \value{
 Named list of data frames with value differences for each measure. Measures with no differences or errors return \code{NULL}.

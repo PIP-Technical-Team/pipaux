@@ -13,8 +13,7 @@ aux_fun(
   tag = NULL,
   log = TRUE,
   log_overwrite = FALSE,
-  verbose = FALSE,
-  ...
+  verbose = FALSE
 )
 }
 \arguments{
@@ -36,9 +35,9 @@ Defaults to \code{release_branch}, which is determined from the working release}
 
 \item{log}{logical, defaults to TRUE. Enables or disables logging in "pipaux_log"}
 
-\item{...}{Additional arguments passed to the auxiliary function handling the measure}
-
 \item{maindir}{character: Main directory of the project. Default is \code{getOption("pipaux.working_dir")}}
+
+\item{...}{Additional arguments passed to the auxiliary function handling the measure}
 }
 \value{
 This function does not return a value but performs the requested action (load/update).

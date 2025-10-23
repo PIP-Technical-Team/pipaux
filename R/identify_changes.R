@@ -41,7 +41,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   if (is.null(old_release)) {
 
-    old_release <- get_last_release(maindir         = maindir,
+    old_release <- get_last_release(board           = get_from_auxenv("aux_data_board"),
                                     current_release = release,
                                     identity        = wrk_release$identity)
 
@@ -55,8 +55,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   new_df <- tryCatch({
 
-      load_aux(measure = measure,
-               maindir = maindir)
+    pipload::load_aux_data(measure = measure)
 
   },
 
@@ -67,9 +66,9 @@ get_aux_changes <- function(measure      = "cpi",
 
   old_df <- tryCatch({
 
-    load_aux(measure = measure,
-             maindir = maindir,
-             branch  = old_release)
+    # load_aux(measure = measure,
+    #          maindir = maindir,
+    #          branch  = old_release)
   },
 
   error = function(e) {

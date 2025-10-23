@@ -4,18 +4,14 @@
 \alias{get_last_release}
 \title{Get the most recent previous release of a specific identity}
 \usage{
-get_last_release(
-  maindir = getOption("pipaux.working_dir"),
-  current_release,
-  identity
-)
+get_last_release(board, current_release, identity)
 }
 \arguments{
-\item{maindir}{Character. The root directory where \code{aux_data} subfolder is located.}
-
 \item{current_release}{Character. Current release string in the format \code{"YYYYMMDD_identity"}.}
 
 \item{identity}{Character. The identity suffix to filter releases (e.g., \code{"prod"}).}
+
+\item{maindir}{Character. The root directory where \code{aux_data} subfolder is located.}
 }
 \value{
 A character string representing the most recent previous release.
