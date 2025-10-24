@@ -69,6 +69,10 @@ get_aux_changes <- function(measure      = "cpi",
     # load_aux(measure = measure,
     #          maindir = maindir,
     #          branch  = old_release)
+
+    pipload::pip_read(board    = board_old,
+             pin_name          = measure,
+             verbose           = FALSE)
   },
 
   error = function(e) {

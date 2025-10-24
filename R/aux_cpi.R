@@ -195,13 +195,6 @@ aux_cpi_update <- function(force   = FALSE,
   # cpi_metadata <- list(raw_sha_fun = raw_sha_fun,
   #                      key_col     = key_cols)
 
-  setattr(cpi,
-          "aux_key",
-          key_cols)
-
-  setattr(cpi,
-          "raw_sha_fun",
-          raw_sha_fun)
 
   #   ____________________________________________________________________________
   #   Saving                                                                ####
@@ -234,6 +227,14 @@ aux_cpi_update <- function(force   = FALSE,
     variable.name = "cpi_year",
     value.name    = "cpi_value"
   )
+
+  setattr(cpi,
+          "aux_key",
+          key_cols)
+
+  setattr(cpi,
+          "raw_sha_fun",
+          raw_sha_fun)
 
   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
   cpi[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]

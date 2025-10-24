@@ -2,24 +2,14 @@
 % Please edit documentation in R/simulate_change.R
 \name{simulate_old_release}
 \alias{simulate_old_release}
-\title{Simulate an "old" version by modifying a measure's data file}
+\title{Simulate an "old" version by modifying a measure's pin}
 \usage{
-simulate_old_release(
-  base_dir = getOption("pipaux.working_dir"),
-  root_dir = Sys.getenv("PIP_ROOT_DIR"),
-  old_release = "20250101_TEST",
-  measure,
-  seed = 123
-)
+simulate_old_release(old_release = "20250101_TEST", measure, seed = 123)
 }
 \arguments{
-\item{base_dir}{Base directory containing the version folders}
+\item{old_release}{Character. The name of the old release board to simulate (e.g. "20250101_TEST")}
 
-\item{root_dir}{Root directory of PIP data. Defaults tpo \code{Sys.getenv("PIP_ROOT_DIR")}}
-
-\item{old_release}{The name of the old release folder to simulate changes in}
-
-\item{measure}{Character. The name of the measure folder (e.g. "gdp")}
+\item{measure}{Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")}
 
 \item{seed}{An optional seed for reproducibility}
 }
@@ -27,6 +17,6 @@ simulate_old_release(
 Invisibly returns the modified data.table
 }
 \description{
-Simulate an "old" version by modifying a measure's data file
+Simulate an "old" version by modifying a measure's pin
 }
 \keyword{internal}
