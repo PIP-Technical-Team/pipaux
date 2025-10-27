@@ -150,13 +150,13 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   }
 
   # Optional: structural difference to make data slightly distinct
-  dt <- dt[-.N]
+  #dt <- dt[-.N]
   dt[, mock_col := "simulated"]
 
   # --- Add metadata attributes ---
-  setattr(dt, "aux_name", measure)
-  raw_sha_fun <- digest::digest(body(paste0("aux_", measure)))
-  setattr(dt, "raw_sha_fun", raw_sha_fun)
+  # setattr(dt, "aux_name", measure)
+  # raw_sha_fun <- digest::digest(body(paste0("aux_", measure)))
+  # setattr(dt, "raw_sha_fun", raw_sha_fun)
 
   # --- Save modified data to old release board ---
   pipload::pip_write(

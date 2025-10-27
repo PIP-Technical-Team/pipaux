@@ -51,7 +51,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Old release board
   ab_old <- get_aux_board(release = old_release,
-                          verbose = TRUE)
+                          verbose = FALSE)
 
 
   # _______________________________________#
@@ -68,8 +68,6 @@ get_aux_changes <- function(measure      = "cpi",
     stop(e)
   })
 
-
-  ## TO DO : ADD HERE GET OLD BOARD
   old_df <- tryCatch({
 
     pipload::pip_read(board    = ab_old,
@@ -163,20 +161,20 @@ get_aux_changes <- function(measure      = "cpi",
 
     # diff values
 
-    # if (measure == "cpi") {
-    #
-    #   diff_rows <- diff_rows |>
-    #     frename(reporting_level = year.new,
-    #             year = survey_acronym.new,
-    #             survey_acronym = reporting_level.new)
-    #
-    #   diff_rows <- diff_rows |>
-    #     frename(year.new = year,
-    #             survey_acronym.new = survey_acronym,
-    #             reporting_level.new = reporting_level
-    #     )
-    #
-    # }
+if (measure == "cpi") {
+
+  diff_rows <- diff_rows |>
+    frename(reporting_level = year.new,
+            year = survey_acronym.new,
+            survey_acronym = reporting_level.new)
+
+  diff_rows <- diff_rows |>
+    frename(year.new = year,
+            survey_acronym.new = survey_acronym,
+            reporting_level.new = reporting_level
+    )
+
+}
 
     ## ppp     ##
     ## ________ #
@@ -238,33 +236,7 @@ get_aux_changes <- function(measure      = "cpi",
       old_release = old_release
     )]
 
-    added  <- setdiff(names(new_df), names(old_df))
-    removed <- setdiff(names(old_df), names(new_df))
-
-
-    # # Optionally reorder for clarity
-    # setcolorder(diff_rows, c("change_type",
-    #                          key_cols,
-    #                          "df"))
-    # setorderv(diff_rows, c("change_type",
-    #                        key_cols))
   }
-
-  # Get info on added or removed column names
-
-  # added   <- setdiff(names(new_df),
-  #                    names(old_df))
-  # removed <- setdiff(names(old_df),
-  #                    names(new_df))
-  #
-  # diff_cols <- if (length(added) > 0 || length(removed) > 0) {
-  #   list(
-  #     added_columns   = if (length(added) > 0) added else NULL,
-  #     removed_columns = if (length(removed) > 0) removed else NULL
-  #   )
-  # } else {
-  #   NULL
-  # }
 
 
   # _______________________________________#
@@ -307,7 +279,6 @@ get_aux_changes <- function(measure      = "cpi",
 #' inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
 #' }
 compare_aux_releases <- function(measure     = NULL,
-                                 #maindir     = getOption("pipaux.working_dir"),
                                  owner       = "PIP-Technical-Team",
                                  old_release = NULL,
                                  verbose     = FALSE,
@@ -339,9 +310,7 @@ compare_aux_releases <- function(measure     = NULL,
 
       get_aux_changes(
         measure     = x,
-        maindir     = maindir,
         old_release = old_release,
-        #key_cols    = key_cols,
         verbose     = verbose
       )
 
@@ -407,97 +376,94 @@ get_last_release <- function(board,
 #' Compare two vintage versions of an auxiliary data file
 #'
 #' Compares the most recent version of an auxiliary data file with an earlier "vintage" version,
-#' identifying differences in values, rows, and columns. This is useful for tracking changes
-#' within a release, especially during development or validation.
+#' identifying differences in values and rows.
 #'
 #' @param measure Character. The name of the auxiliary measure to compare (e.g., "gdp", "pop").
-#' @param root_dir Character. Root directory where the release data is stored. Defaults to the `PIP_ROOT_DIR` environment variable.
-#' @param maindir Character. Path to the main auxiliary data directory. Defaults to the `pipaux.working_dir` option.
-#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed.
+#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed. Default is `FALSE`.
 #' @param version Integer. A negative number indicating how many versions before the latest one to compare with.
-#'   For example, `-1` compares the current version with the one just before it, `-2` goes two versions back, and so on.
-#' @param ... Additional arguments passed to the data loading functions.
+#'   For example, `-1` compares the current version with the one just before it, `-2` goes two versions back, etc.
+#' @param ... Additional arguments passed to `pipload::load_aux_data()`.
 #'
-#' @return (Invisibly) A list with three elements:
+#' @return Invisibly returns a list with the following elements (if differences are found):
 #' \describe{
 #'   \item{diff_values}{A data table showing differences in values across matched rows and columns.}
 #'   \item{diff_rows}{A data table showing rows added or removed between versions.}
-#'   \item{diff_cols}{A list with added or removed columns.}
 #' }
+#' If no previous version is available or no differences are found, returns `NULL`.
 #'
-#' @seealso [pipload::pip_load_aux()], [myrror::myrror()]
+#' @seealso [pipload::load_aux_data()], [myrror::myrror()]
 #' @export
 compare_vintage_versions <- function(measure,
-                                     root_dir    = Sys.getenv("PIP_ROOT_DIR"),
-                                     maindir     = getOption("pipaux.working_dir"),
-                                     verbose     = FALSE,
-                                     version     = -1,
-                                     apply_label = TRUE,
+                                     verbose = FALSE,
+                                     version = -1,
                                      ...) {
 
-  # _____________________________________________________________#
-  # Load last two vintage versions using pip_load_aux ####
-  # _____________________________________________________________#
-
-
-  # Load most recent version (0)
-  # ______________________________ #
-
+  # ------------------------------------------------------------#
+  # Load the most recent version
+  # ------------------------------------------------------------#
   new_df <- tryCatch({
+    pipload::load_aux_data(measure = measure,
+                           ...)
+  },
 
-    load_aux(measure     = measure,
-             maindir     = maindir,
-             apply_label = apply_label)
-
-
-
-  }, error = function(e) {
+  error = function(e) {
     cli::cli_alert_danger("Failed to load latest version of {.strong {measure}}.")
     stop(e)
   })
 
-  # Load previous version (-1)
-  # ______________________________ #
-
+  # Load previous version
   old_df <- tryCatch({
 
-    df <- pipload::pip_load_aux(
-      measure = measure,
-      version = version,
-      verbose = verbose,
-      maindir = "PIP_ingestion_pipeline_v2" # to change??
-    )
-
-
+    df <- pipload::load_aux_data(measure = measure,
+                                 version = version, ...)
     df[]
 
-  }, error = function(e) {
+  },
 
-    cli::cli_alert_warning("Failed to load previous version of {.strong {measure}}. Not enough versions?")
+  error = function(e) {
+    cli::cli_alert_warning(
+      "Failed to load previous version of {.strong {measure}}. Not enough versions?"
+    )
     NULL
   })
 
-  if (is.null(old_df)) return(invisible(NULL))
+  if (is.null(old_df)) {
 
-  # _______________________________________#
-  # Get key columns ####
+    cli::cli_alert_warning(
+      "Previous version of {.strong {measure}} is NULL. Comparison skipped."
+    )
 
+    return(invisible(list(diff_values = NULL,
+                          diff_rows   = NULL,
+                          key_cols    = NULL)))
+  }
+
+  # ------------------------------------------------------------#
+  # Determine key columns
+  # ------------------------------------------------------------#
   key_cols <- attributes(new_df)$aux_key
 
   if (length(key_cols) == 0) {
     cli::cli_abort("No key columns found in data attributes.")
   }
 
-  setorderv(new_df,
-            cols = key_cols)
-  setorderv(old_df,
-            cols = key_cols)
+  # Ensure key columns exist in both datasets
+  missing_keys <- setdiff(key_cols, names(old_df))
 
-  # _______________________________________#
-  # Compare with myrror ####
-  # _______________________________________#
+  if (length(missing_keys) > 0) {
+    cli::cli_abort(
+      "Old version of {.strong {measure}} is missing key columns: {paste(missing_keys, collapse=', ')}"
+    )
+  }
 
+  data.table::setorderv(new_df,
+                        cols = key_cols)
+  data.table::setorderv(old_df,
+                        cols = key_cols)
 
+  # ------------------------------------------------------------#
+  # Compare using myrror
+  # ------------------------------------------------------------#
   myr <- myrror::myrror(
     dfx                 = new_df,
     dfy                 = old_df,
@@ -509,190 +475,155 @@ compare_vintage_versions <- function(measure,
     verbose             = verbose
   )
 
-  diff_vals <- myrror::extract_diff_table(myrror_object  = myr,
-                                          by             = key_cols,
-                                          output         = "simple")
+  diff_vals <- myrror::extract_diff_table(myrror_object = myr,
+                                          by = key_cols,
+                                          output = "simple")
   diff_rows <- myrror::extract_diff_rows(myrror_object = myr,
-                                         by            = key_cols,
-                                         output        = "simple")
+                                         by = key_cols,
+                                         output = "simple")
 
-  if (nrow(diff_rows) == 0) {
-    diff_rows <- NULL
-  }
+  # Handle empty diff_rows
+  if (is.null(diff_rows) || nrow(diff_rows) == 0) diff_rows <- NULL
 
+  # ------------------------------------------------------------#
+  # TEMPORARY measure-specific renaming (CPI / PPP)
+  # ------------------------------------------------------------#
 
-  # col_diff <- list(
-  #   "added_columns" = {
-  #     diff <- setdiff(names(new_df),
-  #                     names(old_df))
-  #     if (length(diff) == 0) NULL else diff
-  #   },
-  #
-  #   "removed_columns" = {
-  #     diff <- setdiff(names(old_df), names(new_df))
-  #     if (length(diff) == 0) NULL else diff
-  #   }
-  # )
-
-
-  if (!is.null(diff_rows)) {
-    diff_rows[, change_type := fifelse(df == "dfx",
-                                       "added",
-                                       "removed")]
-    setorderv(diff_rows, c("change_type",
-                           key_cols))
-  }
-
-
-    if (!is.null(diff_vals) ||
-        !is.null(diff_rows) ||
-        !is.null(col_diff$added_columns) ||
-        !is.null(col_diff$removed_columns)) {
-
-      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. Differences detected.")
-
-      #### --------------- TEMPORARY FIX -------- ####
-
-      ## cpi     ##
-      ## ________ #
-
-      # diff values
-
-      if (measure == "cpi") {
-        diff_vals <- diff_vals |>
-          frename(reporting_level = year.new,
-                  year = survey_acronym.new,
-                  survey_acronym = reporting_level.new)
-
-        diff_vals <- diff_vals |>
-          frename(year.new            = year,
-                  survey_acronym.new  = survey_acronym,
-                  reporting_level.new = reporting_level
-          )
-
-        # diff rows
-
-        diff_rows <- diff_rows |>
-          frename(reporting_level = year.new,
-                  year = survey_acronym.new,
-                  survey_acronym = reporting_level.new)
-
-        diff_rows <- diff_rows |>
-          frename(year.new = year,
-                  survey_acronym.new = survey_acronym,
-                  reporting_level.new = reporting_level
-          )
-
-      }
-
-        ## ppp     ##
-        ## ________ #
-
-
-      if (measure == "ppp") {
-
-        diff_vals <- diff_vals |>
-          frename(reporting_level = ppp_year.new,
-                  ppp_year = reporting_level.new)
-
-        diff_vals <- diff_vals |>
-          frename(ppp_year.new            = ppp_year,
-                  reporting_level.new = reporting_level
-          )
-
-        # diff rows
-
-        diff_rows <- diff_rows |>
-          frename(reporting_level = ppp_year.new,
-                  ppp_year = reporting_level.new)
-
-        diff_rows <- diff_rows |>
-          frename(ppp_year.new = ppp_year,
-                  reporting_level.new = reporting_level
-          )
-
-      }
-      #### --------------------------------------- ####
-
-      result <- list(
-        "diff_values" = diff_vals,
-        "diff_rows"   = diff_rows
-        #"diff_cols"   = col_diff
-      )
-
-      setattr(result, "key_cols", key_cols)
+  ## CPI ##
+  if (measure == "cpi") {
+    # diff values
+    if (!is.null(diff_vals)) {
+      diff_vals <- diff_vals |>
+        frename(reporting_level = year.new,
+                year = survey_acronym.new,
+                survey_acronym = reporting_level.new)
+      diff_vals <- diff_vals |>
+        frename(year.new            = year,
+                survey_acronym.new  = survey_acronym,
+                reporting_level.new = reporting_level)
     }
+
+    # diff rows
+    if (!is.null(diff_rows)) {
+      diff_rows <- diff_rows |>
+        frename(reporting_level = year.new,
+                year = survey_acronym.new,
+                survey_acronym = reporting_level.new)
+      diff_rows <- diff_rows |>
+        frename(year.new = year,
+                survey_acronym.new = survey_acronym,
+                reporting_level.new = reporting_level)
+    }
+  }
+
+  ## PPP ##
+  if (measure == "ppp") {
+    # diff values
+    if (!is.null(diff_vals)) {
+      diff_vals <- diff_vals |>
+        frename(reporting_level = ppp_year.new,
+                ppp_year = reporting_level.new)
+      diff_vals <- diff_vals |>
+        frename(ppp_year.new            = ppp_year,
+                reporting_level.new = reporting_level)
+    }
+
+    # diff rows
+    if (!is.null(diff_rows)) {
+      diff_rows <- diff_rows |>
+        frename(reporting_level = ppp_year.new,
+                ppp_year = reporting_level.new)
+      diff_rows <- diff_rows |>
+        frename(ppp_year.new = ppp_year,
+                reporting_level.new = reporting_level)
+    }
+  }
+
+  # ------------------------------------------------------------#
+  # Report results
+  # ------------------------------------------------------------#
+  if (!is.null(diff_vals) || !is.null(diff_rows)) {
+    cli::cli_alert_success(
+      "Vintage comparison complete for {.strong {measure}}. Differences detected."
+    )
+  }
 
   else {
+    cli::cli_alert_success(
+      "Vintage comparison complete for {.strong {measure}}. No differences found."
+    )
+  }
 
-      result <- NULL
-
-      cli::cli_alert_success("Vintage comparison complete for {.strong {measure}}. No differences found.")
-    }
-
-  # _______________________________________#
-  # Return ####
-  # _______________________________________#
-
-
-  return(invisible(
-    result)
+  # ------------------------------------------------------------#
+  # Return result (always a list)
+  # ------------------------------------------------------------#
+  result <- list(
+    diff_values = diff_vals,
+    diff_rows   = diff_rows,
+    key_cols    = key_cols
   )
+
+  return(invisible(result))
 }
+
 
 #' Compare Vintage Versions for Multiple Auxiliary Data Files
 #'
-#' This function wraps around [compare_vintage_versions()] to apply it across multiple auxiliary data measures.
-#' It is useful for tracking within-release changes across several files.
+#' Applies [compare_vintage_versions()] across multiple auxiliary data measures.
+#' Useful for tracking within-release changes across several files.
 #'
-#' @param measures Character vector. Names of auxiliary data measures to compare (e.g., `c("gdp", "pop", "pfw")`).
-#' @param version Integer. Indicates how many versions before the latest to compare with (e.g., `-1` for previous).
-#' @param root_dir Character. Root directory where the release data is stored. Defaults to `Sys.getenv("PIP_ROOT_DIR")`.
-#' @param maindir Character. Path to the main auxiliary data directory. Defaults to the `pipaux.working_dir` option.
+#' @param measures Character vector. Names of auxiliary data measures to compare
+#'   (e.g., `c("gdp", "pop", "pfw")`).
+#' @param version Integer. Indicates how many versions before the latest to compare with
+#'   (e.g., `-1` for previous).
 #' @param verbose Logical. If `TRUE`, messages about the comparison process are printed.
-#' @param apply_label Logical. Whether to apply labels when loading data. Defaults to `TRUE`.
-#' @param ... Additional arguments passed to `compare_vintage_versions()`.
+#' @param ... Additional arguments passed to [compare_vintage_versions()].
 #'
-#' @return (Invisibly) A named list of results from [compare_vintage_versions()], one per measure.
+#' @return Invisibly returns a named list of results from [compare_vintage_versions()],
+#'   one element per measure.
 #'
 #' @export
 #' @examples
 #' \dontrun{
 #' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
 #' }
-compare_aux_vintages <- function(measures      = NULL,
-                                  version      = -1,
-                                  root_dir     = Sys.getenv("PIP_ROOT_DIR"),
-                                  maindir      = getOption("pipaux.working_dir"),
-                                  verbose      = FALSE,
-                                  apply_label  = TRUE,
-                                  ...) {
+compare_aux_vintages <- function(measures = NULL,
+                                 version = -1,
+                                 verbose = FALSE,
+                                 ...) {
+
+  if (is.null(measures) || length(measures) == 0) {
+    cli::cli_alert_warning("No measures provided. Nothing to compare.")
+    return(invisible(list()))
+  }
 
   results <- lapply(measures, function(m) {
 
     tryCatch({
-      res <- compare_vintage_versions(measure      = m,
-                                      version      = version,
-                                      root_dir     = root_dir,
-                                      maindir      = maindir,
-                                      verbose      = verbose,
-                                      apply_label  = apply_label,
-                                      ...)
+      res <- compare_vintage_versions(
+        measure = m,
+        version = version,
+        verbose = verbose,
+        ...
+      )
+
       if (is.null(res)) {
-        if (verbose) message(sprintf("No previous version found for measure '%s'. Skipping.", m))
+        if (verbose) {
+          cli::cli_alert_info("No previous version found for measure {.strong {m}}. Skipping.")
+        }
         return(NULL)
       }
-      return(res)
-    },
 
-    error = function(e) {
-      if (verbose) message(sprintf("Error comparing measure '%s': %s", m, e$message))
+      return(res)
+    }, error = function(e) {
+      if (verbose) {
+        cli::cli_alert_danger("Error comparing measure {.strong {m}}: {e$message}")
+      }
       return(NULL)
     })
   })
 
   names(results) <- measures
 
-  invisible(results)
+  return(invisible(results))
 }
-
