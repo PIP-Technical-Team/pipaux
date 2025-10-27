@@ -220,23 +220,11 @@ get_aux_changes <- function(measure      = "cpi",
 
   if (!is.null(diff_table)) {
 
-    new_path <- fs::path(maindir,
-                         "aux_data",
-                         release,
-                         measure,
-                         paste0(measure, ".", "qs"))
-
-    old_path <- fs::path(maindir,
-                         "aux_data",
-                         old_release,
-                         measure,
-                         paste0(measure, ".", "qs"))
-
 
     diff_table <- diff_table |>
       fmutate(measure = measure,
-              new_path.x  = new_path,
-              old_path.y  = old_path)
+              new_path.x  = ab$path,
+              old_path.y  = ab_old$path)
 
   }
 
