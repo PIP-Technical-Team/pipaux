@@ -23,39 +23,43 @@
 #' get_aux_changes(measure = "cpi", old_release = "20240101_PROD")
 #' }
 get_aux_changes <- function(measure      = "cpi",
-                            #maindir      = getOption("pipaux.working_dir"),
                             old_release  = NULL,
-                            #key_cols     = getOption("pipaux.key_vars"),
                             verbose      = TRUE) {
 
   # _______________________________________#
   # Get arguments ####
 
-  # Get current release ####
-
+  # Current release ####
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
-  release <- paste0(wrk_release$release,
+  release     <- paste0(wrk_release$release,
                     "_",
                     wrk_release$identity)
 
+  # Relase board ####
+  ab <- get_from_auxenv("aux_data_board")
+
+  # Old release ####
   if (is.null(old_release)) {
 
-    old_release <- get_last_release(board           = get_from_auxenv("aux_data_board"),
+    old_release <- get_last_release(board           = ab,
                                     current_release = release,
                                     identity        = wrk_release$identity)
 
    if (verbose) cli::cli_alert_info("Using last available release: {.strong {old_release}}")
   }
 
+  # Old release board
+  ab_old <- get_aux_board(release = old_release,
+                          verbose = TRUE)
 
 
   # _______________________________________#
-  # Load files with error handling ####
+  # Load files  ####
 
   new_df <- tryCatch({
 
-    pipload::load_aux_data(measure = measure) # by default reads the latest available version
+    pipload::load_aux_data(measure = measure) # by default reads the latest available version in current release
 
   },
 
@@ -68,13 +72,9 @@ get_aux_changes <- function(measure      = "cpi",
   ## TO DO : ADD HERE GET OLD BOARD
   old_df <- tryCatch({
 
-    # load_aux(measure = measure,
-    #          maindir = maindir,
-    #          branch  = old_release)
-
-    pipload::pip_read(board    = board_old,
-             pin_name          = measure,
-             verbose           = FALSE)
+    pipload::pip_read(board    = ab_old,
+                      pin_name = measure,
+                      verbose  = FALSE)
   },
 
   error = function(e) {
@@ -98,7 +98,11 @@ get_aux_changes <- function(measure      = "cpi",
   key_cols <- attributes(new_df)$aux_key
 
   if (length(key_cols) == 0) {
-    cli::cli_abort("No common key vars found in both datasets.")
+    cli::cli_abort("No key vars found.")
+  }
+
+  if (!all(key_cols %in% names(old_df))) {
+    cli::cli_abort("Some key columns are missing in the old dataset: {setdiff(key_cols, names(old_df))}")
   }
 
 
@@ -112,7 +116,7 @@ get_aux_changes <- function(measure      = "cpi",
             cols = key_cols)
 
   if (verbose) {
-    cli::cli_alert_info("Keys used for comparison {key_cols}")
+    cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
   }
 
   # Extract differences __________ ####

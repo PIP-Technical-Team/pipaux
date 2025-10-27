@@ -100,27 +100,21 @@ simulate_file_changes <- function(file_path,
 #' @keywords internal
 simulate_old_release <- function(old_release = "20250101_TEST",
                                  measure,
-                                 seed = 123) {
+                                 seed = 123,
+                                 verbose = TRUE) {
 
   # --- Get the current board from aux environment ---
   board_current <- get_from_auxenv("aux_data_board")
-  if (is.null(board_current)) stop("Current aux_data_board not found in aux environment.")
-
-  current_path <- board_current$path
-
-  # --- Determine old release path in the same parent folder ---
-  old_path <- file.path(dirname(current_path), old_release)
-
-  # --- Create/connect the old release board ---
-  if (!dir.exists(old_path)) {
-    dir.create(old_path, recursive = TRUE)
-    message("Created old release board folder at: ", old_path)
+  if (is.null(board_current)) {
+    cli::cli_abort("Current aux_data_board not found in aux environment.")
   }
-  board_old <- pins::board_folder(path = old_path)
+
+  # --- Retrieve or create the board for the old release ---
+  board_old <- get_aux_board(release = old_release, verbose = verbose)
 
   # --- Load data from current board using pip_read ---
   if (!pins::pin_exists(board_current, measure)) {
-    stop("Measure '", measure, "' does not exist in the current release board.")
+    cli::cli_abort("Measure '{measure}' does not exist in the current release board.")
   }
 
   dt <- pipload::pip_read(board = board_current,
@@ -133,42 +127,31 @@ simulate_old_release <- function(old_release = "20250101_TEST",
 
   # --- Simulate changes ---
   if (nrow(dt) < 2) {
-    warning("Data has fewer than 2 rows, skipping changes.")
-    return(invisible(dt))
+    cli::cli_alert_warning("Data has fewer than 2 rows, skipping changes.")
+    return(invisible(list(data = dt, board = board_old)))
   }
 
-  if (measure == "ppp") {
-    col_to_change <- "ppp"
+  # Modify 'year' column if present
+  if ("year" %in% names(dt)) {
     idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-    dt[idx, (col_to_change) := get(col_to_change) * runif(length(idx), 0.9, 1.1)]
-    message("Modified column: ", col_to_change, " in ", length(idx), " rows.")
-  } else {
-    # 1. Modify year values (if present)
-    if ("year" %in% names(dt)) {
-      idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-      dt[idx, year := year + sample(c(-1, 1), length(idx), replace = TRUE)]
-      message("Modified 'year' column in ", length(idx), " rows.")
-    } else {
-      message("No 'year' column found.")
-    }
-
-    # 2. Modify numeric column matching the measure name
-    num_cols <- names(dt)[sapply(dt, is.numeric)]
-    match_cols <- grep(tolower(measure), tolower(num_cols), value = TRUE)
-
-    if (length(match_cols) > 0) {
-      col_to_change <- match_cols[1]
-      idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-      dt[idx, (col_to_change) := get(col_to_change) * runif(length(idx), 0.9, 1.1)]
-      message("Modified column: ", col_to_change, " in ", length(idx), " rows.")
-    } else {
-      warning("No numeric column matched the measure name: ", measure)
-    }
-
-    # 3. Optional structural differences
-    dt <- dt[-.N]
-    dt[, mock_col := "simulated"]
+    dt[idx, year := year + sample(c(-1, 1), length(idx), replace = TRUE)]
+    cli::cli_alert_info("Modified 'year' column in {length(idx)} rows.")
+  } else if (verbose) {
+    cli::cli_alert_info("No 'year' column found.")
   }
+
+  # Modify the column that exactly matches the measure name, if present
+  if (measure %in% names(dt)) {
+    idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
+    dt[idx, (measure) := get(measure) * runif(length(idx), 0.9, 1.1)]
+    cli::cli_alert_info("Modified '{measure}' column in {length(idx)} rows.")
+  } else if (verbose) {
+    cli::cli_alert_info("No column exactly named '{measure}' found — skipping measure modification.")
+  }
+
+  # Optional: structural difference to make data slightly distinct
+  dt <- dt[-.N]
+  dt[, mock_col := "simulated"]
 
   # --- Add metadata attributes ---
   setattr(dt, "aux_name", measure)
@@ -183,9 +166,13 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     force_identical_write = TRUE
   )
 
-  message("Modified and saved simulated old version of '", measure,
-          "' in old release board: ", old_release)
+  cli::cli_alert_success(
+    "Modified and saved simulated old version of '{measure}' in old release board: {old_release}"
+  )
 
-  invisible(dt)
+  # --- Return both the data and the board object/path ---
+  return(invisible(list(
+    data  = dt,
+    board = board_old
+  )))
 }
-
