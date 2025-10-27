@@ -55,7 +55,7 @@ get_aux_changes <- function(measure      = "cpi",
 
   new_df <- tryCatch({
 
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure) # by default reads the latest available version
 
   },
 
@@ -64,6 +64,8 @@ get_aux_changes <- function(measure      = "cpi",
     stop(e)
   })
 
+
+  ## TO DO : ADD HERE GET OLD BOARD
   old_df <- tryCatch({
 
     # load_aux(measure = measure,

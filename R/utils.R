@@ -535,7 +535,36 @@ NULL
 NULL
 
 
+#' Get auxiliary data board from a specific release
+#'
+#' @param release Character string specifying release in data_identity format
+#' @param verbose Logical. Display messages in console
+#'
+#' @return A pins board object
+#' @keywords internal
+get_aux_board <- function(release, verbose = FALSE) {
 
+  # Retrieve the current board from aux environment
+  board_current <- get_from_auxenv("aux_data_board")
+  if (is.null(board_current)) {
+    cli::cli_abort("Current aux_data_board not found in aux environment.")
+  }
 
+  # Construct path for the release board
+  current_path <- board_current$path
+  release_path <- file.path(dirname(current_path), release)
+
+  # Create release board folder if missing
+  if (!dir.exists(release_path)) {
+    dir.create(release_path, recursive = TRUE)
+    if (verbose) cli::cli_inform("Created new release board folder at: {.path {release_path}}")
+  } else {
+    if (verbose) cli::cli_inform("Using existing release board at: {.path {release_path}}")
+  }
+
+  # Return the board object (invisible)
+  ret_board <- pins::board_folder(path = release_path)
+  invisible(ret_board)
+}
 
 

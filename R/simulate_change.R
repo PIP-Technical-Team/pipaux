@@ -172,7 +172,6 @@ simulate_old_release <- function(old_release = "20250101_TEST",
 
   # --- Add metadata attributes ---
   setattr(dt, "aux_name", measure)
-  setattr(dt, "aux_key", names(dt)[1])
   raw_sha_fun <- digest::digest(body(paste0("aux_", measure)))
   setattr(dt, "raw_sha_fun", raw_sha_fun)
 
