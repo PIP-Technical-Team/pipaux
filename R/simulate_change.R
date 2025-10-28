@@ -150,7 +150,7 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   }
 
   # Optional: structural difference to make data slightly distinct
-  #dt <- dt[-.N]
+  dt <- dt[-.N]
   dt[, mock_col := "simulated"]
 
   # --- Add metadata attributes ---

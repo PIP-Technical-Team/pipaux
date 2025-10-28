@@ -568,14 +568,154 @@ get_aux_board <- function(release, verbose = FALSE) {
 }
 
 # Test function ####
-# Identify country - year changes #
 detect_diffs <- function(measure = NULL,
                          old_release = NULL,
                          verbose = FALSE) {
 
+  # _______________________________________#
+  # Get arguments ####
+  # _______________________________________#
 
+  # Current release ####
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
+  release <- paste0(wrk_release$release,
+                    "_",
+                    wrk_release$identity)
 
+  # Release board ####
+  ab <- get_from_auxenv("aux_data_board")
 
+  # Old release ####
+  if (is.null(old_release)) {
 
+    old_release <- get_last_release(board           = ab,
+                                    current_release = release,
+                                    identity        = wrk_release$identity)
+
+    if (verbose) cli::cli_alert_info("Using last available release: {.strong {old_release}}")
+  }
+
+  # Old release board
+  ab_old <- get_aux_board(release = old_release,
+                          verbose = FALSE)
+
+  # _______________________________________#
+  # Get data - current and old dt ####
+  # _______________________________________#
+
+  new_dt <- tryCatch({
+
+    pipload::load_aux_data(measure = measure) # by default reads the latest available version in current release
+
+  },
+
+  error = function(e) {
+    cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
+    stop(e)
+  })
+
+  old_dt <- tryCatch({
+
+    pipload::pip_read(board    = ab_old,
+                      pin_name = measure,
+                      verbose  = verbose)
+  },
+
+  error = function(e) {
+    cli::cli_alert_warning(
+      "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}.
+       Comparison will be skipped.")
+
+    return(NULL)
+  })
+
+  # Defenses
+  if (is.null(old_dt)) {
+
+    cli::cli_alert_warning(
+      "Empty OLD data for {.strong {measure}} in release {.strong {old_release}}.
+       Comparison will be skipped.")
+
+    return(invisible(NULL))
+  }
+
+  # _______________________________________#
+  # Get diff rows by key vars ####
+  # _______________________________________#
+
+  # Assuming key vars are the same in old and new release
+  key_vars_new <- attributes(new_dt)$aux_key
+  key_vars_old <- attributes(old_dt)$aux_key
+
+  # Validate key vars
+  if (is.null(key_vars_new) || length(key_vars_new) == 0) {
+    cli::cli_abort("Key variables for the NEW dataset are NULL or empty. Cannot compare releases.")
+  }
+  if (is.null(key_vars_old) || length(key_vars_old) == 0) {
+    cli::cli_abort("Key variables for the OLD dataset are NULL or empty. Cannot compare releases.")
+  }
+  if (!identical(key_vars_new, key_vars_old)) {
+    cli::cli_abort(c(
+      "Key variables differ between NEW and OLD datasets.",
+      x = paste0("NEW keys: ", paste(key_vars_new, collapse = ", ")),
+      x = paste0("OLD keys: ", paste(key_vars_old, collapse = ", "))
+    ))
+  }
+
+  if (verbose) {
+    cli::cli_alert_info("Keys used for comparison: {.var {key_vars_new}}")
+  }
+
+  # Sort both datasets by key columns
+  data.table::setorderv(new_dt, cols = key_vars_new)
+  data.table::setorderv(old_dt, cols = key_vars_old)
+
+  # ________________________________________________________#
+  # Identify missing rows (added/removed) using joyn ####
+  # ________________________________________________________#
+
+  joined_dt <- joyn::joyn(
+    x              = new_dt,
+    y              = old_dt,
+    by             = key_vars_new,
+    match_type     = "m:m",
+    keep           = "full",
+    reportvar      = ".joyn",
+    reporttype     = "character",
+    y_vars_to_keep = FALSE,
+    verbose        = FALSE
+  )
+
+  # .joyn values:
+  # "x only"  -> present only in new_dt (added)
+  # "y only"  -> present only in old_dt (removed)
+  # "matched" -> present in both
+
+  joined_dt[, change_type := fifelse(.joyn == "x", "added",
+                                     fifelse(.joyn == "y", "removed", NA_character_))]
+
+  # Keep only differing rows
+  diff_rows <- joined_dt[!is.na(change_type), ]
+
+  if (verbose) {
+    if (nrow(diff_rows) == 0L) {
+      cli::cli_alert_success("No row-level additions/removals detected between releases.")
+    } else {
+      cli::cli_alert_info("{.strong {nrow(diff_rows)}} rows differ between releases.")
+    }
+  }
+
+  #
+
+  # _______________________________________#
+  # Output ####
+  # _______________________________________#
+
+  out <- list(
+    diff_rows   = diff_rows,
+    diff_values = NULL  # to be filled later with waldo comparison
+  )
+
+  return(out)
 }
