@@ -382,7 +382,6 @@ get_last_release <- function(board,
 #' @param verbose Logical. If `TRUE`, messages about the comparison process are printed. Default is `FALSE`.
 #' @param version Integer. A negative number indicating how many versions before the latest one to compare with.
 #'   For example, `-1` compares the current version with the one just before it, `-2` goes two versions back, etc.
-#' @param ... Additional arguments passed to `pipload::load_aux_data()`.
 #'
 #' @return Invisibly returns a list with the following elements (if differences are found):
 #' \describe{
@@ -395,15 +394,13 @@ get_last_release <- function(board,
 #' @export
 compare_vintage_versions <- function(measure,
                                      verbose = FALSE,
-                                     version = -1,
-                                     ...) {
+                                     version = -1) {
 
   # ------------------------------------------------------------#
   # Load the most recent version
   # ------------------------------------------------------------#
   new_df <- tryCatch({
-    pipload::load_aux_data(measure = measure,
-                           ...)
+    pipload::load_aux_data(measure = measure)
   },
 
   error = function(e) {
@@ -414,9 +411,8 @@ compare_vintage_versions <- function(measure,
   # Load previous version
   old_df <- tryCatch({
 
-    df <- pipload::load_aux_data(measure = measure,
-                                 version = version, ...)
-    df[]
+    pipload::load_aux_data(measure = measure,
+                                 version = version)
 
   },
 
@@ -589,8 +585,7 @@ compare_vintage_versions <- function(measure,
 #' }
 compare_aux_vintages <- function(measures = NULL,
                                  version = -1,
-                                 verbose = FALSE,
-                                 ...) {
+                                 verbose = FALSE) {
 
   if (is.null(measures) || length(measures) == 0) {
     cli::cli_alert_warning("No measures provided. Nothing to compare.")
@@ -603,8 +598,7 @@ compare_aux_vintages <- function(measures = NULL,
       res <- compare_vintage_versions(
         measure = m,
         version = version,
-        verbose = verbose,
-        ...
+        verbose = verbose
       )
 
       if (is.null(res)) {

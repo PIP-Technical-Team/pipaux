@@ -45,7 +45,7 @@ aux_fun <- function(measure,
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
-  release_branch         <- paste0(release, "_", identity)
+  release_branch  <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
     tag <- release_branch

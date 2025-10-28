@@ -567,4 +567,15 @@ get_aux_board <- function(release, verbose = FALSE) {
   invisible(ret_board)
 }
 
+# Test function ####
+# Identify country - year changes #
+detect_diffs <- function(measure = NULL,
+                         old_release = NULL,
+                         verbose = FALSE) {
 
+
+
+
+
+
+}
