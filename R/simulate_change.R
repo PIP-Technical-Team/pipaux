@@ -136,27 +136,26 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
     dt[idx, year := year + sample(c(-1, 1), length(idx), replace = TRUE)]
     cli::cli_alert_info("Modified 'year' column in {length(idx)} rows.")
-  } else if (verbose) {
+  }
+
+  else if (verbose) {
     cli::cli_alert_info("No 'year' column found.")
   }
 
-  # Modify the column that exactly matches the measure name, if present
-  if (measure %in% names(dt)) {
-    idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-    dt[idx, (measure) := get(measure) * runif(length(idx), 0.9, 1.1)]
-    cli::cli_alert_info("Modified '{measure}' column in {length(idx)} rows.")
-  } else if (verbose) {
+  # # Modify the column that exactly matches the measure name, if present
+  # if (measure %in% names(dt)) {
+  #   idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
+  #   dt[idx, (measure) := get(measure) * runif(length(idx), 0.9, 1.1)]
+  #   cli::cli_alert_info("Modified '{measure}' column in {length(idx)} rows.")
+  # }
+
+  else if (verbose) {
     cli::cli_alert_info("No column exactly named '{measure}' found — skipping measure modification.")
   }
 
-  # Optional: structural difference to make data slightly distinct
+  # Optional: rm one row, add one col
   dt <- dt[-.N]
-  dt[, mock_col := "simulated"]
-
-  # --- Add metadata attributes ---
-  # setattr(dt, "aux_name", measure)
-  # raw_sha_fun <- digest::digest(body(paste0("aux_", measure)))
-  # setattr(dt, "raw_sha_fun", raw_sha_fun)
+  #dt[, mock_col := "simulated"]
 
   # --- Save modified data to old release board ---
   pipload::pip_write(

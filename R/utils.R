@@ -668,54 +668,48 @@ detect_diffs <- function(measure = NULL,
   }
 
   # Sort both datasets by key columns
-  data.table::setorderv(new_dt, cols = key_vars_new)
-  data.table::setorderv(old_dt, cols = key_vars_old)
+  data.table::setorderv(new_dt,
+                        cols = key_vars_new)
+  data.table::setorderv(old_dt,
+                        cols = key_vars_old)
+
+  # Identify common cols for later use
+  common_cols <- intersect(names(new_dt),
+                           names(old_dt))
+  common_cols <- setdiff(common_cols,
+                         key_vars_new)
+
 
   # ________________________________________________________#
-  # Identify missing rows (added/removed) using joyn ####
+  # Identify rows with any change ####
   # ________________________________________________________#
 
   joined_dt <- joyn::joyn(
-    x              = new_dt,
-    y              = old_dt,
+    x              = old_dt,
+    y              = new_dt,
     by             = key_vars_new,
     match_type     = "m:m",
     keep           = "full",
     reportvar      = ".joyn",
     reporttype     = "character",
-    y_vars_to_keep = FALSE,
+    keep_common_vars = TRUE,
+    update_NAs = TRUE,
     verbose        = FALSE
   )
 
-  # .joyn values:
-  # "x only"  -> present only in new_dt (added)
-  # "y only"  -> present only in old_dt (removed)
-  # "matched" -> present in both
 
-  joined_dt[, change_type := fifelse(.joyn == "x", "added",
-                                     fifelse(.joyn == "y", "removed", NA_character_))]
+  diff_rows <- joined_dt[.joyn != "x & y"]
 
-  # Keep only differing rows
-  diff_rows <- joined_dt[!is.na(change_type), ]
-
-  if (verbose) {
-    if (nrow(diff_rows) == 0L) {
-      cli::cli_alert_success("No row-level additions/removals detected between releases.")
-    } else {
-      cli::cli_alert_info("{.strong {nrow(diff_rows)}} rows differ between releases.")
-    }
+  if (nrow(diff_rows) == 0) {
+    if (verbose) cli::cli_alert_success("No differences detected.")
+    return(NULL)
   }
 
-  #
+  # Identify which columns changed ####
 
-  # _______________________________________#
-  # Output ####
-  # _______________________________________#
+  # TODO
 
-  out <- list(
-    diff_rows   = diff_rows,
-    diff_values = NULL  # to be filled later with waldo comparison
-  )
+
 
   return(out)
 }
