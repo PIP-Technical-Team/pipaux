@@ -154,58 +154,6 @@ get_aux_changes <- function(measure      = "cpi",
                                            output         = "simple",
                                            verbose        = verbose)
 
-    #### --------------- TEMPORARY FIX -------- ####
-
-    ## cpi     ##
-    ## ________ #
-
-    # diff values
-
-if (measure == "cpi") {
-
-  diff_rows <- diff_rows |>
-    frename(reporting_level = year.new,
-            year = survey_acronym.new,
-            survey_acronym = reporting_level.new)
-
-  diff_rows <- diff_rows |>
-    frename(year.new = year,
-            survey_acronym.new = survey_acronym,
-            reporting_level.new = reporting_level
-    )
-
-}
-
-    ## ppp     ##
-    ## ________ #
-
-
-    if (measure == "ppp") {
-
-      diff_table <- diff_table |>
-        frename(reporting_level = ppp_year.new,
-                ppp_year = reporting_level.new)
-
-      diff_table <- diff_table |>
-        frename(ppp_year.new            = ppp_year,
-                reporting_level.new = reporting_level
-        )
-
-      # diff rows
-
-      diff_rows <- diff_rows |>
-        frename(reporting_level = ppp_year.new,
-                ppp_year = reporting_level.new)
-
-      diff_rows <- diff_rows |>
-        frename(ppp_year.new = ppp_year,
-                reporting_level.new = reporting_level
-        )
-
-    }
-    #### --------------------------------------- ####
-
-
   }
 
   else {

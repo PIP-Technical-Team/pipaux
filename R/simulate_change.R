@@ -88,8 +88,6 @@ simulate_file_changes <- function(file_path,
   invisible(dt)
 }
 
-
-## NEW WITH PINS STRUCTURE ####
 #' Simulate an "old" version by modifying a measure's pin
 #'
 #' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
@@ -98,9 +96,33 @@ simulate_file_changes <- function(file_path,
 #'
 #' @return Invisibly returns the modified data.table
 #' @keywords internal
+#' Simulate an "old" version by modifying a measure's pin
+#'
+#' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
+#' @param measure Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")
+#' @param seed An optional seed for reproducibility
+#' @param drop Numeric vector of row indices to drop (optional)
+#' @param indices Numeric vector of row indices to modify for the measure variable (optional)
+#' @param verbose Logical. Whether to print messages.
+#'
+#' @return Invisibly returns a list with the modified data.table and board
+#' @keywords internal
+#' Simulate an "old" version by modifying a measure's pin
+#'
+#' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
+#' @param measure Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")
+#' @param seed An optional seed for reproducibility
+#' @param drop Numeric vector of row indices to drop (optional)
+#' @param indices Numeric vector of row indices to modify (optional)
+#' @param verbose Logical. Whether to print messages.
+#'
+#' @return Invisibly returns a list with the modified data.table and board
+#' @keywords internal
 simulate_old_release <- function(old_release = "20250101_TEST",
                                  measure,
                                  seed = 123,
+                                 drop = NULL,
+                                 indices = NULL,
                                  verbose = TRUE) {
 
   # --- Get the current board from aux environment ---
@@ -112,7 +134,7 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   # --- Retrieve or create the board for the old release ---
   board_old <- get_aux_board(release = old_release, verbose = verbose)
 
-  # --- Load data from current board using pip_read ---
+  # --- Load data from current board ---
   if (!pins::pin_exists(board_current, measure)) {
     cli::cli_abort("Measure '{measure}' does not exist in the current release board.")
   }
@@ -125,37 +147,25 @@ simulate_old_release <- function(old_release = "20250101_TEST",
 
   set.seed(seed)
 
-  # --- Simulate changes ---
-  if (nrow(dt) < 2) {
-    cli::cli_alert_warning("Data has fewer than 2 rows, skipping changes.")
-    return(invisible(list(data = dt, board = board_old)))
+  # --- Drop specified rows ---
+  if (!is.null(drop) && length(drop) > 0) {
+    n_before <- nrow(dt)
+    dt <- dt[-drop, ]
+    if (verbose) cli::cli_alert_info("Dropped {length(drop)} rows. Rows before: {n_before}, after: {nrow(dt)}.")
   }
 
-  # Modify 'year' column if present
-  if ("year" %in% names(dt)) {
-    idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-    dt[idx, year := year + sample(c(-1, 1), length(idx), replace = TRUE)]
-    cli::cli_alert_info("Modified 'year' column in {length(idx)} rows.")
+  # --- Determine which column to modify ---
+  target_col <- if (measure == "cpi") "cpi_value" else measure
+
+  # --- Modify target column at given indices ---
+  if (!is.null(indices) && length(indices) > 0 && target_col %in% names(dt)) {
+    valid_indices <- indices[indices %in% seq_len(nrow(dt))]
+    replacement_values <- rep(c(0.100, 0.150, 0.200), length.out = length(valid_indices))
+    dt[valid_indices, (target_col) := replacement_values]
+    if (verbose) cli::cli_alert_info(
+      "Modified '{target_col}' at {length(valid_indices)} rows with fixed values 0.100, 0.150, 0.200."
+    )
   }
-
-  else if (verbose) {
-    cli::cli_alert_info("No 'year' column found.")
-  }
-
-  # # Modify the column that exactly matches the measure name, if present
-  # if (measure %in% names(dt)) {
-  #   idx <- sample(seq_len(nrow(dt)), min(3, nrow(dt)))
-  #   dt[idx, (measure) := get(measure) * runif(length(idx), 0.9, 1.1)]
-  #   cli::cli_alert_info("Modified '{measure}' column in {length(idx)} rows.")
-  # }
-
-  else if (verbose) {
-    cli::cli_alert_info("No column exactly named '{measure}' found — skipping measure modification.")
-  }
-
-  # Optional: rm one row, add one col
-  dt <- dt[-.N]
-  #dt[, mock_col := "simulated"]
 
   # --- Save modified data to old release board ---
   pipload::pip_write(
@@ -169,9 +179,5 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     "Modified and saved simulated old version of '{measure}' in old release board: {old_release}"
   )
 
-  # --- Return both the data and the board object/path ---
-  return(invisible(list(
-    data  = dt,
-    board = board_old
-  )))
+  invisible(list(data = dt, board = board_old))
 }

@@ -480,7 +480,7 @@ pip_aux_save <- \(x,
 #'
 qattr_from_pin <- function(board, pin_name, version = NULL) {
 
-  # Download the pin to a temp dir (or versioned dir if specified)
+  # pin download returns a character vector of file paths
 
   qs_path <- pins::pin_download(board   = board,
                                 name    = pin_name,

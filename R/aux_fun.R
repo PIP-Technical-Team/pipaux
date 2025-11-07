@@ -36,15 +36,15 @@ aux_fun <- function(measure,
                     force         = FALSE,
                     tag           = NULL,
                     log           = TRUE,
-                    log_overwrite = FALSE,
+                    log_overwrite = TRUE,
                     verbose       = FALSE){
                     #...) {
 
   # Get working release
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
-  release        <- wrk_release$release
-  identity       <- wrk_release$identity
+  release         <- wrk_release$release
+  identity        <- wrk_release$identity
   release_branch  <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
@@ -166,19 +166,6 @@ aux_fun <- function(measure,
           owner   = owner,
           verbose = verbose
         )
-
-        # if (log) {
-        #   pipfun::log_add(
-        #     event          = "status_check",
-        #     message        = cli::col_green(paste0("Check status completed for: ", measure)),
-        #     name           = "pipaux_update_log",
-        #     output         = result,
-        #     # logmeta        = list(
-        #     #   step         = "CHECK",
-        #     #   measure      = measure
-        #     # )
-        #   )
-        # }
 
         result
       },
