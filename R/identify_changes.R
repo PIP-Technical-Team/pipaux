@@ -29,6 +29,10 @@ get_aux_changes <- function(measure      = "cpi",
   # _______________________________________#
   # Get arguments ####
 
+  stopifnot(is.character(measure),
+            length(measure) == 1)
+
+
   # Current release ####
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -95,9 +99,10 @@ get_aux_changes <- function(measure      = "cpi",
 
   key_cols <- attributes(new_df)$aux_key
 
-  if (length(key_cols) == 0) {
-    cli::cli_abort("No key vars found.")
+  if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
+    cli::cli_abort("Key variables could not be retrieved from data attributes.")
   }
+
 
   if (!all(key_cols %in% names(old_df))) {
     cli::cli_abort("Some key columns are missing in the old dataset: {setdiff(key_cols, names(old_df))}")
@@ -130,15 +135,24 @@ get_aux_changes <- function(measure      = "cpi",
   new_df <- new_df[, common_cols, with = FALSE]
   old_df <- old_df[, common_cols, with = FALSE]
 
-  myr_obj <- myrror::myrror(
-              dfx                 = new_df,
-              dfy                 = old_df,
-              by                  = key_cols, # keys for matching (e.g., country and year)
-              compare_type        = FALSE,
-              compare_values      = TRUE,
-              extract_diff_values = TRUE,
-              interactive         = FALSE,
-              verbose             = verbose)
+  myr_obj <- tryCatch(
+    myrror::myrror(
+      dfx                 = new_df,
+      dfy                 = old_df,
+      by                  = key_cols, # keys for matching (e.g., country and year)
+      compare_type        = FALSE,
+      compare_values      = TRUE,
+      extract_diff_values = TRUE,
+      interactive         = FALSE,
+      verbose             = verbose
+    ),
+    error = function(e) {
+      cli::cli_alert_danger(glue::glue(
+        "myrror comparison failed for measure {.strong {measure}}: {e$message}"
+      ))
+      return(NULL)
+    }
+  )
 
   ## Extract different values and different rows
 

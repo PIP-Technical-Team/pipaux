@@ -155,17 +155,40 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   }
 
   # --- Determine which column to modify ---
-  target_col <- if (measure == "cpi") "cpi_value" else measure
+  target_col <- if (measure == "cpi") {
+    "cpi_value"
+  } else if (measure == "pfw") {
+    "survey_comparability"
+  } else {
+    measure
+  }
 
   # --- Modify target column at given indices ---
   if (!is.null(indices) && length(indices) > 0 && target_col %in% names(dt)) {
     valid_indices <- indices[indices %in% seq_len(nrow(dt))]
-    replacement_values <- rep(c(0.100, 0.150, 0.200), length.out = length(valid_indices))
+
+    # Choose replacement values depending on measure
+    if (measure == "pfw") {
+      replacement_values <- rep(1, length(valid_indices))
+    } else {
+      replacement_values <- rep(c(0.100, 0.150, 0.200), length.out = length(valid_indices))
+    }
+
     dt[valid_indices, (target_col) := replacement_values]
-    if (verbose) cli::cli_alert_info(
-      "Modified '{target_col}' at {length(valid_indices)} rows with fixed values 0.100, 0.150, 0.200."
-    )
+
+    if (verbose) {
+      if (measure == "pfw") {
+        cli::cli_alert_info(
+          "Modified '{target_col}' at {length(valid_indices)} rows with value 1."
+        )
+      } else {
+        cli::cli_alert_info(
+          "Modified '{target_col}' at {length(valid_indices)} rows with fixed values 0.100, 0.150, 0.200."
+        )
+      }
+    }
   }
+
 
   # --- Save modified data to old release board ---
   pipload::pip_write(
