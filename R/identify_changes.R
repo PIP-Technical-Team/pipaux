@@ -113,10 +113,10 @@ get_aux_changes <- function(measure      = "cpi",
 
   # Sort both datasets by key columns
 
-  setorderv(new_df,
-            cols = key_cols)
-  setorderv(old_df,
-            cols = key_cols)
+  # setorderv(new_df,
+  #           cols = key_cols)
+  # setorderv(old_df,
+  #           cols = key_cols)
 
   if (verbose) {
     cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
@@ -126,7 +126,6 @@ get_aux_changes <- function(measure      = "cpi",
 
   ## Run comparison
 
-  # first, align columns
   # Find common columns
   common_cols <- intersect(names(new_df),
                            names(old_df))
