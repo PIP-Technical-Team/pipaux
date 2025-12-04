@@ -218,7 +218,9 @@ pip_missing_data <- function(action  = c("update", "load"),
        ][,
          welfare_type := fifelse(incgroup_code == "HIC",
                                  "income", "consumption")
-         ][,
+         ][is.na(incgroup_code),
+           welfare_type := "consumption"
+           ][,
            incgroup_code := NULL]
 
 

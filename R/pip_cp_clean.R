@@ -52,7 +52,8 @@ pip_cp_clean <- function(x) {
 
     gni = key_indicators[, c("country_code",
                              "reporting_year",
-                             "gni")],
+                             "gni")] |>
+      unique(),
 
     gdp_growth = key_indicators[, c("country_code",
                                     "reporting_year",
