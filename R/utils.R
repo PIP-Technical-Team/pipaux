@@ -455,17 +455,20 @@ get_from_auxenv <- \(key) {
 #' @returns Fully qualified name of the new pin, invisibly
 #'
 pip_aux_save <- \(x,
-                  pin_name,
-                  #metadata ,
-                  force) {
+                  id,
+                  force = FALSE,
+                  ...) {
 
-  board <- get_from_auxenv("aux_data_board")
-
-  pipload::pip_write(board                 = board,
-                     x                     = x,
-                     pin_name              = pin_name,
-                     force_identical_write = force)
-                     #metadata              = metadata)
+  # Save to the aux_data_path using pipload::pip_write
+  pipload::pip_write(
+    x        = x,
+    id       = pin_name,
+    dir      = .pipaux$aux_data_path,
+    overwrite = force,
+    ...
+  )
+  
+  invisible(TRUE)
 }
 
 #' Read attributes from pins
