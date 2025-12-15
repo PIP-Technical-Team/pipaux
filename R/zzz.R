@@ -26,22 +26,21 @@ pipuax_default_options <- list(
 
   if (any(toset)) options(pipuax_default_options[toset])
 
-  # Copy the pins_board from pipenv environment to pipaux environment
-  br <- pipfun::get_from_pipenv("pins_boards")
-
-  # pipfun::setup_working_release(release = "20250203")
   wrk_release <- pipfun::get_wrk_release(verbose = FALSE)
-
-
-  if (is.null(br)) stop("Cannot find pins_boards in the environment.")
-
-  abr <- pipfun::get_pins_boards("aux_data")
-  rlang::env_poke(.pipaux, "aux_data_board", abr)
-
-  ameta_br <- pipfun::get_pins_boards("aux_metadata")
-
-  rlang::env_poke(.pipaux, "aux_metadata_board", ameta_br)
   rlang::env_poke(.pipaux, "wrk_release", wrk_release)
+
+  # Get all pip folder paths
+  pip_folders <- pipfun::get_pip_folders(verbose = FALSE)
+  rlang::env_poke(.pipaux, "pip_folders", pip_folders)
+
+  if (is.null(pip_folders)) stop("Cannot find pip_folders in the environment.")
+  
+  # Attach relevant paths to .pipaux environment
+  aux_data_path      <- pip_folders$aux_data
+  aux_metadata_path  <- pip_folders$aux_metadata
+
+  rlang::env_poke(.pipaux, "aux_data_path", aux_data_path)
+  rlang::env_poke(.pipaux, "aux_metadata_path", aux_metadata_path)
 
   # Initialize a log
   pipfun::log_init("pipaux_update_log",
