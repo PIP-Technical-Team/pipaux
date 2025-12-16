@@ -139,7 +139,9 @@ aux_gdm_update <- function(force = FALSE,
   ##  Merge with PFW                                                          ####
 
   pfw    <-  pipload::load_aux_data(measure = "pfw")
-
+  setattr(df, "aux_name", "gdm")
+  key_cols <- c("country_code", "year", "reporting_level")
+  setattr(df, "aux_key", key_cols)
   # Subset columns
   pfw <-
     pfw[, c(
@@ -249,11 +251,13 @@ aux_gdm_update <- function(force = FALSE,
   df <- df |> setnames(c("surveyid_year", "pop_data_level"),
                        c("year", "reporting_level"),
                        skip_absent=TRUE)
+  
+  key_cols <- c("country_code", "year", "reporting_level", "welfare_type")
 
   setattr(df, "aux_name", "gdm")
   setattr(df,
           "aux_key",
-          c("country_code", "year", "reporting_level", "welfare_type"))
+          key_cols)
 
   # validate gdm output data
   gdm_validate_output(gdm = df, detail = detail)
@@ -285,8 +289,8 @@ aux_gdm_update <- function(force = FALSE,
 
   saved <- pip_aux_save(
     x        = df,
-    pin_name = measure,
-    #metadata = cl_metadata,
+    id       = measure,
+    pk       = key_cols,
     force    = force
   )
 

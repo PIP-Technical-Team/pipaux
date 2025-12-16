@@ -172,9 +172,6 @@ aux_pop_update <-  function(force   = FALSE,
                          skip_absent=TRUE)
 
   setattr(pop, "aux_name", "pop")
-  setattr(pop,
-          "aux_key",
-          c("country_code", "year", "reporting_level"))
 
   # validate output pop data
   pop_validate_output(pop = pop, detail = detail)
@@ -200,9 +197,14 @@ aux_pop_update <-  function(force   = FALSE,
           list(gh_spop = gh_spop,
                gh_pop_main = gh_pop_main))
 
+
+  key_cols <- c("country_code", "year", "reporting_level")
+  setattr(pop, "aux_key", key_cols)
+  
   saved <- pip_aux_save(
     x        = pop,
-    pin_name = measure,
+    id       = measure,
+    pk       = key_cols,
     force    = force
   )
 

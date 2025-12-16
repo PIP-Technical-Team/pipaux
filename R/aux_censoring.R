@@ -68,10 +68,15 @@ aux_censoring  <- function(action  = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
+
+    # Define key columns for censoring data
+    key_cols <- c("countries", "regions")
+    setattr(dl, "aux_key", key_cols)
     saved <- pip_aux_save(
       x        = dl,
-      pin_name = measure,
-      force    = force
+      id       = measure,
+      force    = force,
+      pk       = key_cols
     )
 
     return(invisible(saved))

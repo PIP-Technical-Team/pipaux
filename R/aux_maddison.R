@@ -48,19 +48,20 @@ aux_maddison <- function(action  = c("update", "load"),
     aux_maddison)
   )
 
-  setattr(mpd, "aux_name", "maddison")
 
-  setattr(mpd,
-          "aux_key",
-          c("country_code", "year"))
+  setattr(mpd, "aux_name", "maddison")
+  key_cols <- c("country_code", "year")
+  setattr(mpd, "aux_key", key_cols)
 
   setattr(mpd,
           "raw_sha_fun",
           raw_sha_fun)
 
+
     saved <-  pip_aux_save(
       x        = mpd,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

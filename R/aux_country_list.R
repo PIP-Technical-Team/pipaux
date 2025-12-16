@@ -62,11 +62,12 @@ aux_country_list <- function(action       = c("update", "load"),
             raw_sha_fun)
 
 
+
     saved <- pip_aux_save(
       x        = cl,
-      pin_name = measure,
-      #metadata = cl_metadata,
-      force    = force
+      id       = measure,
+      force    = force,
+      pk       = key_cols
     )
 
     return(invisible(saved))

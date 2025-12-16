@@ -149,10 +149,10 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
   ##  Save                                                                    ####
   df <- df |> setnames("reporting_year", "year", skip_absent=TRUE)
 
+
   setattr(df, "aux_name", "metadata")
-  setattr(df,
-          "aux_key",
-          c("country_code", "year", "welfare_type"))
+  key_cols <- c("country_code", "year", "welfare_type")
+  setattr(df, "aux_key", key_cols)
 
   # validate raw metdata data
   metadata_validate_output(metadata = df, detail = detail)
@@ -173,9 +173,11 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
 
   setattr(df, "gh", gh)
 
+
   saved <-  pip_aux_save(
     x        = df,
-    pin_name = measure,
+    id       = measure,
+    pk       = key_cols,
     force    = force
   )
 

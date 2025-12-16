@@ -72,9 +72,9 @@ aux_income_groups <- function(action       = c("update", "load"),
     # ig <- ig |> setnames("year_data", "year", skip_absent=TRUE)
 
     setattr(ig, "aux_name", "income_groups")
-    setattr(ig,
-            "aux_key",
-            c("country_code", "year"))
+
+      key_cols <- c("country_code", "year")
+      setattr(ig, "aux_key", key_cols)
 
     setattr(ig,
            "raw_sha_fun",
@@ -87,9 +87,11 @@ aux_income_groups <- function(action       = c("update", "load"),
       branch <- ""
     }
 
+
     saved <-  pip_aux_save(
       x        = ig,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

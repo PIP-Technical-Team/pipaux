@@ -228,9 +228,8 @@ aux_cpi_update <- function(force   = FALSE,
     value.name    = "cpi_value"
   )
 
-  setattr(cpi,
-          "aux_key",
-          key_cols)
+
+  setattr(cpi, "aux_key", key_cols)
 
   setattr(cpi,
           "raw_sha_fun",
@@ -249,10 +248,10 @@ aux_cpi_update <- function(force   = FALSE,
   #   ____________________________________________________________________________
   #   Return                                                                ####
 
+
   saved <- pip_aux_save(
     x        = cpi,
     id       = measure,
-    #metadata = cpi_metadata,
     force    = force,
     pk       = key_cols
   )

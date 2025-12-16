@@ -44,11 +44,15 @@ aux_dictionary <- function(action  = c("update", "load"),
           "raw_sha_fun",
           raw_sha_fun)
 
+
+    # Define key columns for dictionary data
+    key_cols <- names(df)
+    setattr(df, "aux_key", key_cols)
     saved <- pip_aux_save(
       x        = df,
-      pin_name = measure,
-      #metadata = cl_metadata,
-      force    = force
+      id       = measure,
+      force    = force,
+      pk       = key_cols
     )
 
     return(invisible(saved))

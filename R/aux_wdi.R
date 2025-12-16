@@ -85,10 +85,10 @@ aux_wdi_update <- function(force   = FALSE,
     branch <- ""
   }
 
+
   setattr(wdi, "aux_name", "wdi")
-  setattr(wdi,
-          "aux_key",
-          c("country_code", "year"))
+  key_cols <- c("country_code", "year")
+  setattr(wdi, "aux_key", key_cols)
 
   # ----- function raw sha -----------------------------
   raw_sha_fun <- digest::digest(body(
@@ -100,9 +100,11 @@ aux_wdi_update <- function(force   = FALSE,
           "raw_sha_fun",
           raw_sha_fun)
 
+
   saved <-  pip_aux_save(
     x        = wdi,
-    pin_name = measure,
+    id       = measure,
+    pk       = key_cols,
     force    = force
   )
 

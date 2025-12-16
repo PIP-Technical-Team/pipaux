@@ -412,10 +412,15 @@ aux_cp_update <- function(force = FALSE,
           "raw_sha_fun",
           raw_sha_fun)
 
+
+  # Define key columns for country profiles data
+  key_cols <- names(dl)
+  setattr(dl, "aux_key", key_cols)
   saved <- pip_aux_save(
     x        = dl,
-    pin_name = measure,
-    force    = force
+    id       = measure,
+    force    = force,
+    pk       = key_cols
   )
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

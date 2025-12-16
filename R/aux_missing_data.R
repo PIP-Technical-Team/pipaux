@@ -186,19 +186,20 @@ aux_missing_data <- function(action  = c("update", "load"),
 
 ##  Save data                                                    ####
 
+
     # ----- function raw sha -----------------------------
     raw_sha_fun <- digest::digest(body(
       paste0("aux_", measure))
     )
 
-
-    setattr(pop_md,
-            "raw_sha_fun",
-            raw_sha_fun)
+    key_cols <- c("country_code", "year")
+    setattr(pop_md, "aux_key", key_cols)
+    setattr(pop_md, "raw_sha_fun", raw_sha_fun)
 
     saved <- pip_aux_save(
       x        = pop_md,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

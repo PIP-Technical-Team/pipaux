@@ -194,15 +194,18 @@ aux_pfw_update <- function(force   = FALSE,
   setattr(pfw,
           "raw_sha_fun",
           raw_sha_fun)
+  
+  key_cols <-  c("country_code", "surveyid_year", "welfare_type")
 
   setattr(pfw,
           "aux_key",
-          c("country_code", "surveyid_year", "welfare_type"))
+         key_cols)
 
   saved <- pip_aux_save(
     x        = pfw,
-    pin_name = measure,
-    force    = force
+    id       = measure,
+    force    = force,
+    pk       = key_cols
   )
 
   return(invisible(saved))

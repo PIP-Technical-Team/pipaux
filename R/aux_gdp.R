@@ -61,14 +61,14 @@ aux_gdp <- function(action          = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
-    setattr(gdp,
-            "aux_key",
-            c("country_code", "reporting_level", "year"))
 
+    key_cols <- c("country_code", "reporting_level", "year")
+    setattr(gdp, "aux_key", key_cols)
     saved <- pip_aux_save(
       x        = gdp,
-      pin_name = measure,
-      force    = force
+      id       = measure,
+      force    = force,
+      pk       = key_cols
     )
 
   } else {

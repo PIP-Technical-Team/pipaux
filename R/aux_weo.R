@@ -55,10 +55,10 @@ aux_weo <- function(action  = c("update", "load"),
                         branch = branch)
 
     # Save dataset
+
     setattr(dt, "aux_name", "weo")
-    setattr(dt,
-            "aux_key",
-            c("country_code", "year"))
+    key_cols <- c("country_code", "year")
+    setattr(dt, "aux_key", key_cols)
 
     setattr(dt, "gh", gh)
 
@@ -78,9 +78,11 @@ aux_weo <- function(action  = c("update", "load"),
       branch <- ""
     }
 
+
     saved <- pip_aux_save(
       x        = dt,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

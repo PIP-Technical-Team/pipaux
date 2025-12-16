@@ -255,12 +255,10 @@ aux_ppp_update <- function(force   = FALSE,
   # Aux measure name
   setattr(ppp, "aux_name", "ppp")
 
-  # Keys identifying the data
-  keys <-  c("country_code", "reporting_level", "ppp_year") #issue to solve: keys are not unique in the data so st_pk fails
 
-  setattr(ppp,
-          "aux_key",
-          keys)
+  # Keys identifying the data
+  key_cols <- c("country_code", "reporting_level", "ppp_year")
+  setattr(ppp, "aux_key", key_cols)
 
   setorderv(ppp,
            c("country_code", "reporting_level", "ppp_year"))
@@ -271,10 +269,12 @@ aux_ppp_update <- function(force   = FALSE,
   # _____________________ #####
   # Saving ####
 
+
   saved <-  pip_aux_save(
     x        = ppp,
-    pin_name = measure,
-    force    = force
+    id       = measure,
+    force    = force,
+    pk       = key_cols
   )
 
 
@@ -291,10 +291,15 @@ aux_ppp_update <- function(force   = FALSE,
 
 
   # Save
+
+  # Define key columns for ppp_vintage
+  key_cols_vintage <- c("ppp_year", "ppp_rv", "ppp_av")
+  setattr(ppp_vintage, "aux_key", key_cols_vintage)
   pip_aux_save(
     x        = ppp_vintage,
-    pin_name = "ppp_vintage",
-    force    = force
+    id       = "ppp_vintage",
+    force    = force,
+    pk       = key_cols_vintage
   )
 
   return(invisible(saved))

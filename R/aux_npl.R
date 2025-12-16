@@ -55,10 +55,10 @@ aux_npl <- function(action  = c("update", "load"),
     npl <- npl |> setnames("reporting_year", "year",
                            skip_absent=TRUE)
 
+
     setattr(npl, "aux_name", "npl")
-    setattr(npl,
-            "aux_key",
-            c("country_code", "year"))
+    key_cols <- c("country_code", "year")
+    setattr(npl, "aux_key", key_cols)
 
     # validate npl output data
     npl_validate_output(npl = npl, detail = detail)
@@ -78,9 +78,11 @@ aux_npl <- function(action  = c("update", "load"),
             "raw_sha_fun",
             raw_sha_fun)
 
+
     saved <-  pip_aux_save(
       x        = npl,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

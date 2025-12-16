@@ -87,10 +87,10 @@ aux_regions <- function(action  = c("update", "load"),
     branch <- ""
   }
 
+
   setattr(dt, "aux_name", "regions")
-  setattr(dt,
-          "aux_key",
-          c("region_code"))
+  key_cols <- c("region_code")
+  setattr(dt, "aux_key", key_cols)
 
   # ----- function raw sha -----------------------------
   raw_sha_fun <- digest::digest(body(
@@ -101,9 +101,11 @@ aux_regions <- function(action  = c("update", "load"),
           "raw_sha_fun",
           raw_sha_fun)
 
+
     saved <- pip_aux_save(
       x        = dt,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 
