@@ -19,6 +19,7 @@ simulate_file_changes <- function(file_path,
 
   dt <- switch(ext,
                qs  = qs::qread(file_path),
+               qs2 = qs::qread(file_path),
                rds = readRDS(file_path),
                csv = data.table::fread(file_path),
                stop("Unsupported file extension: ", ext))
@@ -76,16 +77,22 @@ simulate_file_changes <- function(file_path,
   # --- 4. Save the modified version ---
 
 
-  switch(ext,
-         qs  = qs::qsave(dt,
-                         file_path),
-         rds = saveRDS(dt,
-                       file_path),
-         csv = data.table::fwrite(dt,
-                                  file_path))
+    # Use pipload::pip_write if file_path is in a recognized aux_data_path
+    aux_dir <- dirname(file_path)
+    file_name <- tools::file_path_sans_ext(basename(file_path))
+    ext <- tools::file_ext(file_path)
+    if ((ext == "qs" || ext == "qs2") && dir.exists(aux_dir)) {
+      pipload::pip_write(x = dt, id = file_name, dir = aux_dir, format = "qs2")
+    } else {
+      switch(ext,
+             qs  = qs::qsave(dt, file_path),
+             qs2 = qs2::qd_save(dt, file_path),
+             rds = saveRDS(dt, file_path),
+             csv = data.table::fwrite(dt, file_path))
+    }
 
-  cli::cli_alert_success("Saved modified file as: {file_path}")
-  invisible(dt)
+    cli::cli_alert_success("Saved modified file as: {file_path}")
+    invisible(dt)
 }
 
 #' Simulate an "old" version by modifying a measure's pin
@@ -125,24 +132,14 @@ simulate_old_release <- function(old_release = "20250101_TEST",
                                  indices = NULL,
                                  verbose = TRUE) {
 
-  # --- Get the current board from aux environment ---
-  board_current <- get_from_auxenv("aux_data_board")
-  if (is.null(board_current)) {
-    cli::cli_abort("Current aux_data_board not found in aux environment.")
+  # --- Get aux_data_path for the old release ---
+  aux_data_path <- pipfun::get_pip_folders(release = old_release)$aux_data_path
+  if (is.null(aux_data_path) || !dir.exists(aux_data_path)) {
+    cli::cli_abort("aux_data_path for release '{old_release}' not found.")
   }
 
-  # --- Retrieve or create the board for the old release ---
-  board_old <- get_aux_board(release = old_release, verbose = verbose)
-
-  # --- Load data from current board ---
-  if (!pins::pin_exists(board_current, measure)) {
-    cli::cli_abort("Measure '{measure}' does not exist in the current release board.")
-  }
-
-  dt <- pipload::pip_read(board = board_current,
-                          pin_name = measure,
-                          verbose = FALSE)
-
+  # --- Load data for the measure from current aux_data_path ---
+  dt <- pipload::load_aux_data(measure = measure)
   if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
 
   set.seed(seed)
@@ -166,16 +163,13 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   # --- Modify target column at given indices ---
   if (!is.null(indices) && length(indices) > 0 && target_col %in% names(dt)) {
     valid_indices <- indices[indices %in% seq_len(nrow(dt))]
-
     # Choose replacement values depending on measure
     if (measure == "pfw") {
       replacement_values <- rep(1, length(valid_indices))
     } else {
       replacement_values <- rep(c(0.100, 0.150, 0.200), length.out = length(valid_indices))
     }
-
     dt[valid_indices, (target_col) := replacement_values]
-
     if (verbose) {
       if (measure == "pfw") {
         cli::cli_alert_info(
@@ -189,18 +183,23 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     }
   }
 
-
-  # --- Save modified data to old release board ---
+  # --- Save modified data to old release aux_data_path ---
+  # Use pipload::pip_write for normal workflow
   pipload::pip_write(
-    board = board_old,
     x = dt,
-    pin_name = measure,
-    force_identical_write = TRUE
+    id = measure,
+    dir = aux_data_path,
+    format = "qs2"
   )
+
+  # If a direct file write is ever needed for .qs2, use qs2::qd_save(dt, file_path)
+  # Example (not used in current workflow):
+  # file_path <- file.path(aux_data_path, paste0(measure, ".qs2"))
+  # qs2::qd_save(dt, file_path)
 
   cli::cli_alert_success(
-    "Modified and saved simulated old version of '{measure}' in old release board: {old_release}"
+    "Modified and saved simulated old version of '{measure}' in aux_data_path for release: {old_release}"
   )
 
-  invisible(list(data = dt, board = board_old))
+  invisible(list(data = dt, aux_data_path = aux_data_path))
 }
