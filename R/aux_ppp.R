@@ -256,7 +256,7 @@ aux_ppp_update <- function(force   = FALSE,
   setattr(ppp, "aux_name", "ppp")
 
   # Keys identifying the data
-  keys <-  c("country_code", "reporting_level", "ppp_year")
+  keys <-  c("country_code", "reporting_level", "ppp_year") #issue to solve: keys are not unique in the data so st_pk fails
 
   setattr(ppp,
           "aux_key",

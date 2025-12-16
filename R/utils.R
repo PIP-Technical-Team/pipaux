@@ -459,15 +459,19 @@ pip_aux_save <- \(x,
                   force = FALSE,
                   ...) {
 
+  
+  dir_path <- fs::path(get_from_auxenv("aux_data_path"), id)
+  if (!fs::dir_exists(dir_path)) fs::dir_create(dir_path)
+  
   # Save to the aux_data_path using pipload::pip_write
   pipload::pip_write(
     x        = x,
     id       = pin_name,
-    dir      = .pipaux$aux_data_path,
+    dir      = get_from_auxenv("aux_data_path"),
     overwrite = force,
     ...
   )
-  
+
   invisible(TRUE)
 }
 

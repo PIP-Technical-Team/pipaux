@@ -251,9 +251,10 @@ aux_cpi_update <- function(force   = FALSE,
 
   saved <- pip_aux_save(
     x        = cpi,
-    pin_name = measure,
+    id       = measure,
     #metadata = cpi_metadata,
-    force    = force
+    force    = force,
+    pk       = key_cols
   )
 
   return(invisible(saved))

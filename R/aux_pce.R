@@ -286,16 +286,6 @@ aux_pce_update <- function(force = FALSE,
           "raw_sha_fun",
           raw_sha_fun)
 
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(pce,
-          "raw_sha_fun",
-          raw_sha_fun)
 
   saved <-  pip_aux_save(
     x        = pce,
