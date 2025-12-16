@@ -249,10 +249,7 @@ aux_gdp_weo <- function(action = "update",
 
 
   } else if (action == "load") {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure
-    )
+    dt <- pipload::load_aux_data(measure = measure)
     return(dt)
   } else {
     rlang::abort(c("`action` must be `update` or `load`",
