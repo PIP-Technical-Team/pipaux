@@ -467,7 +467,7 @@ pip_aux_save <- \(x,
   pipload::pip_write(
     x        = x,
     id       = pin_name,
-    dir      = get_from_auxenv("aux_data_path"),
+    dir      = dir_path,
     overwrite = force,
     ...
   )

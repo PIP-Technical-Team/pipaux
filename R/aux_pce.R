@@ -263,11 +263,13 @@ aux_pce_update <- function(force = FALSE,
   ## ---- Sign and save ----
   pce <- pce |> setnames("pce_data_level", "reporting_level",
                          skip_absent=TRUE)
+  
+  key_cols = c("country_code", "year", "reporting_level")
 
   setattr(pce, "aux_name", "pce")
   setattr(pce,
           "aux_key",
-          c("country_code", "year", "reporting_level"))
+          key_cols)
 
   # validate pce output data
   pce_validate_output(pce = pce, detail = detail)
@@ -289,8 +291,9 @@ aux_pce_update <- function(force = FALSE,
 
   saved <-  pip_aux_save(
     x        = pce,
-    pin_name = measure,
-    force    = force
+    id       = measure,
+    force    = force,
+    pk       = key_cols
   )
 
   return(invisible(saved))
