@@ -4,7 +4,7 @@
 \alias{pip_aux_save}
 \title{Save data to the pinned site}
 \usage{
-pip_aux_save(x, pin_name, force)
+pip_aux_save(x, id, force = FALSE, ...)
 }
 \arguments{
 \item{x}{Data to be saved}

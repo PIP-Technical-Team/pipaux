@@ -4,37 +4,26 @@
 \alias{compare_aux_vintages}
 \title{Compare Vintage Versions for Multiple Auxiliary Data Files}
 \usage{
-compare_aux_vintages(
-  measures = NULL,
-  version = -1,
-  root_dir = Sys.getenv("PIP_ROOT_DIR"),
-  maindir = getOption("pipaux.working_dir"),
-  verbose = FALSE,
-  apply_label = TRUE,
-  ...
-)
+compare_aux_vintages(measures = NULL, version = -1, verbose = FALSE)
 }
 \arguments{
-\item{measures}{Character vector. Names of auxiliary data measures to compare (e.g., \code{c("gdp", "pop", "pfw")}).}
+\item{measures}{Character vector. Names of auxiliary data measures to compare
+(e.g., \code{c("gdp", "pop", "pfw")}).}
 
-\item{version}{Integer. Indicates how many versions before the latest to compare with (e.g., \code{-1} for previous).}
-
-\item{root_dir}{Character. Root directory where the release data is stored. Defaults to \code{Sys.getenv("PIP_ROOT_DIR")}.}
-
-\item{maindir}{Character. Path to the main auxiliary data directory. Defaults to the \code{pipaux.working_dir} option.}
+\item{version}{Integer. Indicates how many versions before the latest to compare with
+(e.g., \code{-1} for previous).}
 
 \item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are printed.}
 
-\item{apply_label}{Logical. Whether to apply labels when loading data. Defaults to \code{TRUE}.}
-
-\item{...}{Additional arguments passed to \code{compare_vintage_versions()}.}
+\item{...}{Additional arguments passed to \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}.}
 }
 \value{
-(Invisibly) A named list of results from \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}, one per measure.
+Invisibly returns a named list of results from \code{\link[=compare_vintage_versions]{compare_vintage_versions()}},
+one element per measure.
 }
 \description{
-This function wraps around \code{\link[=compare_vintage_versions]{compare_vintage_versions()}} to apply it across multiple auxiliary data measures.
-It is useful for tracking within-release changes across several files.
+Applies \code{\link[=compare_vintage_versions]{compare_vintage_versions()}} across multiple auxiliary data measures.
+Useful for tracking within-release changes across several files.
 }
 \examples{
 \dontrun{

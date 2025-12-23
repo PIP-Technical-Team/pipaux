@@ -45,10 +45,13 @@ aux_sna <- function(action          = c("update", "load"),
     setattr(sna,
             "raw_sha_fun",
             raw_sha_fun)
+    
+    key_cols <- c("year")
 
     saved <- pip_aux_save(
       x        = sna,
-      pin_name = measure,
+      id       = measure,
+      pk       = key_cols,
       force    = force
     )
 

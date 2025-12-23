@@ -9,14 +9,15 @@
 #' If `action = "load"`, the function reads the previously saved local version of the
 #' censoring data and returns it as a list of data.tables.
 #'
-#'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param ... Additional arguments passed to [pip_aux_save()] when `action = "update"`.
 #' @export
 aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           tag     = NULL) {
+                           tag     = NULL,
+                          ...) {
 
   measure <- "censoring"
   action <- match.arg(action)
@@ -72,11 +73,13 @@ aux_censoring  <- function(action  = c("update", "load"),
     # Define key columns for censoring data
     key_cols <- c("countries", "regions")
     setattr(dl, "aux_key", key_cols)
+
     saved <- pip_aux_save(
       x        = dl,
       id       = measure,
       force    = force,
-      pk       = key_cols
+      #pk       = key_cols,  rm this because of list
+      ...
     )
 
     return(invisible(saved))

@@ -13,7 +13,8 @@ aux_pfw <- function(action  = c("update", "load"),
                     force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    ...) {
   measure <- "pfw"
   action <- match.arg(action)
 
@@ -32,7 +33,8 @@ aux_pfw <- function(action  = c("update", "load"),
                    owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                  ...)
 
   } else {
 
@@ -159,7 +161,8 @@ aux_pfw_update <- function(force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                          ...) {
 
   measure <- "pfw"
   tag <- branch
@@ -205,7 +208,8 @@ aux_pfw_update <- function(force   = FALSE,
     x        = pfw,
     id       = measure,
     force    = force,
-    pk       = key_cols
+    pk       = key_cols,
+    ...
   )
 
   return(invisible(saved))

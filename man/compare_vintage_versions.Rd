@@ -4,43 +4,28 @@
 \alias{compare_vintage_versions}
 \title{Compare two vintage versions of an auxiliary data file}
 \usage{
-compare_vintage_versions(
-  measure,
-  root_dir = Sys.getenv("PIP_ROOT_DIR"),
-  maindir = getOption("pipaux.working_dir"),
-  verbose = FALSE,
-  version = -1,
-  apply_label = TRUE,
-  ...
-)
+compare_vintage_versions(measure, verbose = FALSE, version = -1)
 }
 \arguments{
 \item{measure}{Character. The name of the auxiliary measure to compare (e.g., "gdp", "pop").}
 
-\item{root_dir}{Character. Root directory where the release data is stored. Defaults to the \code{PIP_ROOT_DIR} environment variable.}
-
-\item{maindir}{Character. Path to the main auxiliary data directory. Defaults to the \code{pipaux.working_dir} option.}
-
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are printed.}
+\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are printed. Default is \code{FALSE}.}
 
 \item{version}{Integer. A negative number indicating how many versions before the latest one to compare with.
-For example, \code{-1} compares the current version with the one just before it, \code{-2} goes two versions back, and so on.}
-
-\item{...}{Additional arguments passed to the data loading functions.}
+For example, \code{-1} compares the current version with the one just before it, \code{-2} goes two versions back, etc.}
 }
 \value{
-(Invisibly) A list with three elements:
+Invisibly returns a list with the following elements (if differences are found):
 \describe{
 \item{diff_values}{A data table showing differences in values across matched rows and columns.}
 \item{diff_rows}{A data table showing rows added or removed between versions.}
-\item{diff_cols}{A list with added or removed columns.}
 }
+If no previous version is available or no differences are found, returns \code{NULL}.
 }
 \description{
 Compares the most recent version of an auxiliary data file with an earlier "vintage" version,
-identifying differences in values, rows, and columns. This is useful for tracking changes
-within a release, especially during development or validation.
+identifying differences in values and rows.
 }
 \seealso{
-\code{\link[pipload:pip_load_aux]{pipload::pip_load_aux()}}, \code{\link[myrror:myrror]{myrror::myrror()}}
+\code{\link[pipload:load_aux_data]{pipload::load_aux_data()}}, \code{\link[myrror:myrror]{myrror::myrror()}}
 }

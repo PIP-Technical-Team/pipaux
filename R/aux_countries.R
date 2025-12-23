@@ -8,7 +8,8 @@
 aux_countries <- function(action  = c("update", "load"),
                           force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          tag     = NULL) {
+                          tag     = NULL,
+                        ...) {
 
   measure <- "countries"
   action  <- match.arg(action)
@@ -69,7 +70,8 @@ aux_countries <- function(action  = c("update", "load"),
       x        = countries,
       id       = measure,
       force    = force,
-      pk       = key_cols
+      pk       = key_cols,
+      ...
     )
 
   } else {

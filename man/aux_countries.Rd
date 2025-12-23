@@ -8,7 +8,8 @@ aux_countries(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  tag = NULL
+  tag = NULL,
+  ...
 )
 }
 \arguments{

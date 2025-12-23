@@ -15,7 +15,8 @@
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),
                              force        = FALSE,
-                             detail       = getOption("pipaux.detail.raw")
+                             detail       = getOption("pipaux.detail.raw"),
+                             ...
                              ) {
 
   #   ____________________________________________________________________________
@@ -67,14 +68,15 @@ aux_country_list <- function(action       = c("update", "load"),
       x        = cl,
       id       = measure,
       force    = force,
-      pk       = key_cols
+      pk       = key_cols,
+      ...
     )
 
     return(invisible(saved))
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, version = 0)
 
     return(df)
   }

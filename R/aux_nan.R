@@ -30,7 +30,7 @@ aux_nan <- function(action          = c("update", "load"),
     # load nowcast growth rates
     nan <- pipfun::load_from_gh(
       measure = "nan",
-      owner  = owner,
+      owner  = "PIP-Technical-Team",
       branch = branch,
       filename = "nan.csv"
     )
@@ -45,7 +45,7 @@ aux_nan <- function(action          = c("update", "load"),
       paste0("aux_", measure))
     )
 
-    key_cols <- c("country_code", "year")
+    key_cols <- c("country_code", "year", "gdp_data_level")
     setattr(nan, "aux_key", key_cols)
     setattr(nan, "raw_sha_fun", raw_sha_fun)
 
