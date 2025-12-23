@@ -61,10 +61,14 @@ aux_indicators <- function(action  = c("update", "load"),
   setattr(df,
           "raw_sha_fun",
           raw_sha_fun)
+    
+  key_cols <- c("page", "indicator_name")
+    
 
-    saved <- pip_aux_save(
+  saved <- pip_aux_save(
       x        = df,
-      pin_name = measure,
+      id = measure,
+      pk = key_cols,
       force    = force
     )
 

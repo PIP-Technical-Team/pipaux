@@ -257,7 +257,7 @@ aux_ppp_update <- function(force   = FALSE,
 
 
   # Keys identifying the data
-  key_cols <- c("country_code", "reporting_level", "ppp_year")
+  key_cols <- c("country_code", "reporting_level", "ppp_year", "adaptation_version", "release_version")
   setattr(ppp, "aux_key", key_cols)
 
   setorderv(ppp,

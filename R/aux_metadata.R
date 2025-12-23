@@ -234,7 +234,7 @@ aux_metaregion <- function(action = c("update", "load"),
       paste0("aux_", measure))
     )
 
-    key_cols <- c("reg")
+    key_cols <- c("region_code")
     setattr(mr, "aux_name", "metaregion")
     setattr(mr, "aux_key", key_cols)
     setattr(mr,

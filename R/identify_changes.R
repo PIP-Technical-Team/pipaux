@@ -22,128 +22,76 @@
 #' \dontrun{
 #' get_aux_changes(measure = "cpi", old_release = "20240101_PROD")
 #' }
-get_aux_changes <- function(measure      = "cpi",
-                            old_release  = NULL,
-                            verbose      = TRUE) {
+get_aux_changes <- function(measure = "cpi",
+                            old_release = NULL,
+                            verbose = TRUE) {
 
-  # _______________________________________#
-  # Get arguments ####
+  stopifnot(is.character(measure), length(measure) == 1)
 
-  stopifnot(is.character(measure),
-            length(measure) == 1)
+  wrk_release <- get_from_auxenv("wrk_release")
+  aux_data_path <- get_from_auxenv("aux_data_path")
+  release <- paste0(wrk_release$release, "_", wrk_release$identity)
 
-
-  # Current release ####
-  wrk_release <- get_from_auxenv(key = "wrk_release")
-
-  release     <- paste0(wrk_release$release,
-                    "_",
-                    wrk_release$identity)
-
-  # Relase board ####
-  ab <- get_from_auxenv("aux_data_board")
-
-  # Old release ####
+  # Find old release if not provided
   if (is.null(old_release)) {
-
-    old_release <- get_last_release(board           = ab,
-                                    current_release = release,
-                                    identity        = wrk_release$identity)
-
-   if (verbose) cli::cli_alert_info("Using last available release: {.strong {old_release}}")
+    old_release <- get_last_release(
+      aux_data_path = aux_data_path,
+      current_release = release,
+      identity = wrk_release$identity
+    )
+    if (verbose) cli::cli_alert_info("Using last available release: {.strong {old_release}}")
   }
 
-  # Old release board
-  ab_old <- get_aux_board(release = old_release,
-                          verbose = FALSE)
-
-
-  # _______________________________________#
-  # Load files  ####
-
+  # Load new data (current release)
   new_df <- tryCatch({
-
-    pipload::load_aux_data(measure = measure) # by default reads the latest available version in current release
-
-  },
-
-  error = function(e) {
+    pipload::load_aux_data(measure = measure)
+  }, error = function(e) {
     cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
     stop(e)
   })
 
+  # Load old data (previous release) using pip_read and explicit path
+  old_artifact_dir <- fs::path(aux_data_path, old_release, measure)
   old_df <- tryCatch({
-
-    pipload::pip_read(board    = ab_old,
-                      pin_name = measure,
-                      verbose  = FALSE)
-  },
-
-  error = function(e) {
+    pipload::pip_read(id = measure, dir = old_artifact_dir, format = "qs2", verbose = verbose)
+  }, error = function(e) {
     cli::cli_alert_warning(
-      "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}.
-       Comparison will be skipped.")
-
+      "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
     return(NULL)
   })
 
   if (is.null(old_df)) {
     cli::cli_alert_warning(
-      "Empty OLD data for {.strong {measure}} in release {.strong {old_release}}.
-       Comparison will be skipped.")
+      "Empty OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
     return(invisible(NULL))
   }
 
-
-  # Key vars to compare by ______ ####
-
   key_cols <- attributes(new_df)$aux_key
-
   if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
     cli::cli_abort("Key variables could not be retrieved from data attributes.")
   }
-
-
   if (!all(key_cols %in% names(old_df))) {
     cli::cli_abort("Some key columns are missing in the old dataset: {setdiff(key_cols, names(old_df))}")
   }
-
-
-  # _______________________________________#
-
-  # Sort both datasets by key columns
-
-  # setorderv(new_df,
-  #           cols = key_cols)
-  # setorderv(old_df,
-  #           cols = key_cols)
 
   if (verbose) {
     cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
   }
 
-  # Extract differences __________ ####
-
-  ## Run comparison
-
-  # Find common columns
-  common_cols <- intersect(names(new_df),
-                           names(old_df))
-
-  # Subset and order columns identically
+  common_cols <- intersect(names(new_df), names(old_df))
   new_df <- new_df[, common_cols, with = FALSE]
   old_df <- old_df[, common_cols, with = FALSE]
 
   myr_obj <- tryCatch(
     myrror::myrror(
-      dfx                 = new_df,
-      dfy                 = old_df,
-      by                  = key_cols, # keys for matching (e.g., country and year)
-      compare_type        = FALSE,
-      compare_values      = TRUE,
+      dfx = new_df,
+      dfy = old_df,
+      by = key_cols,
+      compare_type = FALSE,
+      compare_values = TRUE,
       extract_diff_values = TRUE,
-      interactive         = FALSE,
-      verbose             = verbose
+      interactive = FALSE,
+      verbose = verbose
     ),
     error = function(e) {
       cli::cli_alert_danger(glue::glue(
@@ -153,55 +101,35 @@ get_aux_changes <- function(measure      = "cpi",
     }
   )
 
-  ## Extract different values and different rows
-
   if (!is.null(myr_obj)) {
     diff_table <- myrror::extract_diff_table(myrror_object = myr_obj,
-                                             by            = key_cols,
-                                             output        = "simple",
-                                             interactive   = FALSE)
-
-    # Extract different rows
-    diff_rows <- myrror::extract_diff_rows(myrror_object  = myr_obj,
-                                           by             = key_cols,
-                                           output         = "simple",
-                                           verbose        = verbose)
-
-  }
-
-  else {
+                                             by = key_cols,
+                                             output = "simple",
+                                             interactive = FALSE)
+    diff_rows <- myrror::extract_diff_rows(myrror_object = myr_obj,
+                                           by = key_cols,
+                                           output = "simple",
+                                           verbose = verbose)
+  } else {
     diff_table <- NULL
     diff_rows <- NULL
   }
 
-
-  # Add metadata: files paths, measure
-
+  # Add metadata: file paths, measure
   if (!is.null(diff_table)) {
-
-
     diff_table <- diff_table |>
       fmutate(measure = measure,
-              new_path.x  = ab$path,
-              old_path.y  = ab_old$path)
-
+              new_path.x = aux_data_path,
+              old_path.y = fs::path(aux_data_path, old_release))
   }
-
   if (!is.null(diff_rows)) {
-    diff_rows[, change_type := fifelse(df == "dfx",
-                                       "added",
-                                       "removed")]
+    diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
     diff_rows[, `:=`(
-      measure     = measure,
-      release     = release,
+      measure = measure,
+      release = release,
       old_release = old_release
     )]
-
   }
-
-
-  # _______________________________________#
-  # Return ####
 
   if (verbose) {
     cli::cli_alert_success("Diff values extracted successfully for measure: {.strong {measure}}")
@@ -210,15 +138,9 @@ get_aux_changes <- function(measure      = "cpi",
   result <- list(
     "diff_values" = diff_table,
     "diff_rows"   = diff_rows
-   # "diff_cols"   = diff_cols
   )
-
-  setattr(result,
-          "key_cols",
-          key_cols)
-
+  setattr(result, "key_cols", key_cols)
   return(invisible(result))
-
 }
 
 #' Inventory of changes in auxiliary data across measures
@@ -303,15 +225,11 @@ compare_aux_releases <- function(measure     = NULL,
 #' @return A character string representing the most recent previous release.
 #'
 #' @keywords internal
-get_last_release <- function(board,
+get_last_release <- function(aux_data_path,
                              current_release,
                              identity) {
-
-  # Go up from current release folder to aux_data
-  aux_path <- fs::path_dir(board$path)
-
-  # List all release folders under aux_data
-  release_names <- fs::dir_ls(aux_path,
+  # List all release folders under aux_data_path
+  release_names <- fs::dir_ls(aux_data_path,
                               type = "directory",
                               recurse = FALSE) |>
     fs::path_file()
@@ -441,60 +359,6 @@ compare_vintage_versions <- function(measure,
 
   # Handle empty diff_rows
   if (is.null(diff_rows) || nrow(diff_rows) == 0) diff_rows <- NULL
-
-  # ------------------------------------------------------------#
-  # TEMPORARY measure-specific renaming (CPI / PPP)
-  # ------------------------------------------------------------#
-
-  ## CPI ##
-  if (measure == "cpi") {
-    # diff values
-    if (!is.null(diff_vals)) {
-      diff_vals <- diff_vals |>
-        frename(reporting_level = year.new,
-                year = survey_acronym.new,
-                survey_acronym = reporting_level.new)
-      diff_vals <- diff_vals |>
-        frename(year.new            = year,
-                survey_acronym.new  = survey_acronym,
-                reporting_level.new = reporting_level)
-    }
-
-    # diff rows
-    if (!is.null(diff_rows)) {
-      diff_rows <- diff_rows |>
-        frename(reporting_level = year.new,
-                year = survey_acronym.new,
-                survey_acronym = reporting_level.new)
-      diff_rows <- diff_rows |>
-        frename(year.new = year,
-                survey_acronym.new = survey_acronym,
-                reporting_level.new = reporting_level)
-    }
-  }
-
-  ## PPP ##
-  if (measure == "ppp") {
-    # diff values
-    if (!is.null(diff_vals)) {
-      diff_vals <- diff_vals |>
-        frename(reporting_level = ppp_year.new,
-                ppp_year = reporting_level.new)
-      diff_vals <- diff_vals |>
-        frename(ppp_year.new            = ppp_year,
-                reporting_level.new = reporting_level)
-    }
-
-    # diff rows
-    if (!is.null(diff_rows)) {
-      diff_rows <- diff_rows |>
-        frename(reporting_level = ppp_year.new,
-                ppp_year = reporting_level.new)
-      diff_rows <- diff_rows |>
-        frename(ppp_year.new = ppp_year,
-                reporting_level.new = reporting_level)
-    }
-  }
 
   # ------------------------------------------------------------#
   # Report results
