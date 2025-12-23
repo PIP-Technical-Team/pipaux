@@ -234,14 +234,17 @@ aux_metaregion <- function(action = c("update", "load"),
       paste0("aux_", measure))
     )
 
-
+    key_cols <- c("reg")
+    setattr(mr, "aux_name", "metaregion")
+    setattr(mr, "aux_key", key_cols)
     setattr(mr,
             "raw_sha_fun",
             raw_sha_fun)
 
     saved <-  pip_aux_save(
       x        = mr,
-      pin_name = measure,
+      id = measure,
+      pk = key_cols,
       force    = force
     )
 
