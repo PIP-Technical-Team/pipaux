@@ -1,99 +1,4 @@
-#' Simulate changes in a vintage data file
-#'
-#' Introduces small random changes to an existing file to simulate an updated or modified version.
-#' Overwrites the original file with the modified data.
-#'
-#' @param file_path Character. Full path to the file to be modified (supported: .qs, .rds, .csv).
-#' @param seed Optional integer. Random seed for reproducibility.
-#'
-#' @return Invisibly returns the modified `data.table`. The original file is overwritten.
-#' @keywords internal
-simulate_file_changes <- function(file_path,
-                                  seed = 123
-                                  ) {
 
-  stopifnot(file.exists(file_path))
-
-  # Load data depending on extension
-  ext <- tools::file_ext(file_path)
-
-  dt <- switch(ext,
-               qs  = qs::qread(file_path),
-               qs2 = qs::qread(file_path),
-               rds = readRDS(file_path),
-               csv = data.table::fread(file_path),
-               stop("Unsupported file extension: ", ext))
-
-  if (!data.table::is.data.table(dt))
-
-    dt <- data.table::as.data.table(dt)
-
-  if (nrow(dt) < 2) {
-
-    cli::cli_alert_warning("Data has fewer than 2 rows, skipping changes.")
-    return(invisible(dt))
-
-  }
-
-  set.seed(seed)
-
-  # --- 1. Modify "year" column if it exists ---
-  if ("year" %in% names(dt)) {
-
-    idx <- sample(seq_len(nrow(dt)),
-                  min(3,
-                      nrow(dt)))
-
-    dt[idx, year := year + sample(c(-1, 1),
-                                  length(idx),
-                                  replace = TRUE)]
-    message("Modified 'year' in ",
-            length(idx),
-            " rows.")
-  }
-
-  # --- 2. Modify a numeric column ---
-  num_cols <- names(dt)[sapply(dt, is.numeric)]
-
-  if (length(num_cols) > 0) {
-
-    col_to_change <- sample(num_cols, 1)
-
-    idx <- sample(seq_len(nrow(dt)),
-                  min(3, nrow(dt)))
-
-    dt[idx, (col_to_change) := get(col_to_change) * runif(length(idx),
-                                                          0.9, 1.1)]
-    message("Modified '",
-            col_to_change, "' in ",
-            length(idx), " rows.")
-
-  }
-
-  # --- 3. Structural changes (optional) ---
-  dt <- dt[-.N]                      # Remove last row
-  dt[, simulated_flag := TRUE]      # Add dummy column
-
-  # --- 4. Save the modified version ---
-
-
-    # Use pipload::pip_write if file_path is in a recognized aux_data_path
-    aux_dir <- dirname(file_path)
-    file_name <- tools::file_path_sans_ext(basename(file_path))
-    ext <- tools::file_ext(file_path)
-    if ((ext == "qs" || ext == "qs2") && dir.exists(aux_dir)) {
-      pipload::pip_write(x = dt, id = file_name, dir = aux_dir, format = "qs2")
-    } else {
-      switch(ext,
-             qs  = qs::qsave(dt, file_path),
-             qs2 = qs2::qd_save(dt, file_path),
-             rds = saveRDS(dt, file_path),
-             csv = data.table::fwrite(dt, file_path))
-    }
-
-    cli::cli_alert_success("Saved modified file as: {file_path}")
-    invisible(dt)
-}
 
 #' Simulate an "old" version by modifying a measure's pin
 #'
@@ -131,27 +36,29 @@ simulate_old_release <- function(old_release = "20250101_TEST",
                                  drop = NULL,
                                  indices = NULL,
                                  verbose = TRUE) {
-
-  # --- Get aux_data_path for the old release ---
-  aux_data_path <- pipfun::get_pip_folders(release = old_release)$aux_data_path
-  if (is.null(aux_data_path) || !dir.exists(aux_data_path)) {
-    cli::cli_abort("aux_data_path for release '{old_release}' not found.")
+  # Get aux_data_path for the old release by replacing the release folder in the current path
+  current_path <- get_from_auxenv("aux_data_path")
+  old_aux_data_path <- sub("[^/\\\\]+$", old_release, current_path)
+  measure_dir <- file.path(old_aux_data_path, measure)
+  if (is.null(measure_dir) || !dir.exists(measure_dir)) {
+    dir.create(measure_dir, recursive = TRUE)
+    if (verbose) cli::cli_alert_info("Created measure directory for '{measure}' in release '{old_release}': {measure_dir}")
   }
 
-  # --- Load data for the measure from current aux_data_path ---
+  # Always load data for the measure from the current working release
   dt <- pipload::load_aux_data(measure = measure)
   if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
 
   set.seed(seed)
 
-  # --- Drop specified rows ---
+  # Drop specified rows
   if (!is.null(drop) && length(drop) > 0) {
     n_before <- nrow(dt)
     dt <- dt[-drop, ]
     if (verbose) cli::cli_alert_info("Dropped {length(drop)} rows. Rows before: {n_before}, after: {nrow(dt)}.")
   }
 
-  # --- Determine which column to modify ---
+  # Determine which column to modify
   target_col <- if (measure == "cpi") {
     "cpi_value"
   } else if (measure == "pfw") {
@@ -160,7 +67,7 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     measure
   }
 
-  # --- Modify target column at given indices ---
+  # Modify target column at given indices
   if (!is.null(indices) && length(indices) > 0 && target_col %in% names(dt)) {
     valid_indices <- indices[indices %in% seq_len(nrow(dt))]
     # Choose replacement values depending on measure
@@ -183,23 +90,51 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     }
   }
 
-  # --- Save modified data to old release aux_data_path ---
-  # Use pipload::pip_write for normal workflow
+  # Save modified data to old release aux_data_path
   pipload::pip_write(
     x = dt,
     id = measure,
-    dir = aux_data_path,
+    dir = measure_dir,
     format = "qs2"
   )
-
-  # If a direct file write is ever needed for .qs2, use qs2::qd_save(dt, file_path)
-  # Example (not used in current workflow):
-  # file_path <- file.path(aux_data_path, paste0(measure, ".qs2"))
-  # qs2::qd_save(dt, file_path)
 
   cli::cli_alert_success(
     "Modified and saved simulated old version of '{measure}' in aux_data_path for release: {old_release}"
   )
 
-  invisible(list(data = dt, aux_data_path = aux_data_path))
+  invisible(list(data = dt, aux_data_path = old_aux_data_path))
+}
+
+#' Simulate file changes for a measure
+#'
+#' Loads, modifies, and saves auxiliary data for a given measure, following the standard aux_ workflow.
+#'
+#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi", "ppp").
+#' @param seed Optional integer. Random seed for reproducibility.
+#' @param ... Additional arguments passed to pip_aux_save.
+#' @return Invisibly returns the modified data.table.
+#' @export
+simulate_file_changes <- function(measure, seed = 123, ...) {
+  dt <- pipload::load_aux_data(measure = measure)
+  if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
+  set.seed(seed)
+
+  n_rows <- nrow(dt)
+  if (n_rows < 1) return(invisible(dt))
+  n_mod <- min(3, n_rows)
+  idx <- sample(seq_len(n_rows), n_mod)
+
+  # Modify 'year' column if present
+  if ("year" %in% names(dt)) {
+    dt[idx, year := year + sample(c(-1, 1), n_mod, replace = TRUE)]
+  }
+
+  # Modify column named by 'measure' if present and numeric
+  if (measure %in% names(dt) && is.numeric(dt[[measure]])) {
+    dt[idx, (measure) := get(measure) * runif(n_mod, 0.9, 1.1)]
+  }
+
+  dt[, simulated_flag := TRUE]
+  pip_aux_save(x = dt, id = measure, ...)
+  invisible(dt)
 }
