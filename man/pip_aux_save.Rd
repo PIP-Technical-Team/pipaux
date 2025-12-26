@@ -2,18 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{pip_aux_save}
 \alias{pip_aux_save}
-\title{Save data to the pinned site}
+\title{Save data to auxiliary data path}
 \usage{
 pip_aux_save(x, id, force = FALSE, ...)
 }
 \arguments{
 \item{x}{Data to be saved}
 
-\item{pin_name}{Name of the pin}
+\item{id}{Name of the file}
 }
 \value{
-Fully qualified name of the new pin, invisibly
+Fully qualified name of the new file, invisibly
 }
 \description{
-Save data to the pinned site
+Save data to auxiliary data path
 }

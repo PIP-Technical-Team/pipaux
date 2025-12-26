@@ -9,7 +9,8 @@ aux_pfw_update(
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = NULL,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ...
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ will be used to update either the development server or production.}
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{...}{parameters to be passed to the loading functions depending of the
+extension used}
 }
 \description{
 Update PFW

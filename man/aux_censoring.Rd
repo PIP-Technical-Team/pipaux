@@ -8,7 +8,8 @@ aux_censoring(
   action = c("update", "load"),
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  tag = NULL
+  tag = NULL,
+  ...
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ aux_censoring(
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \description{
 Load or update censoring data

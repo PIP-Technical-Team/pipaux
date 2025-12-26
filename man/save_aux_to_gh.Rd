@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{save_aux_to_gh}
 \alias{save_aux_to_gh}
-\title{SAve auxiliary file to Github Repo}
+\title{Save auxiliary file to Github Repo}
 \usage{
 save_aux_to_gh(
   df,

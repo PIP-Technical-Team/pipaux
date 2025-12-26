@@ -1,3 +1,19 @@
+#' @title Check GitHub status for an auxiliary data measure
+#'
+#' @description
+#' Checks if the release branch for a measure is present and up to date with DEV on GitHub.
+#'
+#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
+#' @param repo Character. GitHub repository name.
+#' @param owner Character. GitHub repository owner.
+#' @param release_branch Character. Name of the release branch to check.
+#' @param verbose Logical. If TRUE, prints status messages.
+#'
+#' @return A list with `update_gh` (logical or NA) and `reason` (character).
+#' @keywords internal
+#'
+#' @examples
+#' check_github_status("cpi", "aux_cpi", "myuser", "20250101_TEST")
 check_github_status <- function(measure,
                                 repo,
                                 owner,
@@ -76,7 +92,19 @@ check_github_status <- function(measure,
   list(update_gh = update_gh, reason = reason)
 }
 
-
+#' @title Check Y-drive status for an auxiliary data measure
+#'
+#' @description
+#' Checks if the local Y-drive version of the auxiliary data is in sync with GitHub and the function code.
+#'
+#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
+#' @param verbose Logical. If TRUE, prints status messages.
+#'
+#' @return A list with `update_y` (logical) and `reason` (character).
+#' @keywords internal
+#'
+#' @examples
+#' check_y_drive_status("cpi")
 check_y_drive_status <- function(measure,
                                  verbose = TRUE) {
 
@@ -183,7 +211,21 @@ check_y_drive_status <- function(measure,
   )
 }
 
-
+#' @title Check overall status for an auxiliary data measure
+#'
+#' @description
+#' Checks both GitHub and Y-drive status for a measure and summarizes whether updates are needed.
+#'
+#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
+#' @param repo Character. GitHub repository name. Defaults to "aux_<measure>".
+#' @param owner Character. GitHub repository owner.
+#' @param verbose Logical. If TRUE, prints status messages.
+#'
+#' @return An (invisible) list with `update_gh` and `update_y` (logical or NA).
+#' @keywords internal
+#'
+#' @examples
+#' check_status("cpi")
 check_status <- function(measure,
                          repo    = paste0("aux_", measure),
                          owner   = getOption("pipfun.ghowner"),
@@ -201,7 +243,7 @@ check_status <- function(measure,
     cli::cli_h1("Checking Status for {measure}")
   }
 
-  # 1️⃣ GitHub status
+  # 1️ GitHub status
   gh_status <- check_github_status(
     measure        = measure,
     repo           = repo,
@@ -225,7 +267,7 @@ check_status <- function(measure,
     )))
   }
 
-  # 2️⃣ Y-drive status (only if GH is FALSE or NA)
+  # 2️ Y-drive status (only if GH is FALSE or NA)
   y_status <- check_y_drive_status(
     measure = measure,
     verbose = verbose
@@ -243,6 +285,20 @@ check_status <- function(measure,
   ))
 }
 
+#' @title Get file system status for an auxiliary data measure
+#'
+#' @description
+#' Wrapper for \code{check_status()} with \code{verbose = FALSE}.
+#'
+#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
+#' @param repo Character. GitHub repository name. Defaults to "aux_<measure>".
+#' @param owner Character. GitHub repository owner.
+#'
+#' @return A list with `update_gh` and `update_y` (logical or NA).
+#' @keywords internal
+#'
+#' @examples
+#' get_fs_status("cpi")
 get_fs_status <- function(measure,
                           repo    = paste0("aux_", measure),
                           owner   = getOption("pipfun.ghowner")) {

@@ -8,7 +8,8 @@ aux_cp_update(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = paste0(wrk_release$release, "_", wrk_release$identity),
-  tag = match.arg(branch)
+  tag = match.arg(branch),
+  ...
 )
 }
 \arguments{
@@ -18,6 +19,8 @@ aux_cp_update(
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \description{
 Update a list with country profiles data

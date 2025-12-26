@@ -7,7 +7,8 @@
 aux_country_list(
   action = c("update", "load"),
   force = FALSE,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ...
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ aux_country_list(
 \item{force}{logical: If TRUE data will be overwritten.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \value{
 logical if \code{action = "update"} or data.table if \code{action = "load"}

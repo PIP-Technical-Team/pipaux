@@ -4,7 +4,7 @@
 \alias{get_last_release}
 \title{Get the most recent previous release of a specific identity}
 \usage{
-get_last_release(board, current_release, identity)
+get_last_release(aux_data_path, current_release, identity)
 }
 \arguments{
 \item{current_release}{Character. Current release string in the format \code{"YYYYMMDD_identity"}.}

@@ -2,20 +2,20 @@
 % Please edit documentation in R/simulate_change.R
 \name{simulate_file_changes}
 \alias{simulate_file_changes}
-\title{Simulate changes in a vintage data file}
+\title{Simulate file changes for a measure}
 \usage{
-simulate_file_changes(file_path, seed = 123)
+simulate_file_changes(measure, seed = 123, ...)
 }
 \arguments{
-\item{file_path}{Character. Full path to the file to be modified (supported: .qs, .rds, .csv).}
+\item{measure}{Character. Name of the auxiliary data measure (e.g., "cpi", "ppp").}
 
 \item{seed}{Optional integer. Random seed for reproducibility.}
+
+\item{...}{Additional arguments passed to pip_aux_save.}
 }
 \value{
-Invisibly returns the modified \code{data.table}. The original file is overwritten.
+Invisibly returns the modified data.table.
 }
 \description{
-Introduces small random changes to an existing file to simulate an updated or modified version.
-Overwrites the original file with the modified data.
+Loads, modifies, and saves auxiliary data for a given measure, following the standard aux_ workflow.
 }
-\keyword{internal}

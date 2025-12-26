@@ -9,7 +9,8 @@ aux_pfw(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ...
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ aux_pfw(
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{...}{parameters to be passed to the loading functions depending of the
+extension used}
 }
 \description{
 Load or update PIP Price Framework data.
