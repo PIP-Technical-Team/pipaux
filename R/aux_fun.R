@@ -270,7 +270,6 @@ aux_fun <- function(measure,
     all_args <- c(
       list(
         action  = "update",
-        #maindir = maindir,
         branch  = release_branch,
         force   = force,
         owner   = owner,
@@ -439,7 +438,7 @@ check_status <- function(measure,
   aux_data_exists <- TRUE
 
   tryCatch(
-    pipload::load_aux_data(measure = measure), #Todo silent output
+    pipload::load_aux_data(measure = measure), 
 
     error = function(e) {
       aux_data_exists <<- FALSE
@@ -460,14 +459,12 @@ check_status <- function(measure,
                           update_y  = update_y)))
   }
 
-  # Read attributes directly from .qs file
-  ### Retrieve stored GitHub metadata from Y drive file ####
-
-  aux_board <- get_from_auxenv("aux_data_board")
-  attr_list <- qattr_from_pin(board    = aux_board,
-                              pin_name = measure)
-
-  gh <- attr_list$gh
+  # Retrieve stored GitHub metadata from Y drive file
+  y_file_path <- fs::path(get_from_auxenv("aux_data_path"),
+                          measure,
+                          paste0(measure, ".qs2"))
+  
+  gh <- qs::qattributes(y_file_path)$gh
 
   # Normalize structure of gh, ensuring it's always a list for subsequent iteration
   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)

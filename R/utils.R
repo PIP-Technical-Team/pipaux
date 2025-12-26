@@ -408,7 +408,7 @@ get_gh <- function(owner,
 
 }
 
-#' SAve auxiliary file to Github Repo
+#' Save auxiliary file to Github Repo
 #'
 #' Sometimes we need to save auxiliary files to Github repo.
 #' This function allows for this.
@@ -475,8 +475,18 @@ pip_aux_save <- \(x,
   invisible(TRUE)
 }
 
-#' Read attributes from pins
-#'
+read_dependencies <- function(gh_user, owner) {
+  dependencies <- paste(gh_user,
+                        owner,
+                        "pipaux/metadata/Data/dependency.yml",
+                        sep = "/") |>
+    yaml::read_yaml()
+
+  sapply(dependencies, \(x) if (length(x))
+    strsplit(x, ",\\s+")[[1]]
+    else
+      character())
+}
 
 
 # data.table is generally careful to minimize the scope for namespace

@@ -218,6 +218,12 @@ aux_cpi_update <- function(force   = FALSE,
 
   )]
 
+  gh_attr <- attr(cpi, "gh")
+
+  cols <- c("cpi2005", "cpi2011", "cpi2017", "cpi2021")
+
+  cpi[, (cols) := lapply(.SD, as.numeric), .SDcols = cols]
+
   # Long format
   cpi <- melt(
     cpi,
@@ -228,6 +234,7 @@ aux_cpi_update <- function(force   = FALSE,
     value.name    = "cpi_value"
   )
 
+  setattr(cpi, "gh", gh_attr)
 
   setattr(cpi, "aux_key", key_cols)
 
@@ -247,7 +254,6 @@ aux_cpi_update <- function(force   = FALSE,
 
   #   ____________________________________________________________________________
   #   Return                                                                ####
-
 
   saved <- pip_aux_save(
     x        = cpi,

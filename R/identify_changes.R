@@ -386,8 +386,6 @@ compare_vintage_versions <- function(measure,
 
   return(invisible(result))
 }
-
-
 #' Compare Vintage Versions for Multiple Auxiliary Data Files
 #'
 #' Applies [compare_vintage_versions()] across multiple auxiliary data measures.
