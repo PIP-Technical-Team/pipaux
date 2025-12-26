@@ -208,8 +208,6 @@ aux_cpi_update <- function(force   = FALSE,
                   "cpi2017_unadj",
                   "cpi2011_unadj",
                   "cpi_replication",
-                  "cpi2011_AM24",
-                  "cpi2017_AM24",
                   "cpi",
                   "cpi_domain_value",
                   "change_cpi2011",
@@ -250,7 +248,6 @@ aux_cpi_update <- function(force   = FALSE,
               c("country_code", "year", "cpi_year", "cpi_value"))
 
   setorderv(cpi, key_cols)
-
 
   #   ____________________________________________________________________________
   #   Return                                                                ####

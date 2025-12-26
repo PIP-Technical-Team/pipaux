@@ -447,18 +447,20 @@ get_from_auxenv <- \(key) {
   rlang::env_get(.pipaux, key, default = NULL) # Returns NULL if key doesn't exist
 }
 
-#' Save data to the pinned site
+#' Save data to auxiliary data path
 #'
 #' @param x Data to be saved
-#' @param pin_name Name of the pin
+#' @param id Name of the file
 #'
-#' @returns Fully qualified name of the new pin, invisibly
+#' @returns Fully qualified name of the new file, invisibly
 #'
 pip_aux_save <- \(x,
                   id,
                   force = FALSE,
                   ...) {
 
+  print("debug")
+  print(attributes(x))
   
   dir_path <- fs::path(get_from_auxenv("aux_data_path"), id)
   if (!fs::dir_exists(dir_path)) fs::dir_create(dir_path)

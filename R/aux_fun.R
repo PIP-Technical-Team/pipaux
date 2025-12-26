@@ -351,180 +351,182 @@ aux_fun <- function(measure,
 
 
 
-#' Check update status of a measure
-#'
-#' Determines whether a measure needs to be updated on GitHub and/or the Y drive.
-#'
-#' @param measure Character: Name of the measure to check.
-#' @param repo Character: Repository name. Defaults to "aux_<measure>".
-#' @param owner Character: GitHub repository owner. Defaults to `getOption("pipfun.ghowner")`.
-#' @param maindir Character: Main directory path. Defaults to `getOption("pipaux.working_dir")`.
-#' @param verbose Logical: If TRUE, prints messages about the status. Default is TRUE.
-#'
-#' @return A list with `update_gh` (logical) indicating if GitHub needs updating,
-#'   and `update_y` (logical) indicating if the Y drive needs updating.
-#' @keywords internal
-check_status <- function(measure,
-                         repo       = paste0("aux_", measure),
-                         owner      = getOption("pipfun.ghowner"),
-                         verbose    = TRUE) {
+# #' Check update status of a measure
+# #'
+# #' Determines whether a measure needs to be updated on GitHub and/or the Y drive.
+# #'
+# #' @param measure Character: Name of the measure to check.
+# #' @param repo Character: Repository name. Defaults to "aux_<measure>".
+# #' @param owner Character: GitHub repository owner. Defaults to `getOption("pipfun.ghowner")`.
+# #' @param maindir Character: Main directory path. Defaults to `getOption("pipaux.working_dir")`.
+# #' @param verbose Logical: If TRUE, prints messages about the status. Default is TRUE.
+# #'
+# #' @return A list with `update_gh` (logical) indicating if GitHub needs updating,
+# #'   and `update_y` (logical) indicating if the Y drive needs updating.
+# #' @keywords internal
+# check_status <- function(measure,
+#                          repo       = paste0("aux_", measure),
+#                          owner      = getOption("pipfun.ghowner"),
+#                          verbose    = TRUE) {
 
-  wrk_release <- get_from_auxenv(key = "wrk_release")
+#   wrk_release <- get_from_auxenv(key = "wrk_release")
 
-  release          <- wrk_release$release
-  identity         <- wrk_release$identity
-  release_branch   <- paste0(release, "_", identity)
+#   release          <- wrk_release$release
+#   identity         <- wrk_release$identity
+#   release_branch   <- paste0(release, "_", identity)
 
-  if (verbose) {
-    cli::cli_h1("Checking Status for {measure}")
-  }
+#   if (verbose) {
+#     cli::cli_h1("Checking Status for {measure}")
+#   }
 
-  update_gh      <- TRUE
+#   update_gh      <- TRUE
 
-  # Retrieve GitHub branches
-  gh_branches <- tryCatch(
-    pipfun::get_repo_branches(owner = owner, repo = repo),
-    error = function(e) {
-      if (verbose) cli::cli_alert_danger("GitHub repository not found or an error occurred: {e$message}")
-      return(NULL)
-    }
-  )
+#   # Retrieve GitHub branches
+#   gh_branches <- tryCatch(
+#     pipfun::get_repo_branches(owner = owner, repo = repo),
+#     error = function(e) {
+#       if (verbose) cli::cli_alert_danger("GitHub repository not found or an error occurred: {e$message}")
+#       return(NULL)
+#     }
+#   )
 
-  # Determine if GitHub needs an update
-  if (is.null(gh_branches)) {
+#   # Determine if GitHub needs an update
+#   if (is.null(gh_branches)) {
 
-    update_gh <- FALSE  # Repo not found or error
+#     update_gh <- FALSE  # Repo not found or error
 
-  } else if (release_branch %in% gh_branches$release_branches) {
+#   } else if (release_branch %in% gh_branches$release_branches) {
 
-    release_up_to_date <- pipfun::compare_branch_content(
-      owner    = owner,
-      repo     = paste0("aux_", measure),
-      branch1  = "DEV",
-      branch2  = release_branch,
-      verbose = FALSE
-    )$same_content
+#     release_up_to_date <- pipfun::compare_branch_content(
+#       owner    = owner,
+#       repo     = paste0("aux_", measure),
+#       branch1  = "DEV",
+#       branch2  = release_branch,
+#       verbose = FALSE
+#     )$same_content
 
-    if (release_up_to_date) {
-      if (verbose) cli::cli_alert_success(
-        "GitHub branch {.strong {release_branch}} is up to date with DEV.")
+#     if (release_up_to_date) {
+#       if (verbose) cli::cli_alert_success(
+#         "GitHub branch {.strong {release_branch}} is up to date with DEV.")
 
-    } else {
-      if (verbose) cli::cli_alert_warning(
-        "GitHub branch {.strong {release_branch}} is outdated. Update required."
-        )
-    }
+#     } else {
+#       if (verbose) cli::cli_alert_warning(
+#         "GitHub branch {.strong {release_branch}} is outdated. Update required."
+#         )
+#     }
 
-    update_gh <- !release_up_to_date
-  }
+#     update_gh <- !release_up_to_date
+#   }
 
-  if (update_gh) {
+#   if (update_gh) {
 
-    update_y <- TRUE
+#     update_y <- TRUE
 
-    if (verbose) {
-      cli::cli_h1("Summary")
-      cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
-      cli::cli_alert_info("Update Y drive: TRUE")
+#     if (verbose) {
+#       cli::cli_h1("Summary")
+#       cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+#       cli::cli_alert_info("Update Y drive: TRUE")
 
-    }
+#     }
 
-    return(invisible(list(update_gh = update_gh,
-                update_y  = update_y)))
-  }
+#     return(invisible(list(update_gh = update_gh,
+#                 update_y  = update_y)))
+#   }
 
-  # Check if Y drive file exists -if not, update_y is TRUE and return
+#   # Check if Y drive file exists -if not, update_y is TRUE and return
 
-  aux_data_exists <- TRUE
+#   aux_data_exists <- TRUE
 
-  tryCatch(
-    pipload::load_aux_data(measure = measure), 
+#   tryCatch(
+#     pipload::load_aux_data(measure = measure), 
 
-    error = function(e) {
-      aux_data_exists <<- FALSE
-      if (verbose) cli::cli_alert_danger("Aux data for measure '{measure}' not found: {e$message}")
-    }
-  )
+#     error = function(e) {
+#       aux_data_exists <<- FALSE
+#       if (verbose) cli::cli_alert_danger("Aux data for measure '{measure}' not found: {e$message}")
+#     }
+#   )
 
-  if (!aux_data_exists) {
-    update_y <- TRUE
+#   if (!aux_data_exists) {
+#     update_y <- TRUE
 
-    if (verbose) {
-      cli::cli_h1("Summary")
-      cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
-      cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
-    }
+#     if (verbose) {
+#       cli::cli_h1("Summary")
+#       cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+#       cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
+#     }
 
-    return(invisible(list(update_gh = update_gh,
-                          update_y  = update_y)))
-  }
+#     return(invisible(list(update_gh = update_gh,
+#                           update_y  = update_y)))
+#   }
 
-  # Retrieve stored GitHub metadata from Y drive file
-  y_file_path <- fs::path(get_from_auxenv("aux_data_path"),
-                          measure,
-                          paste0(measure, ".qs2"))
+#   # Retrieve stored GitHub metadata from Y drive file
+#   #y_file_path <- fs::path(get_from_auxenv("aux_data_path"),
+#   #                        measure,
+#   #                        paste0(measure, ".qs2"))
+
+#   dt <- pipload::load_aux_data(measure = measure)
   
-  gh <- qs::qattributes(y_file_path)$gh
+#   gh <- attributes(dt)$gh
 
-  # Normalize structure of gh, ensuring it's always a list for subsequent iteration
-  if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
+#   # Normalize structure of gh, ensuring it's always a list for subsequent iteration
+#   if (length(gh) > 0 && !is.list(gh[[1]])) gh <- list(gh_list = gh)
 
-  # Function to get SHA from GitHub
-  get_gh_sha <- function(gh_entry) {
+#   # Function to get SHA from GitHub
+#   get_gh_sha <- function(gh_entry) {
 
-    tryCatch(
-      pipfun::get_file_info_from_gh(
-        owner     = gh_entry$owner,
-        repo      = gh_entry$repo,
-        branch    = gh_entry$branch,
-        file_path = gh_entry$file_path
-      )$sha,
-      error = function(e) {
-        if (verbose) cli::cli_alert_danger("File not found or another error occurred: {e$message}")
-        NULL
-      }
-    )
+#     tryCatch(
+#       pipfun::get_file_info_from_gh(
+#         owner     = gh_entry$owner,
+#         repo      = gh_entry$repo,
+#         branch    = gh_entry$branch,
+#         file_path = gh_entry$file_path
+#       )$sha,
+#       error = function(e) {
+#         if (verbose) cli::cli_alert_danger("File not found or another error occurred: {e$message}")
+#         NULL
+#       }
+#     )
 
-  }
+#   }
 
-  # Compare SHA values between GitHub and Y drive
-  gh_sha_list <- lapply(gh, function(entry) {
-    list(
-      gh_sha = get_gh_sha(entry),
-      y_sha  = entry$gh_raw_sha
-    )
-  })
+#   # Compare SHA values between GitHub and Y drive
+#   gh_sha_list <- lapply(gh, function(entry) {
+#     list(
+#       gh_sha = get_gh_sha(entry),
+#       y_sha  = entry$gh_raw_sha
+#     )
+#   })
 
-  # Compute current function SHA
-  fun_sha     <- digest::digest(body(paste0("aux_", measure)))
-  raw_fun_sha <- attr_list$raw_sha_fun
+#   # Compute current function SHA
+#   fun_sha     <- digest::digest(body(paste0("aux_", measure)))
+#   raw_fun_sha <- attr_list$raw_sha_fun
 
-  if (verbose) {
-    if (fun_sha == raw_fun_sha) {
-      cli::cli_alert_success("Current and prev. stored function SHAs match. No update needed.")
-    } else {
-      cli::cli_alert_danger("Current and prev. stored function SHAs do NOT match. An update is required.")
-    }
-  }
+#   if (verbose) {
+#     if (fun_sha == raw_fun_sha) {
+#       cli::cli_alert_success("Current and prev. stored function SHAs match. No update needed.")
+#     } else {
+#       cli::cli_alert_danger("Current and prev. stored function SHAs do NOT match. An update is required.")
+#     }
+#   }
 
-  # Determine if Y drive needs an update
-  update_y <- any(vapply(gh_sha_list,
-                         function(x) x$gh_sha != x$y_sha, logical(1))) ||
-                                     !(fun_sha == raw_fun_sha)
+#   # Determine if Y drive needs an update
+#   update_y <- any(vapply(gh_sha_list,
+#                          function(x) x$gh_sha != x$y_sha, logical(1))) ||
+#                                      !(fun_sha == raw_fun_sha)
 
-  update_y <- ifelse(is.na(update_y),
-                     FALSE,
-                     update_y)  # Treat NA as FALSE
+#   update_y <- ifelse(is.na(update_y),
+#                      FALSE,
+#                      update_y)  # Treat NA as FALSE
 
-  if (verbose) {
-    cli::cli_h1("Summary")
-    cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
-    cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
-  }
+#   if (verbose) {
+#     cli::cli_h1("Summary")
+#     cli::cli_alert_info("Update GitHub: {.strong {update_gh}}")
+#     cli::cli_alert_info("Update Y drive: {.strong {update_y}}")
+#   }
 
-  return(invisible(list(update_gh = update_gh,
-                        update_y  = update_y)))
-}
+#   return(invisible(list(update_gh = update_gh,
+#                         update_y  = update_y)))
+# }
 
 #' Automatically Update All Auxiliary Data Files
 #'
