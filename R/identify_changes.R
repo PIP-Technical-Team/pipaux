@@ -228,8 +228,11 @@ compare_aux_releases <- function(measure     = NULL,
 get_last_release <- function(aux_data_path,
                              current_release,
                              identity) {
-  # List all release folders under aux_data_path
-  release_names <- fs::dir_ls(aux_data_path,
+  # Move up one level if aux_data_path already includes the release
+  release_root <- fs::path_dir(aux_data_path)
+
+  # List all release folders under the root
+  release_names <- fs::dir_ls(release_root,
                               type = "directory",
                               recurse = FALSE) |>
     fs::path_file()
