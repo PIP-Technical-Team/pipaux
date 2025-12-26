@@ -51,7 +51,10 @@ get_aux_changes <- function(measure = "cpi",
   })
 
   # Load old data (previous release) using pip_read and explicit path
-  old_artifact_dir <- fs::path(aux_data_path, old_release, measure)
+  release_root <- fs::path_dir(aux_data_path)
+
+  old_artifact_dir <- fs::path(release_root, old_release, measure)
+  
   old_df <- tryCatch({
     pipload::pip_read(id = measure, dir = old_artifact_dir, format = "qs2", verbose = verbose)
   }, error = function(e) {
@@ -67,6 +70,7 @@ get_aux_changes <- function(measure = "cpi",
   }
 
   key_cols <- attributes(new_df)$aux_key
+  
   if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
     cli::cli_abort("Key variables could not be retrieved from data attributes.")
   }
