@@ -124,16 +124,19 @@ aux_cp_clean <- function(x,
   ## ---- FIXED SECTION (warning removal, same output) ----
 
   key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
-    x %>%
-      dplyr::filter(!is.na(.data[[3]])) %>%   # <- FIX
-      dplyr::group_by(country_code) %>%
-      dplyr::slice_tail(n = 2) %>%
-      dplyr::mutate(
-        latest = reporting_year == max(reporting_year)
-      ) %>%
-      dplyr::ungroup() %>%
-      data.table::as.data.table()
-  })
+
+  val_col <- setdiff(names(x), c("country_code", "reporting_year"))
+
+  x %>%
+    dplyr::filter(!is.na(.data[[val_col]])) %>%   # ✅ fixed
+    dplyr::group_by(country_code) %>%
+    dplyr::slice_tail(n = 2) %>%
+    dplyr::mutate(
+      latest = reporting_year == max(reporting_year)
+    ) %>%
+    dplyr::ungroup() %>%
+    data.table::as.data.table()
+})
 
   ## Additional charts ----------
 
@@ -350,7 +353,7 @@ clean_cp_names <- function(x) {
 #' @keywords internal
 aux_cp_update <- function(force = FALSE,
                           owner   = getOption("pipfun.ghowner"),
-                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
+                          branch,
                           tag     = match.arg(branch),
                         ...) {
 

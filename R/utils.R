@@ -459,8 +459,6 @@ pip_aux_save <- \(x,
                   force = FALSE,
                   ...) {
 
-  print("debug")
-  print(attributes(x))
   
   dir_path <- fs::path(get_from_auxenv("aux_data_path"), id)
   if (!fs::dir_exists(dir_path)) fs::dir_create(dir_path)
