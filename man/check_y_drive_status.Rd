@@ -17,4 +17,7 @@ A list with \code{update_y} (logical) and \code{reason} (character).
 \description{
 Checks if the local Y-drive version of the auxiliary data is in sync with GitHub and the function code.
 }
+\examples{
+check_y_drive_status("cpi")
+}
 \keyword{internal}

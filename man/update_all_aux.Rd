@@ -25,15 +25,12 @@ If \code{NULL}, all known measures will be updated.}
 \item{...}{
   Arguments passed on to \code{\link[=aux_fun]{aux_fun}}
   \describe{
-    \item{\code{repo}}{character: Name of the GitHub repository containing the auxiliary data
-Defaults to \code{"aux_<measure>"} unless \code{measure} is \code{"income_groups"} or \code{"country_list"}, in which case it defaults to \code{"Class"}.}
-    \item{\code{owner}}{character: GitHub repository owner. Default is \code{getOption("pipfun.ghowner")}}
-    \item{\code{processed}}{environment: Environment that keeps track of already processed measures to avoid redundant processing.
-Default is a new empty environment}
-    \item{\code{force}}{logical: If \code{TRUE}, forces an update even if the data appears up to date.
-Default is \code{FALSE}}
-    \item{\code{tag}}{character: Specifies the GitHub branch tag for versioning.
-Defaults to \code{release_branch}, which is determined from the working release}
+    \item{\code{repo}}{Character. Repository name (optional).}
+    \item{\code{owner}}{Character. Repository owner (optional).}
+    \item{\code{processed}}{Environment. Tracks processed measures (optional).}
+    \item{\code{force}}{Logical. Whether to force update.}
+    \item{\code{tag}}{Character. Release tag (optional).}
+    \item{\code{log_overwrite}}{Logical. Whether to overwrite existing log.}
   }}
 }
 \value{

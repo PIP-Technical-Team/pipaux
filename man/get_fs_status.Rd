@@ -23,4 +23,7 @@ A list with \code{update_gh} and \code{update_y} (logical or NA).
 \description{
 Wrapper for \code{check_status()} with \code{verbose = FALSE}.
 }
+\examples{
+get_fs_status("cpi")
+}
 \keyword{internal}

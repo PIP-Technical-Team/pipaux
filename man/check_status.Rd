@@ -26,4 +26,7 @@ An (invisible) list with \code{update_gh} and \code{update_y} (logical or NA).
 \description{
 Checks both GitHub and Y-drive status for a measure and summarizes whether updates are needed.
 }
+\examples{
+check_status("cpi")
+}
 \keyword{internal}
