@@ -314,13 +314,15 @@ check_status <- function(measure,
 #' get_fs_status("cpi")
 get_fs_status <- function(measure,
                           repo    = paste0("aux_", measure),
-                          owner   = getOption("pipfun.ghowner")) {
+                          owner   = getOption("pipfun.ghowner"),
+                          include_reason = FALSE) {
 
   status <- check_status(
     measure = measure,
     repo    = repo,
     owner   = owner,
-    verbose = FALSE
+    verbose = FALSE,
+    include_reason = include_reason
   )
 
   status
