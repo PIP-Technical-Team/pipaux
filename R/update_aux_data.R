@@ -22,6 +22,10 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 
 #' Recursively process dependencies for a measure
 #'
+#' For each dependency, calls \code{aux_fun()} recursively. Each dependency is only updated once per cascade.
+#'
+#' If \code{halt_on_dep_fail = TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
+#'
 #' @param measure Character. The measure to process.
 #' @param processed Environment. Tracks processed measures to avoid cycles.
 #' @param owner Character. Repository owner.
@@ -29,6 +33,7 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 #' @param tag Character. Release tag.
 #' @param verbose Logical. Verbosity flag.
 #' @param log Logical. Whether to log events.
+#' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails.
 #'
 #' @return Invisibly returns NULL.
 #' @keywords internal
@@ -38,7 +43,8 @@ process_dependencies <- function(measure,
                                  force,
                                  tag,
                                  verbose,
-                                 log) {
+                                 log,
+                                 halt_on_dep_fail = FALSE) {
 
   # Skip if already processed (prevents infinite loops)
   if (rlang::env_has(processed, measure)) return(invisible(NULL))
@@ -67,7 +73,8 @@ process_dependencies <- function(measure,
         tag           = tag,
         log_overwrite = TRUE,
         verbose       = verbose,
-        log           = log
+        log           = log,
+        halt_on_dep_fail = halt_on_dep_fail
       ),
       error = function(e) {
         if (log) {
@@ -78,6 +85,7 @@ process_dependencies <- function(measure,
             logmeta = list(step = "ERROR_DEP", measure = dep)
           )
         }
+        if (halt_on_dep_fail) stop(e)
       }
     )
   }
@@ -132,7 +140,6 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 
     func <- get(func_name, envir = asNamespace("pipaux"))
 
-    # Explicitly pass all necessary arguments; do NOT rely on defaults
     update_args <- list(
       action = "update",
       branch = release_branch,
@@ -142,20 +149,19 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
       repo   = repo
     )
 
-    # Filter only arguments actually accepted by the function
     filtered_args <- update_args[names(update_args) %in% names(formals(func))]
 
     tryCatch(
       {
         do.call(func, filtered_args)
-        # if (log) {
-        #   pipfun::log_add(
-        #     event   = "update",
-        #     message = paste0("Updated Y drive for: ", measure),
-        #     name    = "pipaux_update_log",
-        #     logmeta = list(step = "UPDATE_Y", measure = measure)
-        #   )
-        # }
+        if (log) {
+          pipfun::log_add(
+            event   = "update",
+            message = paste0("Updated Y drive for: ", measure),
+            name    = "pipaux_update_log",
+            logmeta = list(step = "UPDATE_Y", measure = measure)
+          )
+        }
       },
       error = function(e) {
         if (log) {
@@ -172,10 +178,15 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
   }
 }
 
+
 #' Update auxiliary data for a measure and its dependencies
 #'
 #' This is the main exported function for updating auxiliary data. It handles
 #' dependency resolution, update checks, and update execution for both GitHub and Y drive.
+#'
+#' Dependencies are always resolved recursively and each dependency is only updated once per cascade.
+#'
+#' Logging is performed to the log named \code{"pipaux_update_log"} by default. Use \code{pipfun::log_get("pipaux_update_log")} to retrieve logs.
 #'
 #' @param measure Character. The measure to update.
 #' @param repo Character. Repository name (optional).
@@ -186,6 +197,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 #' @param log Logical. Whether to log events.
 #' @param log_overwrite Logical. Whether to overwrite existing log.
 #' @param verbose Logical. Verbosity flag.
+#' @param halt_on_dep_fail Logical. If \code{TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
 #'
 #' @return Invisibly returns NULL.
 #' @export
@@ -197,7 +209,8 @@ aux_fun <- function(measure,
                     tag       = NULL,
                     log       = TRUE,
                     log_overwrite = TRUE,
-                    verbose   = FALSE) {
+                    verbose   = FALSE,
+                    halt_on_dep_fail = FALSE) {
 
   # Working release
   wrk_release <- get_from_auxenv(key = "wrk_release")
@@ -220,7 +233,7 @@ aux_fun <- function(measure,
   owner <- ro$owner
 
   # Process dependencies
-  process_dependencies(measure, processed, owner, force, tag, verbose, log)
+  process_dependencies(measure, processed, owner, force, tag, verbose, log, halt_on_dep_fail)
 
   # Check update status
   check_result <- tryCatch(

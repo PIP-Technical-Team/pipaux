@@ -8,7 +8,7 @@ aux_cp_update(
   force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch,
-  tag = match.arg(branch),
+  tag = tag,
   ...
 )
 }

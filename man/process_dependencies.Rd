@@ -4,7 +4,16 @@
 \alias{process_dependencies}
 \title{Recursively process dependencies for a measure}
 \usage{
-process_dependencies(measure, processed, owner, force, tag, verbose, log)
+process_dependencies(
+  measure,
+  processed,
+  owner,
+  force,
+  tag,
+  verbose,
+  log,
+  halt_on_dep_fail = FALSE
+)
 }
 \arguments{
 \item{measure}{Character. The measure to process.}
@@ -20,11 +29,16 @@ process_dependencies(measure, processed, owner, force, tag, verbose, log)
 \item{verbose}{Logical. Verbosity flag.}
 
 \item{log}{Logical. Whether to log events.}
+
+\item{halt_on_dep_fail}{Logical. Whether to halt parent update if a dependency fails.}
 }
 \value{
 Invisibly returns NULL.
 }
 \description{
-Recursively process dependencies for a measure
+For each dependency, calls \code{aux_fun()} recursively. Each dependency is only updated once per cascade.
+}
+\details{
+If \code{halt_on_dep_fail = TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
 }
 \keyword{internal}

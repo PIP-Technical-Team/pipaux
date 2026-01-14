@@ -8,7 +8,8 @@ check_status(
   measure,
   repo = paste0("aux_", measure),
   owner = getOption("pipfun.ghowner"),
-  verbose = TRUE
+  verbose = TRUE,
+  include_reason = FALSE
 )
 }
 \arguments{
@@ -19,9 +20,11 @@ check_status(
 \item{owner}{Character. GitHub repository owner.}
 
 \item{verbose}{Logical. If TRUE, prints status messages.}
+
+\item{include_reason}{Logical. If TRUE, includes reasons in output.}
 }
 \value{
-An (invisible) list with \code{update_gh} and \code{update_y} (logical or NA).
+An (invisible) list with \code{update_gh}, \code{update_y} (logical or NA), and optionally \code{gh_reason}, \code{y_reason}.
 }
 \description{
 Checks both GitHub and Y-drive status for a measure and summarizes whether updates are needed.

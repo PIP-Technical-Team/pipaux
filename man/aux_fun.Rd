@@ -13,7 +13,8 @@ aux_fun(
   tag = NULL,
   log = TRUE,
   log_overwrite = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  halt_on_dep_fail = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ aux_fun(
 \item{log_overwrite}{Logical. Whether to overwrite existing log.}
 
 \item{verbose}{Logical. Verbosity flag.}
+
+\item{halt_on_dep_fail}{Logical. If \code{TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.}
 }
 \value{
 Invisibly returns NULL.
@@ -41,4 +44,9 @@ Invisibly returns NULL.
 \description{
 This is the main exported function for updating auxiliary data. It handles
 dependency resolution, update checks, and update execution for both GitHub and Y drive.
+}
+\details{
+Dependencies are always resolved recursively and each dependency is only updated once per cascade.
+
+Logging is performed to the log named \code{"pipaux_update_log"} by default. Use \code{pipfun::log_get("pipaux_update_log")} to retrieve logs.
 }

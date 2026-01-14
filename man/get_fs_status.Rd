@@ -7,7 +7,8 @@
 get_fs_status(
   measure,
   repo = paste0("aux_", measure),
-  owner = getOption("pipfun.ghowner")
+  owner = getOption("pipfun.ghowner"),
+  include_reason = FALSE
 )
 }
 \arguments{
