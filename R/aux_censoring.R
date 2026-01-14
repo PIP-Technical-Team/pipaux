@@ -78,7 +78,7 @@ aux_censoring  <- function(action  = c("update", "load"),
       x        = dl,
       id       = measure,
       force    = force,
-      #pk       = key_cols,  rm this because of list
+      #pk       = key_cols,  rm this because of x being list
       ...
     )
 

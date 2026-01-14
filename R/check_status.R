@@ -220,8 +220,9 @@ check_y_drive_status <- function(measure,
 #' @param repo Character. GitHub repository name. Defaults to "aux_<measure>".
 #' @param owner Character. GitHub repository owner.
 #' @param verbose Logical. If TRUE, prints status messages.
+#' @param include_reason Logical. If TRUE, includes reasons in output.
 #'
-#' @return An (invisible) list with `update_gh` and `update_y` (logical or NA).
+#' @return An (invisible) list with `update_gh`, `update_y` (logical or NA), and optionally `gh_reason`, `y_reason`.
 #' @keywords internal
 #'
 #' @examples
@@ -229,7 +230,8 @@ check_y_drive_status <- function(measure,
 check_status <- function(measure,
                          repo    = paste0("aux_", measure),
                          owner   = getOption("pipfun.ghowner"),
-                         verbose = TRUE) {
+                         verbose = TRUE,
+                         include_reason = FALSE) {
 
   wrk_release <- get_from_auxenv("wrk_release")
 
@@ -261,10 +263,15 @@ check_status <- function(measure,
       cli::cli_alert_info("Update Y drive: TRUE")
     }
 
-    return(invisible(list(
+    out <- list(
       update_gh = TRUE,
       update_y  = TRUE
-    )))
+    )
+    if (include_reason) {
+      out$gh_reason <- gh_status$reason
+      out$y_reason  <- "Policy: GitHub update implies Y drive update"
+    }
+    return(invisible(out))
   }
 
   # 2️ Y-drive status (only if GH is FALSE or NA)
@@ -279,10 +286,16 @@ check_status <- function(measure,
     cli::cli_alert_info("Update Y drive: {.strong {y_status$update_y}}")
   }
 
-  invisible(list(
+  out <- list(
     update_gh = gh_status$update_gh,
     update_y  = y_status$update_y
-  ))
+  )
+  if (include_reason) {
+    out$gh_reason <- gh_status$reason
+    out$y_reason  <- y_status$reason
+  }
+
+  invisible(out)
 }
 
 #' @title Get file system status for an auxiliary data measure
