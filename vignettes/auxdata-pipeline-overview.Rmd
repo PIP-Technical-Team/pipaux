@@ -1,5 +1,5 @@
 ---
-title: "Aux data -Pipeline Overview"
+title: "Aux data - Pipeline Overview"
 author: Rossana Tatulli
 output: rmarkdown::html_vignette
 vignette: >
@@ -16,115 +16,96 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-
 ```{r setup}
-#devtools::load_all()
-
 library(pipaux)
-
-# Initialize log to make it available in this vignette
-pipfun::log_init("pipaux_update_log", overwrite = T)
-#pipfun::setup_working_release(release = "20250203")
-
+pipfun::log_init("pipaux_update_log", overwrite = TRUE)
 ```
 
-### Overview
+## Overview
 
--   **Objectives**: Update auxiliary data files and compare them both across different releases and within a single release.
+- **Objectives**: Update auxiliary data files and compare them both across different releases and within a single release.
 
--   **Key functions**:
+- **Key functions**:
+    - `update_all_aux()`: Automatically updates all (or selected) auxiliary data measures.
+    - `compare_aux_releases()`: Compares auxiliary data files between different releases.
+    - `compare_vintage_versions()`: Compares versions of auxiliary data within the same release
 
-    -   `update_all_aux()`: Automatically updates all (or selected) auxiliary data measures.
+- **Key Outputs**:
+    - Updated GitHub branches and synchronized auxiliary data files saved to the Y drive. The current folder used to store files from the new pipeline is specified by the option `getOption("pipaux.working_dir")`, which currently points to `"Y:/PIP_ingestion_pipeline_v2"`.
+    - Data tables highlighting changes in files either within a release or between different releases.
 
-    -   `compare_aux_releases()`: Compares auxiliary data files between different releases.
+- **Key Steps**:
+    1. Set up the working release.
+    2. Update auxiliary data in both GitHub and the Y drive.
+    3. Compare auxiliary data files to identify and review changes.
 
-    -   `compare_vintage_versions()`: Compares versions of auxiliary data within the same release
-
--   **Key Outputs**:
-
-    -   Updated GitHub branches and synchronized auxiliary data files saved to the Y drive. The current folder used to store files from the new pipeline is specified by the option getOption("pipaux.working_dir"), which currently points to "Y:/PIP_ingestion_pipeline_v2".
-
-    -   Data tables highlighting changes in files either within a release or between different releases.
-
--   **Key Steps**:
-
-1.  Set up the working release.
-2.  Update auxiliary data in both GitHub and the Y drive.
-3.  Compare auxiliary data files to identify and review changes.
+- **New/Advanced Options**:
+    - `halt_on_dep_fail` (in `update_all_aux`, `aux_fun`): If `TRUE`, halt on dependency errors; if `FALSE` (default), log and continue.
+    - `log_overwrite` (in `update_all_aux`, `aux_fun`): If `TRUE`, overwrite the log at the start of a top-level call.
+    - `include_reason` (in `check_status`, `get_fs_status`): If `TRUE`, output includes reasons for update decisions.
 
 ## 1️⃣ STEP 1 - SETUP WORKING RELEASE
 
-In the new pipeline framework, we always work with a reference version called the "working release." Therefore, we need to set up the working release at the beginning of each new R session:
-
-In this example, I am using a "TEST" release with a release date of "20250203". However, if no release has been created for the desired date, call `pipfun::new_pip_release` with the appropriate arguments to create it.
+In the new pipeline framework, always work with a reference version called the "working release." Set up the working release at the beginning of each new R session:
 
 ```{r}
-# Set up the working release 
 pipfun::setup_working_release(release  = "20250203",
                               identity = "TEST")
 ```
 
 ## 2️⃣ STEP 2 - UPDATE ALL (OR SOME) AUXILIARY DATA
 
-**Update** In this example, we update a selection of auxiliary data measures. The repositories used are hosted on my GitHub account, so we specify the owner as "RossanaTat".
+**Update**: In this example, we update a selection of auxiliary data measures. The repositories used are hosted on my GitHub account, so we specify the owner as "RossanaTat".
 
 ```{r}
-
 update <- update_all_aux(
   measures = c("maddison", "cpi"),
   owner    = "RossanaTat",
   log      = TRUE,         # Enable logging
-  log_save = FALSE          # Optionally save the log as a .qs file in the current release folder
+  log_save = FALSE,        # Optionally save the log as a .qs file in the current release folder
+  halt_on_dep_fail = FALSE # Control dependency error handling
 )
-
 update
-
 ```
 
 The output of `update_all_aux()` is a named list, with each element corresponding to a measure. For each measure, the list contains:
 
--   success: a logical flag (`TRUE` or `FALSE`) indicating whether the update completed successfully,
+- `success`: a logical flag (`TRUE` or `FALSE`) indicating whether the update completed successfully,
+- `error`: either `NULL` if there was no error, or the error message if something went wrong.
 
--   error: either `NULL` if there was no error, or the error message if something went wrong.
-
-**IMPORTANT**:
-
+**IMPORTANT**:  
 As explained in the [**"update_workflow"** vignette](../articles/update_workflow.html), the update process ensures that each auxiliary data measure is kept up to date with the latest changes. This means that the GitHub branches are updated with the most recent version of the DEV branch, and that the corresponding files are saved to the Y drive accordingly.
 
-To better understand what happened during the update process, you should inspect the **log**. The log is stored as a data.table, and can be accessed using **{pipfun}** functions or read directly from the .qs file saved in current release folder (if log_save = TRUE). **Note:** The logging functions from the `{pipfun}` package are explained in the [Log vignette](https://pip-technical-team.github.io/pipfun/articles/log.html).
+To better understand what happened during the update process, you should inspect the **log**. The log is stored as a data.table, and can be accessed using **{pipfun}** functions or read directly from the .qs file saved in current release folder (if log_save = TRUE).  
+Logs are always available via `pipfun::log_get("pipaux_update_log")`.
 
 **Inspect result** 👀
 
 ```{r}
-
-# Read the entire log into memory
-#pipfun::log_get(name = "pipaux_update_log")[]
-
-# Filter log entries 
-
-## Show info messages
+# Show info messages
 pipfun::log_get(name = "pipaux_update_log")[event == "info"]
 
-## Show all update-related events
+# Show all update-related events
 pipfun::log_get(name = "pipaux_update_log")[event == "update"]
-
-
 ```
 
-**Under the hood** The `update_all_aux()` function internally calls an auxiliary function named `aux_fun()` for each specified measure. This function manages the full update workflow — from checking synchronization status between GitHub and the network drive (Y:) to updating all interdependencies among auxiliary data measures.
+If you want to see why a measure needs updating, use:
+```{r}
+check_status("cpi", include_reason = TRUE)
+```
 
-To learn more about this process and the logic behind it, please refer to the dedicated article "Aux Data: Updating GitHub and the Y drive" .
+**Dependency Error Handling**  
+If you want the update process to stop when a dependency fails, set `halt_on_dep_fail = TRUE` in `update_all_aux()` or `aux_fun()`. By default, errors in dependencies are logged and the update continues.
 
-## Notes (for your reference or future modifications):
+**Under the hood**:  
+The `update_all_aux()` function internally calls an auxiliary function named `aux_fun()` for each specified measure. This function manages the full update workflow — from checking synchronization status between GitHub and the network drive (Y:) to updating all interdependencies among auxiliary data measures.  
+Status checks and update logic now use metadata stored in sidecar files for efficiency, so large data files are not loaded just to check status.
 
--   At this stage, I am working with auxiliary data repositories under my GitHub account. Once testing is complete, we will run the functions on the actual folders under the owner **"PIP-Technical-Team"** organization.
-
--   Additional functions to facilitate log interaction are under development. For now, we use those already available in the `{pipfun}` package.
+To learn more about this process and the logic behind it, please refer to the dedicated article "Aux Data: Updating GitHub and the Y drive".
 
 ## 3️⃣ STEP 3 - COMPARE AUXILIARY DATA FILES (ACROSS RELEASES AND VERSIONS)
 
-In this section, we explore how to identify changes in auxiliary data files. We focus on the following measures: **cpi**, **pop**, **ppp**, **gdp**, and **pfw**.\
+In this section, we explore how to identify changes in auxiliary data files. We focus on the following measures: **cpi**, **pop**, **ppp**, **gdp**, and **pfw**.
 
 The current release used here is `"20250101_TEST"`.
 
@@ -142,10 +123,8 @@ changes_pop <- compare_aux_releases(
 
 # Inspect structure of the output
 names(changes_pop$pop)
-
 changes_pop$diff_values
 # changes_pop$diff_rows
-
 ```
 
 Each element in the returned list corresponds to a measure, depending on what you passed to the measure argument (e.g., "gdp", "pop", "ppp"). For each measure, the output is itself a list with three named elements:
@@ -156,7 +135,7 @@ Each element in the returned list corresponds to a measure, depending on what yo
 
 If no differences are found for a given measure, all three elements (diff_values, diff_rows, diff_cols) will be NULL or empty.
 
-Note: compare_aux_releases() uses the {myrror} package to detect changes. The key variables used for comparison are stored as attributes in the .qs files on the Y drive. The function reads these attributes to ensure consistency across releases.
+Note: `compare_aux_releases()` uses the {myrror} package to detect changes. The key variables used for comparison are stored as attributes in the .qs files on the Y drive. The function reads these attributes to ensure consistency across releases.
 
 **Compare within releases**
 
@@ -164,10 +143,7 @@ The `compare_aux_vintages()` function helps you detect changes within the same r
 
 By default, the function compares the current version with the immediately previous one (version = -1). You can specify a different relative version using the version argument (e.g., -2 to compare with two versions back).
 
-Check the `version` argument documentation for more details.
-
 ```{r}
-
 # Compare the current POP file with its previous version
 vintage_changes_pop <- compare_aux_vintages(
   measures = "pop",
@@ -175,11 +151,8 @@ vintage_changes_pop <- compare_aux_vintages(
 )
 
 names(vintage_changes_pop)
-
 vintage_changes_pop
 ```
-
-Each element in the returned (invisible) list corresponds to a measure provided in the measures argument. The result for each measure includes the differences in values, rows, and columns (as returned by the internal function `compare_vintage_versions()`).
 
 If no previous version is found for a given measure, or if an error occurs during comparison, the function will return NULL for that measure and optionally print a message (if verbose = TRUE).
 
@@ -191,13 +164,10 @@ vintage_changes_cpi <- compare_aux_vintages(
   measures = "cpi",
   version  = -1
 )
-
 ```
 
-## Notes (for your reference or future modifications):
+## Notes
 
--   These functions compare auxiliary data files either between releases or within the same release (i.e., across versions).
-
--   They are intended for use with files structured and saved through the new pipeline framework.
-
--   Since we haven’t run the full pipeline yet, I simulated changes (e.g., modified values, new rows or columns) in older files using helper functions for testing purposes (e.g., `simulate_old_release()` and `simulate_file_changes()` ). As a result, the output values shown here are not real and stem from the simulated changes.
+- These functions compare auxiliary data files either between releases or within the same release (i.e., across versions).
+- They are intended for use with files structured and saved through the new pipeline framework.
+- Since we haven’t run the full pipeline yet, I simulated changes (e.g., modified values, new rows or columns) in older files using helper functions for testing purposes (e.g., `simulate_old_release()` and `simulate_file_changes()`). As a result, the output values shown here are not real and stem from the simulated changes.
