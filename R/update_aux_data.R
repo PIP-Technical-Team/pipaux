@@ -82,6 +82,7 @@ process_dependencies <- function(measure,
             event   = "error",
             message = paste0("Failed to process dependency '", dep, "': ", e$message),
             name    = "pipaux_update_log",
+            args    = list(),
             logmeta = list(step = "ERROR_DEP", measure = dep)
           )
         }
@@ -125,6 +126,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
         event   = "update",
         message = paste0("Updated GitHub for: ", measure),
         name    = "pipaux_update_log",
+        args    = list(),
         logmeta = list(step = "UPDATE_GH", measure = measure)
       )
     }
@@ -159,6 +161,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
             event   = "update",
             message = paste0("Updated Y drive for: ", measure),
             name    = "pipaux_update_log",
+            args    = list(),
             logmeta = list(step = "UPDATE_Y", measure = measure)
           )
         }
@@ -169,6 +172,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
             event   = "error",
             message = paste0("Error updating Y drive: ", e$message),
             name    = "pipaux_update_log",
+            args    = list(),
             logmeta = list(step = "ERROR_Y", measure = measure)
           )
         }
@@ -244,6 +248,7 @@ aux_fun <- function(measure,
           event   = "error",
           message = paste0("Check failed: ", e$message),
           name    = "pipaux_update_log",
+          args    = list(),
           logmeta = list(step = "ERROR_CHECK", measure = measure)
         )
       }
@@ -263,6 +268,7 @@ aux_fun <- function(measure,
         event   = "info",
         message = paste0("No update needed for: ", measure),
         name    = "pipaux_update_log",
+        args    = list(),
         logmeta = list(step = "END", measure = measure)
       )
     }
@@ -279,6 +285,7 @@ aux_fun <- function(measure,
       event   = "success",
       message = "Measure and dependencies successfully updated",
       name    = "pipaux_update_log",
+      args    = list(),
       logmeta = list(step = "END", measure = measure)
     )
     cli::cli_alert_success(
