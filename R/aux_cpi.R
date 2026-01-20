@@ -184,11 +184,12 @@ aux_cpi_update <- function(force   = FALSE,
 
 
   #   ____________________________________________________________________________
-  #   Metadata        -stored under $user in pin metadata                                                       ####
+  #   Metadata                                                         ####
 
   key_cols <- c("country_code", "cpi_year",
                 "reporting_level", "year",
                 "survey_acronym")
+
 
   #   ____________________________________________________________________________
   #   Saving                                                                ####
@@ -242,7 +243,8 @@ aux_cpi_update <- function(force   = FALSE,
   force    = force,
   pk       = key_cols,
   metadata = list(gh_raw_sha = gh_raw_sha),
-  code     = aux_cpi_update
+  code     = aux_cpi_update,
+  code_label = "aux_cpi_update"
 )
 
   return(invisible(saved))

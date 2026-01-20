@@ -107,6 +107,27 @@ check_github_status <- function(measure,
 #' check_y_drive_status("cpi")
 check_y_drive_status <- function(measure,
                                  verbose = TRUE) {
+  
+  # Construct the path to the aux data file
+  ext <- "qs2"
+  sidecar_path <- fs::path(get_from_auxenv("aux_data_path"), measure, measure, ext = ext)
+
+  # Read sidecar metadata
+  sidecar <- tryCatch(
+    stamp::st_read_sidecar(sidecar_path),
+    error = function(e) {
+      if (verbose) {
+        cli::cli_alert_danger(
+          "Sidecar for measure '{measure}' not found: {e$message}"
+        )
+      }
+      return(NULL)
+    }
+  )
+
+  if (is.null(sidecar)) {
+    return(list(update_y = TRUE, reason = "Aux sidecar missing"))
+  }
 
   # Try loading aux data ONCE
   dt <- tryCatch(
@@ -125,8 +146,8 @@ check_y_drive_status <- function(measure,
     return(list(update_y = TRUE, reason = "Aux data missing"))
   }
 
-  attr_list <- attributes(dt)
-  gh        <- attr_list$gh
+  #attr_list <- attributes(dt)
+  gh        <- sidecar$gh_raw_sha
 
   if (is.null(gh) || length(gh) == 0) {
     if (verbose) {
@@ -174,22 +195,40 @@ check_y_drive_status <- function(measure,
   }
 
   # Function SHA comparison
-  fun_name <- paste0("aux_", measure)
+  # fun_name <- paste0("aux_", measure)
+  fun_name <- sidecar$code_label
 
-  if (!exists(fun_name, mode = "function")) {
-    if (verbose) {
-      cli::cli_alert_danger(
-        "Aux function {.strong {fun_name}} not found."
-      )
-    }
-    return(list(update_y = TRUE, reason = "Aux function missing"))
-  }
-
-  fun          <- get(fun_name, mode = "function")
-  fun_sha      <- digest::digest(body(fun))
-  stored_sha   <- attr_list$raw_sha_fun
-
+  if (is.null(fun_name) || !exists(fun_name, mode = "function")) {
+  return(list(update_y = TRUE, reason = "Generator function missing"))
+}
+  
+  fun <- get(fun_name, mode = "function")
+  fun_sha <- hash_code(fun)
+  stored_sha <- sidecar$code_hash
+  
   fun_changed <- is.null(stored_sha) || fun_sha != stored_sha
+
+
+
+  # if (!exists(fun_name, mode = "function")) {
+  #   if (verbose) {
+  #     cli::cli_alert_danger(
+  #       "Aux function {.strong {fun_name}} not found."
+  #     )
+  #   }
+  #   return(list(update_y = TRUE, reason = "Aux function missing"))
+  # }
+
+  # fun          <- get(fun_name, mode = "function")
+  # # fun_sha      <- digest::digest(body(fun))
+
+  # fun_sha <- stamp:::st_hash_code(fun)
+
+
+  # # stored_sha   <- attr_list$raw_sha_fun
+  # stored_sha <- sidecar$code_hash
+
+  # fun_changed <- is.null(stored_sha) || fun_sha != stored_sha
 
   if (verbose) {
     if (!fun_changed) {

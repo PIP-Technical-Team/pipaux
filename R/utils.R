@@ -518,3 +518,12 @@ NULL
 NULL
 
 
+#' Hash code using stamp's hashing logic
+#'
+#' Internal wrapper around stamp:::st_hash_code()
+#'
+#' @param x A function, expression, or character vector
+#' @keywords internal
+hash_code <- function(x) {
+  stamp:::st_hash_code(x)
+}
