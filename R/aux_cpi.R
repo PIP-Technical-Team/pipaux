@@ -163,6 +163,8 @@ aux_cpi_update <- function(force   = FALSE,
     ext     = "csv"
   )
 
+  gh_attr <- attributes(cpi)$gh
+  gh_raw_sha <- gh_attr$gh_raw_sha
 
   # validate cpi raw data
   cpi_validate_raw(cpi,
@@ -184,17 +186,9 @@ aux_cpi_update <- function(force   = FALSE,
   #   ____________________________________________________________________________
   #   Metadata        -stored under $user in pin metadata                                                       ####
 
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
   key_cols <- c("country_code", "cpi_year",
                 "reporting_level", "year",
                 "survey_acronym")
-
-  # cpi_metadata <- list(raw_sha_fun = raw_sha_fun,
-  #                      key_col     = key_cols)
-
 
   #   ____________________________________________________________________________
   #   Saving                                                                ####
@@ -216,8 +210,6 @@ aux_cpi_update <- function(force   = FALSE,
 
   )]
 
-  gh_attr <- attr(cpi, "gh")
-
   cols <- c("cpi2005", "cpi2011", "cpi2017", "cpi2021")
 
   cpi[, (cols) := lapply(.SD, as.numeric), .SDcols = cols]
@@ -232,14 +224,6 @@ aux_cpi_update <- function(force   = FALSE,
     value.name    = "cpi_value"
   )
 
-  setattr(cpi, "gh", gh_attr)
-
-  setattr(cpi, "aux_key", key_cols)
-
-  setattr(cpi,
-          "raw_sha_fun",
-          raw_sha_fun)
-
   # Convert 'cpi_year' from 'cpi2011' → numeric 2011
   cpi[, cpi_year := as.integer(sub("^cpi", "", cpi_year))]
 
@@ -253,11 +237,13 @@ aux_cpi_update <- function(force   = FALSE,
   #   Return                                                                ####
 
   saved <- pip_aux_save(
-    x        = cpi,
-    id       = measure,
-    force    = force,
-    pk       = key_cols
-  )
+  x        = cpi,
+  id       = measure,
+  force    = force,
+  pk       = key_cols,
+  metadata = list(gh_raw_sha = gh_raw_sha),
+  code     = aux_cpi_update
+)
 
   return(invisible(saved))
 }
