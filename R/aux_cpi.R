@@ -163,8 +163,8 @@ aux_cpi_update <- function(force   = FALSE,
     ext     = "csv"
   )
 
-  gh_attr <- attributes(cpi)$gh
-  gh_raw_sha <- gh_attr$gh_raw_sha
+  gh <- attributes(cpi)$gh
+  #gh_raw_sha <- gh$gh_raw_sha
 
   # validate cpi raw data
   cpi_validate_raw(cpi,
@@ -242,7 +242,8 @@ aux_cpi_update <- function(force   = FALSE,
   id       = measure,
   force    = force,
   pk       = key_cols,
-  metadata = list(gh_raw_sha = gh_raw_sha),
+  metadata = list(gh = gh),
+  #metadata = list(gh_raw_sha = gh_raw_sha),
   code     = aux_cpi_update,
   code_label = "aux_cpi_update"
 )

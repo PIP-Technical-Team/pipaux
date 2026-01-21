@@ -147,7 +147,7 @@ check_y_drive_status <- function(measure,
   }
 
   #attr_list <- attributes(dt)
-  gh        <- sidecar$gh_raw_sha
+  gh        <- sidecar$gh
 
   if (is.null(gh) || length(gh) == 0) {
     if (verbose) {
