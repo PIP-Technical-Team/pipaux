@@ -78,6 +78,8 @@ aux_censoring  <- function(action  = c("update", "load"),
       x        = dl,
       id       = measure,
       force    = force,
+      code     = aux_censoring,
+      code_label = "aux_censoring",
       #pk       = key_cols,  rm this because of x being list
       ...
     )

@@ -35,6 +35,8 @@ aux_nan <- function(action          = c("update", "load"),
       filename = "nan.csv"
     )
 
+    gh <- attributes(nan)$gh
+
     if (branch == "main") {
       branch <- ""
     }
@@ -53,7 +55,10 @@ aux_nan <- function(action          = c("update", "load"),
       x        = nan,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_nan,
+      code_label = "aux_nan"
     )
 
   } else {

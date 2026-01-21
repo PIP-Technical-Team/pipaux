@@ -46,29 +46,33 @@ aux_gdp <- function(action          = c("update", "load"),
       branch = branch,
       ext = "csv"
     )
-
+    # Collect gh attribute from loaded gdp
+    gh <- attributes(gdp)$gh
 
     if (branch == "main") {
       branch <- ""
     }
 
     # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
+    # raw_sha_fun <- digest::digest(body(
+    #   paste0("aux_", measure))
+    # )
 
-    setattr(gdp,
-            "raw_sha_fun",
-            raw_sha_fun)
-
+    # setattr(gdp,
+    #         "raw_sha_fun",
+    #         raw_sha_fun)
 
     key_cols <- c("country_code", "reporting_level", "year")
-    setattr(gdp, "aux_key", key_cols)
+
+    # setattr(gdp, "aux_key", key_cols)
     saved <- pip_aux_save(
       x        = gdp,
       id       = measure,
       force    = force,
-      pk       = key_cols
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_gdp_update,
+      code_label = "aux_gdp_update"
     )
 
   } else {

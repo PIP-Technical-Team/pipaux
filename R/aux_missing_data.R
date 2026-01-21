@@ -200,7 +200,9 @@ aux_missing_data <- function(action  = c("update", "load"),
       x        = pop_md,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      code     = aux_missing_data,
+      code_label = "aux_missing_data"
     )
 
     return(invisible(saved))

@@ -83,7 +83,10 @@ aux_weo <- function(action  = c("update", "load"),
       x        = dt,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_weo,
+      code_label = "aux_weo"
     )
 
     return(invisible(saved))

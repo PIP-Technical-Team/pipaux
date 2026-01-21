@@ -37,6 +37,7 @@ aux_country_list <- function(action       = c("update", "load"),
 
     ## Special national accounts --------
     cl <- aux_country_list_update(class_branch = class_branch)
+    gh <- attributes(cl)$gh
 
     #validate country list raw data
     cl_validate_raw(cl, detail = detail)
@@ -69,6 +70,9 @@ aux_country_list <- function(action       = c("update", "load"),
       id       = measure,
       force    = force,
       pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_country_list,
+      code_label = "aux_country_list",
       ...
     )
 

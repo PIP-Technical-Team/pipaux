@@ -65,8 +65,7 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
                              tag = tag,
                              ext = "csv")
 
-  # Get gh attributes before they get removed
-  gh <- attr(df, "gh")
+  gh <- attributes(df)$gh
 
   # validate raw metdata data
   metadata_validate_raw(metadata = df, detail = detail)
@@ -178,7 +177,10 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
     x        = df,
     id       = measure,
     pk       = key_cols,
-    force    = force
+    force    = force,
+    metadata = list(gh = gh),
+    code     = aux_metadata_update,
+    code_label = "aux_metadata_update"
   )
 
   #   ____________________________________________________________________________
@@ -215,9 +217,11 @@ aux_metaregion <- function(action = c("update", "load"),
 
   if (action == "update") {
     mr <- pipfun::load_from_gh(measure = measure,
-                               owner    = owner,
-                               branch   = branch,
-                               ext = "csv")
+                   owner    = owner,
+                   branch   = branch,
+                   ext = "csv")
+
+    gh <- attributes(mr)$gh
 
 
     ##  ............................................................................
@@ -243,9 +247,12 @@ aux_metaregion <- function(action = c("update", "load"),
 
     saved <-  pip_aux_save(
       x        = mr,
-      id = measure,
-      pk = key_cols,
-      force    = force
+      id       = measure,
+      pk       = key_cols,
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_metaregion,
+      code_label = "aux_metaregion"
     )
 
     return(invisible(saved))

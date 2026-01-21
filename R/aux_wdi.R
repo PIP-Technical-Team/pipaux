@@ -70,9 +70,11 @@ aux_wdi_update <- function(force   = FALSE,
   ##  From file                                          ####
 
     wdi <- pipfun::load_from_gh(measure = measure,
-                                owner = owner,
-                                branch = branch,
-                                ext    = "csv")
+                  owner = owner,
+                  branch = branch,
+                  ext    = "csv")
+
+    gh <- attributes(wdi)$gh
 
 
   # validate wdi raw data
@@ -105,7 +107,10 @@ aux_wdi_update <- function(force   = FALSE,
     x        = wdi,
     id       = measure,
     pk       = key_cols,
-    force    = force
+    force    = force,
+    metadata = list(gh = gh),
+    code     = aux_wdi_update,
+    code_label = "aux_wdi_update"
   )
 
   return(invisible(saved))

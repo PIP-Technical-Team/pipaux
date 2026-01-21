@@ -106,7 +106,9 @@ aux_regions <- function(action  = c("update", "load"),
       x        = dt,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      code     = aux_regions,
+      code_label = "aux_regions"
     )
 
     return(invisible(saved))

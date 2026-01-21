@@ -33,6 +33,8 @@ aux_sna <- function(action          = c("update", "load"),
       branch = branch,
       ext = "csv"
     )
+
+    gh <- attributes(sna)$gh
     if (branch == "main") {
       branch <- ""
     }
@@ -52,7 +54,10 @@ aux_sna <- function(action          = c("update", "load"),
       x        = sna,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_sna,
+      code_label = "aux_sna"
     )
 
 

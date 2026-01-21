@@ -71,6 +71,8 @@ aux_countries <- function(action  = c("update", "load"),
       id       = measure,
       force    = force,
       pk       = key_cols,
+      code     = aux_countries,
+      code_label = "aux_countries",
       ...
     )
 

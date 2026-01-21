@@ -172,6 +172,8 @@ aux_pfw_update <- function(force   = FALSE,
                               owner = owner,
                               branch = branch,
                               ext = "dta")
+  # Collect gh attribute from loaded pfw
+  gh <- attributes(pfw)$gh
   # validate pfw raw data
   pfw_validate_raw(pfw = pfw, detail = detail)
 
@@ -209,6 +211,9 @@ aux_pfw_update <- function(force   = FALSE,
     id       = measure,
     force    = force,
     pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_pfw_update,
+    code_label = "aux_pfw_update",
     ...
   )
 

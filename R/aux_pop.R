@@ -205,7 +205,10 @@ aux_pop_update <-  function(force   = FALSE,
     x        = pop,
     id       = measure,
     pk       = key_cols,
-    force    = force
+    force    = force,
+    metadata = list(gh = list(gh_spop = gh_spop, gh_pop_main = gh_pop_main)),
+    code     = aux_pop_update,
+    code_label = "aux_pop_update"
   )
 
 

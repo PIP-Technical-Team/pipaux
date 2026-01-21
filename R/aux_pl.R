@@ -38,6 +38,8 @@ aux_pl <- function(action = c("update", "load"),
       ext    = "yaml"
     )
 
+    gh <- lapply(dl, function(x) attributes(x)$gh)
+
     dt <- purrr::map_df(dl,aux_pl_clean)
 
   # Save
@@ -66,7 +68,10 @@ aux_pl <- function(action = c("update", "load"),
       x        = dt,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_pl,
+      code_label = "aux_pl"
     )
 
 

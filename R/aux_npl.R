@@ -38,6 +38,8 @@ aux_npl <- function(action  = c("update", "load"),
                                 ext    = "dta") |>
       setDT()
 
+    gh <- attributes(npl)$gh
+
     # validate npl raw data
     npl_validate_raw(npl = npl, detail = detail)
 
@@ -83,7 +85,10 @@ aux_npl <- function(action  = c("update", "load"),
       x        = npl,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_npl,
+      code_label = "aux_npl"
     )
 
 

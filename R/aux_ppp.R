@@ -274,7 +274,10 @@ aux_ppp_update <- function(force   = FALSE,
     x        = ppp,
     id       = measure,
     force    = force,
-    pk       = key_cols
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_ppp_update,
+    code_label = "aux_ppp_update"
   )
 
 

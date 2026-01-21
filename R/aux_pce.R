@@ -289,11 +289,16 @@ aux_pce_update <- function(force = FALSE,
           raw_sha_fun)
 
 
+  # Collect gh attribute from sna (main external GH source)
+  gh <- attributes(sna)$gh
   saved <-  pip_aux_save(
     x        = pce,
     id       = measure,
     force    = force,
-    pk       = key_cols
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_pce_update,
+    code_label = "aux_pce_update"
   )
 
   return(invisible(saved))

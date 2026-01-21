@@ -31,6 +31,8 @@ aux_indicators <- function(action  = c("update", "load"),
         ext    = "csv"
       )
 
+    gh <- attributes(df)$gh
+
     # Convert empty strings to NA in all character variables
     chr_df <-
       sapply(df, is.character) |>
@@ -67,9 +69,12 @@ aux_indicators <- function(action  = c("update", "load"),
 
   saved <- pip_aux_save(
       x        = df,
-      id = measure,
-      pk = key_cols,
-      force    = force
+      id       = measure,
+      pk       = key_cols,
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_indicators,
+      code_label = "aux_indicators"
     )
 
     return(invisible(saved))

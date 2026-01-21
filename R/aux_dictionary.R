@@ -26,10 +26,11 @@ aux_dictionary <- function(action  = c("update", "load"),
   if (action == "update") {
 
     df <- pipfun::load_from_gh(measure = measure,
-                       owner           = owner,
-                       branch          = branch,
-                       tag             = tag,
-                       ext             = "csv")
+               owner           = owner,
+               branch          = branch,
+               tag             = tag,
+               ext             = "csv")
+    gh <- attributes(df)$gh
     # Save dataset
     if (branch == "main") {
     branch <- ""
@@ -52,7 +53,10 @@ aux_dictionary <- function(action  = c("update", "load"),
       x        = df,
       id       = measure,
       force    = force,
-      pk       = key_cols
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_dictionary,
+      code_label = "aux_dictionary"
     )
 
     return(invisible(saved))

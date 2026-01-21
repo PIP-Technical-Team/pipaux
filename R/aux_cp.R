@@ -384,6 +384,9 @@ aux_cp_update <- function(force = FALSE,
                               filename = .x,
                               ext = "csv")
                           })
+  # Collect gh attributes from all raw files
+  gh_list <- lapply(raw_files, function(x) attributes(x)$gh)
+  gh_list <- gh_list[!vapply(gh_list, is.null, logical(1))] # remove NULLs
 
 
   dl <- aux_cp_clean(raw_files,
@@ -430,10 +433,14 @@ aux_cp_update <- function(force = FALSE,
   # Define key columns for country profiles data
   key_cols <- names(dl)
   setattr(dl, "aux_key", key_cols)
+  
   saved <- pip_aux_save(
     x        = dl,
     id       = measure,
     force    = force,
+    metadata = list(gh = gh_list),
+    code     = aux_cp_update,
+    code_label = "aux_cp_update",
     #pk       = key_cols, removed because of list
     ...
   )

@@ -33,6 +33,8 @@ aux_maddison <- function(action  = c("update", "load"),
       tag     = tag,
       ext     = "csv"
     )
+
+    gh <- attributes(mpd)$gh
   # validate raw data
     mpd_validate_raw(mpd = mpd, detail = detail)
 
@@ -62,7 +64,10 @@ aux_maddison <- function(action  = c("update", "load"),
       x        = mpd,
       id       = measure,
       pk       = key_cols,
-      force    = force
+      force    = force,
+      metadata = list(gh = gh),
+      code     = aux_maddison,
+      code_label = "aux_maddison"
     )
 
     return(invisible(saved))
