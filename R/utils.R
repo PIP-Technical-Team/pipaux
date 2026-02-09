@@ -484,7 +484,7 @@ pip_aux_save <- \(x,
 read_dependencies <- function(gh_user, owner) {
   dependencies <- paste(gh_user,
                         owner,
-                        "pipaux/metadata/Data/dependency.yml",
+                        "pipaux/metadata/Data/new_dependency.yml",
                         sep = "/") |>
     yaml::read_yaml()
 

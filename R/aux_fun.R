@@ -593,19 +593,6 @@ update_all_aux <- function(measures = NULL,
 
   # Add log ####
 
-  # # Optional: define all known measures if not provided
-  # all_measures <- gh::gh("GET /users/{username}/repos",
-  #                        username = getOption("pipfun.ghowner")) |>
-  #   vapply("[[", "", "name") |>
-  #   grep("^aux_", x = _, value = TRUE) |>
-  #   (\(x) sub("^aux_", "", x))()
-  #
-  # # Filter measures if user provides a subset
-  # if (!is.null(measures)) {
-  #   all_measures <- all_measures[all_measures %in% measures]
-  # }
-
-
   # Get measures ####
   all_measures_raw <- gh::gh("GET /users/{username}/repos",
                              username = getOption("pipfun.ghowner")) |>
@@ -628,20 +615,67 @@ update_all_aux <- function(measures = NULL,
     all_measures <- all_measures[all_measures %in% measures]
   }
 
+  # Log start of the overall update run (included in saved log)
+  if (log) {
+    pipfun::log_add(
+      event   = "info",
+      message = paste0("Starting update_all_aux for release: ", release_branch),
+      name    = "pipaux_update_log",
+      args    = list(),
+      logmeta = list(step = "START", measures = all_measures)
+    )
+  }
+
   # Track update status for each measure
+  # Use a single shared `processed` environment across the whole run
+  # so dependencies updated for one top-level measure are not reprocessed
+  # for subsequent top-level measures.
+  shared_processed <- new.env(parent = emptyenv())
+
   status <- setNames(lapply(all_measures,
                             function(msr) {
+    if (log) {
+      pipfun::log_add(
+        event   = "info",
+        message = paste0("Start processing measure: ", msr),
+        name    = "pipaux_update_log",
+        args    = list(),
+        logmeta = list(step = "START_MEASURE", measure = msr)
+      )
+    }
+
     tryCatch({
       aux_fun(measure = msr,
+              processed = shared_processed,
               verbose = verbose,
               log     = log,
               ...)
+
+      if (log) {
+        pipfun::log_add(
+          event   = "success",
+          message = paste0("Successfully updated measure: ", msr),
+          name    = "pipaux_update_log",
+          args    = list(),
+          logmeta = list(step = "END_MEASURE", measure = msr)
+        )
+      }
 
       list(measure = msr,
            success = TRUE,
            error   = NULL)
 
     }, error = function(e) {
+      if (log) {
+        pipfun::log_add(
+          event   = "error",
+          message = paste0("Failed to update measure: ", msr, " — ", e$message),
+          name    = "pipaux_update_log",
+          args    = list(),
+          logmeta = list(step = "ERROR_MEASURE", measure = msr, error = e$message)
+        )
+      }
+
       list(measure = msr,
            success = FALSE,
            error   = e$message)
@@ -653,9 +687,27 @@ update_all_aux <- function(measures = NULL,
 
   if (log_save == TRUE) {
 
+    id_path <- fs::fs_path(
+      get_from_auxenv("aux_metadata_path"),
+      "logs",
+      paste0("pipaux_update_log_", release_branch, "_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".log")
+    )
+
+    # Add an entry to the in-memory log before saving so the saved file includes it
+    if (log) {
+      pipfun::log_add(
+        event   = "info",
+        message = paste0("Saving full update log to: ", id_path),
+        name    = "pipaux_update_log",
+        args    = list(),
+        logmeta = list(step = "SAVE_LOG", path = id_path)
+      )
+    }
+
     pipfun::log_save(
       name = "pipaux_update_log",
-      board = get_from_auxenv("aux_metadata_board")
+      alias = get_from_auxenv("aux_meta_alias"),
+      id = id_path
     )
 
   }
