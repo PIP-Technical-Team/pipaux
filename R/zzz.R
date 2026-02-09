@@ -33,6 +33,12 @@ pipuax_default_options <- list(
   pip_folders <- pipfun::get_pip_folders(verbose = FALSE)
   rlang::env_poke(.pipaux, "pip_folders", pip_folders)
 
+  # Get all pip aliases relevant to aux data
+  aux_alias <- pipfun::get_pip_aliases("aux_data", verbose = FALSE)
+  rlang::env_poke(.pipaux, "aux_alias", aux_alias)
+  aux_meta_alias <- pipfun::get_pip_aliases("aux_metadata", verbose = FALSE)
+  rlang::env_poke(.pipaux, "aux_meta_alias", aux_meta_alias)
+
   if (is.null(pip_folders)) stop("Cannot find pip_folders in the environment.")
   
   # Attach relevant paths to .pipaux environment

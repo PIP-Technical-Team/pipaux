@@ -467,7 +467,7 @@ pip_aux_save <- \(x,
   id_path <- fs::path(id, paste0(id, ".qs2"))
 
   # alias to pass into pipload::pip_write
-  alias <- pipfun::get_pip_aliases("aux_data")
+  alias <- get_from_auxenv("aux_alias")
 
   # Save to the aux_data_path using pipload::pip_write
   pipload::pip_write(
