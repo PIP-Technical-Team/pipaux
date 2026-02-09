@@ -17,7 +17,7 @@ aux_censoring  <- function(action  = c("update", "load"),
                            force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL,
-                          ...) {
+                           ...) {
 
   measure <- "censoring"
   action <- match.arg(action)
@@ -80,7 +80,7 @@ aux_censoring  <- function(action  = c("update", "load"),
       force    = force,
       code     = aux_censoring,
       code_label = "aux_censoring",
-      #pk       = key_cols,  rm this because of x being list
+      #pk       = key_cols,  rm this because of dl being list
       ...
     )
 

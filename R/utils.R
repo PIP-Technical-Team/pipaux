@@ -460,15 +460,21 @@ pip_aux_save <- \(x,
                   ...) {
 
   
-  dir_path <- fs::path(get_from_auxenv("aux_data_path"), id)
-  if (!fs::dir_exists(dir_path)) fs::dir_create(dir_path)
-  
+  # dir_path <- fs::path(get_from_auxenv("aux_data_path"), id)
+  # if (!fs::dir_exists(dir_path)) fs::dir_create(dir_path)
+
+  # file path to pass to id
+  id_path <- fs::path(id, paste0(id, ".qs2"))
+
+  # alias to pass into pipload::pip_write
+  alias <- pipfun::get_pip_aliases("aux_data")
+
   # Save to the aux_data_path using pipload::pip_write
   pipload::pip_write(
     x        = x,
-    id       = id,
-    dir      = dir_path,
+    id       = id_path,
     force_identical_write = force,
+    alias = alias,
     ...
   )
 
