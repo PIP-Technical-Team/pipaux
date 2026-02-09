@@ -533,3 +533,94 @@ NULL
 hash_code <- function(x) {
   stamp:::st_hash_code(x)
 }
+
+#' Plot dependency graph
+#'
+#' Internal utility to visualize object dependencies returned by
+#' `read_dependencies()`. Produces a directed dependency graph where nodes
+#' are colored according to their role:
+#' \itemize{
+#'   \item purple: root objects (no dependencies)
+#'   \item blue: intermediate objects
+#'   \item green: leaf / final objects
+#' }
+#'
+#' The function returns the underlying `igraph` object invisibly so it can
+#' be reused for further analysis.
+#'
+#' @param dependencies_all Named list of character vectors describing
+#'   dependencies, as returned by `read_dependencies()`.
+#'
+#' @return Invisibly returns an `igraph` object representing the dependency DAG.
+#'
+#' @keywords internal
+plot_dependencies <- function(dependencies_all) {
+
+  if (!requireNamespace("igraph", quietly = TRUE)) {
+    stop("Package 'igraph' is required.")
+  }
+
+  edges <- do.call(
+    rbind,
+    lapply(names(dependencies_all), function(x) {
+      deps <- dependencies_all[[x]]
+      if (length(deps) == 0) return(NULL)
+      cbind(from = x, to = deps)
+    })
+  )
+
+  g <- igraph::graph_from_data_frame(edges, directed = TRUE)
+
+  indeg  <- igraph::degree(g, mode = "in")
+  outdeg <- igraph::degree(g, mode = "out")
+
+  cols <- ifelse(outdeg == 0,
+                 grDevices::adjustcolor("#A8D5A2", alpha.f = 0.75),
+          ifelse(indeg == 0,
+                 grDevices::adjustcolor("#C6A0DC", alpha.f = 0.75),
+                 grDevices::adjustcolor("#9EC9FF", alpha.f = 0.75)))
+
+  lay0 <- igraph::layout_with_sugiyama(g)$layout
+  lay  <- igraph::layout_with_fr(g, coords = lay0, niter = 2000)
+
+  igraph::E(g)$curved <- 0.15
+
+  plot(
+    g,
+    layout = lay,
+    vertex.size = 26,
+    vertex.color = cols,
+    vertex.frame.color = "white",
+    vertex.label.font = 2,
+    vertex.label.cex = 0.85,
+    vertex.label.color = "grey20",
+    edge.arrow.size = 0.35,
+    edge.color = "grey70",
+    margin = 0.2
+  )
+
+  legend(
+    "topleft",
+    legend = c("root (no deps)", "intermediate", "leaf"),
+    fill = grDevices::adjustcolor(c("#C6A0DC", "#9EC9FF", "#A8D5A2"), alpha.f = 0.75),
+    border = NA,
+    bty = "n",
+    cex = 0.9
+  )
+
+  invisible(g)
+}
+
+#' Plot dependencies from GitHub
+#'
+#' Downloads and visualizes object dependencies for a given GitHub user/repo.
+#'
+#' @param gh_user GitHub username
+#' @param owner Repository owner
+#'
+#' @return Invisibly returns an `igraph` object representing the dependency DAG.
+#' @export
+plot_dependencies_from_github <- function(gh_user, owner) {
+  deps <- read_dependencies(gh_user, owner)
+  plot_dependencies(deps)
+}
