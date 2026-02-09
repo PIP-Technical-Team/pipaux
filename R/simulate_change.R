@@ -94,7 +94,7 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   pipload::pip_write(
     x = dt,
     id = measure,
-    dir = measure_dir,
+    #dir = measure_dir,
     format = "qs2"
   )
 

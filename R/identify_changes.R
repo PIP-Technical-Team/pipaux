@@ -52,11 +52,12 @@ get_aux_changes <- function(measure = "cpi",
 
   # Load old data (previous release) using pip_read and explicit path
   release_root <- fs::path_dir(aux_data_path)
+  id_path <- fs::path(release_root, old_release, measure, measure, ext = "qs2")
 
-  old_artifact_dir <- fs::path(release_root, old_release, measure)
+  #old_artifact_dir <- fs::path(release_root, old_release, measure)
   
   old_df <- tryCatch({
-    pipload::pip_read(id = measure, dir = old_artifact_dir, format = "qs2", verbose = verbose)
+    pipload::pip_read(id = id_path, format = "qs2", verbose = verbose)
   }, error = function(e) {
     cli::cli_alert_warning(
       "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
@@ -69,7 +70,8 @@ get_aux_changes <- function(measure = "cpi",
     return(invisible(NULL))
   }
 
-  key_cols <- attributes(new_df)$aux_key
+  #key_cols <- attributes(new_df)$aux_key
+  key_cols <- stamp::st_get_pk(cpi)
   
   if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
     cli::cli_abort("Key variables could not be retrieved from data attributes.")
@@ -298,7 +300,7 @@ compare_vintage_versions <- function(measure,
   old_df <- tryCatch({
 
     pipload::load_aux_data(measure = measure,
-                                 version = version)
+                           version = version)
 
   },
 
