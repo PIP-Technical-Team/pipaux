@@ -8,7 +8,7 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_income_groups <- function(action       = c("update", "load"),
-                              force        = FALSE,
+                              #force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
                               detail       = getOption("pipaux.detail.raw")
 ) {
@@ -92,7 +92,7 @@ aux_income_groups <- function(action       = c("update", "load"),
       x        = ig,
       id       = measure,
       pk       = key_cols,
-      force    = force,
+      #force    = force,
       metadata = list(gh = gh),
       code     = aux_income_groups,
       code_label = "aux_income_groups"

@@ -252,6 +252,7 @@ pip_aux_save(x = df, id = measure, metadata = list(gh = gh), ...)
 
 ### `aux_income_groups.R`
 - Source type: GH-raw (GPID-WB/Class). Persists `attributes(ig)$gh` to metadata and records `raw_sha_fun`.
+- Repo in GitHub where release branch is created is `GPID-WB/Class` (not PIP-Technical-Team) — workflow should ensure the correct owner/repo is used in the loader and that GH metadata is captured for provenance.
 
 ### Remaining measures (summarized)
 - `aux_indicators.R`: GH-raw (indicators CSV/JSON). Persist `metadata$gh`.

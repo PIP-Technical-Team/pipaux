@@ -280,6 +280,11 @@ check_status <- function(measure,
     wrk_release$identity
   )
 
+  # Resolve special repo/owner for certain measures
+  ro <- resolve_measure_repo_owner(measure, repo, owner)
+  repo <- ro$repo
+  owner <- ro$owner
+
   if (verbose) {
     cli::cli_h1("Checking Status for {measure}")
   }

@@ -109,7 +109,7 @@ process_dependencies <- function(measure,
 #'
 #' @return Invisibly returns NULL.
 #' @keywords internal
-execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, force, verbose, log) {
+execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log) {
 
   # --- GitHub update ---
   if (update_gh) {
@@ -145,7 +145,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
     update_args <- list(
       action = "update",
       branch = release_branch,
-      force  = force,
+      #force  = force,
       owner  = owner,
       tag    = tag,
       repo   = repo
@@ -155,7 +155,22 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 
     tryCatch(
       {
-        do.call(func, filtered_args)
+        res <- do.call(func, filtered_args)
+
+        # If the aux save returned a fallback (NULL) result, treat as error.
+        if (is.null(res)) {
+          if (log) {
+            pipfun::log_add(
+              event   = "error",
+              message = paste0("Y drive update returned NULL (fallback) for: ", measure),
+              name    = "pipaux_update_log",
+              args    = list(),
+              logmeta = list(step = "ERROR_Y_SAVE", measure = measure)
+            )
+          }
+          stop(sprintf("Y drive update failed for measure '%s': returned NULL", measure))
+        }
+
         if (log) {
           pipfun::log_add(
             event   = "update",
@@ -209,7 +224,7 @@ aux_fun <- function(measure,
                     repo      = NULL,
                     owner     = getOption("pipfun.ghowner"),
                     processed = new.env(parent = emptyenv()),
-                    force     = FALSE,
+                    #force     = FALSE,
                     tag       = NULL,
                     log       = TRUE,
                     log_overwrite = TRUE,
@@ -277,7 +292,7 @@ aux_fun <- function(measure,
   }
 
   # Execute updates
-  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, force, verbose, log)
+  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log)
 
   # Final log
   if (is_top_level() && log) {
