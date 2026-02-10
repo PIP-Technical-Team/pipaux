@@ -4,8 +4,6 @@ pipuax_default_options <- list(
   pipaux.pppyear       = 2017,
   pipaux.popsrc        = "emi",
   pipaux.madsrc        = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
-  # pipaux.key_vars      = c("country_code", "year", "reporting_level",
-  #                        "survey_acronym", "welfare_type"),
   pipfun.ghowner       = "PIP-Technical-Team",
   joyn.verbose         = FALSE,
   pipfun.verbose       = TRUE,
