@@ -10,7 +10,6 @@
 #' @export
 #' @import data.table
 aux_pfw <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
@@ -29,8 +28,7 @@ aux_pfw <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pfw_update(force   = force,
-                   owner   = owner,
+    aux_pfw_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail,
@@ -157,8 +155,7 @@ aux_pfw_clean <- function(y) {
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pfw_update <- function(force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw"),
@@ -209,7 +206,6 @@ aux_pfw_update <- function(force   = FALSE,
   saved <- pip_aux_save(
     x        = pfw,
     id       = measure,
-    force    = force,
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_pfw_update,

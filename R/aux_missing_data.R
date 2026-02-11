@@ -7,7 +7,6 @@
 #'   a data.table
 #' @export
 aux_missing_data <- function(action  = c("update", "load"),
-                             force   = FALSE,
                              owner   = getOption("pipfun.ghowner"),
                              tag     = NULL
                              ) {
@@ -200,7 +199,6 @@ aux_missing_data <- function(action  = c("update", "load"),
       x        = pop_md,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       code     = aux_missing_data,
       code_label = "aux_missing_data"
     )

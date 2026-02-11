@@ -14,7 +14,6 @@
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),
-                             force        = FALSE,
                              detail       = getOption("pipaux.detail.raw"),
                              ...
                              ) {
@@ -68,7 +67,6 @@ aux_country_list <- function(action       = c("update", "load"),
     saved <- pip_aux_save(
       x        = cl,
       id       = measure,
-      force    = force,
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_country_list,
@@ -80,7 +78,7 @@ aux_country_list <- function(action       = c("update", "load"),
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure, version = 0)
+    df <- pipload::load_aux_data(measure = measure)
 
     return(df)
   }

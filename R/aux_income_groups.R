@@ -92,7 +92,6 @@ aux_income_groups <- function(action       = c("update", "load"),
       x        = ig,
       id       = measure,
       pk       = key_cols,
-      #force    = force,
       metadata = list(gh = gh),
       code     = aux_income_groups,
       code_label = "aux_income_groups"

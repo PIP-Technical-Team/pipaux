@@ -14,7 +14,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_gdm <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -34,8 +33,7 @@ aux_gdm <- function(action  = c("update", "load"),
 
   if (action == "update") {
 
-    aux_gdm_update(force   = force,
-                   owner   = owner,
+    aux_gdm_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -54,8 +52,7 @@ aux_gdm <- function(action  = c("update", "load"),
 #'
 #' @inheritParams aux_gdm
 #' @keywords internal
-aux_gdm_update <- function(force = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -267,17 +264,6 @@ aux_gdm_update <- function(force = FALSE,
 
   setattr(df, "gh", gh)
 
-  # ----- function raw sha ----------------------
-
-  # raw_sha_fun <- digest::digest(body(
-  #   paste0("aux_", measure))
-  # )
-
-
-  # setattr(df,
-  #         "raw_sha_fun",
-  #         raw_sha_fun)
-
 
   if (branch == "main") {
     branch <- ""
@@ -291,7 +277,6 @@ aux_gdm_update <- function(force = FALSE,
     x        = df,
     id       = measure,
     pk       = key_cols,
-    force    = force,
     metadata = list(gh = gh),
     code     = aux_gdm_update,
     code_label = "aux_gdm_update"

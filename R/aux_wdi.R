@@ -9,7 +9,6 @@
 #'   and "gh" are synonymous
 #' @export
 aux_wdi <- function(action          = c("update", "load"),
-                    force           = FALSE,
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -29,8 +28,7 @@ aux_wdi <- function(action          = c("update", "load"),
 
 
   if (action == "update") {
-    aux_wdi_update(force   = force,
-                   owner   = owner,
+    aux_wdi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -55,8 +53,7 @@ aux_wdi <- function(action          = c("update", "load"),
 #'
 #' @examples
 #' aux_wdi_update()
-aux_wdi_update <- function(force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -107,7 +104,6 @@ aux_wdi_update <- function(force   = FALSE,
     x        = wdi,
     id       = measure,
     pk       = key_cols,
-    force    = force,
     metadata = list(gh = gh),
     code     = aux_wdi_update,
     code_label = "aux_wdi_update"

@@ -9,7 +9,6 @@
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
-                    force   = FALSE,
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
                     ppp_defaults = TRUE) {
@@ -51,8 +50,7 @@ aux_ppp <- function(action = c("update", "load"),
   #   Computations                                                            ####
   if (action == "update") {
 
-    aux_ppp_update(force   = force,
-                   owner   = owner,
+    aux_ppp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -162,8 +160,7 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #'
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_ppp_update <- function(force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -273,7 +270,6 @@ aux_ppp_update <- function(force   = FALSE,
   saved <-  pip_aux_save(
     x        = ppp,
     id       = measure,
-    force    = force,
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_ppp_update,

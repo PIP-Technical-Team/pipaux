@@ -8,7 +8,6 @@
 #'   and "gh" are synonymous
 #' @export
 aux_sna <- function(action          = c("update", "load"),
-                    force           = FALSE,
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL) {
 
@@ -54,7 +53,6 @@ aux_sna <- function(action          = c("update", "load"),
       x        = sna,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_sna,
       code_label = "aux_sna"
@@ -166,7 +164,6 @@ sna_fy_validate_raw <- function(sna_fy, detail = getOption("pipaux.detail.raw"))
 #' @inheritParams pipfun::load_from_gh
 #' @export
 fake_aux_sna <- function(action  = c("update", "load"),
-                         force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          maindir = getOption("pipaux.working_dir"),
                          branch  = paste0(wrk_release$release, "_", wrk_release$identity),

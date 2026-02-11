@@ -9,7 +9,6 @@
 #' @import data.table
 aux_maddison <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
-                         force   = FALSE,
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "maddison"
@@ -64,7 +63,6 @@ aux_maddison <- function(action  = c("update", "load"),
       x        = mpd,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_maddison,
       code_label = "aux_maddison"

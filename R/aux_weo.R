@@ -14,7 +14,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_weo <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -83,7 +82,6 @@ aux_weo <- function(action  = c("update", "load"),
       x        = dt,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_weo,
       code_label = "aux_weo"

@@ -7,7 +7,6 @@
 #' @inheritParams load_raw_indicators
 #' @export
 aux_metadata <- function(action  = c("update", "load"),
-                         force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
@@ -27,7 +26,6 @@ aux_metadata <- function(action  = c("update", "load"),
   if (action == "update") {
 
     aux_metadata_update(
-      force   = force,
       owner   = owner,
       branch  = branch,
       tag     = tag,
@@ -49,7 +47,6 @@ aux_metadata <- function(action  = c("update", "load"),
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
 aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
-                                force = FALSE,
                                 branch  = NULL,
                                 tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
@@ -177,7 +174,6 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
     x        = df,
     id       = measure,
     pk       = key_cols,
-    force    = force,
     metadata = list(gh = gh),
     code     = aux_metadata_update,
     code_label = "aux_metadata_update"
@@ -197,7 +193,6 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_metaregion <- function(action = c("update", "load"),
-                           force = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL
 ) {
@@ -249,7 +244,6 @@ aux_metaregion <- function(action = c("update", "load"),
       x        = mr,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_metaregion,
       code_label = "aux_metaregion"

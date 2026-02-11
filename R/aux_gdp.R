@@ -9,7 +9,6 @@
 #'   and "gh" are synonymous
 #' @export
 aux_gdp <- function(action          = c("update", "load"),
-                    force           = FALSE,
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -32,8 +31,7 @@ aux_gdp <- function(action          = c("update", "load"),
   if (action == "update") {
 
     # Get raw data from various sources, format it, and push it to github
-    aux_gdp_update(force   = force,
-                   owner   = owner,
+    aux_gdp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -53,22 +51,12 @@ aux_gdp <- function(action          = c("update", "load"),
       branch <- ""
     }
 
-    # ----- function raw sha ------
-    # raw_sha_fun <- digest::digest(body(
-    #   paste0("aux_", measure))
-    # )
-
-    # setattr(gdp,
-    #         "raw_sha_fun",
-    #         raw_sha_fun)
-
     key_cols <- c("country_code", "reporting_level", "year")
 
     # setattr(gdp, "aux_key", key_cols)
     saved <- pip_aux_save(
       x        = gdp,
       id       = measure,
-      force    = force,
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_gdp_update,
@@ -95,11 +83,8 @@ aux_gdp <- function(action          = c("update", "load"),
 #' that's not really xls.
 #'
 #' @export
-aux_gdp_weo <- function(action = "update",
-                        force = FALSE,
-                        maindir = getOption("pipaux.working_dir")) {
+aux_gdp_weo <- function(action = "update") {
   measure <- "weo"
-  msrdir <- fs::path(maindir, "aux_data/", measure) # measure dir
 
   if (action == "update") {
 
@@ -222,30 +207,17 @@ aux_gdp_weo <- function(action = "update",
     dt <- dt[, c("country_code", "year", "weo_gdp")]
 
     # Save dataset
-    # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
 
     setattr(dt, "aux_name", "pfw")
 
-    setattr(dt,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-    # aux_sign_save(
-    #   x = dt,
-    #   measure = measure,
-    #   msrdir = msrdir,
-    #   force = force
-    # )
-
-    saved <- pipfun::pip_sign_save(
-      x       = dt,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
-    )
+    saved <- pip_aux_save(
+    x        = dt,
+    id       = measure,
+    #pk       = key_cols,
+    #metadata = list(gh = gh),
+    code     = aux_gdp_weo,
+    code_label = "aux_gdp_weo"
+  )
 
     return(
       invisible(saved)

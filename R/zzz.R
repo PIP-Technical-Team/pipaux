@@ -51,7 +51,7 @@ pipuax_default_options <- list(
                    overwrite = TRUE)
   
   # ---- Initialize stamp defaults for pipaux ----
-  pipaux_reset_stamp_options()
+  #pipaux_reset_stamp_options()
 
 
   invisible()

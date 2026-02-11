@@ -6,7 +6,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_cp <- function(action  = c("update", "load"),
-                   force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
                   ...) {
@@ -24,8 +23,7 @@ aux_cp <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_cp_update(force   = force,
-                  owner   = owner,
+    aux_cp_update(owner   = owner,
                   branch  = branch,
                   tag     = tag,
                 ...)
@@ -351,8 +349,7 @@ clean_cp_names <- function(x) {
 #'
 #' @inheritParams aux_cp
 #' @keywords internal
-aux_cp_update <- function(force = FALSE,
-                          owner   = getOption("pipfun.ghowner"),
+aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
                           branch,
                           tag     = tag,
                         ...) {
@@ -437,7 +434,6 @@ aux_cp_update <- function(force = FALSE,
   saved <- pip_aux_save(
     x        = dl,
     id       = measure,
-    force    = force,
     metadata = list(gh = gh_list),
     code     = aux_cp_update,
     code_label = "aux_cp_update",

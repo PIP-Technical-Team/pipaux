@@ -7,7 +7,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_npl <- function(action  = c("update", "load"),
-                   force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
                    detail  = getOption("pipaux.detail.raw")) {
@@ -85,7 +84,6 @@ aux_npl <- function(action  = c("update", "load"),
       x        = npl,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_npl,
       code_label = "aux_npl"

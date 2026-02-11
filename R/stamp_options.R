@@ -43,6 +43,6 @@ pipaux_reset_stamp_options <- function() {
 #'
 #' @export
 pipaux_set_stamp_option <- function(...) {
-  stamp::st_opts_set(...)
+  stamp::st_opts(...)
   invisible(TRUE)
 }

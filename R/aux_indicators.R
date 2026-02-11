@@ -6,7 +6,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_indicators <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL) {
   measure <- "indicators"
@@ -71,7 +70,6 @@ aux_indicators <- function(action  = c("update", "load"),
       x        = df,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_indicators,
       code_label = "aux_indicators"

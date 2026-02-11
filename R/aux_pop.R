@@ -8,7 +8,6 @@
 #' @param from character: Source for population data.
 #' @export
 aux_pop <- function(action = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -27,7 +26,6 @@ aux_pop <- function(action = c("update", "load"),
 
   if (action == "update") {
     aux_pop_update(
-      force   = force,
       owner   = owner,
       branch  = branch,
       tag     = tag,
@@ -47,8 +45,7 @@ aux_pop <- function(action = c("update", "load"),
 #' @param from character: Source for population data.
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
-aux_pop_update <-  function(force   = FALSE,
-                            owner   = getOption("pipfun.ghowner"),
+aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
                             branch  = NULL,
                             tag     = branch,
                             detail  = getOption("pipaux.detail.raw")) {

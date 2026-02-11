@@ -8,7 +8,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_pce <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -27,8 +26,7 @@ aux_pce <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pce_update(force   = force,
-                   owner   = owner,
+    aux_pce_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -48,8 +46,7 @@ aux_pce <- function(action  = c("update", "load"),
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pce_update <- function(force = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -294,7 +291,6 @@ aux_pce_update <- function(force = FALSE,
   saved <-  pip_aux_save(
     x        = pce,
     id       = measure,
-    force    = force,
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_pce_update,

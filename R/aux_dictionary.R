@@ -6,7 +6,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_dictionary <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL) {
   measure <- "dictionary"
@@ -26,10 +25,10 @@ aux_dictionary <- function(action  = c("update", "load"),
   if (action == "update") {
 
     df <- pipfun::load_from_gh(measure = measure,
-               owner           = owner,
-               branch          = branch,
-               tag             = tag,
-               ext             = "csv")
+                              owner           = owner,
+                              branch          = branch,
+                              tag             = tag,
+                              ext             = "csv")
     gh <- attributes(df)$gh
     # Save dataset
     if (branch == "main") {
@@ -52,7 +51,6 @@ aux_dictionary <- function(action  = c("update", "load"),
     saved <- pip_aux_save(
       x        = df,
       id       = measure,
-      force    = force,
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_dictionary,

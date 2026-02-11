@@ -8,7 +8,6 @@
 #'   and "gh" are synonymous
 #' @export
 aux_nan <- function(action          = c("update", "load"),
-                    force           = FALSE,
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL) {
 
@@ -55,7 +54,6 @@ aux_nan <- function(action          = c("update", "load"),
       x        = nan,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       metadata = list(gh = gh),
       code     = aux_nan,
       code_label = "aux_nan"

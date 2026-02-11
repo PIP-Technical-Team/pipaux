@@ -5,14 +5,12 @@
 #' @param action character: Either "load" or "update". Default is "update". If
 #'   "update" data will be updated on the system. If "load" data is loaded in
 #'   memory.
-#' @param force logical: If TRUE data will be overwritten.
 #' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
 #'
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
@@ -47,8 +45,7 @@ aux_cpi <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    aux_cpi_update(force   = force,
-                   owner   = owner,
+    aux_cpi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
@@ -140,8 +137,7 @@ aux_cpi_clean <- function(x,
 #' @inheritParams aux_cpi
 #' @keywords internal
 #'
-aux_cpi_update <- function(force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
                            detail  = getOption("pipaux.detail.raw"),
                            branch  = NULL,
                            tag = tag
@@ -240,10 +236,8 @@ aux_cpi_update <- function(force   = FALSE,
   saved <- pip_aux_save(
   x        = cpi,
   id       = measure,
-  force    = force,
   pk       = key_cols,
   metadata = list(gh = gh),
-  #metadata = list(gh_raw_sha = gh_raw_sha),
   code     = aux_cpi_update,
   code_label = "aux_cpi_update"
 )

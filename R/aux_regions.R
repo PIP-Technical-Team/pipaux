@@ -6,7 +6,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_regions <- function(action  = c("update", "load"),
-                        force   = FALSE,
                         owner   = getOption("pipfun.ghowner"),
                         tag     = NULL
                         ) {
@@ -106,7 +105,6 @@ aux_regions <- function(action  = c("update", "load"),
       x        = dt,
       id       = measure,
       pk       = key_cols,
-      force    = force,
       code     = aux_regions,
       code_label = "aux_regions"
     )
