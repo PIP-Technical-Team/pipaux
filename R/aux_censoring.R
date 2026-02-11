@@ -14,7 +14,6 @@
 #' @param ... Additional arguments passed to [pip_aux_save()] when `action = "update"`.
 #' @export
 aux_censoring  <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL,
                            ...) {
@@ -77,7 +76,6 @@ aux_censoring  <- function(action  = c("update", "load"),
     saved <- pip_aux_save(
       x        = dl,
       id       = measure,
-      force    = force,
       code     = aux_censoring,
       code_label = "aux_censoring",
       #pk       = key_cols,  rm this because of dl being list

@@ -288,7 +288,7 @@ str(attributes(obj)$raw_sha_fun)
 
 ---
 
-## Appendix — developer checks & snippets
+# Appendix — developer checks & snippets
 
 - Inspect `.pipaux` and key paths:
 ```r
@@ -305,6 +305,24 @@ devtools::load_all()
 pipfun::setup_working_release()
 aux_fun("gdp", verbose = TRUE, force = FALSE)
 pipfun::log_get("pipaux_update_log")
+```
+
+- Check filesystem status including the human-readable reasons:
+
+```r
+# Request status plus reasons (useful in scripts / CI checks)
+s <- get_fs_status("gdp", include_reason = TRUE)
+s
+# Typical return (an R list):
+# $update_gh  TRUE | FALSE | NA        # whether GitHub needs an update (NA = unknown/unreachable)
+# $update_y   TRUE | FALSE             # whether Y-drive artifact needs update
+# $gh_reason  "Release branch missing" | "GitHub up to date" | "Branch comparison failed" | NA
+# $y_reason   "Y drive out of sync" | "Y drive up to date" | "Generator function missing" | explanatory message
+
+# Example handling:
+if (isTRUE(s$update_gh)) {
+  # update both GH and Y drive according to policy
+}
 ```
 
 - Generate dependency diagram (save to `inst/images/dependencies.png`):

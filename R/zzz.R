@@ -49,6 +49,9 @@ pipuax_default_options <- list(
   # Initialize a log
   pipfun::log_init("pipaux_update_log",
                    overwrite = TRUE)
+  
+  # ---- Initialize stamp defaults for pipaux ----
+  pipaux_reset_stamp_options()
 
 
   invisible()

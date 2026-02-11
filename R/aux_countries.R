@@ -6,10 +6,9 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_countries <- function(action  = c("update", "load"),
-                          force   = FALSE,
                           owner   = getOption("pipfun.ghowner"),
                           tag     = NULL,
-                        ...) {
+                          ...) {
 
   measure <- "countries"
   action  <- match.arg(action)
