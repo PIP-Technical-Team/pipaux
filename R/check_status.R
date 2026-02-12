@@ -149,13 +149,16 @@ check_y_drive_status <- function(measure,
   gh        <- sidecar$gh
 
   if (is.null(gh) || length(gh) == 0) {
-    if (verbose) {
-      cli::cli_alert_danger("Missing or empty 'gh' attribute in aux data.")
-    }
-    return(list(update_y = TRUE, reason = "Missing GitHub metadata"))
-  }
 
-  # Normalize: expect a list of entries
+    if (verbose) {
+      cli::cli_alert_danger("Missing or empty 'gh' attribute in aux data. Sync status with GH skipped.")
+    }
+    
+    sha_mismatch <- FALSE
+
+  } else {
+    # Check for SHA mismatches
+    # Normalize: expect a list of entries
   if (!is.list(gh[[1]])) {
     gh <- list(gh)
   }
@@ -191,8 +194,10 @@ check_y_drive_status <- function(measure,
       sha_mismatch <- TRUE
       break
     }
-  }
+  } 
+} # end gh check
 
+  
   # Function SHA comparison
   # fun_name <- paste0("aux_", measure)
   fun_name <- sidecar$code_label

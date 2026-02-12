@@ -29,7 +29,6 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 #' @param measure Character. The measure to process.
 #' @param processed Environment. Tracks processed measures to avoid cycles.
 #' @param owner Character. Repository owner.
-#' @param force Logical. Whether to force update.
 #' @param tag Character. Release tag.
 #' @param verbose Logical. Verbosity flag.
 #' @param log Logical. Whether to log events.
@@ -40,7 +39,6 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 process_dependencies <- function(measure,
                                  processed,
                                  owner,
-                                 force,
                                  tag,
                                  verbose,
                                  log,
@@ -69,7 +67,6 @@ process_dependencies <- function(measure,
         repo          = NULL,
         processed     = processed,
         owner         = owner,
-        force         = force,
         tag           = tag,
         log_overwrite = TRUE,
         verbose       = verbose,
@@ -145,7 +142,6 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
     update_args <- list(
       action = "update",
       branch = release_branch,
-      #force  = force,
       owner  = owner,
       tag    = tag,
       repo   = repo
@@ -211,7 +207,6 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 #' @param repo Character. Repository name (optional).
 #' @param owner Character. Repository owner (optional).
 #' @param processed Environment. Tracks processed measures (optional).
-#' @param force Logical. Whether to force update.
 #' @param tag Character. Release tag (optional).
 #' @param log Logical. Whether to log events.
 #' @param log_overwrite Logical. Whether to overwrite existing log.
@@ -224,7 +219,6 @@ aux_fun <- function(measure,
                     repo      = NULL,
                     owner     = getOption("pipfun.ghowner"),
                     processed = new.env(parent = emptyenv()),
-                    #force     = FALSE,
                     tag       = NULL,
                     log       = TRUE,
                     log_overwrite = TRUE,
@@ -252,7 +246,7 @@ aux_fun <- function(measure,
   owner <- ro$owner
 
   # Process dependencies
-  process_dependencies(measure, processed, owner, force, tag, verbose, log, halt_on_dep_fail)
+  process_dependencies(measure, processed, owner, tag, verbose, log, halt_on_dep_fail)
 
   # Check update status
   check_result <- tryCatch(

@@ -436,4 +436,10 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
     get_error_validation(validation_record, detail)
   }
 
+  #  if (any(validation_record[["type"]] == "error")){
+  #   return(validation_record)  # Return the validation record instead of stopping
+  # }
+
+  # return(invisible(NULL))  # Return NULL if no errors
+
 }
