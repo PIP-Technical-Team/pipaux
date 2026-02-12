@@ -91,16 +91,6 @@ aux_regions <- function(action  = c("update", "load"),
   key_cols <- c("region_code")
   setattr(dt, "aux_key", key_cols)
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-   setattr(dt,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
     saved <- pip_aux_save(
       x        = dt,
       id       = measure,

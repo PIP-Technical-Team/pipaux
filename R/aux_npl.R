@@ -68,17 +68,6 @@ aux_npl <- function(action  = c("update", "load"),
       branch <- ""
     }
 
-    # ----- function raw sha ----------------------
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-
-    setattr(npl,
-            "raw_sha_fun",
-            raw_sha_fun)
-
 
     saved <-  pip_aux_save(
       x        = npl,

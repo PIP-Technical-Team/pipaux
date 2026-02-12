@@ -89,17 +89,6 @@ aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
   key_cols <- c("country_code", "year")
   setattr(wdi, "aux_key", key_cols)
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(wdi,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
   saved <-  pip_aux_save(
     x        = wdi,
     id       = measure,

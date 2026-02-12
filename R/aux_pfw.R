@@ -185,18 +185,8 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
   if (branch == "main") {
     branch <- ""
   }
-
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
   setattr(pfw, "aux_name", "pfw")
 
-  setattr(pfw,
-          "raw_sha_fun",
-          raw_sha_fun)
-  
   key_cols <-  c("country_code", "surveyid_year", "welfare_type")
 
   setattr(pfw,

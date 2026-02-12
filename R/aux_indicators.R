@@ -50,18 +50,6 @@ aux_indicators <- function(action  = c("update", "load"),
   if (branch == "main") {
     branch <- ""
   }
-
-
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(df,
-          "raw_sha_fun",
-          raw_sha_fun)
     
   key_cols <- c("page", "indicator_name")
     

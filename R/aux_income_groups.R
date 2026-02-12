@@ -61,12 +61,6 @@ aux_income_groups <- function(action       = c("update", "load"),
     gh <- attr(ig,
                "gh")
 
-    # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      aux_income_groups)
-      )
-
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
     # ig <- ig |> setnames("year_data", "year", skip_absent=TRUE)
@@ -76,9 +70,7 @@ aux_income_groups <- function(action       = c("update", "load"),
       key_cols <- c("country_code", "year")
       setattr(ig, "aux_key", key_cols)
 
-    setattr(ig,
-           "raw_sha_fun",
-           raw_sha_fun)
+    # ...existing code...
 
     # validate income group output data
     incgroup_validate_output(incgroup = ig, detail = detail)

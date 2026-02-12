@@ -160,7 +160,6 @@ aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
   )
 
   gh <- attributes(cpi)$gh
-  #gh_raw_sha <- gh$gh_raw_sha
 
   # validate cpi raw data
   cpi_validate_raw(cpi,

@@ -57,17 +57,6 @@ aux_censoring  <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
     }
-    # ----- function raw sha ----------------------
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-
-    setattr(dl,
-            "raw_sha_fun",
-            raw_sha_fun)
-
 
     # Define key columns for censoring data
     key_cols <- c("countries", "regions")

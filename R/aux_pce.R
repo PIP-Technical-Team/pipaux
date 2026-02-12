@@ -275,17 +275,6 @@ aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
     branch <- ""
   }
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(pce,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
   # Collect gh attribute from sna (main external GH source)
   gh <- attributes(sna)$gh
   saved <-  pip_aux_save(

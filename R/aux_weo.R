@@ -64,15 +64,6 @@ aux_weo <- function(action  = c("update", "load"),
     # validate weo clean data
     weo_validate_output(weo = dt, detail = detail)
 
-    # ----- function raw sha -----------------------------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-    setattr(dt,
-            "raw_sha_fun",
-            raw_sha_fun)
-
     if (branch == "main") {
       branch <- ""
     }

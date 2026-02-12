@@ -43,21 +43,9 @@ aux_maddison <- function(action  = c("update", "load"),
   if (branch == "main") {
     branch <- ""
   }
-
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    aux_maddison)
-  )
-
-
   setattr(mpd, "aux_name", "maddison")
   key_cols <- c("country_code", "year")
   setattr(mpd, "aux_key", key_cols)
-
-  setattr(mpd,
-          "raw_sha_fun",
-          raw_sha_fun)
-
 
     saved <-  pip_aux_save(
       x        = mpd,

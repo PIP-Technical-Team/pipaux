@@ -50,19 +50,9 @@ aux_pl <- function(action = c("update", "load"),
       branch <- ""
     }
 
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(dt,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
     key_cols <- c("poverty_line")
     setattr(dt, "aux_key", key_cols)
+
     saved <- pip_aux_save(
       x        = dt,
       id       = measure,

@@ -178,15 +178,6 @@ aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
     branch <- ""
   }
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(pop,
-          "raw_sha_fun",
-          raw_sha_fun)
-
   # Set gh attributes --------------------------------
 
   setattr(pop,

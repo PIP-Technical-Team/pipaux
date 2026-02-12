@@ -238,15 +238,6 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
     branch <- ""
   }
 
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(ppp,
-          "raw_sha_fun",
-          raw_sha_fun)
-
   # Set other attributes ________________ #
 
   # Aux measure name
@@ -435,11 +426,5 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
   if (any(validation_record[["type"]] == "error")){
     get_error_validation(validation_record, detail)
   }
-
-  #  if (any(validation_record[["type"]] == "error")){
-  #   return(validation_record)  # Return the validation record instead of stopping
-  # }
-
-  # return(invisible(NULL))  # Return NULL if no errors
 
 }

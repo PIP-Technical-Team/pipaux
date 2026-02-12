@@ -34,17 +34,6 @@ aux_dictionary <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(df,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
     # Define key columns for dictionary data
     key_cols <- names(df)
     setattr(df, "aux_key", key_cols)

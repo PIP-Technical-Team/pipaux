@@ -40,15 +40,8 @@ aux_nan <- function(action          = c("update", "load"),
       branch <- ""
     }
 
-
-    # ----- function raw sha ----------------------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
     key_cols <- c("country_code", "year", "gdp_data_level")
     setattr(nan, "aux_key", key_cols)
-    setattr(nan, "raw_sha_fun", raw_sha_fun)
 
     saved <- pip_aux_save(
       x        = nan,

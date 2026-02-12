@@ -41,28 +41,11 @@ aux_country_list <- function(action       = c("update", "load"),
     #validate country list raw data
     cl_validate_raw(cl, detail = detail)
 
-
-    #   ____________________________________________________________________________
-    #   Metadata        -stored under $user in pin metadata                                                       ####
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
     key_cols <- c("country_code")
-
-    # cl_metadata <- list(raw_sha_fun = raw_sha_fun,
-    #                     key_col     = key_cols)
 
     setattr(cl,
             "aux_key",
             key_cols)
-
-    setattr(cl,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-
 
     saved <- pip_aux_save(
       x        = cl,

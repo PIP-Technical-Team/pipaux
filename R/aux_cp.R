@@ -415,18 +415,6 @@ aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
     branch <- ""
   }
 
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(dl,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-
   # Define key columns for country profiles data
   key_cols <- names(dl)
   setattr(dl, "aux_key", key_cols)

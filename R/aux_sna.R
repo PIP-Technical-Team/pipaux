@@ -38,15 +38,6 @@ aux_sna <- function(action          = c("update", "load"),
       branch <- ""
     }
 
-    # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-    setattr(sna,
-            "raw_sha_fun",
-            raw_sha_fun)
-    
     key_cols <- c("year")
 
     saved <- pip_aux_save(

@@ -226,19 +226,9 @@ aux_metaregion <- function(action = c("update", "load"),
       branch <- ""
     }
 
-
-    # ----- function raw sha ----------------------
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
     key_cols <- c("region_code")
     setattr(mr, "aux_name", "metaregion")
     setattr(mr, "aux_key", key_cols)
-    setattr(mr,
-            "raw_sha_fun",
-            raw_sha_fun)
 
     saved <-  pip_aux_save(
       x        = mr,
