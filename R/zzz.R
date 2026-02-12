@@ -6,12 +6,11 @@ pipuax_default_options <- list(
   pipaux.madsrc        = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
   pipfun.ghowner       = "PIP-Technical-Team",
   joyn.verbose         = FALSE,
-  pipfun.verbose       = TRUE,
+  joyn.reportvar       = ".joyn",
   pipaux.detail.raw    = FALSE,
   pipaux.detail.output = FALSE,
   pipfun.verbose       = FALSE,
-  joyn.reportvar       = ".joyn"
-
+  pipload.verbose      = FALSE
 )
 
 .onLoad <- function(libname, pkgname) {

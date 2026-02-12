@@ -110,7 +110,7 @@ check_y_drive_status <- function(measure,
   
   # Construct the path to the aux data file
   ext <- "qs2"
-  sidecar_path <- fs::path(get_from_auxenv("aux_data_path"), measure, measure, ext = ext)
+  sidecar_path <- fs::path(get_from_auxenv("aux_data_path"), measure, ext = ext)
 
   # Read sidecar metadata
   sidecar <- tryCatch(
@@ -146,7 +146,6 @@ check_y_drive_status <- function(measure,
     return(list(update_y = TRUE, reason = "Aux data missing"))
   }
 
-  #attr_list <- attributes(dt)
   gh        <- sidecar$gh
 
   if (is.null(gh) || length(gh) == 0) {
@@ -207,28 +206,6 @@ check_y_drive_status <- function(measure,
   stored_sha <- sidecar$code_hash
   
   fun_changed <- is.null(stored_sha) || fun_sha != stored_sha
-
-
-
-  # if (!exists(fun_name, mode = "function")) {
-  #   if (verbose) {
-  #     cli::cli_alert_danger(
-  #       "Aux function {.strong {fun_name}} not found."
-  #     )
-  #   }
-  #   return(list(update_y = TRUE, reason = "Aux function missing"))
-  # }
-
-  # fun          <- get(fun_name, mode = "function")
-  # # fun_sha      <- digest::digest(body(fun))
-
-  # fun_sha <- stamp:::st_hash_code(fun)
-
-
-  # # stored_sha   <- attr_list$raw_sha_fun
-  # stored_sha <- sidecar$code_hash
-
-  # fun_changed <- is.null(stored_sha) || fun_sha != stored_sha
 
   if (verbose) {
     if (!fun_changed) {
