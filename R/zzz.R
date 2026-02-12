@@ -1,3 +1,5 @@
+gls <- pipfun::pip_create_globals()
+
 pipuax_default_options <- list(
   pipaux.cpivar        = "cpi2017",
   pipaux.pppvar        = "icp2017",

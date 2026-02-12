@@ -19,6 +19,14 @@ check_github_status <- function(measure,
                                 owner,
                                 release_branch,
                                 verbose = TRUE) {
+  
+  # Skip GitHub check for the "countries" measure
+  if (measure == "countries" || measure == "missing_data") {
+    if (verbose) {
+      cli::cli_alert_info("Skipping GitHub check for measure 'countries'.")
+    }
+    return(invisible(list(update_gh = FALSE, gh_reason = "Skipped")))
+  }
 
   # Default: unknown
   update_gh <- NA
@@ -153,7 +161,7 @@ check_y_drive_status <- function(measure,
     if (verbose) {
       cli::cli_alert_danger("Missing or empty 'gh' attribute in aux data. Sync status with GH skipped.")
     }
-    
+
     sha_mismatch <- FALSE
 
   } else {

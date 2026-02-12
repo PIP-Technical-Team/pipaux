@@ -55,20 +55,9 @@ aux_countries <- function(action  = c("update", "load"),
     key_cols <- c("country_code")
     setattr(countries, "aux_key", key_cols)
 
-    # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-    setattr(countries,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-
     pip_aux_save(
       x        = countries,
       id       = measure,
-      force    = force,
       pk       = key_cols,
       code     = aux_countries,
       code_label = "aux_countries",

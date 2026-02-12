@@ -263,6 +263,9 @@ pip_aux_save(x = df, id = measure, metadata = list(gh = gh), ...)
 - `aux_nan.R`: GH-raw (PIP-Technical-Team) or internal fallback. Keep `attributes(... )$gh` intact.
 - `aux_npl.R`, `aux_pl.R`, `aux_pce.R`, `aux_pfw.R`, `aux_pop.R`, `aux_ppp.R`, `aux_regions.R`, `aux_sna.R`, `aux_wdi.R`, `aux_weo.R`: follow the same patterns described above — loaders via `pipfun::load_from_gh()` when GH source exists (produces `attributes(x)$gh`), or `pipload::load_aux_data()` for derived inputs.
 
+# todo: add more info on the following measures:
+- `aux_regions`: regions do not have a raw GH file because they come from formatting country list 
+- `aux_countries`: 
 ---
 
 ## Troubleshooting (common GH raw SHA & update issues)
