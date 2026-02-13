@@ -581,3 +581,34 @@ plot_dependencies <- function(dependencies_all) {
 
   invisible(g)
 }
+
+init_aux_log <- function(overwrite = TRUE) {
+
+  # If already inside a cascade, reuse existing log
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    return(.piplogenv$active_aux_log)
+  }
+
+  # Unique name per cascade
+  log_name <- paste0(
+    "pipaux_update_log_",
+    format(Sys.time(), "%Y%m%d_%H%M%S")
+  )
+
+  pipfun::log_init(log_name, overwrite = overwrite)
+
+  .piplogenv$active_aux_log <- log_name
+  .piplogenv$last_aux_log   <- log_name
+
+  log_name
+}
+
+finalize_aux_log <- function() {
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    rlang::env_unbind(.piplogenv, "active_aux_log")
+  }
+}
+
+aux_log_last <- function() {
+  pipfun::log_get(.piplogenv$last_aux_log)
+}

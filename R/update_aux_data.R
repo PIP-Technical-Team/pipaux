@@ -235,10 +235,19 @@ aux_fun <- function(measure,
   if (is.null(repo)) repo <- paste0("aux_", measure)
 
   # Initialize log at top level
+  # if (is_top_level() && log) {
+  #   log_exists <- rlang::env_has(.piplogenv, "pipaux_update_log")
+  #   if (log_overwrite || !log_exists) pipfun::log_init("pipaux_update_log", overwrite = log_overwrite)
+  # }
   if (is_top_level() && log) {
-    log_exists <- rlang::env_has(.piplogenv, "pipaux_update_log")
-    if (log_overwrite || !log_exists) pipfun::log_init("pipaux_update_log", overwrite = log_overwrite)
-  }
+  log_name <- init_aux_log(overwrite = log_overwrite)
+
+  # Ensure cleanup even if error occurs
+  on.exit(finalize_aux_log(), add = TRUE)
+} else if (log) {
+  log_name <- .piplogenv$active_aux_log
+}
+
 
   # Resolve special repo/owner
   ro <- resolve_measure_repo_owner(measure, repo, owner)
@@ -256,8 +265,7 @@ aux_fun <- function(measure,
         pipfun::log_add(
           event   = "error",
           message = paste0("Check failed: ", e$message),
-          name    = "pipaux_update_log",
-          args    = list(),
+          name    = log_name,
           logmeta = list(step = "ERROR_CHECK", measure = measure)
         )
       }
@@ -276,8 +284,7 @@ aux_fun <- function(measure,
       pipfun::log_add(
         event   = "info",
         message = paste0("No update needed for: ", measure),
-        name    = "pipaux_update_log",
-        args    = list(),
+        name    = log_name,
         logmeta = list(step = "END", measure = measure)
       )
     }
@@ -293,13 +300,12 @@ aux_fun <- function(measure,
     pipfun::log_add(
       event   = "success",
       message = "Measure and dependencies successfully updated",
-      name    = "pipaux_update_log",
-      args    = list(),
+      name    = log_name,
       logmeta = list(step = "END", measure = measure)
     )
     cli::cli_alert_success(
-      paste0("Log available: ", cli::bg_br_cyan(cli::col_black("{.strong pipaux_update_log}")),
-             "\nUse {.code pipfun::log_get()} to access it")
+      paste0("Log available: ", cli::bg_br_cyan(cli::col_black("{.strong ", log_name, "}")),
+             "\nUse {.code pipfun::log_get()} to access it. Or call {.code aux_log_last()} for a quick look at the most recent log.")
     )
   }
 
