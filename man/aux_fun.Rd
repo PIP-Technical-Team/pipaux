@@ -9,44 +9,14 @@ aux_fun(
   repo = NULL,
   owner = getOption("pipfun.ghowner"),
   processed = new.env(parent = emptyenv()),
-  force = FALSE,
   tag = NULL,
   log = TRUE,
   log_overwrite = TRUE,
   verbose = FALSE,
-  halt_on_dep_fail = FALSE
+  halt_on_dep_fail = FALSE,
+  log_name = NULL
 )
 }
-\arguments{
-\item{measure}{Character. The measure to update.}
-
-\item{repo}{Character. Repository name (optional).}
-
-\item{owner}{Character. Repository owner (optional).}
-
-\item{processed}{Environment. Tracks processed measures (optional).}
-
-\item{force}{Logical. Whether to force update.}
-
-\item{tag}{Character. Release tag (optional).}
-
-\item{log}{Logical. Whether to log events.}
-
-\item{log_overwrite}{Logical. Whether to overwrite existing log.}
-
-\item{verbose}{Logical. Verbosity flag.}
-
-\item{halt_on_dep_fail}{Logical. If \code{TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.}
-}
-\value{
-Invisibly returns NULL.
-}
 \description{
-This is the main exported function for updating auxiliary data. It handles
-dependency resolution, update checks, and update execution for both GitHub and Y drive.
-}
-\details{
-Dependencies are always resolved recursively and each dependency is only updated once per cascade.
-
-Logging is performed to the log named \code{"pipaux_update_log"} by default. Use \code{pipfun::log_get("pipaux_update_log")} to retrieve logs.
+Update auxiliary data for a measure and its dependencies
 }

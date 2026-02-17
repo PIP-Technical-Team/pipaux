@@ -5,7 +5,6 @@
 \title{Update GDM}
 \usage{
 aux_gdm_update(
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch,
   tag = branch,
@@ -13,8 +12,6 @@ aux_gdm_update(
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 

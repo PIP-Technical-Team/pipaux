@@ -40,7 +40,7 @@
 #' pipaux_reset_stamp_options()
 #' }
 #'
-#' @importFrom stamp st_opts st_opts_get st_opts_set
+#' @importFrom stamp st_opts st_opts_get st_opts
 #' @name pipaux-stamp-options
 NULL
 
@@ -96,7 +96,7 @@ pipaux_reset_stamp_options <- function() {
   # - versioning = "content": avoid spurious versions unless content/code changed
   # - retain_versions = Inf: keep all versions by default (adjust for disk if needed)
   # - force_on_code_change = TRUE & code_hash = TRUE: ensure code changes trigger versioning
-  stamp::st_opts_set(
+  stamp::st_opts(
     versioning = "content",
     retain_versions = Inf,
     force_on_code_change = TRUE,

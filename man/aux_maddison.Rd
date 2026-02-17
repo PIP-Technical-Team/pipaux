@@ -7,7 +7,6 @@
 aux_maddison(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
-  force = FALSE,
   tag = NULL,
   detail = getOption("pipaux.detail.raw")
 )
@@ -18,8 +17,6 @@ aux_maddison(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{tag}{character: specific release to be used in the update.}
 

@@ -4,17 +4,9 @@
 \alias{aux_cp_update}
 \title{Update Country Profiles}
 \usage{
-aux_cp_update(
-  force = FALSE,
-  owner = getOption("pipfun.ghowner"),
-  branch,
-  tag = tag,
-  ...
-)
+aux_cp_update(owner = getOption("pipfun.ghowner"), branch, tag = tag, ...)
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 

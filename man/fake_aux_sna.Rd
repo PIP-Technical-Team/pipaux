@@ -6,7 +6,6 @@
 \usage{
 fake_aux_sna(
   action = c("update", "load"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   maindir = getOption("pipaux.working_dir"),
   branch = paste0(wrk_release$release, "_", wrk_release$identity),
@@ -17,8 +16,6 @@ fake_aux_sna(
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}

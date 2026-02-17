@@ -270,3 +270,77 @@ aux_fun <- function(measure,
 
   invisible(NULL)
 }
+
+
+
+#' Update specified auxiliary data measures
+#'
+#' This function updates the specified auxiliary data measures and their dependencies.
+#' If `measures` is NULL, all available measures will be updated. If `repo` or `tag` 
+#' are NULL, default values will be used based on the measure being updated.
+#'
+#' @param measures Character vector. The measures to update. If NULL, all available measures will be updated.
+#' @param repo Character. Default repository name. If NULL, a default repository based on the measure will be used.
+#' @param owner Character. Default owner name. If NULL, the owner will be taken from the option "pipfun.ghowner".
+#' @param tag Character. Release tag. If NULL, the release branch will be used as the tag.
+#' @param log Logical. Whether to log events. Default is TRUE.
+#' @param log_overwrite Logical. Whether to overwrite existing logs. Default is TRUE.
+#' @param verbose Logical. Verbosity flag. Default is FALSE.
+#' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails. Default is FALSE.
+#' @param log_save Logical. Whether to save the final log. Default is FALSE.
+#' @param log_name Character. Explicit log name to use. If NULL, a default log name will be generated.
+#'
+#' @return Invisibly returns NULL.
+#' @export
+update_aux_measures <- function(measures,
+                                 repo = NULL,
+                                 owner = getOption("pipfun.ghowner"),
+                                 tag = NULL,
+                                 log = TRUE,
+                                 log_overwrite = TRUE,
+                                 verbose = FALSE,
+                                 halt_on_dep_fail = FALSE,
+                                 log_save = FALSE,
+                                 log_name = NULL) {
+  
+  processed <- new.env(parent = emptyenv())
+  
+  # Initialize log if top-level and logging is enabled
+  if (is_top_level() && log && is.null(log_name)) {
+    log_name <- init_aux_log(overwrite = log_overwrite)
+    on.exit(finalize_aux_log(), add = TRUE)
+  }
+
+  for (measure in unique(measures)) {
+    tryCatch({
+      aux_fun(measure,
+              repo = repo,
+              owner = owner,
+              processed = processed,
+              tag = tag,
+              log = log,
+              log_overwrite = log_overwrite,
+              verbose = verbose,
+              halt_on_dep_fail = halt_on_dep_fail,
+              log_name = log_name)
+    }, error = function(e) {
+      if (log && !is.null(log_name)) {
+        pipfun::log_add(
+          event = "error",
+          message = paste0("Failed to update measure '", measure, "': ", e$message),
+          name = log_name,
+          args = list(),
+          logmeta = list(step = "ERROR_UPDATE", measure = measure)
+        )
+      }
+      if (halt_on_dep_fail) stop(e)
+    })
+  }
+  
+  # Save the log if requested
+  if (log_save && !is.null(log_name)) {
+    pipfun::log_save(name = log_name)
+  }
+  
+  invisible(NULL)
+}

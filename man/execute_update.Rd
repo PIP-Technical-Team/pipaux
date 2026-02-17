@@ -12,9 +12,9 @@ execute_update(
   owner,
   repo,
   tag,
-  force,
   verbose,
-  log
+  log,
+  log_name = NULL
 )
 }
 \arguments{
@@ -32,11 +32,11 @@ execute_update(
 
 \item{tag}{Character. Release tag.}
 
-\item{force}{Logical. Whether to force update.}
-
 \item{verbose}{Logical. Verbosity flag.}
 
 \item{log}{Logical. Whether to log events.}
+
+\item{log_name}{Character. Explicit log name to use.}
 }
 \value{
 Invisibly returns NULL.

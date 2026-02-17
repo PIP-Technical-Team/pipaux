@@ -8,10 +8,10 @@ process_dependencies(
   measure,
   processed,
   owner,
-  force,
   tag,
   verbose,
   log,
+  log_name = NULL,
   halt_on_dep_fail = FALSE
 )
 }
@@ -22,13 +22,13 @@ process_dependencies(
 
 \item{owner}{Character. Repository owner.}
 
-\item{force}{Logical. Whether to force update.}
-
 \item{tag}{Character. Release tag.}
 
 \item{verbose}{Logical. Verbosity flag.}
 
 \item{log}{Logical. Whether to log events.}
+
+\item{log_name}{Character. Explicit log name to use.}
 
 \item{halt_on_dep_fail}{Logical. Whether to halt parent update if a dependency fails.}
 }
@@ -36,9 +36,6 @@ process_dependencies(
 Invisibly returns NULL.
 }
 \description{
-For each dependency, calls \code{aux_fun()} recursively. Each dependency is only updated once per cascade.
-}
-\details{
-If \code{halt_on_dep_fail = TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
+Recursively process dependencies for a measure
 }
 \keyword{internal}

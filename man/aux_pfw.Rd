@@ -6,7 +6,6 @@
 \usage{
 aux_pfw(
   action = c("update", "load"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   detail = getOption("pipaux.detail.raw"),
@@ -17,8 +16,6 @@ aux_pfw(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
@@ -28,6 +25,8 @@ aux_pfw(
 
 \item{...}{parameters to be passed to the loading functions depending of the
 extension used}
+
+\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
 Load or update PIP Price Framework data.

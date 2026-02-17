@@ -6,7 +6,6 @@
 \usage{
 aux_country_list(
   action = c("update", "load"),
-  force = FALSE,
   detail = getOption("pipaux.detail.raw"),
   ...
 )
@@ -14,8 +13,6 @@ aux_country_list(
 \arguments{
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 

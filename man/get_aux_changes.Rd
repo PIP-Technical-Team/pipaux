@@ -7,8 +7,6 @@
 get_aux_changes(measure = "cpi", old_release = NULL, verbose = TRUE)
 }
 \arguments{
-\item{measure}{Character. The measure to update.}
-
 \item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
 If NULL, automatically take last available release of same identity as the current working release}
 

@@ -6,7 +6,6 @@
 \usage{
 aux_metadata_update(
   owner = getOption("pipfun.ghowner"),
-  force = FALSE,
   branch = NULL,
   tag = branch,
   detail = getOption("pipaux.detail.raw")
@@ -15,8 +14,6 @@ aux_metadata_update(
 \arguments{
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}

@@ -4,11 +4,7 @@
 \alias{aux_gdp_weo}
 \title{Fetch GDP data from WEO}
 \usage{
-aux_gdp_weo(
-  action = "update",
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir")
-)
+aux_gdp_weo(action = "update")
 }
 \description{
 Create a dataset with GDP data from World Economic Outlook.

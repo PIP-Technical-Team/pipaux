@@ -7,7 +7,6 @@
 aux_ppp(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
-  force = FALSE,
   tag = NULL,
   detail = getOption("pipaux.detail.raw"),
   ppp_defaults = TRUE
@@ -19,8 +18,6 @@ aux_ppp(
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{tag}{character: specific release to be used in the update.}
 

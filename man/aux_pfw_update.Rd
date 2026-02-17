@@ -5,7 +5,6 @@
 \title{Update PFW}
 \usage{
 aux_pfw_update(
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = NULL,
@@ -14,8 +13,6 @@ aux_pfw_update(
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 

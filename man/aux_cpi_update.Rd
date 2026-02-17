@@ -5,7 +5,6 @@
 \title{Update CPI}
 \usage{
 aux_cpi_update(
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   detail = getOption("pipaux.detail.raw"),
   branch = NULL,
@@ -13,8 +12,6 @@ aux_cpi_update(
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
