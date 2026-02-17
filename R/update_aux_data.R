@@ -42,6 +42,7 @@ process_dependencies <- function(measure,
                                  tag,
                                  verbose,
                                  log,
+                                 log_name,
                                  halt_on_dep_fail = FALSE) {
 
   # Skip if already processed (prevents infinite loops)
@@ -78,8 +79,7 @@ process_dependencies <- function(measure,
           pipfun::log_add(
             event   = "error",
             message = paste0("Failed to process dependency '", dep, "': ", e$message),
-            name    = "pipaux_update_log",
-            args    = list(),
+            name    = log_name,
             logmeta = list(step = "ERROR_DEP", measure = dep)
           )
         }
@@ -106,7 +106,7 @@ process_dependencies <- function(measure,
 #'
 #' @return Invisibly returns NULL.
 #' @keywords internal
-execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log) {
+execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name) {
 
   # --- GitHub update ---
   if (update_gh) {
@@ -122,8 +122,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
       pipfun::log_add(
         event   = "update",
         message = paste0("Updated GitHub for: ", measure),
-        name    = "pipaux_update_log",
-        args    = list(),
+        name    = log_name,
         logmeta = list(step = "UPDATE_GH", measure = measure)
       )
     }
@@ -153,26 +152,26 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
       {
         res <- do.call(func, filtered_args)
 
-        # If the aux save returned a fallback (NULL) result, treat as error.
-        if (is.null(res)) {
-          if (log) {
-            pipfun::log_add(
-              event   = "error",
-              message = paste0("Y drive update returned NULL (fallback) for: ", measure),
-              name    = "pipaux_update_log",
-              args    = list(),
-              logmeta = list(step = "ERROR_Y_SAVE", measure = measure)
-            )
-          }
-          stop(sprintf("Y drive update failed for measure '%s': returned NULL", measure))
-        }
+        # # If the aux save returned a fallback (NULL) result, treat as error.
+        # if (is.null(res)) {
+        #   if (log) {
+        #     pipfun::log_add(
+        #       event   = "error",
+        #       message = paste0("Y drive update returned NULL (fallback) for: ", measure),
+        #       name    = .piplogenv$active_aux_log,
+        #       logmeta = list(step = "ERROR_Y_SAVE", measure = measure)
+        #     )
+        #   }
+        #   stop(sprintf("Y drive update failed for measure '%s': returned NULL", measure))
+        # }
 
         if (log) {
+          log_name <- .piplogenv$active_aux_log
+          
           pipfun::log_add(
             event   = "update",
             message = paste0("Updated Y drive for: ", measure),
-            name    = "pipaux_update_log",
-            args    = list(),
+            name    = log_name,
             logmeta = list(step = "UPDATE_Y", measure = measure)
           )
         }
@@ -182,8 +181,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
           pipfun::log_add(
             event   = "error",
             message = paste0("Error updating Y drive: ", e$message),
-            name    = "pipaux_update_log",
-            args    = list(),
+            name    = log_name,
             logmeta = list(step = "ERROR_Y", measure = measure)
           )
         }
@@ -222,6 +220,7 @@ aux_fun <- function(measure,
                     tag       = NULL,
                     log       = TRUE,
                     log_overwrite = TRUE,
+                    log_name = NULL,
                     verbose   = FALSE,
                     halt_on_dep_fail = FALSE) {
 
@@ -234,19 +233,12 @@ aux_fun <- function(measure,
   if (is.null(tag)) tag <- release_branch
   if (is.null(repo)) repo <- paste0("aux_", measure)
 
-  # Initialize log at top level
-  # if (is_top_level() && log) {
-  #   log_exists <- rlang::env_has(.piplogenv, "pipaux_update_log")
-  #   if (log_overwrite || !log_exists) pipfun::log_init("pipaux_update_log", overwrite = log_overwrite)
-  # }
-  if (is_top_level() && log) {
-  log_name <- init_aux_log(overwrite = log_overwrite)
-
-  # Ensure cleanup even if error occurs
-  on.exit(finalize_aux_log(), add = TRUE)
-} else if (log) {
-  log_name <- .piplogenv$active_aux_log
-}
+   if (is_top_level() && log && is.null(log_name)) {
+    log_name <- init_aux_log(overwrite = log_overwrite)
+    on.exit(finalize_aux_log(), add = TRUE)
+  } else if (log && is.null(log_name) && rlang::env_has(.piplogenv, "active_aux_log")) {
+    log_name <- .piplogenv$active_aux_log
+  }
 
 
   # Resolve special repo/owner
@@ -255,7 +247,7 @@ aux_fun <- function(measure,
   owner <- ro$owner
 
   # Process dependencies
-  process_dependencies(measure, processed, owner, tag, verbose, log, halt_on_dep_fail)
+  process_dependencies(measure, processed, owner, tag, verbose, log, log_name = log_name, halt_on_dep_fail)
 
   # Check update status
   check_result <- tryCatch(
@@ -293,7 +285,7 @@ aux_fun <- function(measure,
   }
 
   # Execute updates
-  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log)
+  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name = log_name)
 
   # Final log
   if (is_top_level() && log) {
