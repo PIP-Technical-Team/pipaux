@@ -22,16 +22,13 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 
 #' Recursively process dependencies for a measure
 #'
-#' For each dependency, calls \code{aux_fun()} recursively. Each dependency is only updated once per cascade.
-#'
-#' If \code{halt_on_dep_fail = TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
-#'
 #' @param measure Character. The measure to process.
 #' @param processed Environment. Tracks processed measures to avoid cycles.
 #' @param owner Character. Repository owner.
 #' @param tag Character. Release tag.
 #' @param verbose Logical. Verbosity flag.
 #' @param log Logical. Whether to log events.
+#' @param log_name Character. Explicit log name to use.
 #' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails.
 #'
 #' @return Invisibly returns NULL.
@@ -42,16 +39,15 @@ process_dependencies <- function(measure,
                                  tag,
                                  verbose,
                                  log,
-                                 log_name,
+                                 log_name = NULL,
                                  halt_on_dep_fail = FALSE) {
 
-  # Skip if already processed (prevents infinite loops)
-  if (rlang::env_has(processed, measure)) return(invisible(NULL))
+  # Capture log conditions early
+  use_log <- log && !is.null(log_name)
 
-  # Mark as processed
+  if (rlang::env_has(processed, measure)) return(invisible(NULL))
   rlang::env_poke(processed, measure, TRUE)
 
-  # Read dependency map
   dependencies_all <- read_dependencies(
     gh_user = "https://raw.githubusercontent.com",
     owner   = "PIP-Technical-Team"
@@ -60,7 +56,6 @@ process_dependencies <- function(measure,
   deps <- dependencies_all[[measure]]
   if (is.null(deps)) deps <- character(0)
 
-  # Recursively process dependencies
   for (dep in deps) {
     tryCatch(
       aux_fun(
@@ -69,17 +64,19 @@ process_dependencies <- function(measure,
         processed     = processed,
         owner         = owner,
         tag           = tag,
-        log_overwrite = TRUE,
+        log_overwrite = FALSE,
         verbose       = verbose,
         log           = log,
-        halt_on_dep_fail = halt_on_dep_fail
+        halt_on_dep_fail = halt_on_dep_fail,
+        log_name      = log_name
       ),
       error = function(e) {
-        if (log) {
+        if (use_log) {
           pipfun::log_add(
             event   = "error",
             message = paste0("Failed to process dependency '", dep, "': ", e$message),
             name    = log_name,
+            args = list(),
             logmeta = list(step = "ERROR_DEP", measure = dep)
           )
         }
@@ -100,13 +97,16 @@ process_dependencies <- function(measure,
 #' @param owner Character. Repository owner.
 #' @param repo Character. Repository name.
 #' @param tag Character. Release tag.
-#' @param force Logical. Whether to force update.
 #' @param verbose Logical. Verbosity flag.
 #' @param log Logical. Whether to log events.
+#' @param log_name Character. Explicit log name to use.
 #'
 #' @return Invisibly returns NULL.
 #' @keywords internal
-execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name) {
+execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name = NULL) {
+
+  # Capture log_name early to avoid promise evaluation issues
+  use_log <- log && !is.null(log_name)
 
   # --- GitHub update ---
   if (update_gh) {
@@ -118,11 +118,12 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
       verbose       = verbose
     )
 
-    if (log) {
+    if (use_log) {
       pipfun::log_add(
         event   = "update",
         message = paste0("Updated GitHub for: ", measure),
         name    = log_name,
+        args = list(),
         logmeta = list(step = "UPDATE_GH", measure = measure)
       )
     }
@@ -131,7 +132,6 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
   # --- Y drive update ---
   if (update_y) {
     func_name <- paste0("aux_", measure)
-
     if (!exists(func_name, envir = asNamespace("pipaux"))) {
       cli::cli_abort(paste0("Function '", func_name, "' does not exist in pipaux namespace"))
     }
@@ -152,36 +152,23 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
       {
         res <- do.call(func, filtered_args)
 
-        # # If the aux save returned a fallback (NULL) result, treat as error.
-        # if (is.null(res)) {
-        #   if (log) {
-        #     pipfun::log_add(
-        #       event   = "error",
-        #       message = paste0("Y drive update returned NULL (fallback) for: ", measure),
-        #       name    = .piplogenv$active_aux_log,
-        #       logmeta = list(step = "ERROR_Y_SAVE", measure = measure)
-        #     )
-        #   }
-        #   stop(sprintf("Y drive update failed for measure '%s': returned NULL", measure))
-        # }
-
-        if (log) {
-          log_name <- .piplogenv$active_aux_log
-          
+        if (use_log) {
           pipfun::log_add(
             event   = "update",
             message = paste0("Updated Y drive for: ", measure),
             name    = log_name,
+            args = list(),
             logmeta = list(step = "UPDATE_Y", measure = measure)
           )
         }
       },
       error = function(e) {
-        if (log) {
+        if (use_log) {
           pipfun::log_add(
             event   = "error",
             message = paste0("Error updating Y drive: ", e$message),
             name    = log_name,
+            args = list(),
             logmeta = list(step = "ERROR_Y", measure = measure)
           )
         }
@@ -191,27 +178,8 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
   }
 }
 
-
 #' Update auxiliary data for a measure and its dependencies
 #'
-#' This is the main exported function for updating auxiliary data. It handles
-#' dependency resolution, update checks, and update execution for both GitHub and Y drive.
-#'
-#' Dependencies are always resolved recursively and each dependency is only updated once per cascade.
-#'
-#' Logging is performed to the log named \code{"pipaux_update_log"} by default. Use \code{pipfun::log_get("pipaux_update_log")} to retrieve logs.
-#'
-#' @param measure Character. The measure to update.
-#' @param repo Character. Repository name (optional).
-#' @param owner Character. Repository owner (optional).
-#' @param processed Environment. Tracks processed measures (optional).
-#' @param tag Character. Release tag (optional).
-#' @param log Logical. Whether to log events.
-#' @param log_overwrite Logical. Whether to overwrite existing log.
-#' @param verbose Logical. Verbosity flag.
-#' @param halt_on_dep_fail Logical. If \code{TRUE}, any error in a dependency will halt the parent update and propagate the error. If \code{FALSE} (default), dependency errors are logged and the parent update continues.
-#'
-#' @return Invisibly returns NULL.
 #' @export
 aux_fun <- function(measure,
                     repo      = NULL,
@@ -220,11 +188,10 @@ aux_fun <- function(measure,
                     tag       = NULL,
                     log       = TRUE,
                     log_overwrite = TRUE,
-                    log_name = NULL,
                     verbose   = FALSE,
-                    halt_on_dep_fail = FALSE) {
+                    halt_on_dep_fail = FALSE,
+                    log_name  = NULL) {
 
-  # Working release
   wrk_release <- get_from_auxenv(key = "wrk_release")
   release <- wrk_release$release
   identity <- wrk_release$identity
@@ -233,13 +200,11 @@ aux_fun <- function(measure,
   if (is.null(tag)) tag <- release_branch
   if (is.null(repo)) repo <- paste0("aux_", measure)
 
-   if (is_top_level() && log && is.null(log_name)) {
+  # Top-level logging only
+  if (is_top_level() && log && is.null(log_name)) {
     log_name <- init_aux_log(overwrite = log_overwrite)
     on.exit(finalize_aux_log(), add = TRUE)
-  } else if (log && is.null(log_name) && rlang::env_has(.piplogenv, "active_aux_log")) {
-    log_name <- .piplogenv$active_aux_log
   }
-
 
   # Resolve special repo/owner
   ro <- resolve_measure_repo_owner(measure, repo, owner)
@@ -247,17 +212,18 @@ aux_fun <- function(measure,
   owner <- ro$owner
 
   # Process dependencies
-  process_dependencies(measure, processed, owner, tag, verbose, log, log_name = log_name, halt_on_dep_fail)
+  process_dependencies(measure, processed, owner, tag, verbose, log, log_name, halt_on_dep_fail)
 
   # Check update status
   check_result <- tryCatch(
     get_fs_status(measure = measure, repo = repo, owner = owner),
     error = function(e) {
-      if (log) {
+      if (log && !is.null(log_name)) {
         pipfun::log_add(
           event   = "error",
           message = paste0("Check failed: ", e$message),
           name    = log_name,
+          args = list(),
           logmeta = list(step = "ERROR_CHECK", measure = measure)
         )
       }
@@ -270,13 +236,13 @@ aux_fun <- function(measure,
   update_gh <- check_result$update_gh
   update_y  <- check_result$update_y
 
-  # Early return if nothing to update
   if (!update_gh && !update_y) {
-    if (log) {
+    if (log && !is.null(log_name)) {
       pipfun::log_add(
         event   = "info",
         message = paste0("No update needed for: ", measure),
         name    = log_name,
+        args = list(),
         logmeta = list(step = "END", measure = measure)
       )
     }
@@ -285,19 +251,20 @@ aux_fun <- function(measure,
   }
 
   # Execute updates
-  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name = log_name)
+  execute_update(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name)
 
-  # Final log
-  if (is_top_level() && log) {
+  # Final top-level log
+  if (is_top_level() && log && !is.null(log_name)) {
     pipfun::log_add(
       event   = "success",
       message = "Measure and dependencies successfully updated",
       name    = log_name,
+      args = list(),
       logmeta = list(step = "END", measure = measure)
     )
     cli::cli_alert_success(
-      paste0("Log available: ", cli::bg_br_cyan(cli::col_black("{.strong ", log_name, "}")),
-             "\nUse {.code pipfun::log_get()} to access it. Or call {.code aux_log_last()} for a quick look at the most recent log.")
+      paste0("Log available: ", cli::bg_br_cyan(cli::col_black("{.strong ", log_name, "}"))),
+      "\nUse {.code pipfun::log_get()} to access it. Or call {.code aux_log_last()} for a quick look at the most recent log."
     )
   }
 
