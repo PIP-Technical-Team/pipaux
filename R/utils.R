@@ -582,6 +582,18 @@ plot_dependencies <- function(dependencies_all) {
   invisible(g)
 }
 
+#' Initialize auxiliary data update log
+#'
+#' Creates a new log for tracking auxiliary data updates within a cascade.
+#' If a log already exists in the current cascade, reuses the existing log
+#' instead of creating a new one.
+#'
+#' @param overwrite logical: If `TRUE` (default), overwrites existing log file.
+#'   If `FALSE`, appends to existing log.
+#'
+#' @return character: Name of the initialized log
+#'
+#' @keywords internal
 init_aux_log <- function(overwrite = TRUE) {
 
   # If already inside a cascade, reuse existing log
@@ -603,12 +615,28 @@ init_aux_log <- function(overwrite = TRUE) {
   log_name
 }
 
+#' Finalize auxiliary data update log
+#'
+#' Cleans up the active log reference from the logging environment.
+#' Called at the end of an auxiliary data update cascade to release
+#' the active log.
+#'
+#' @return NULL (invisibly)
+#'
+#' @keywords internal
 finalize_aux_log <- function() {
   if (rlang::env_has(.piplogenv, "active_aux_log")) {
     rlang::env_unbind(.piplogenv, "active_aux_log")
   }
 }
 
+#' Retrieve the last auxiliary data update log
+#'
+#' Returns the log object from the most recent auxiliary data update cascade.
+#'
+#' @return A log object containing entries from the last update cascade
+#'
+#' @keywords internal
 aux_log_last <- function() {
   pipfun::log_get(.piplogenv$last_aux_log)
 }
