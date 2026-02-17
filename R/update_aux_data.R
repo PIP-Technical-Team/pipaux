@@ -339,7 +339,8 @@ update_aux_measures <- function(measures,
   
   # Save the log if requested
   if (log_save && !is.null(log_name)) {
-    pipfun::log_save(name = log_name)
+    pipfun::log_save(name = log_name,
+    alias = get_from_auxenv("aux_meta_alias"))
   }
   
   invisible(NULL)
