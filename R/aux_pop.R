@@ -193,7 +193,6 @@ aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
     x        = pop,
     id       = measure,
     pk       = key_cols,
-    force    = force,
     metadata = list(gh = list(gh_spop = gh_spop, gh_pop_main = gh_pop_main)),
     code     = aux_pop_update,
     code_label = "aux_pop_update"

@@ -352,7 +352,7 @@ clean_cp_names <- function(x) {
 aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
                           branch,
                           tag     = tag,
-                        ...) {
+                          ...) {
 
   measure <- "cp"
 

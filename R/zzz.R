@@ -12,7 +12,8 @@ pipuax_default_options <- list(
   pipaux.detail.raw    = FALSE,
   pipaux.detail.output = FALSE,
   pipfun.verbose       = FALSE,
-  pipload.verbose      = FALSE
+  pipload.verbose      = FALSE,
+  pipaux.working_dir   = "Y:/PIP_ingestion_pipeline_v2"
 )
 
 .onLoad <- function(libname, pkgname) {

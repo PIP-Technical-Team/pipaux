@@ -456,7 +456,6 @@ get_from_auxenv <- \(key) {
 #'
 pip_aux_save <- \(x,
                   id,
-                  force = FALSE,
                   ...) {
 
   # alias to pass into pipload::pip_write

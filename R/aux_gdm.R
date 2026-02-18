@@ -174,7 +174,7 @@ aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
   ##  ............................................................................
   ##  Merge with inventory                                                    ####
 
-  inv <- fst::read_fst(fs::path(getOption("pipaux.working_dir"), "_inventory/inventory.fst"),
+  inv <- fst::read_fst("Y:\\PIP_ingestion_pipeline_v2\\_inventory\\inventory.fst",
                        as.data.table = TRUE)
 
   # Create survey_id column
