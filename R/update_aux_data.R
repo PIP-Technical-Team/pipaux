@@ -189,13 +189,14 @@ aux_fun <- function(measure,
                     log       = TRUE,
                     log_overwrite = TRUE,
                     verbose   = FALSE,
-                    halt_on_dep_fail = FALSE,
-                    log_name  = NULL) {
+                    halt_on_dep_fail = FALSE) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
   release <- wrk_release$release
   identity <- wrk_release$identity
   release_branch <- paste0(release, "_", identity)
+
+  log_name <- NULL
 
   if (is.null(tag)) tag <- release_branch
   if (is.null(repo)) repo <- paste0("aux_", measure)
@@ -288,7 +289,6 @@ aux_fun <- function(measure,
 #' @param verbose Logical. Verbosity flag. Default is FALSE.
 #' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails. Default is FALSE.
 #' @param log_save Logical. Whether to save the final log. Default is FALSE.
-#' @param log_name Character. Explicit log name to use. If NULL, a default log name will be generated.
 #'
 #' @return Invisibly returns NULL.
 #' @export
@@ -300,10 +300,10 @@ update_aux_measures <- function(measures,
                                  log_overwrite = TRUE,
                                  verbose = FALSE,
                                  halt_on_dep_fail = FALSE,
-                                 log_save = FALSE,
-                                 log_name = NULL) {
+                                 log_save = FALSE) {
   
   processed <- new.env(parent = emptyenv())
+  log_name <- NULL
   
   # Initialize log if top-level and logging is enabled
   if (is_top_level() && log && is.null(log_name)) {
@@ -321,8 +321,7 @@ update_aux_measures <- function(measures,
               log = log,
               log_overwrite = log_overwrite,
               verbose = verbose,
-              halt_on_dep_fail = halt_on_dep_fail,
-              log_name = log_name)
+              halt_on_dep_fail = halt_on_dep_fail)
     }, error = function(e) {
       if (log && !is.null(log_name)) {
         pipfun::log_add(

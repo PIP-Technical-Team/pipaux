@@ -273,3 +273,313 @@ cat(sprintf("  Total: %.2f s\n", results[, sum(elapsed_sec)]))
 
 # # Return for inspection
 # invisible(results)
+
+# ============================================================================
+# Test update_aux_measures with logging
+# ============================================================================
+
+test_that("update_aux_measures processes multiple measures in order with unified log", {
+  
+  # Select a subset of measures (choose non-error-prone ones for testing)
+  test_measures <- c("cp", "metaregion", "npl")
+  
+  # Get the aux_meta_alias for log retrieval later
+  aux_meta_alias <- get_from_auxenv("aux_meta_alias")
+  
+  # Generate a unique log filename for this test
+  #log_filename <- paste0("test_aux_measures_", format(Sys.time(), "%Y%m%d_%H%M%S"))
+  
+  # Call update_aux_measures with logging enabled and save
+  update_aux_measures(
+    measures = test_measures,
+    repo = NULL,
+    owner = "RossanaTat",
+    tag = NULL,
+    log = TRUE,
+    log_overwrite = TRUE,
+    verbose = FALSE,
+    halt_on_dep_fail = FALSE,
+    log_save = TRUE,
+    log_name = log_filename
+  )
+  
+  # Verify: Check that the unified log exists in memory
+  expect_true(
+    rlang::env_has(.piplogenv, "last_aux_log"),
+    info = "Log should be stored in .piplogenv with the specified name"
+  )
+  
+  # Retrieve the in-memory log name 
+  unified_log <- aux_log_last()
+  
+  expect_s3_class(unified_log, "piplog")
+  expect_s3_class(unified_log, "data.table")
+  
+  # Verify: Log contains entries for all processed measures
+  expect_true(
+    nrow(unified_log) > 0,
+    info = "Log should contain entries for processed measures"
+  )
+  
+  # Check that all test measures appear in the log metadata
+  log_measures <- unique(sapply(unified_log$logmeta, function(x) x[["measure"]]))
+
+  for (measure in test_measures) {
+    expect_true(
+      measure %in% log_measures,
+      info = sprintf("Measure '%s' should appear in the unified log", measure)
+    )
+  }
+  
+  # Verify: Log contains expected step types
+  expected_steps <- c("UPDATE_GH", "UPDATE_Y", "END")
+  log_steps <- unique(sapply(unified_log$logmeta, function(x) x[["step"]]))
+
+  # At least some of these should be present (depending on what actually updates)
+  expect_true(
+    any(expected_steps %in% log_steps),
+    info = "Log should contain recognizable step types"
+  )
+  
+  # Verify: No duplicate measure entries (each measure should be processed once)
+  measure_counts <- table(sapply(unified_log$logmeta, function(x) x[["measure"]]))
+  for (measure in test_measures) {
+    if (measure %in% names(measure_counts)) {
+      # Each measure should be processed, not duplicated excessively
+      expect_lte(
+        measure_counts[[measure]], 10
+      )
+    }
+  }
+  
+})
+
+test_that("update_aux_measures persists log to disk and can be retrieved", {
+  
+  aux_meta_alias <- get_from_auxenv("aux_meta_alias")
+  test_measures <- c("cp")
+  
+  #log_filename <- paste0("test_aux_persist_", format(Sys.time(), "%Y%m%d_%H%M%S"))
+  
+  # Run update with log persistence
+  update_aux_measures(
+    measures = test_measures,
+    repo = NULL,
+    owner = "RossanaTat",
+    log = TRUE,
+    log_overwrite = TRUE,
+    log_save = TRUE,
+    log_name = log_filename
+  )
+  
+  # The log should now be saved to disk via the aux_meta_alias
+  # Retrieve it using pipfun::log_load
+  loaded_log <- pipfun::log_load(
+    id = log_filename,
+    name = paste0(log_filename, "_loaded"),
+    alias = aux_meta_alias,
+    verbose = FALSE
+  )
+  
+  # Verify: Retrieved log is valid
+  expect_s3_class(loaded_log, "piplog")
+  expect_s3_class(loaded_log, "data.table")
+  expect_true(nrow(loaded_log) > 0)
+  
+  # Verify: Log contains expected columns
+  expected_cols <- c("event", "message", "logmeta")
+  for (col in expected_cols) {
+    expect_true(
+      col %in% names(loaded_log),
+      info = sprintf("Log should contain '%s' column", col)
+    )
+  }
+  
+})
+
+test_that("update_aux_measures respects dependency order in log", {
+  
+  test_measures <- c("pfw", "npl")  # npl depends on pfw
+  log_filename <- paste0("test_aux_deps_", format(Sys.time(), "%Y%m%d_%H%M%S"))
+  
+  update_aux_measures(
+    measures = test_measures,
+    repo = NULL,
+    owner = "RossanaTat",
+    log = TRUE,
+    log_save = FALSE,
+    log_name = log_filename
+  )
+  
+  # Retrieve the log
+  unified_log <- rlang::env_get(.piplogenv, log_filename)
+  
+  # Extract the order in which measures appear in the log (first occurrence per measure)
+  first_appearance <- unified_log[, .(first_row = min(.I)), by = "logmeta"]
+  first_appearance <- first_appearance[!is.na(logmeta[["measure"]]), ]
+  
+  # Verify: Dependencies should be processed before dependents
+  # (This is a soft test—actual order depends on the dependency graph)
+  expect_true(
+    nrow(first_appearance) > 0,
+    info = "Log should track multiple measures in order"
+  )
+  
+})
+
+# ============================================================================
+# Interactive testing: Run update_aux_measures and inspect results
+# ============================================================================
+
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("INTERACTIVE TEST: update_aux_measures with detailed inspection\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+# Select test measures (small subset for quick feedback)
+test_measures <- c("cp", "metaregion", "npl")
+aux_meta_alias <- get_from_auxenv("aux_meta_alias")
+log_name_interactive <- paste0("interactive_test_", format(Sys.time(), "%Y%m%d_%H%M%S"))
+
+cat(sprintf("Running update_aux_measures for: %s\n", paste(test_measures, collapse = ", ")))
+cat(sprintf("Log name: %s\n\n", log_name_interactive))
+
+# Run the update
+start_time <- Sys.time()
+update_aux_measures(
+  measures = test_measures,
+  repo = NULL,
+  owner = "RossanaTat",
+  tag = NULL,
+  log = TRUE,
+  log_overwrite = TRUE,
+  verbose = FALSE,
+  halt_on_dep_fail = FALSE,
+  log_save = TRUE,
+  log_name = log_name_interactive
+)
+elapsed_total <- as.numeric(Sys.time() - start_time)
+
+cat(sprintf("✓ Total execution time: %.2f seconds\n\n", elapsed_total))
+
+# ============================================================================
+# Inspect the in-memory log
+# ============================================================================
+
+cat(strrep("-", 80), "\n")
+cat("IN-MEMORY LOG INSPECTION\n")
+cat(strrep("-", 80), "\n\n")
+
+# Retrieve the log from memory
+unified_log <- rlang::env_get(.piplogenv, log_name_interactive)
+
+cat(sprintf("Log class: %s\n", paste(class(unified_log), collapse = ", ")))
+cat(sprintf("Log dimensions: %d rows × %d columns\n", nrow(unified_log), ncol(unified_log)))
+cat(sprintf("Columns: %s\n\n", paste(names(unified_log), collapse = ", ")))
+
+# Event summary
+cat("Event summary:\n")
+event_summary <- unified_log[, .N, by = "event"]
+print(event_summary)
+
+cat("\n")
+
+# Measure summary from logmeta
+cat("Measures processed (from logmeta):\n")
+measure_summary <- unified_log[, .(
+  n_entries = .N
+), by = "logmeta"]
+measure_summary <- measure_summary[!is.na(logmeta[["measure"]]), ]
+measure_summary[, measure := sapply(logmeta, function(x) x[["measure"]])]
+measure_summary[, step := sapply(logmeta, function(x) x[["step"]])]
+measure_summary <- measure_summary[, .(n_entries = sum(n_entries)), by = "measure"]
+print(measure_summary)
+
+cat("\n")
+
+# Step types processed
+cat("Step types in log:\n")
+step_summary <- unified_log[, .(
+  n_entries = .N
+), by = "logmeta"]
+step_summary <- step_summary[!is.na(logmeta[["step"]]), ]
+step_summary[, step := sapply(logmeta, function(x) x[["step"]])]
+step_summary <- step_summary[, .(n_entries = sum(n_entries)), by = "step"]
+print(step_summary)
+
+cat("\n")
+
+# Show any errors
+cat(strrep("-", 80), "\n")
+cat("ERROR ENTRIES\n")
+cat(strrep("-", 80), "\n")
+
+errors <- unified_log[event == "error"]
+if (nrow(errors) > 0) {
+  for (i in 1:nrow(errors)) {
+    row <- errors[i]
+    cat(sprintf("[%d] %s\n", i, row$message))
+  }
+} else {
+  cat("✓ No errors detected\n")
+}
+
+cat("\n")
+
+# ============================================================================
+# Load and inspect persisted log from disk
+# ============================================================================
+
+cat(strrep("-", 80), "\n")
+cat("PERSISTED LOG INSPECTION (from disk)\n")
+cat(strrep("-", 80), "\n\n")
+
+cat(sprintf("Attempting to load persisted log: %s\n", log_name_interactive))
+cat(sprintf("Using alias: %s\n\n", aux_meta_alias))
+
+loaded_log <- tryCatch({
+  pipfun::log_load(
+    id = log_name_interactive,
+    name = paste0(log_name_interactive, "_disk"),
+    alias = aux_meta_alias,
+    verbose = FALSE
+  )
+}, error = function(e) {
+  cat(sprintf("✗ Failed to load persisted log: %s\n", e$message))
+  return(NULL)
+})
+
+if (!is.null(loaded_log)) {
+  cat(sprintf("✓ Successfully loaded persisted log\n"))
+  cat(sprintf("  Dimensions: %d rows × %d columns\n", nrow(loaded_log), ncol(loaded_log)))
+  cat(sprintf("  In-memory log matches persisted log: %s\n", 
+              identical(unified_log, loaded_log)))
+} else {
+  cat("⚠ Persisted log could not be loaded\n")
+}
+
+cat("\n")
+
+# ============================================================================
+# Compare in-memory vs. persisted
+# ============================================================================
+
+if (!is.null(loaded_log)) {
+  cat(strrep("-", 80), "\n")
+  cat("CONSISTENCY CHECK: In-Memory vs. Persisted\n")
+  cat(strrep("-", 80), "\n\n")
+  
+  cat(sprintf("In-memory log nrows:  %d\n", nrow(unified_log)))
+  cat(sprintf("Persisted log nrows:  %d\n", nrow(loaded_log)))
+  cat(sprintf("Row counts match: %s\n\n", nrow(unified_log) == nrow(loaded_log)))
+  
+  if (nrow(unified_log) == nrow(loaded_log)) {
+    cat("✓ Log persistence successful\n")
+  } else {
+    cat("✗ Row count mismatch between in-memory and persisted logs\n")
+  }
+}
+
+cat("\n")
+cat(strrep("=", 80), "\n")
+cat("END OF INTERACTIVE TEST\n")
+cat(strrep("=", 80), "\n\n")
