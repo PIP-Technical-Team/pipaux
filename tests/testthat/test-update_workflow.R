@@ -329,7 +329,7 @@ test_that("update_aux_measures processes multiple measures in order with unified
 test_that("update_aux_measures persists log to disk and can be retrieved", {
   
   aux_meta_alias <- get_from_auxenv("aux_meta_alias")
-  test_measures <- c("cp")
+  test_measures <- c("cpi")
   
   #log_filename <- paste0("test_aux_persist_", format(Sys.time(), "%Y%m%d_%H%M%S"))
   
@@ -348,7 +348,8 @@ test_that("update_aux_measures persists log to disk and can be retrieved", {
   loaded_log <- pipfun::log_load(
     id = aux_log_last_name(), 
     alias = aux_meta_alias,
-    verbose = FALSE
+    verbose = FALSE,
+    overwrite = TRUE
   )
   
   # Verify: Retrieved log is valid
@@ -370,20 +371,18 @@ test_that("update_aux_measures persists log to disk and can be retrieved", {
 test_that("update_aux_measures respects dependency order in log", {
   
   test_measures <- c("pfw", "npl")  # npl depends on pfw
-  log_filename <- paste0("test_aux_deps_", format(Sys.time(), "%Y%m%d_%H%M%S"))
   
   update_aux_measures(
     measures = test_measures,
     repo = NULL,
     owner = "RossanaTat",
     log = TRUE,
-    log_save = FALSE,
-    log_name = log_filename
+    log_save = FALSE
   )
   
   # Retrieve the log
-  unified_log <- rlang::env_get(.piplogenv, log_filename)
-  
+  unified_log <- rlang::env_get(.piplogenv, aux_log_last_name())
+
   # Extract the order in which measures appear in the log (first occurrence per measure)
   first_appearance <- unified_log[, .(first_row = min(.I)), by = "logmeta"]
   first_appearance <- first_appearance[!is.na(logmeta[["measure"]]), ]

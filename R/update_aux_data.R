@@ -336,7 +336,13 @@ update_aux_measures <- function(measures,
       if (halt_on_dep_fail) stop(e)
     })
   }
-  
+
+   # Retrieve and store the log in .piplogenv for later access
+  if (log && !is.null(log_name)) {
+    log_obj <- pipfun::log_get(log_name)
+    rlang::env_poke(.piplogenv, log_name, log_obj)
+  }
+
   # Save the log if requested
   if (log_save && !is.null(log_name)) {
     pipfun::log_save(name = log_name, alias = get_from_auxenv("aux_meta_alias"))
