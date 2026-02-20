@@ -13,8 +13,7 @@ update_aux_measures(
   log_overwrite = TRUE,
   verbose = FALSE,
   halt_on_dep_fail = FALSE,
-  log_save = FALSE,
-  log_name = NULL
+  log_save = FALSE
 )
 }
 \arguments{
@@ -35,8 +34,6 @@ update_aux_measures(
 \item{halt_on_dep_fail}{Logical. Whether to halt parent update if a dependency fails. Default is FALSE.}
 
 \item{log_save}{Logical. Whether to save the final log. Default is FALSE.}
-
-\item{log_name}{Character. Explicit log name to use. If NULL, a default log name will be generated.}
 }
 \value{
 Invisibly returns NULL.

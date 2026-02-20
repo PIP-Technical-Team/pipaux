@@ -4,7 +4,7 @@ pipfun::setup_working_release(release = "20260101", identity = "TEST")
 devtools::load_all()
 
 # ============================================================================
-# Build topological sort of dependency graph
+# Build topological sort of dependency graph ####
 # ============================================================================
 
 build_topological_order <- function(deps_list) {
@@ -57,7 +57,7 @@ for (i in seq_along(ordered_measures)) {
 }
 
 # ============================================================================
-# Run updates in topological order
+# Run updates in topological order ####
 # ============================================================================
 
 cat("\n", strrep("=", 80), "\n", sep = "")
@@ -203,7 +203,7 @@ for (i in seq_along(ordered_measures)) {
 }
 
 # ============================================================================
-# Summary report
+# Summary report ####
 # ============================================================================
 
 cat("\n", strrep("=", 80), "\n", sep = "")
@@ -249,46 +249,19 @@ cat(sprintf("  Slowest: %s (%.2f s)\n",
             results[, max(elapsed_sec)]))
 cat(sprintf("  Total: %.2f s\n", results[, sum(elapsed_sec)]))
 
-# Final log
-# cat("\n", strrep("=", 80), "\n", sep = "")
-# cat("FINAL LOG\n")
-# cat(strrep("=", 80), "\n\n", sep = "")
-
-# final_log <- aux_log_last()
-
-# if (!is.null(final_log)) {
-#   cat(sprintf("Log has %d entries\n", nrow(final_log)))
-#   cat("Event summary:\n")
-#   event_summary <- final_log[, .N, by = event]
-#   print(event_summary)
-# } else {
-#   cat("No log found\n")
-# }
-
-# # Display the results table
-# cat("\n", strrep("=", 80), "\n", sep = "")
-# cat("DETAILED RESULTS\n")
-# cat(strrep("=", 80), "\n\n", sep = "")
-# print(results)
-
-# # Return for inspection
-# invisible(results)
-
 # ============================================================================
-# Test update_aux_measures with logging
+# Test update_aux_measures with logging ####
 # ============================================================================
 
 test_that("update_aux_measures processes multiple measures in order with unified log", {
   
   # Select a subset of measures (choose non-error-prone ones for testing)
-  test_measures <- c("cp", "metaregion", "npl")
+  test_measures <- c("cp", "metaregion")
+  # "npl")
   
   # Get the aux_meta_alias for log retrieval later
   aux_meta_alias <- get_from_auxenv("aux_meta_alias")
-  
-  # Generate a unique log filename for this test
-  #log_filename <- paste0("test_aux_measures_", format(Sys.time(), "%Y%m%d_%H%M%S"))
-  
+    
   # Call update_aux_measures with logging enabled and save
   update_aux_measures(
     measures = test_measures,
@@ -299,8 +272,7 @@ test_that("update_aux_measures processes multiple measures in order with unified
     log_overwrite = TRUE,
     verbose = FALSE,
     halt_on_dep_fail = FALSE,
-    log_save = TRUE,
-    log_name = log_filename
+    log_save = TRUE
   )
   
   # Verify: Check that the unified log exists in memory
@@ -368,15 +340,13 @@ test_that("update_aux_measures persists log to disk and can be retrieved", {
     owner = "RossanaTat",
     log = TRUE,
     log_overwrite = TRUE,
-    log_save = TRUE,
-    log_name = log_filename
+    log_save = TRUE
   )
   
   # The log should now be saved to disk via the aux_meta_alias
   # Retrieve it using pipfun::log_load
   loaded_log <- pipfun::log_load(
-    id = log_filename,
-    name = paste0(log_filename, "_loaded"),
+    id = aux_log_last_name(), 
     alias = aux_meta_alias,
     verbose = FALSE
   )

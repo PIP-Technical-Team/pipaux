@@ -601,11 +601,11 @@ init_aux_log <- function(overwrite = TRUE) {
   }
 
   # Unique name per cascade
-  log_name <- paste0(
-    "pipaux_update_log_",
-    format(Sys.time(), "%Y%m%d_%H%M%S")
-  )
-
+  # log_name <- paste0(
+  #   "pipaux_update_log_",
+  #   format(Sys.time(), "%Y%m%d_%H%M%S")
+  # )
+  log_name <- "pipaux_update_log"  
   pipfun::log_init(log_name, overwrite = overwrite)
 
   .piplogenv$active_aux_log <- log_name
@@ -638,4 +638,15 @@ finalize_aux_log <- function() {
 #' @keywords internal
 aux_log_last <- function() {
   pipfun::log_get(.piplogenv$last_aux_log)
+}
+
+#' Retrieve the name of the last auxiliary data update log
+#'
+#' Returns the name of the log file from the most recent auxiliary data update cascade.
+#'
+#' @return A character string containing the name of the last update log
+#'
+#' @keywords internal
+aux_log_last_name <- function() {
+  return(.piplogenv$last_aux_log)
 }

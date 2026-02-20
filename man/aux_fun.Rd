@@ -13,8 +13,7 @@ aux_fun(
   log = TRUE,
   log_overwrite = TRUE,
   verbose = FALSE,
-  halt_on_dep_fail = FALSE,
-  log_name = NULL
+  halt_on_dep_fail = FALSE
 )
 }
 \description{

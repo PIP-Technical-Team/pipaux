@@ -4,7 +4,7 @@
 \alias{pip_aux_save}
 \title{Save data to auxiliary data path}
 \usage{
-pip_aux_save(x, id, force = FALSE, ...)
+pip_aux_save(x, id, ...)
 }
 \arguments{
 \item{x}{Data to be saved}
