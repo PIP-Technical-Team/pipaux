@@ -383,34 +383,43 @@ test_that("update_aux_measures respects dependency order in log", {
   # Retrieve the log
   unified_log <- rlang::env_get(.piplogenv, aux_log_last_name())
 
-  # Extract the order in which measures appear in the log (first occurrence per measure)
-  first_appearance <- unified_log[, .(first_row = min(.I)), by = "logmeta"]
-  first_appearance <- first_appearance[!is.na(logmeta[["measure"]]), ]
+  # Extract measure and step from logmeta list column
+  unified_log[, c("measure", "step") := list(
+    sapply(logmeta, function(x) x[["measure"]]),
+    sapply(logmeta, function(x) x[["step"]])
+  )]
   
-  # Verify: Dependencies should be processed before dependents
-  # (This is a soft test—actual order depends on the dependency graph)
+  # Get first occurrence of each measure (where step == "END" marks completion)
+  first_appearance <- unified_log[
+    step == "END",
+    .(first_row = min(.I)),
+    by = "measure"
+  ]
+  
+  # Verify: pfw should appear before npl (pfw is a dependency of npl)
+  pfw_row <- first_appearance[measure == "pfw", first_row]
+  npl_row <- first_appearance[measure == "npl", first_row]
+  
   expect_true(
-    nrow(first_appearance) > 0,
-    info = "Log should track multiple measures in order"
+    pfw_row < npl_row,
+    info = "pfw (dependency) should be processed before npl (dependent)"
   )
   
 })
 
 # ============================================================================
-# Interactive testing: Run update_aux_measures and inspect results
+# Interactive testing ####
 # ============================================================================
 
 cat("\n", strrep("=", 80), "\n", sep = "")
 cat("INTERACTIVE TEST: update_aux_measures with detailed inspection\n")
-cat(strrep("=", 80), "\n\n", sep = "")
+cat(strrep("=", 80), "\n\n")
 
 # Select test measures (small subset for quick feedback)
-test_measures <- c("cp", "metaregion", "npl")
+test_measures <- c("cp", "metaregion", "npl", "pfw", "cpi", "pop")
 aux_meta_alias <- get_from_auxenv("aux_meta_alias")
-log_name_interactive <- paste0("interactive_test_", format(Sys.time(), "%Y%m%d_%H%M%S"))
 
 cat(sprintf("Running update_aux_measures for: %s\n", paste(test_measures, collapse = ", ")))
-cat(sprintf("Log name: %s\n\n", log_name_interactive))
 
 # Run the update
 start_time <- Sys.time()
@@ -423,15 +432,14 @@ update_aux_measures(
   log_overwrite = TRUE,
   verbose = FALSE,
   halt_on_dep_fail = FALSE,
-  log_save = TRUE,
-  log_name = log_name_interactive
+  log_save = TRUE
 )
 elapsed_total <- as.numeric(Sys.time() - start_time)
 
 cat(sprintf("✓ Total execution time: %.2f seconds\n\n", elapsed_total))
 
 # ============================================================================
-# Inspect the in-memory log
+## Inspect the in-memory log ####
 # ============================================================================
 
 cat(strrep("-", 80), "\n")
@@ -439,7 +447,7 @@ cat("IN-MEMORY LOG INSPECTION\n")
 cat(strrep("-", 80), "\n\n")
 
 # Retrieve the log from memory
-unified_log <- rlang::env_get(.piplogenv, log_name_interactive)
+unified_log <- rlang::env_get(.piplogenv, aux_log_last_name())
 
 cat(sprintf("Log class: %s\n", paste(class(unified_log), collapse = ", ")))
 cat(sprintf("Log dimensions: %d rows × %d columns\n", nrow(unified_log), ncol(unified_log)))
@@ -452,27 +460,28 @@ print(event_summary)
 
 cat("\n")
 
-# Measure summary from logmeta
+# Measure summary from logmeta - FIXED
 cat("Measures processed (from logmeta):\n")
-measure_summary <- unified_log[, .(
-  n_entries = .N
-), by = "logmeta"]
-measure_summary <- measure_summary[!is.na(logmeta[["measure"]]), ]
-measure_summary[, measure := sapply(logmeta, function(x) x[["measure"]])]
-measure_summary[, step := sapply(logmeta, function(x) x[["step"]])]
-measure_summary <- measure_summary[, .(n_entries = sum(n_entries)), by = "measure"]
+unified_log[, c("measure", "step") := list(
+  sapply(logmeta, function(x) x[["measure"]]),
+  sapply(logmeta, function(x) x[["step"]])
+)]
+measure_summary <- unified_log[
+  !is.na(measure),
+  .(n_entries = .N),
+  by = "measure"
+]
 print(measure_summary)
 
 cat("\n")
 
-# Step types processed
+# Step types processed - FIXED
 cat("Step types in log:\n")
-step_summary <- unified_log[, .(
-  n_entries = .N
-), by = "logmeta"]
-step_summary <- step_summary[!is.na(logmeta[["step"]]), ]
-step_summary[, step := sapply(logmeta, function(x) x[["step"]])]
-step_summary <- step_summary[, .(n_entries = sum(n_entries)), by = "step"]
+step_summary <- unified_log[
+  !is.na(step),
+  .(n_entries = .N),
+  by = "step"
+]
 print(step_summary)
 
 cat("\n")
@@ -495,22 +504,23 @@ if (nrow(errors) > 0) {
 cat("\n")
 
 # ============================================================================
-# Load and inspect persisted log from disk
+## Load and inspect persisted log from disk ####
 # ============================================================================
 
 cat(strrep("-", 80), "\n")
 cat("PERSISTED LOG INSPECTION (from disk)\n")
 cat(strrep("-", 80), "\n\n")
 
+log_name_interactive <- aux_log_last_name()
 cat(sprintf("Attempting to load persisted log: %s\n", log_name_interactive))
 cat(sprintf("Using alias: %s\n\n", aux_meta_alias))
 
 loaded_log <- tryCatch({
   pipfun::log_load(
     id = log_name_interactive,
-    name = paste0(log_name_interactive, "_disk"),
     alias = aux_meta_alias,
-    verbose = FALSE
+    verbose = FALSE,
+    overwrite = TRUE
   )
 }, error = function(e) {
   cat(sprintf("✗ Failed to load persisted log: %s\n", e$message))
@@ -520,8 +530,7 @@ loaded_log <- tryCatch({
 if (!is.null(loaded_log)) {
   cat(sprintf("✓ Successfully loaded persisted log\n"))
   cat(sprintf("  Dimensions: %d rows × %d columns\n", nrow(loaded_log), ncol(loaded_log)))
-  cat(sprintf("  In-memory log matches persisted log: %s\n", 
-              identical(unified_log, loaded_log)))
+  cat(sprintf("  Row counts match: %s\n", nrow(unified_log) == nrow(loaded_log)))
 } else {
   cat("⚠ Persisted log could not be loaded\n")
 }
@@ -529,7 +538,7 @@ if (!is.null(loaded_log)) {
 cat("\n")
 
 # ============================================================================
-# Compare in-memory vs. persisted
+## Compare in-memory vs. persisted logs ####
 # ============================================================================
 
 if (!is.null(loaded_log)) {
@@ -539,7 +548,6 @@ if (!is.null(loaded_log)) {
   
   cat(sprintf("In-memory log nrows:  %d\n", nrow(unified_log)))
   cat(sprintf("Persisted log nrows:  %d\n", nrow(loaded_log)))
-  cat(sprintf("Row counts match: %s\n\n", nrow(unified_log) == nrow(loaded_log)))
   
   if (nrow(unified_log) == nrow(loaded_log)) {
     cat("✓ Log persistence successful\n")
