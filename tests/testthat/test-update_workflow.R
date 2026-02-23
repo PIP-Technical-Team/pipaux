@@ -560,3 +560,268 @@ cat("\n")
 cat(strrep("=", 80), "\n")
 cat("END OF INTERACTIVE TEST\n")
 cat(strrep("=", 80), "\n\n")
+
+# ============================================================================
+# Comparing changes ####
+# ============================================================================
+
+# Switch to 20260202 as current release
+pipfun::setup_working_release(release = "20260202", identity = "TEST")
+
+## Between diff releases ####
+old_release <- "20260101_TEST"
+
+# Part 1: focus on gdp, cpi, pfw, pop, pce and ppp
+# Test on a single measure first to verify log structure, then expand to multiple measures
+
+res_aux_rel = compare_aux_releases(measure = "cpi", old_release = old_release, owner = "RossanaTat")
+
+## Between vintages (versions) within same release ####
+
+res_aux_vint = compare_aux_vintages(measures = c("cpi", "pfw", "gdp", "pop", "pce", "ppp"))
+
+# ============================================================================
+# Diagnostics | Comparing changes ####
+# ============================================================================
+
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("RELEASE COMPARISON DIAGNOSTICS\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+run_release_comparison_diagnostics <- function(
+  measures,
+  old_release = NULL,
+  owner = "RossanaTat"
+) {
+
+  results <- data.table::data.table(
+    order           = integer(),
+    measure         = character(),
+    status          = character(),
+    value_changes   = integer(),
+    row_changes     = integer(),
+    elapsed_sec     = numeric(),
+    error_msg       = character()
+  )
+
+  for (i in seq_along(measures)) {
+
+    m <- measures[i]
+
+    cat(sprintf("\n[%d/%d] Comparing release: %s\n",
+                i, length(measures), m))
+
+    start_time <- Sys.time()
+    status     <- "no_change"
+    error_msg  <- NA_character_
+    val_n      <- 0L
+    row_n      <- 0L
+
+    res <- tryCatch({
+
+      get_aux_changes(
+        measure     = m,
+        old_release = old_release,
+        verbose     = FALSE
+      )
+
+    }, error = function(e) {
+      status <<- "error"
+      error_msg <<- e$message
+      cat(sprintf("  ✗ ERROR: %s\n", e$message))
+      return(NULL)
+    })
+
+    if (!is.null(res)) {
+
+      if (!is.null(res$diff_values))
+        val_n <- nrow(res$diff_values)
+
+      if (!is.null(res$diff_rows))
+        row_n <- nrow(res$diff_rows)
+
+      if (val_n > 0 & row_n > 0) {
+        status <- "row_and_value_change"
+      } else if (val_n > 0) {
+        status <- "value_change"
+      } else if (row_n > 0) {
+        status <- "row_change"
+      }
+    }
+
+    elapsed <- as.numeric(Sys.time() - start_time)
+
+    results <- rbind(
+      results,
+      data.table::data.table(
+        order         = i,
+        measure       = m,
+        status        = status,
+        value_changes = val_n,
+        row_changes   = row_n,
+        elapsed_sec   = elapsed,
+        error_msg     = error_msg
+      )
+    )
+
+    cat(sprintf("  Status: %s\n", status))
+    cat(sprintf("  Value diffs: %d\n", val_n))
+    cat(sprintf("  Row diffs:   %d\n", row_n))
+    cat(sprintf("  ⏱ %.2f seconds\n", elapsed))
+  }
+
+  return(results)
+}
+
+## RELEASE COMPARISON ####
+# Example configuration
+old_release <- "20260101_TEST"
+test_measures <- c("cpi", "pfw", "gdp", "pop", "pce", "ppp")
+
+release_diag <- run_release_comparison_diagnostics(
+  measures    = test_measures,
+  old_release = old_release
+)
+
+### Summary report ####
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("RELEASE COMPARISON SUMMARY\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+cat("Status breakdown:\n")
+print(release_diag[, .N, by = status])
+
+changed <- release_diag[status != "no_change" & status != "error"]
+
+if (nrow(changed) > 0) {
+  cat("\nMeasures with detected changes:\n")
+  print(changed[, .(measure, status, value_changes, row_changes)])
+} else {
+  cat("\n✓ No changes detected across measures\n")
+}
+
+cat("\nTiming summary:\n")
+cat(sprintf("  Fastest: %s (%.2f s)\n",
+            release_diag[which.min(elapsed_sec), measure],
+            release_diag[, min(elapsed_sec)]))
+cat(sprintf("  Slowest: %s (%.2f s)\n",
+            release_diag[which.max(elapsed_sec), measure],
+            release_diag[, max(elapsed_sec)]))
+cat(sprintf("  Total: %.2f s\n",
+            release_diag[, sum(elapsed_sec)]))
+
+## VINTAGE COMPARISON DIAGNOSTICS ####
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("VINTAGE COMPARISON DIAGNOSTICS\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+run_vintage_comparison_diagnostics <- function(
+  measures,
+  version = -1
+) {
+
+  results <- data.table::data.table(
+    order           = integer(),
+    measure         = character(),
+    status          = character(),
+    value_changes   = integer(),
+    row_changes     = integer(),
+    elapsed_sec     = numeric(),
+    error_msg       = character()
+  )
+
+  for (i in seq_along(measures)) {
+
+    m <- measures[i]
+
+    cat(sprintf("\n[%d/%d] Comparing vintage: %s\n",
+                i, length(measures), m))
+
+    start_time <- Sys.time()
+    status     <- "no_change"
+    error_msg  <- NA_character_
+    val_n      <- 0L
+    row_n      <- 0L
+
+    res <- tryCatch({
+
+      compare_vintage_versions(
+        measure = m,
+        version = version,
+        verbose = FALSE
+      )
+
+    }, error = function(e) {
+      status <<- "error"
+      error_msg <<- e$message
+      cat(sprintf("  ✗ ERROR: %s\n", e$message))
+      return(NULL)
+    })
+
+    if (!is.null(res)) {
+
+      if (!is.null(res$diff_values))
+        val_n <- nrow(res$diff_values)
+
+      if (!is.null(res$diff_rows))
+        row_n <- nrow(res$diff_rows)
+
+      if (val_n > 0 & row_n > 0) {
+        status <- "row_and_value_change"
+      } else if (val_n > 0) {
+        status <- "value_change"
+      } else if (row_n > 0) {
+        status <- "row_change"
+      }
+    }
+
+    elapsed <- as.numeric(Sys.time() - start_time)
+
+    results <- rbind(
+      results,
+      data.table::data.table(
+        order         = i,
+        measure       = m,
+        status        = status,
+        value_changes = val_n,
+        row_changes   = row_n,
+        elapsed_sec   = elapsed,
+        error_msg     = error_msg
+      )
+    )
+
+    cat(sprintf("  Status: %s\n", status))
+    cat(sprintf("  Value diffs: %d\n", val_n))
+    cat(sprintf("  Row diffs:   %d\n", row_n))
+    cat(sprintf("  ⏱ %.2f seconds\n", elapsed))
+  }
+
+  return(results)
+}
+
+## Run Vintage Comparison Diagnostics ####
+vintage_diag <- run_vintage_comparison_diagnostics(
+  measures = test_measures,
+  version  = -1
+)
+
+### Summary report ####
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("VINTAGE COMPARISON SUMMARY\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+cat("Status breakdown:\n")
+print(vintage_diag[, .N, by = status])
+
+changed_vint <- vintage_diag[status != "no_change" & status != "error"]
+
+if (nrow(changed_vint) > 0) {
+  cat("\nMeasures with vintage changes:\n")
+  print(changed_vint[, .(measure, status, value_changes, row_changes)])
+} else {
+  cat("\n✓ No vintage changes detected\n")
+}
+
+cat("\nTiming summary:\n")
+cat(sprintf("  Total: %.2f s\n",
+            vintage_diag[, sum(elapsed_sec)]))

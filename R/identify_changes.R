@@ -1,5 +1,5 @@
 # Auxiliary function that creates an inventory of value changes per country/year of the following measures:
-# cpi, ppp, pfw, pop, gdp
+# cpi, ppp, pfw, pop, gdp, pce
 
 #' Compare auxiliary data files across releases
 #'
@@ -52,12 +52,11 @@ get_aux_changes <- function(measure = "cpi",
 
   # Load old data (previous release) using pip_read and explicit path
   release_root <- fs::path_dir(aux_data_path)
-  id_path <- fs::path(release_root, old_release, measure, measure, ext = "qs2")
-
-  #old_artifact_dir <- fs::path(release_root, old_release, measure)
+  id_path <- fs::path(release_root, old_release, paste0(measure, ".qs2"), measure, ext = "qs2")
   
   old_df <- tryCatch({
-    pipload::pip_read(id = id_path, format = "qs2", verbose = verbose)
+    qs2::qs_read(file = id_path)
+    #pipload::pip_read(id = id_path, format = "qs2", verbose = verbose)
   }, error = function(e) {
     cli::cli_alert_warning(
       "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
@@ -70,8 +69,7 @@ get_aux_changes <- function(measure = "cpi",
     return(invisible(NULL))
   }
 
-  #key_cols <- attributes(new_df)$aux_key
-  key_cols <- stamp::st_get_pk(cpi)
+  key_cols <- stamp::st_get_pk(new_df)
   
   if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
     cli::cli_abort("Key variables could not be retrieved from data attributes.")
@@ -84,9 +82,9 @@ get_aux_changes <- function(measure = "cpi",
     cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
   }
 
-  common_cols <- intersect(names(new_df), names(old_df))
-  new_df <- new_df[, common_cols, with = FALSE]
-  old_df <- old_df[, common_cols, with = FALSE]
+  # common_cols <- intersect(names(new_df), names(old_df))
+  # new_df <- new_df[, common_cols, with = FALSE]
+  # old_df <- old_df[, common_cols, with = FALSE]
 
   myr_obj <- tryCatch(
     myrror::myrror(
@@ -223,8 +221,7 @@ compare_aux_releases <- function(measure     = NULL,
 #' This function searches the `aux_data` directory inside the given main directory
 #' and returns the latest available release (prior to a given current release)
 #' that matches the specified identity (e.g., `"prod"` or `"dev"`).
-#'
-#' @param maindir Character. The root directory where `aux_data` subfolder is located.
+#' @param aux_data_path Character. Path to the `aux_data` directory 
 #' @param current_release Character. Current release string in the format `"YYYYMMDD_identity"`.
 #' @param identity Character. The identity suffix to filter releases (e.g., `"prod"`).
 #'
@@ -325,7 +322,7 @@ compare_vintage_versions <- function(measure,
   # ------------------------------------------------------------#
   # Determine key columns
   # ------------------------------------------------------------#
-  key_cols <- attributes(new_df)$aux_key
+  key_cols <- stamp::st_get_pk(new_df)
 
   if (length(key_cols) == 0) {
     cli::cli_abort("No key columns found in data attributes.")
