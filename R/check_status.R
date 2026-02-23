@@ -171,7 +171,7 @@ check_y_drive_status <- function(measure,
     gh <- list(gh)
   }
 
-  # Helper to fetch GitHub SHA
+  # Helper to fetch GitHub SHA for a single file
   get_gh_sha <- function(entry) {
     tryCatch(
       pipfun::get_file_info_from_gh(
@@ -194,13 +194,34 @@ check_y_drive_status <- function(measure,
   sha_mismatch <- FALSE
 
   for (entry in gh) {
-
-    gh_sha <- get_gh_sha(entry)
-    y_sha  <- entry$gh_raw_sha
-
-    if (is.na(gh_sha) || is.na(y_sha) || gh_sha != y_sha) {
-      sha_mismatch <- TRUE
-      break
+    
+    # If entry is a data frame with multiple rows, check each row
+    if (is.data.frame(entry) && nrow(entry) > 1) {
+      for (i in seq_len(nrow(entry))) {
+        row <- entry[i, , drop = FALSE]
+        gh_sha <- get_gh_sha(as.list(row))
+        y_sha  <- row$gh_raw_sha
+        
+        if (is.na(gh_sha) || is.na(y_sha) || gh_sha != y_sha) {
+          sha_mismatch <- TRUE
+          break
+        }
+      }
+      if (sha_mismatch) break
+      
+    } else {
+      # Single row or list entry - convert to list for consistency
+      if (is.data.frame(entry)) {
+        entry <- as.list(entry)
+      }
+      
+      gh_sha <- get_gh_sha(entry)
+      y_sha  <- entry$gh_raw_sha
+      
+      if (is.na(gh_sha) || is.na(y_sha) || gh_sha != y_sha) {
+        sha_mismatch <- TRUE
+        break
+      }
     }
   } 
 } # end gh check

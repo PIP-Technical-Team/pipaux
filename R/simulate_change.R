@@ -1,34 +1,21 @@
-
-
-#' Simulate an "old" version by modifying a measure's pin
+#' Simulate an "old" version by modifying a measure's artifact
 #'
-#' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
-#' @param measure Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")
+#' @param old_release Character. The name of the old release to simulate (e.g. "20250101_TEST")
+#' @param measure Character. The name of the measure artifact (e.g. "gdp", "ppp", "countries")
 #' @param seed An optional seed for reproducibility
 #'
 #' @return Invisibly returns the modified data.table
 #' @keywords internal
-#' Simulate an "old" version by modifying a measure's pin
+#' Simulate an "old" version by modifying a measure's artifact
 #'
-#' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
-#' @param measure Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")
+#' @param old_release Character. The name of the old release to simulate (e.g. "20250101_TEST")
+#' @param measure Character. The name of the measure artifact (e.g. "gdp", "ppp", "countries")
 #' @param seed An optional seed for reproducibility
 #' @param drop Numeric vector of row indices to drop (optional)
 #' @param indices Numeric vector of row indices to modify for the measure variable (optional)
 #' @param verbose Logical. Whether to print messages.
 #'
-#' @return Invisibly returns a list with the modified data.table and board
-#' @keywords internal
-#' Simulate an "old" version by modifying a measure's pin
-#'
-#' @param old_release Character. The name of the old release board to simulate (e.g. "20250101_TEST")
-#' @param measure Character. The name of the measure pin (e.g. "gdp", "ppp", "countries")
-#' @param seed An optional seed for reproducibility
-#' @param drop Numeric vector of row indices to drop (optional)
-#' @param indices Numeric vector of row indices to modify (optional)
-#' @param verbose Logical. Whether to print messages.
-#'
-#' @return Invisibly returns a list with the modified data.table and board
+#' @return Invisibly returns a list with the modified data.table 
 #' @keywords internal
 simulate_old_release <- function(old_release = "20250101_TEST",
                                  measure,
@@ -91,9 +78,11 @@ simulate_old_release <- function(old_release = "20250101_TEST",
   }
 
   # Save modified data to old release aux_data_path
+  # make sure to init stamp
+  #stamp::st_init(root = , alias = "test_simulate_old_release")
   pipload::pip_write(
     x = dt,
-    id = measure,
+    id = measure_dir,
     #dir = measure_dir,
     format = "qs2"
   )

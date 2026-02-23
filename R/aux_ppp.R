@@ -412,8 +412,8 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
                 description = "`Seriesname` should be character") |>
     validate_if(is.character(note_may192020),
                 description = "`note_may192020` should be character") |>
-    validate_if(is.character(ppp_2017_v1_v2_note),
-                description = "`ppp_2017_v1_v2_note` should be character") |>
+    validate_if(is.character(note_ppp_2017_v1_v2),
+                description = "`note_ppp_2017_v1_v2` should be character") |>
     validate_cols(not_na, code, CoverageType, datalevel,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(code, CoverageType, datalevel),
