@@ -1,0 +1,227 @@
+---
+title: "Auxiliary Data Release Checklist Workflow"
+output: html_document
+---
+
+## 📋 Auxiliary Data Release Checklist Workflow
+
+This workflow provides a structured, stepwise process for updating, verifying, and validating auxiliary data updates for a specific release. It leverages the modular scripts in the `dev/` folder and ensures dependency order, log diagnostics, simulations of files changes, and release/vintage comparisons are executed systematically.
+
+---
+
+## Pre-requisites
+
+Ensure your R environment has the following packages installed:
+
+- pipfun
+- pipload
+- stamp
+- data.table
+- devtools
+- rlang
+- testthat
+- gh
+
+Set up the working release for testing:
+
+```r
+pipfun::setup_working_release(release = "YYYYMMDD", identity = "TEST")
+devtools::load_all()
+```
+
+Confirm `dev/` folder contains the following scripts:
+
+- 01_dependency_and_update_runner.R
+- 02_log_diagnostics.R
+- 03_simulation_tools.R
+- 04_release_comparison_diagnostics.R
+- 05_interactive_run_all.R
+
+---
+
+## Step 1 – Dependency-Aware Update
+
+**File:** `01_dependency_and_update_runner.R`  
+**Purpose:** Update auxiliary measures respecting dependency order. Keep track of success, warnings, errors, and timing.
+
+**Usage:**
+```r
+source("dev/01_dependency_and_update_runner.R")
+update_results <- run_dependency_update(
+  measures = c("cp", "metaregion"), # optional; NULL for all
+  owner = "RossanaTat"
+)
+```
+
+**Key Outputs:**
+
+- Data table with:
+    - order: processing order
+    - measure: measure name
+    - status: success, warning, error
+    - elapsed_sec: runtime per measure
+    - error_msg: error messages if any
+
+**Tips:**
+
+- Always start with dependency-aware update before any diagnostics.
+- Keep track of timing to identify slow updates.
+
+---
+
+## Step 2 – Log Diagnostics
+
+**File:** `02_log_diagnostics.R`  
+**Purpose:** Validate in-memory log structure after updates. Confirm log persistence to disk. Verify dependency order in the log.
+
+**Usage:**
+```r
+source("dev/02_log_diagnostics.R")
+log_results <- run_log_diagnostics(
+  measures = c("cp", "metaregion"),
+  owner = "RossanaTat"
+)
+```
+
+**Key Checks:**
+
+- Log class and dimensions
+- Measures processed
+- Step types (UPDATE_GH, UPDATE_Y, END, etc.)
+- Row count match between in-memory and persisted logs
+
+**Tips:**
+
+- Run immediately after Step 1.
+- Investigate any discrepancies between memory and disk logs.
+
+---
+
+## Step 3 – Simulations
+
+**File:** `03_simulation_tools.R`  
+**Purpose:** Simulate data changes for selected measures. Validate that auxiliary update functions handle dropped or modified rows correctly.
+
+**Usage:**
+```r
+source("dev/03_simulation_tools.R")
+sim_results <- run_simulations(
+  measures = c("cpi", "pop", "pfw"),
+  sim_config = list(
+    cpi = list(drop = c(1,5,10), indices = c(20,50,100)),
+    pop = list(drop = c(2,8), indices = c(15,45,90))
+  )
+)
+```
+
+**Key Outputs:**
+
+- measure: measure name
+- status: success or error
+- rows_dropped, rows_modified
+- elapsed_sec: runtime
+- error_msg: errors if any
+
+**Tips:**
+
+- Run simulations on a subset of measures for testing.
+- Helps identify potential issues before final release.
+
+---
+
+## Step 4 – Release & Vintage Comparison Diagnostics
+
+**File:** `04_release_comparison_diagnostics.R`  
+**Purpose:** Compare current release vs. previous release (or tag). Compare vintage versions within the same release. Identify row and value changes.
+
+**Usage:**
+```r
+source("dev/04_release_comparison_diagnostics.R")
+
+# Release comparison
+release_diag <- run_release_comparison_diagnostics(
+  measures = c("cpi","pfw","gdp"),
+  old_release = "20260101_TEST",
+  owner = "RossanaTat"
+)
+
+# Vintage comparison
+vintage_diag <- run_vintage_comparison_diagnostics(
+  measures = c("cpi","pfw","gdp")
+)
+```
+
+**Key Outputs:**
+
+- status: no_change, row_change, value_change, row_and_value_change, error
+- value_changes, row_changes, elapsed_sec, error_msg
+
+**Tips:**
+
+- Use diagnostics before final release to ensure integrity.
+- Review timing to identify expensive comparisons.
+
+---
+
+## Step 5 – Full Interactive Workflow
+
+**File:** `05_interactive_run_all.R`  
+**Purpose:** Sequentially run Steps 1–4. Aggregate results, track timing per step, and return structured results.
+
+**Usage:**
+```r
+source("dev/05_interactive_run_all.R")
+results <- run_all_workflow(
+  measures = c("cpi","pfw","gdp","pop"),
+  owner = "RossanaTat",
+  old_release = "20260101_TEST"
+)
+```
+
+**Output Structure:**
+```r
+names(results)
+# "update_results"
+# "log_diagnostics"
+# "simulation_results"
+# "release_diagnostics"
+# "vintage_diagnostics"
+```
+
+**Tips:**
+
+- Use interactively to monitor stepwise progress.
+- Good for end-to-end validation before publishing a new release.
+
+---
+
+## Step 6 – Optional: Use `update_aux_measures()` Directly
+
+**Purpose:** Programmatically update a specific set of measures with full logging.
+
+**Usage:**
+```r
+update_aux_measures(
+  measures = c("cpi","pop"),
+  owner = "RossanaTat",
+  log = TRUE,
+  log_save = TRUE
+)
+```
+
+**Notes:**
+
+- Honors dependency order automatically.
+- Can specify repo, tag, halt_on_dep_fail for advanced control.
+- Logs are stored in `.piplogenv` and optionally persisted to disk.
+
+---
+
+## General Recommendations
+
+- Always start with Step 1 (dependency-aware update).
+- Run log diagnostics immediately after updates.
+- Use simulations to generate trackable changes in aux data files before release comparisons.
+- Run release/vintage diagnostics.
+- Track timing to identify bottlenecks.
+- Use `05_interactive_run_all.R` for end-to-end runs in testing environments.

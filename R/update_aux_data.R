@@ -292,61 +292,179 @@ aux_fun <- function(measure,
 #'
 #' @return Invisibly returns NULL.
 #' @export
-update_aux_measures <- function(measures,
-                                 repo = NULL,
-                                 owner = getOption("pipfun.ghowner"),
-                                 tag = NULL,
-                                 log = TRUE,
-                                 log_overwrite = TRUE,
-                                 verbose = FALSE,
-                                 halt_on_dep_fail = FALSE,
-                                 log_save = FALSE,
-                                 log_name = NULL) {
-  
-  processed <- new.env(parent = emptyenv())
-  
-  # Initialize log if top-level and logging is enabled
-  if (is_top_level() && log && is.null(log_name)) {
-    log_name <- init_aux_log(overwrite = log_overwrite)
-    on.exit(finalize_aux_log(), add = TRUE)
+#' Update specified auxiliary data measures
+#'
+#' Updates the specified auxiliary data measures and their dependencies.
+#' If `measures` is NULL, all available measures are updated in dependency order.
+#'
+#' @export
+update_aux_measures <- function(
+  measures = NULL,
+  repo = NULL,
+  owner = getOption("pipfun.ghowner"),
+  tag = NULL,
+  log = TRUE,
+  log_overwrite = TRUE,
+  verbose = FALSE,
+  halt_on_dep_fail = FALSE,
+  log_save = FALSE,
+  log_name = NULL
+) {
+
+  # -------------------------------------------------------------------
+  # 1. Resolve available measures from GitHub
+  # -------------------------------------------------------------------
+
+  if (is.null(owner)) {
+    stop("Owner must be provided or set via option 'pipfun.ghowner'.")
   }
 
-  for (measure in unique(measures)) {
+  # All aux_* repos under owner
+  all_measures_raw <- gh::gh(
+    "GET /users/{username}/repos",
+    username = owner
+  ) |>
+    vapply("[[", "", "name") |>
+    grep("^aux_", x = _, value = TRUE) |>
+    sub("^aux_", "", x = _)
+
+  # -------------------------------------------------------------------
+  # 2. Resolve dependency order
+  # -------------------------------------------------------------------
+
+  dependency_order <- names(
+    read_dependencies(
+      gh_user = "https://raw.githubusercontent.com",
+      owner   = owner
+    )
+  )
+
+  # Keep only repos that actually exist
+  available_measures <- intersect(dependency_order, all_measures_raw)
+
+  if (length(available_measures) == 0) {
+    stop("No auxiliary measures found.")
+  }
+
+  # -------------------------------------------------------------------
+  # 3. Determine final measure list
+  # -------------------------------------------------------------------
+
+  if (is.null(measures)) {
+    final_measures <- available_measures
+  } else {
+
+    unknown <- setdiff(measures, available_measures)
+    if (length(unknown) > 0) {
+      stop(
+        "Unknown measure(s): ",
+        paste(unknown, collapse = ", ")
+      )
+    }
+
+    # Preserve dependency order
+    final_measures <- available_measures[
+      available_measures %in% measures
+    ]
+  }
+
+  if (length(final_measures) == 0) {
+    message("No measures to update.")
+    return(invisible(NULL))
+  }
+
+  if (verbose) {
+    message("Measures to update (in dependency order):")
+    message(paste(final_measures, collapse = ", "))
+  }
+
+  # -------------------------------------------------------------------
+  # 4. Initialize logging (top-level only)
+  # -------------------------------------------------------------------
+
+  is_top <- is_top_level()
+
+  if (is_top && log) {
+
+    if (is.null(log_name)) {
+      log_name <- init_aux_log(overwrite = log_overwrite)
+    }
+
+    on.exit({
+      finalize_aux_log()
+    }, add = TRUE)
+  }
+
+  # -------------------------------------------------------------------
+  # 5. Execute updates
+  # -------------------------------------------------------------------
+
+  processed <- new.env(parent = emptyenv())
+
+  for (measure in final_measures) {
+
+    if (verbose) message("Updating: ", measure)
+
     tryCatch({
-      aux_fun(measure,
-              repo = repo,
-              owner = owner,
-              processed = processed,
-              tag = tag,
-              log = log,
-              log_overwrite = log_overwrite,
-              verbose = verbose,
-              halt_on_dep_fail = halt_on_dep_fail,
-              log_name = log_name)
+
+      aux_fun(
+        measure = measure,
+        repo = repo,
+        owner = owner,
+        processed = processed,
+        tag = tag,
+        log = log,
+        log_overwrite = log_overwrite,
+        verbose = verbose,
+        halt_on_dep_fail = halt_on_dep_fail,
+        log_name = log_name
+      )
+
     }, error = function(e) {
+
       if (log && !is.null(log_name)) {
         pipfun::log_add(
           event = "error",
-          message = paste0("Failed to update measure '", measure, "': ", e$message),
+          message = paste0(
+            "Failed to update measure '",
+            measure,
+            "': ",
+            e$message
+          ),
           name = log_name,
           args = list(),
-          logmeta = list(step = "ERROR_UPDATE", measure = measure)
+          logmeta = list(
+            step = "ERROR_UPDATE",
+            measure = measure
+          )
         )
       }
-      if (halt_on_dep_fail) stop(e)
+
+      if (halt_on_dep_fail) {
+        stop(e)
+      }
     })
   }
 
-   # Retrieve and store the log in .piplogenv for later access
+  # -------------------------------------------------------------------
+  # 6. Retrieve log object into .piplogenv
+  # -------------------------------------------------------------------
+
   if (log && !is.null(log_name)) {
     log_obj <- pipfun::log_get(log_name)
     rlang::env_poke(.piplogenv, log_name, log_obj)
   }
 
-  # Save the log if requested
+  # -------------------------------------------------------------------
+  # 7. Persist log if requested
+  # -------------------------------------------------------------------
+
   if (log_save && !is.null(log_name)) {
-    pipfun::log_save(name = log_name, alias = get_from_auxenv("aux_meta_alias"))
+    pipfun::log_save(
+      name = log_name,
+      alias = get_from_auxenv("aux_meta_alias")
+    )
   }
-  
+
   invisible(NULL)
 }
