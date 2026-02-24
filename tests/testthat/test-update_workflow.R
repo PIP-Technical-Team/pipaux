@@ -562,11 +562,116 @@ cat("END OF INTERACTIVE TEST\n")
 cat(strrep("=", 80), "\n\n")
 
 # ============================================================================
+# Simulate changes for multiple measures ####
+# ============================================================================
+# Setup
+pipfun::setup_working_release(release = "20260101", identity = "TEST")
+devtools::load_all()
+
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("SIMULATING CHANGES FOR AUXILIARY DATA\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+# Define measures to simulate
+measures_to_simulate <- c("cpi", "pop", "pfw", "gdp", "pce")
+
+# Define simulation parameters for each measure
+simulation_config <- list(
+  cpi = list(drop = c(1, 5, 10), indices = c(20, 50, 100)),
+  pop = list(drop = c(2, 8), indices = c(15, 45, 90)),
+  pfw = list(drop = c(3, 7), indices = c(10, 30, 60)),
+  gdp = list(drop = c(4, 9), indices = c(25, 55, 95)),
+  pce = list(drop = c(1, 6, 11), indices = c(18, 48, 88))
+)
+
+# Track results
+results <- data.table::data.table(
+  measure = character(),
+  status = character(),
+  rows_dropped = integer(),
+  rows_modified = integer(),
+  elapsed_sec = numeric(),
+  error_msg = character()
+)
+
+for (measure in measures_to_simulate) {
+  
+  cat(sprintf("\n[%s] Simulating changes...\n", measure))
+  
+  start_time <- Sys.time()
+  status <- "success"
+  error_msg <- NA_character_
+  config <- simulation_config[[measure]]
+  
+  result <- tryCatch({
+    
+    simulate_old_release(
+      measure = measure,
+      seed = 123,
+      drop = config$drop,
+      indices = config$indices,
+      verbose = TRUE
+    )
+    
+  }, error = function(e) {
+    status <<- "error"
+    error_msg <<- e$message
+    cat(sprintf("  ✗ ERROR: %s\n", e$message))
+    return(NULL)
+  })
+  
+  elapsed <- as.numeric(Sys.time() - start_time)
+  
+  if (status == "success") {
+    cat(sprintf("  ✓ Simulation complete\n"))
+    cat(sprintf("  Rows dropped: %d\n", length(config$drop)))
+    cat(sprintf("  Rows modified: %d\n", length(config$indices)))
+  }
+  
+  results <- rbind(results, data.table::data.table(
+    measure = measure,
+    status = status,
+    rows_dropped = length(config$drop),
+    rows_modified = length(config$indices),
+    elapsed_sec = elapsed,
+    error_msg = error_msg
+  ))
+  
+  cat(sprintf("  ⏱ %.2f seconds\n", elapsed))
+}
+
+# ============================================================================
+# Summary report ####
+# ============================================================================
+
+cat("\n", strrep("=", 80), "\n", sep = "")
+cat("SIMULATION SUMMARY\n")
+cat(strrep("=", 80), "\n\n", sep = "")
+
+cat("Status breakdown:\n")
+print(results[, .N, by = status])
+
+if (nrow(results[status == "success"]) > 0) {
+  cat("\nSuccessfully simulated measures:\n")
+  print(results[status == "success", .(measure, rows_dropped, rows_modified, elapsed_sec)])
+}
+
+if (nrow(results[status == "error"]) > 0) {
+  cat("\nFailed simulations:\n")
+  print(results[status == "error", .(measure, error_msg)])
+}
+
+cat(sprintf("\nTotal time: %.2f seconds\n", results[, sum(elapsed_sec)]))
+
+# ============================================================================
 # Comparing changes ####
 # ============================================================================
 
-# Switch to 20260202 as current release
-pipfun::setup_working_release(release = "20260202", identity = "TEST")
+# # Switch to 20260202 as current release
+# pipfun::setup_working_release(release = "20260202", identity = "TEST")
+# # Switch to 20260101 as older release
+# pipfun::setup_working_release(release = "20260101", identity = "TEST")
+
 
 ## Between diff releases ####
 old_release <- "20260101_TEST"

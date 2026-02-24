@@ -1,38 +1,20 @@
-#' Simulate an "old" version by modifying a measure's artifact
+#' Simulate changes by modifying a measure's artifact and save it using pip_aux_save
 #'
-#' @param old_release Character. The name of the old release to simulate (e.g. "20250101_TEST")
-#' @param measure Character. The name of the measure artifact (e.g. "gdp", "ppp", "countries")
-#' @param seed An optional seed for reproducibility
-#'
-#' @return Invisibly returns the modified data.table
-#' @keywords internal
-#' Simulate an "old" version by modifying a measure's artifact
-#'
-#' @param old_release Character. The name of the old release to simulate (e.g. "20250101_TEST")
 #' @param measure Character. The name of the measure artifact (e.g. "gdp", "ppp", "countries")
 #' @param seed An optional seed for reproducibility
 #' @param drop Numeric vector of row indices to drop (optional)
 #' @param indices Numeric vector of row indices to modify for the measure variable (optional)
 #' @param verbose Logical. Whether to print messages.
 #'
-#' @return Invisibly returns a list with the modified data.table 
+#' @return Invisibly returns the modified data.table
 #' @keywords internal
-simulate_old_release <- function(old_release = "20250101_TEST",
-                                 measure,
+simulate_changes <- function(measure,
                                  seed = 123,
                                  drop = NULL,
                                  indices = NULL,
                                  verbose = TRUE) {
-  # Get aux_data_path for the old release by replacing the release folder in the current path
-  current_path <- get_from_auxenv("aux_data_path")
-  old_aux_data_path <- sub("[^/\\\\]+$", old_release, current_path)
-  measure_dir <- file.path(old_aux_data_path, measure)
-  if (is.null(measure_dir) || !dir.exists(measure_dir)) {
-    dir.create(measure_dir, recursive = TRUE)
-    if (verbose) cli::cli_alert_info("Created measure directory for '{measure}' in release '{old_release}': {measure_dir}")
-  }
-
-  # Always load data for the measure from the current working release
+  
+  # Load data from current working release
   dt <- pipload::load_aux_data(measure = measure)
   if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
 
@@ -77,53 +59,34 @@ simulate_old_release <- function(old_release = "20250101_TEST",
     }
   }
 
-  # Save modified data to old release aux_data_path
-  # make sure to init stamp
-  #stamp::st_init(root = , alias = "test_simulate_old_release")
-  pipload::pip_write(
-    x = dt,
-    id = measure_dir,
-    #dir = measure_dir,
-    format = "qs2"
+  # Get primary key columns
+  key_cols <- stamp::st_get_pk(dt)
+  
+  # Read sidecar to get gh attribute
+  ext <- "qs2"
+  sidecar_path <- fs::path(get_from_auxenv("aux_data_path"), measure, ext = ext)
+  sidecar <- stamp::st_read_sidecar(sidecar_path)
+  gh <- sidecar$gh
+  
+  # Get the function for code hash
+  fun_name <- paste0("aux_", measure)
+  aux_fun <- get(fun_name, mode = "function")
+
+  # Save modified data using pip_aux_save
+  pip_aux_save(
+    x          = dt,
+    id         = measure,
+    pk         = key_cols,
+    metadata   = list(gh = gh),
+    code       = aux_fun,
+    code_label = fun_name,
+    format     = "qs2"
   )
 
   cli::cli_alert_success(
-    "Modified and saved simulated old version of '{measure}' in aux_data_path for release: {old_release}"
+    "Modified and saved simulated version of '{measure}'"
   )
 
-  invisible(list(data = dt, aux_data_path = old_aux_data_path))
-}
-
-#' Simulate file changes for a measure
-#'
-#' Loads, modifies, and saves auxiliary data for a given measure, following the standard aux_ workflow.
-#'
-#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi", "ppp").
-#' @param seed Optional integer. Random seed for reproducibility.
-#' @param ... Additional arguments passed to pip_aux_save.
-#' @return Invisibly returns the modified data.table.
-#' @export
-simulate_file_changes <- function(measure, seed = 123, ...) {
-  dt <- pipload::load_aux_data(measure = measure)
-  if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
-  set.seed(seed)
-
-  n_rows <- nrow(dt)
-  if (n_rows < 1) return(invisible(dt))
-  n_mod <- min(3, n_rows)
-  idx <- sample(seq_len(n_rows), n_mod)
-
-  # Modify 'year' column if present
-  if ("year" %in% names(dt)) {
-    dt[idx, year := year + sample(c(-1, 1), n_mod, replace = TRUE)]
-  }
-
-  # Modify column named by 'measure' if present and numeric
-  if (measure %in% names(dt) && is.numeric(dt[[measure]])) {
-    dt[idx, (measure) := get(measure) * runif(n_mod, 0.9, 1.1)]
-  }
-
-  dt[, simulated_flag := TRUE]
-  pip_aux_save(x = dt, id = measure, ...)
   invisible(dt)
 }
+

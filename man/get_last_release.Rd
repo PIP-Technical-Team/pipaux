@@ -7,11 +7,11 @@
 get_last_release(aux_data_path, current_release, identity)
 }
 \arguments{
+\item{aux_data_path}{Character. Path to the \code{aux_data} directory}
+
 \item{current_release}{Character. Current release string in the format \code{"YYYYMMDD_identity"}.}
 
 \item{identity}{Character. The identity suffix to filter releases (e.g., \code{"prod"}).}
-
-\item{maindir}{Character. The root directory where \code{aux_data} subfolder is located.}
 }
 \value{
 A character string representing the most recent previous release.
