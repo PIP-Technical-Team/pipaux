@@ -98,7 +98,9 @@ auto_aux_update <- function(measure = NULL,
 
   if (any(ldiffs != 0) ) {
     wdiffs <- which(ldiffs != 0)
-    cli::cli_alert_danger("{diff_text[[wdiffs]]}: {.field {diffs[[wdiffs]]}}")
+    for (i in wdiffs) {
+      cli::cli_alert_danger("{diff_text[[i]]}: {.field {diffs[[i]]}}")
+    }
     cli::cli_alert_info("Both the numbers above should be equal or else some
                       debugging is required.", wrap = TRUE)
   }
