@@ -268,8 +268,8 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
   )
 
 
-  #   ____________________________________________________________________________
-  #   PPP vintages data                                                     ####
+  # #   ____________________________________________________________________________
+  # #   PPP vintages data                                                     ####
 
   vars        <- c("ppp_year", "release_version", "adaptation_version")
   ppp_vintage <- unique(ppp[, ..vars], by = vars)
@@ -280,15 +280,14 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
 
-  # Save
+  # # Save
 
-  # Define key columns for ppp_vintage
+  # # Define key columns for ppp_vintage
   key_cols_vintage <- c("ppp_year", "ppp_rv", "ppp_av")
   setattr(ppp_vintage, "aux_key", key_cols_vintage)
   pip_aux_save(
     x        = ppp_vintage,
     id       = "ppp_vintage",
-    force    = force,
     pk       = key_cols_vintage
   )
 
@@ -412,8 +411,8 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
                 description = "`Seriesname` should be character") |>
     validate_if(is.character(note_may192020),
                 description = "`note_may192020` should be character") |>
-    validate_if(is.character(note_ppp_2017_v1_v2),
-                description = "`note_ppp_2017_v1_v2` should be character") |>
+    # validate_if(is.character(note_ppp_2017_v1_v2),
+    #             description = "`note_ppp_2017_v1_v2` should be character") |>
     validate_cols(not_na, code, CoverageType, datalevel,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(code, CoverageType, datalevel),

@@ -20,10 +20,9 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/PIP-Technical-Team/pipaux/branch/master/graph/badge.svg)](https://app.codecov.io/gh/PIP-Technical-Team/pipaux?branch=master)
 <!-- badges: end -->
 
-`pipaux` manages the auxiliary data used in the PIP workflow. It basically
-does two things. [1] It updates the auxiliary data and makes sure to keep 
-it unchanged when it the raw data has not been modified. [2] it loads the 
-data into memory.
+`pipaux` manages the auxiliary data used in the PIP workflow. It allows two main actions: 
+[1] It efficiently updates the auxiliary data in the Y drive, while making sure it is in sync with the raw data in Github, and that the right dependencies are processed. It also logs the updates, so that users can inspect timing, success, and errors information.
+[2] It tracks changes across and within releases 
 
 ## Installation
 
@@ -34,92 +33,30 @@ You can install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("PIP-Technical-Team/pipaux")
 ```
 
-```{r, include = FALSE}
-
-last_item <- function(x, word = "and") {
-  if (!(is.character(x))) {
-    warning("`x` must be character. coercing to character")
-    x <- as.character(x)
-  }
-
-  lx <- length(x)
-  if (lx == 1) {
-    y <- x
-  }
-  else if (lx == 2) {
-    y <- paste(x[1], word, x[2])
-  }
-  else {
-    y <- c(x[1:lx-1], paste(word, x[lx]))
-    y <- paste(y, collapse = ", ")
-  }
-  return(y)
-}
-
-
-```
-
 ```{r setup}
 library(pipaux)
 ```
 
 ```{r numb-func, include = FALSE}
-lf <- lsf.str("package:pipaux", pattern = "^pip_")
+lf <- lsf.str("package:pipaux", pattern = "^aux_")
   lf <- as.character(lf)
   num_functions <- length(lf)
 ```
 
-Even though `pipaux` has more than `r num_functions` functions, most of its features 
-can be executed by only using functions `pipaux::load_aux` and `pipaux::update_all_aux`, which wrappers of other measure-specific functions. 
+Even though `pipaux` has more than `r num_functions` functions, one per each auxiliary data measure, most of its features can be executed through the following key functions: 
+ 
+`update_aux_measures()`: to update auxiliary data measures, either one at a time or all together, in the right order of dependencies.
+`pipload::load_aux_data()`: to load the auxiliary data into memory. This function is a wrapper around the measure-specific loading functions (e.g., `aux_cpi("load")`), and it allows users to load one or more measures together.
+`compare_aux_releases()`: to compare auxiliary data across releases, and detect new rows, removed rows, or changed values.
+`compare_aux_vintages()`: to compare auxiliary data within the same release, and detect version changes.
+
+## Preliminary step 
+Setting up the working release to ensure all info is in place for the updates and comparisons to run smoothly. This includes defining the release name and identity (e.g., TEST, PROD).
+
+## Overview of key outputs
 
 ## Loading data
 
-```{r functions-av, include = FALSE}
-  lf <- lsf.str("package:pipaux", pattern = "^pip_[a-z]{3}$")
-  lf <- as.character(lf)
-  lf <- gsub("pip_", "", lf)
-```
-
-Loading auxiliary data can be done using the function `pipaux::load_aux`, whose 
-first argument is the name of the `measure` to be loaded. The measures available
-are **`r last_item(lf)`**. 
-
-So, loading the `cpi` database could be done by typing, 
-`load_aux(measure = "cpi")` or `aux_cpi("load")`. 
-
-Remember to first set up your working release, so that `load_aux()` will automatically load the file in the current release folder. For example, 
-
-```{r}
-pipfun::setup_working_release(release = "20250203")
-```
-
-
-```{r equal-load, echo=TRUE}
-identical(load_aux(measure = "cpi"), aux_cpi("load"))
-identical(load_aux(measure = "ppp"), aux_ppp("load"))
-identical(load_aux(measure = "pop"), aux_pop("load"))
-```
-
 ## Updating data
 
-Updating the auxiliary data in PIP can be done either one measure at a time or all measures together. 
-Data could be updated using the function `pipaux::aux_fun(measure = "...")` of any of the measure 
-specific functions. Or all auxiliary data measures can be updated altogether with `update_all_aux`. Both of these functions also update any dependencies of the specified measure.
-
-Alternatively, updating the specified measure (e.g., cpi) only can be done using again the `aux_cpi(action = "update")` function.
-
-```{r equal-update, eval = FALSE}
-# this, 
-aux_fun(measure = "cpi")
-
-# is equivalent to this, 
-aux_cpi("update")
-
-# And this
-update_all_aux(measure = "cpi")
-
-```
-
-`pipaux` checks whether the hash of each database has changed and updates the data 
-in case it has changed. If it has not changed, it notifies the user. The user can 
-force the update by using `force = TRUE` as part of the arguments.
+## Comparing data versions 
