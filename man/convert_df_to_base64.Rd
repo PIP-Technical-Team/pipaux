@@ -16,7 +16,7 @@ base64 encoded dataframe
 Function to write dataframe to GitHub
 }
 \examples{
-\dontrun {
+\dontrun{
 convert_df_to_base64(mtcars)
 }
 }

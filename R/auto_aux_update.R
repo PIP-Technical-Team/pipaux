@@ -222,7 +222,7 @@ return_value <- function(aux, dependencies) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' convert_df_to_base64(mtcars)
 #' }
 convert_df_to_base64 <- function(df) {
