@@ -7,25 +7,41 @@
 compare_vintage_versions(measure, verbose = FALSE, version = -1)
 }
 \arguments{
-\item{measure}{Character. The name of the auxiliary measure to compare (e.g., "gdp", "pop").}
+\item{measure}{Character. The name of the auxiliary measure to compare
+(e.g., \code{"gdp"}, \code{"pop"}).}
 
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are printed. Default is \code{FALSE}.}
+\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
+printed. Default is \code{FALSE}.}
 
-\item{version}{Integer. A negative number indicating how many versions before the latest one to compare with.
-For example, \code{-1} compares the current version with the one just before it, \code{-2} goes two versions back, etc.}
+\item{version}{Integer. A negative integer indicating how many versions
+before the latest to compare with. For example, \code{-1} (default) compares
+with the version immediately prior; \code{-2} goes two versions back.}
 }
 \value{
-Invisibly returns a list with the following elements (if differences are found):
+Invisibly returns a named list with:
 \describe{
-\item{diff_values}{A data table showing differences in values across matched rows and columns.}
-\item{diff_rows}{A data table showing rows added or removed between versions.}
+\item{diff_values}{A data table of value-level differences, or \code{NULL}
+if none found.}
+\item{diff_rows}{A data table of added/removed rows, or \code{NULL} if none
+found.}
+\item{key_cols}{Character vector of primary key columns used for
+comparison.}
 }
-If no previous version is available or no differences are found, returns \code{NULL}.
+If no previous version is available, returns a list with all elements set
+to \code{NULL}.
 }
 \description{
-Compares the most recent version of an auxiliary data file with an earlier "vintage" version,
-identifying differences in values and rows.
+Compares the most recent (latest) version of an auxiliary data file with an
+earlier "vintage" version stored under the same release, identifying
+differences in values and rows.
+}
+\examples{
+\dontrun{
+compare_vintage_versions("cpi")
+compare_vintage_versions("gdp", version = -2, verbose = TRUE)
+}
 }
 \seealso{
-\code{\link[pipload:load_aux_data]{pipload::load_aux_data()}}, \code{\link[myrror:myrror]{myrror::myrror()}}
+\code{\link[=compare_aux_vintages]{compare_aux_vintages()}}, \code{\link[pipload:load_aux_data]{pipload::load_aux_data()}},
+\code{\link[myrror:myrror]{myrror::myrror()}}
 }

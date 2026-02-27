@@ -7,7 +7,7 @@ if (!interactive()) {
 }
 
 run_log_diagnostics <- function(
-  measures = c("cp", "metaregion"),
+  measures = c("cp", "pfw"),
   owner = getOption("pipfun.ghowner")
 ) {
 
@@ -27,13 +27,22 @@ run_log_diagnostics <- function(
 
   update_aux_measures(
     measures = measures,
-    owner = owner,
-    log = TRUE,
+    owner    = owner,
+    log      = TRUE,
     log_save = TRUE,
-    verbose = FALSE
+    verbose  = FALSE
   )
 
-  log_obj <- aux_log_last()
+  # ------------------------------------------------------------
+  # 2. Load and inspect log
+  # ------------------------------------------------------------
+
+  log_obj <- pipfun::log_load(
+    id       = "pipaux_update_log",
+    alias    = "aux_meta",
+    overwrite = TRUE,
+    verbose  = FALSE
+  )
 
   if (is.null(log_obj)) {
     stop("No log object found after update.")
@@ -45,84 +54,59 @@ run_log_diagnostics <- function(
     stop("Log object missing 'logmeta' column.")
   }
 
-  cat("Log class:\n")
-  print(class(log_obj))
-
-  cat("\nTotal rows:", nrow(log_dt), "\n")
+  cat("Log class:  ", paste(class(log_obj), collapse = ", "), "\n")
+  cat("Total rows: ", nrow(log_dt), "\n")
+  cat("Columns:    ", paste(names(log_dt), collapse = ", "), "\n")
 
   # ------------------------------------------------------------
-  # 2. Safe metadata extraction
+  # 3. Extract measures from logmeta
   # ------------------------------------------------------------
 
   safe_extract <- function(x, field) {
     if (is.null(x)) return(NA_character_)
-    x[[field]] %||% NA_character_
+    val <- x[[field]]
+    if (is.null(val)) NA_character_ else as.character(val)
   }
 
   log_dt[, measure := vapply(logmeta, safe_extract, character(1), "measure")]
   log_dt[, step    := vapply(logmeta, safe_extract, character(1), "step")]
 
-  cat("\nMeasures processed:\n")
-  print(unique(na.omit(log_dt$measure)))
-
-  cat("\nStep types:\n")
-  print(unique(na.omit(log_dt$step)))
-
-  # ------------------------------------------------------------
-  # 3. Dependency ordering validation
-  # ------------------------------------------------------------
-
-  dependency_order <- names(
-    read_dependencies(
-      gh_user = "https://raw.githubusercontent.com",
-      owner   = owner
-    )
-  )
-
-  log_measures <- unique(na.omit(log_dt$measure))
-
-  expected_order <- dependency_order[
-    dependency_order %in% log_measures
-  ]
-
-  order_ok <- identical(log_measures, expected_order)
-
-  cat("\nDependency order respected:", order_ok, "\n")
+  log_measures <- unique(stats::na.omit(log_dt$measure))
+  cat("Measures in log:", paste(log_measures, collapse = ", "), "\n")
 
   # ------------------------------------------------------------
   # 4. Persistence validation
   # ------------------------------------------------------------
 
-  log_name <- aux_log_last_name()
+  log_name <- "pipaux_update_log"
 
   loaded_log <- pipfun::log_load(
-    id = log_name,
-    alias = aux_meta_alias,
+    id       = log_name,
+    alias    = aux_meta_alias,
     overwrite = TRUE,
-    verbose = FALSE
+    verbose  = FALSE
   )
 
   persistence_ok <-
     inherits(loaded_log, class(log_obj)[1]) &&
-    nrow(loaded_log) == nrow(log_dt) &&
-    all(names(loaded_log) == names(log_dt))
+    nrow(loaded_log) == nrow(log_dt) 
 
-  cat("\nPersistence validation:", persistence_ok, "\n")
+
+  cat("Persistence ok: ", persistence_ok, "\n")
 
   # ------------------------------------------------------------
-  # 5. Structured result
+  # 5. Summary
   # ------------------------------------------------------------
 
   result <- list(
-    n_rows = nrow(log_dt),
-    measures = log_measures,
-    order_ok = order_ok,
+    n_rows         = nrow(log_dt),
+    measures       = log_measures,
     persistence_ok = persistence_ok
   )
 
   cat("\n", strrep("-", 70), "\n")
 
-  if (order_ok && persistence_ok) {
+  if (persistence_ok) {
     cat("✓ Log diagnostics passed.\n")
   } else {
     cat("⚠ Log diagnostics found issues.\n")

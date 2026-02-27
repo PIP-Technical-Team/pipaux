@@ -16,26 +16,32 @@ process_dependencies(
 )
 }
 \arguments{
-\item{measure}{Character. The measure to process.}
+\item{measure}{Character. The measure whose dependencies should be processed.}
 
-\item{processed}{Environment. Tracks processed measures to avoid cycles.}
+\item{processed}{Environment. Tracks already-processed measures to avoid
+cycles. Modified in-place.}
 
-\item{owner}{Character. Repository owner.}
+\item{owner}{Character. GitHub repository owner.}
 
-\item{tag}{Character. Release tag.}
+\item{tag}{Character. Release tag used when updating dependencies.}
 
-\item{verbose}{Logical. Verbosity flag.}
+\item{verbose}{Logical. If \code{TRUE}, prints progress messages.}
 
-\item{log}{Logical. Whether to log events.}
+\item{log}{Logical. If \code{TRUE}, log events are recorded.}
 
-\item{log_name}{Character. Explicit log name to use.}
+\item{log_name}{Character or \code{NULL}. Explicit log name to use. If \code{NULL},
+logging is skipped even when \code{log = TRUE}.}
 
-\item{halt_on_dep_fail}{Logical. Whether to halt parent update if a dependency fails.}
+\item{halt_on_dep_fail}{Logical. If \code{TRUE}, stops execution when a dependency
+update fails. If \code{FALSE}, errors are logged and processing continues.}
 }
 \value{
-Invisibly returns NULL.
+Invisibly returns \code{NULL}. The \code{processed} environment is modified
+as a side effect.
 }
 \description{
-Recursively process dependencies for a measure
+Reads the dependency graph and calls \code{\link[=aux_fun]{aux_fun()}} for each upstream dependency
+of \code{measure} that has not yet been processed. Tracks processed measures via
+the \code{processed} environment to prevent cyclic re-processing.
 }
 \keyword{internal}

@@ -7,15 +7,21 @@
 check_y_drive_status(measure, verbose = TRUE)
 }
 \arguments{
-\item{measure}{Character. Name of the auxiliary data measure (e.g., "cpi").}
+\item{measure}{Character. Name of the auxiliary data measure (e.g., \code{"cpi"}).}
 
-\item{verbose}{Logical. If TRUE, prints status messages.}
+\item{verbose}{Logical. If \code{TRUE}, prints status messages. Default is \code{TRUE}.}
 }
 \value{
-A list with \code{update_y} (logical) and \code{reason} (character).
+A named list with:
+\describe{
+\item{update_y}{Logical. \code{TRUE} if the Y-drive data is out of sync and needs updating.}
+\item{reason}{Character. Human-readable explanation of the status.}
+}
 }
 \description{
-Checks if the local Y-drive version of the auxiliary data is in sync with GitHub and the function code.
+Checks if the local Y-drive version of the auxiliary data is in sync with
+GitHub (via SHA comparison) and with the current generator function code
+(via code hash comparison).
 }
 \examples{
 check_y_drive_status("cpi")

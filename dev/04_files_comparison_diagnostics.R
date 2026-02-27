@@ -44,12 +44,12 @@ run_release_diagnostics <- function(
     })
 
     if (!is.null(res)) {
-      val_n <- nrow(res$diff_values %||% data.frame())
-      row_n <- nrow(res$diff_rows %||% data.frame())
+      val_n <- nrow(if (is.null(res$diff_values)) data.frame() else res$diff_values)
+      row_n <- nrow(if (is.null(res$diff_rows))   data.frame() else res$diff_rows)
 
       if (val_n > 0 & row_n > 0) status <- "row_and_value_change"
-      else if (val_n > 0) status <- "value_change"
-      else if (row_n > 0) status <- "row_change"
+      else if (val_n > 0)        status <- "value_change"
+      else if (row_n > 0)        status <- "row_change"
     }
 
     results <- rbind(
@@ -98,12 +98,12 @@ run_vintage_diagnostics <- function(
     })
 
     if (!is.null(res)) {
-      val_n <- nrow(res$diff_values %||% data.frame())
-      row_n <- nrow(res$diff_rows %||% data.frame())
+      val_n <- nrow(if (is.null(res$diff_values)) data.frame() else res$diff_values)
+      row_n <- nrow(if (is.null(res$diff_rows))   data.frame() else res$diff_rows)
 
       if (val_n > 0 & row_n > 0) status <- "row_and_value_change"
-      else if (val_n > 0) status <- "value_change"
-      else if (row_n > 0) status <- "row_change"
+      else if (val_n > 0)        status <- "value_change"
+      else if (row_n > 0)        status <- "row_change"
     }
 
     results <- rbind(

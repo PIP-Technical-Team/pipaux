@@ -14,9 +14,12 @@ resolve_measure_repo_owner(measure, repo, owner)
 \item{owner}{Character. Default owner name.}
 }
 \value{
-List with elements 'repo' and 'owner'.
+A named list with elements \code{repo} and \code{owner}.
 }
 \description{
-Resolve repository and owner for a measure
+Applies special-case overrides for measures that live in non-standard
+repositories or under a different GitHub owner.
+\code{"income_groups"} and \code{"country_list"} resolve to repo \code{"Class"};
+\code{"nan"} always resolves to owner \code{"PIP-Technical-Team"}.
 }
 \keyword{internal}

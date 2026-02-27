@@ -3,18 +3,33 @@
 
 #' Compare auxiliary data files across releases
 #'
-#' This function compares the contents of auxiliary data files between the current and a specified previous release.
-#' It identifies differences for specified key variables
+#' Compares the contents of auxiliary data files between the current and a
+#' specified previous release, identifying differences in values and rows for
+#' a given measure.
 #'
-#' The release identifiers must follow the format `"YYYYMMDD_identity"` (e.g., `"20250101_TEST"`).
+#' The release identifiers must follow the format `"YYYYMMDD_identity"`
+#' (e.g., `"20250101_TEST"`).
 #'
 #' @inheritParams aux_fun
-#' @param old_release Character. The identifier of the previous release to compare against (e.g., `"20240101_PROD"`).
-#'        If NULL, automatically take last available release of same identity as the current working release
-#' @param key_cols Character vector. Variables used as keys to compare values between releases. Defaults to the `pipaux.key_vars` option.
+#' @param old_release Character. The identifier of the previous release to
+#'   compare against (e.g., `"20240101_PROD"`). If `NULL`, automatically uses
+#'   the last available release matching the same identity as the current
+#'   working release.
 #' @param verbose Logical. If `TRUE`, displays messages in the console.
+#'   Default is `TRUE`.
 #'
-#' @return A data frame with detected differences in values, grouped by the specified key variables.
+#' @return Invisibly returns a named list with:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences across matched
+#'       rows and columns, with added `measure`, `new_path.x`, and `old_path.y`
+#'       columns. `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between releases,
+#'       with `change_type`, `measure`, `release`, and `old_release` columns.
+#'       `NULL` if no row differences found.}
+#'   }
+#'   The list has a `"key_cols"` attribute containing the primary key columns
+#'   used for comparison. Returns `NULL` invisibly if the old release data
+#'   cannot be loaded.
 #'
 #' @keywords internal
 #'
@@ -147,23 +162,29 @@ get_aux_changes <- function(measure = "cpi",
   return(invisible(result))
 }
 
-#' Inventory of changes in auxiliary data across measures
+#' Compare auxiliary data across measures between two releases
 #'
-#' Compares auxiliary data files between the current and a previous release across one or more measures.
+#' Compares auxiliary data files between the current and a previous release
+#' across one or more measures, by calling [get_aux_changes()] for each.
 #'
-#' @param measure Optional character vector. Specific measures to check (e.g., `c("cpi", "gdp")`). If `NULL`, all available measures are included.
-#' @param maindir Path to the local auxiliary data directory. Defaults to `getOption("pipaux.working_dir")`.
-#' @param owner GitHub owner of aux data repos. Defaults to `"PIP-Technical-Team"`.
+#' @param measure Character vector or `NULL`. Specific measures to check
+#'   (e.g., `c("cpi", "gdp")`). If `NULL`, all measures available in the
+#'   GitHub organisation are included.
+#' @param owner Character. GitHub owner of the auxiliary data repositories.
+#'   Defaults to `"PIP-Technical-Team"`.
 #' @inheritParams get_aux_changes
-#' @param ... Additional arguments passed to `get_aux_changes()`.
+#' @param ... Additional arguments passed to [get_aux_changes()].
 #'
-#' @return Named list of data frames with value differences for each measure. Measures with no differences or errors return `NULL`.
+#' @return A named list with one element per measure. Each element is the
+#'   output of [get_aux_changes()] — a list with `diff_values` and `diff_rows`
+#'   data tables — or `NULL` for measures with no differences or load errors.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
+#' compare_aux_releases(old_release = "20240101_PROD", verbose = TRUE)
+#' compare_aux_releases(measure = c("cpi", "gdp"), old_release = "20240101_PROD")
 #' }
 compare_aux_releases <- function(measure     = NULL,
                                  owner       = "PIP-Technical-Team",
@@ -218,14 +239,19 @@ compare_aux_releases <- function(measure     = NULL,
 
 #' Get the most recent previous release of a specific identity
 #'
-#' This function searches the `aux_data` directory inside the given main directory
-#' and returns the latest available release (prior to a given current release)
-#' that matches the specified identity (e.g., `"prod"` or `"dev"`).
-#' @param aux_data_path Character. Path to the `aux_data` directory 
-#' @param current_release Character. Current release string in the format `"YYYYMMDD_identity"`.
-#' @param identity Character. The identity suffix to filter releases (e.g., `"prod"`).
+#' Searches the `aux_data` parent directory for release folders and returns
+#' the latest one prior to `current_release` that matches the specified
+#' identity (e.g., `"PROD"` or `"TEST"`).
 #'
-#' @return A character string representing the most recent previous release.
+#' @param aux_data_path Character. Path to the current release's `aux_data`
+#'   directory. The function moves up one level to find sibling release folders.
+#' @param current_release Character. Current release string in the format
+#'   `"YYYYMMDD_identity"` (e.g., `"20260202_TEST"`).
+#' @param identity Character. The identity suffix to filter releases
+#'   (e.g., `"PROD"`, `"TEST"`). Case-sensitive.
+#'
+#' @return A character scalar with the most recent matching release prior to
+#'   `current_release`. Throws an error if no older matching release is found.
 #'
 #' @keywords internal
 get_last_release <- function(aux_data_path,
@@ -260,23 +286,39 @@ get_last_release <- function(aux_data_path,
 
 #' Compare two vintage versions of an auxiliary data file
 #'
-#' Compares the most recent version of an auxiliary data file with an earlier "vintage" version,
-#' identifying differences in values and rows.
+#' Compares the most recent (latest) version of an auxiliary data file with an
+#' earlier "vintage" version stored under the same release, identifying
+#' differences in values and rows.
 #'
-#' @param measure Character. The name of the auxiliary measure to compare (e.g., "gdp", "pop").
-#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed. Default is `FALSE`.
-#' @param version Integer. A negative number indicating how many versions before the latest one to compare with.
-#'   For example, `-1` compares the current version with the one just before it, `-2` goes two versions back, etc.
+#' @param measure Character. The name of the auxiliary measure to compare
+#'   (e.g., `"gdp"`, `"pop"`).
+#' @param verbose Logical. If `TRUE`, messages about the comparison process are
+#'   printed. Default is `FALSE`.
+#' @param version Integer. A negative integer indicating how many versions
+#'   before the latest to compare with. For example, `-1` (default) compares
+#'   with the version immediately prior; `-2` goes two versions back.
 #'
-#' @return Invisibly returns a list with the following elements (if differences are found):
-#' \describe{
-#'   \item{diff_values}{A data table showing differences in values across matched rows and columns.}
-#'   \item{diff_rows}{A data table showing rows added or removed between versions.}
-#' }
-#' If no previous version is available or no differences are found, returns `NULL`.
+#' @return Invisibly returns a named list with:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences, or `NULL`
+#'       if none found.}
+#'     \item{diff_rows}{A data table of added/removed rows, or `NULL` if none
+#'       found.}
+#'     \item{key_cols}{Character vector of primary key columns used for
+#'       comparison.}
+#'   }
+#'   If no previous version is available, returns a list with all elements set
+#'   to `NULL`.
 #'
-#' @seealso [pipload::load_aux_data()], [myrror::myrror()]
+#' @seealso [compare_aux_vintages()], [pipload::load_aux_data()],
+#'   [myrror::myrror()]
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' compare_vintage_versions("cpi")
+#' compare_vintage_versions("gdp", version = -2, verbose = TRUE)
+#' }
 compare_vintage_versions <- function(measure,
                                      verbose = FALSE,
                                      version = -1) {
@@ -392,25 +434,32 @@ compare_vintage_versions <- function(measure,
 
   return(invisible(result))
 }
-#' Compare Vintage Versions for Multiple Auxiliary Data Files
+#' Compare vintage versions across multiple auxiliary data measures
 #'
 #' Applies [compare_vintage_versions()] across multiple auxiliary data measures.
-#' Useful for tracking within-release changes across several files.
+#' Useful for tracking within-release changes across several files simultaneously.
 #'
 #' @param measures Character vector. Names of auxiliary data measures to compare
-#'   (e.g., `c("gdp", "pop", "pfw")`).
-#' @param version Integer. Indicates how many versions before the latest to compare with
-#'   (e.g., `-1` for previous).
-#' @param verbose Logical. If `TRUE`, messages about the comparison process are printed.
+#'   (e.g., `c("gdp", "pop", "pfw")`). If `NULL` or empty, returns an empty
+#'   list with a warning.
+#' @param version Integer. Indicates how many versions before the latest to
+#'   compare with (e.g., `-1` for the immediately previous version).
+#'   Default is `-1`.
+#' @param verbose Logical. If `TRUE`, messages about the comparison process are
+#'   printed. Default is `FALSE`.
 #' @param ... Additional arguments passed to [compare_vintage_versions()].
 #'
-#' @return Invisibly returns a named list of results from [compare_vintage_versions()],
-#'   one element per measure.
+#' @return Invisibly returns a named list with one element per measure,
+#'   each being the output of [compare_vintage_versions()]. Elements are `NULL`
+#'   for measures where no previous version exists or an error occurred.
 #'
+#' @seealso [compare_vintage_versions()]
 #' @export
+#'
 #' @examples
 #' \dontrun{
 #' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
+#' compare_aux_vintages(measures = c("cpi", "gdp"), version = -2, verbose = TRUE)
 #' }
 compare_aux_vintages <- function(measures = NULL,
                                  version = -1,

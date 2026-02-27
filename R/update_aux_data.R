@@ -1,6 +1,10 @@
 #' Detect if the current call is top-level
 #'
-#' @return Logical. TRUE if the function is called from the top-level (interactive or script), FALSE otherwise.
+#' @description
+#' Returns `TRUE` if the function is being called from the top-level environment
+#' (interactive session or script), `FALSE` if called from within another function.
+#'
+#' @return Logical. `TRUE` if called from the top level, `FALSE` otherwise.
 #' @keywords internal
 is_top_level <- function() {
   sys.nframe() <= 2
@@ -8,11 +12,17 @@ is_top_level <- function() {
 
 #' Resolve repository and owner for a measure
 #'
+#' @description
+#' Applies special-case overrides for measures that live in non-standard
+#' repositories or under a different GitHub owner.
+#' `"income_groups"` and `"country_list"` resolve to repo `"Class"`;
+#' `"nan"` always resolves to owner `"PIP-Technical-Team"`.
+#'
 #' @param measure Character. The measure name.
 #' @param repo Character. Default repository name.
 #' @param owner Character. Default owner name.
 #'
-#' @return List with elements 'repo' and 'owner'.
+#' @return A named list with elements `repo` and `owner`.
 #' @keywords internal
 resolve_measure_repo_owner <- function(measure, repo, owner) {
   repo  <- if (measure %in% c("income_groups", "country_list")) "Class" else repo
@@ -22,16 +32,25 @@ resolve_measure_repo_owner <- function(measure, repo, owner) {
 
 #' Recursively process dependencies for a measure
 #'
-#' @param measure Character. The measure to process.
-#' @param processed Environment. Tracks processed measures to avoid cycles.
-#' @param owner Character. Repository owner.
-#' @param tag Character. Release tag.
-#' @param verbose Logical. Verbosity flag.
-#' @param log Logical. Whether to log events.
-#' @param log_name Character. Explicit log name to use.
-#' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails.
+#' @description
+#' Reads the dependency graph and calls [aux_fun()] for each upstream dependency
+#' of `measure` that has not yet been processed. Tracks processed measures via
+#' the `processed` environment to prevent cyclic re-processing.
 #'
-#' @return Invisibly returns NULL.
+#' @param measure Character. The measure whose dependencies should be processed.
+#' @param processed Environment. Tracks already-processed measures to avoid
+#'   cycles. Modified in-place.
+#' @param owner Character. GitHub repository owner.
+#' @param tag Character. Release tag used when updating dependencies.
+#' @param verbose Logical. If `TRUE`, prints progress messages.
+#' @param log Logical. If `TRUE`, log events are recorded.
+#' @param log_name Character or `NULL`. Explicit log name to use. If `NULL`,
+#'   logging is skipped even when `log = TRUE`.
+#' @param halt_on_dep_fail Logical. If `TRUE`, stops execution when a dependency
+#'   update fails. If `FALSE`, errors are logged and processing continues.
+#'
+#' @return Invisibly returns `NULL`. The `processed` environment is modified
+#'   as a side effect.
 #' @keywords internal
 process_dependencies <- function(measure,
                                  processed,
@@ -88,20 +107,28 @@ process_dependencies <- function(measure,
   invisible(NULL)
 }
 
-#' Execute update for GitHub and Y drive
+#' Execute GitHub and Y-drive updates for a measure
 #'
-#' @param measure Character. The measure to update.
-#' @param update_gh Logical. Whether to update GitHub.
-#' @param update_y Logical. Whether to update Y drive.
-#' @param release_branch Character. Release branch name.
-#' @param owner Character. Repository owner.
-#' @param repo Character. Repository name.
-#' @param tag Character. Release tag.
-#' @param verbose Logical. Verbosity flag.
-#' @param log Logical. Whether to log events.
-#' @param log_name Character. Explicit log name to use.
+#' @description
+#' Performs the actual update steps for a measure:
+#' - If `update_gh = TRUE`, syncs the release branch on GitHub from `DEV` via
+#'   [pipfun::sync_release_branch()].
+#' - If `update_y = TRUE`, calls the measure's generator function
+#'   (`aux_<measure>()`) with the appropriate arguments to refresh the Y-drive
+#'   data file.
 #'
-#' @return Invisibly returns NULL.
+#' @param measure Character. The measure name.
+#' @param update_gh Logical. If `TRUE`, the GitHub release branch is updated.
+#' @param update_y Logical. If `TRUE`, the Y-drive data file is regenerated.
+#' @param release_branch Character. Name of the release branch to sync to.
+#' @param owner Character. GitHub repository owner.
+#' @param repo Character. GitHub repository name.
+#' @param tag Character. Release tag passed to the generator function.
+#' @param verbose Logical. If `TRUE`, prints progress messages.
+#' @param log Logical. If `TRUE`, log events are recorded.
+#' @param log_name Character or `NULL`. Leave it NULL to make the name be internally generated.
+#'
+#' @return Invisibly returns `NULL`.
 #' @keywords internal
 execute_update <- function(measure, update_gh, update_y, release_branch, owner, repo, tag, verbose, log, log_name = NULL) {
 
@@ -180,7 +207,41 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 
 #' Update auxiliary data for a measure and its dependencies
 #'
+#' @description
+#' Main entry point for updating a single auxiliary data measure. Resolves
+#' the release branch from the working environment, processes upstream
+#' dependencies via [process_dependencies()], checks whether updates are
+#' needed via [get_fs_status()], and calls [execute_update()] if required.
+#' Top-level calls initialise and finalise the audit log automatically.
+#'
+#' @param measure Character. Name of the auxiliary data measure to update
+#'   (e.g., `"cpi"`, `"ppp"`).
+#' @param repo Character or `NULL`. GitHub repository name. Defaults to
+#'   `"aux_<measure>"` if `NULL`.
+#' @param owner Character. GitHub repository owner. Defaults to
+#'   `getOption("pipfun.ghowner")`.
+#' @param processed Environment. Tracks already-processed measures to avoid
+#'   cyclic dependency updates. Defaults to a fresh empty environment.
+#' @param tag Character or `NULL`. Release tag passed to the generator
+#'   function. Defaults to the release branch name if `NULL`.
+#' @param log Logical. If `TRUE`, audit log events are recorded.
+#'   Default is `TRUE`.
+#' @param log_overwrite Logical. If `TRUE`, overwrites an existing log with
+#'   the same name. Default is `TRUE`.
+#' @param verbose Logical. If `TRUE`, prints progress messages. Default is
+#'   `FALSE`.
+#' @param halt_on_dep_fail Logical. If `TRUE`, stops execution when a
+#'   dependency update fails. Default is `FALSE`.
+#' @param log_name Character or `NULL`. Leave it NULL. 
+#'
+#' @return Invisibly returns `NULL`.
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' aux_fun(measure = "cpi")
+#' aux_fun(measure = "ppp", verbose = TRUE)
+#' }
 aux_fun <- function(measure,
                     repo      = NULL,
                     owner     = getOption("pipfun.ghowner"),
@@ -275,29 +336,42 @@ aux_fun <- function(measure,
 
 #' Update specified auxiliary data measures
 #'
-#' This function updates the specified auxiliary data measures and their dependencies.
-#' If `measures` is NULL, all available measures will be updated. If `repo` or `tag` 
-#' are NULL, default values will be used based on the measure being updated.
+#' @description
+#' Updates one or more auxiliary data measures and their dependencies, in
+#' dependency order. If `measures` is `NULL`, all measures available under
+#' `owner` are updated. Resolves dependency order by reading the shared
+#' dependency manifest via [read_dependencies()].
 #'
-#' @param measures Character vector. The measures to update. If NULL, all available measures will be updated.
-#' @param repo Character. Default repository name. If NULL, a default repository based on the measure will be used.
-#' @param owner Character. Default owner name. If NULL, the owner will be taken from the option "pipfun.ghowner".
-#' @param tag Character. Release tag. If NULL, the release branch will be used as the tag.
-#' @param log Logical. Whether to log events. Default is TRUE.
-#' @param log_overwrite Logical. Whether to overwrite existing logs. Default is TRUE.
-#' @param verbose Logical. Verbosity flag. Default is FALSE.
-#' @param halt_on_dep_fail Logical. Whether to halt parent update if a dependency fails. Default is FALSE.
-#' @param log_save Logical. Whether to save the final log. Default is FALSE.
-#' @param log_name Character. Explicit log name to use. If NULL, a default log name will be generated.
+#' @param measures Character vector or `NULL`. Names of measures to update
+#'   (e.g., `c("cpi", "ppp")`). If `NULL`, all available measures are updated
+#'   in dependency order.
+#' @param repo Character or `NULL`. Default repository name. If `NULL`, a
+#'   repository name is derived as `"aux_<measure>"` for each measure.
+#' @param owner Character. GitHub repository owner. Defaults to
+#'   `getOption("pipfun.ghowner")`.
+#' @param tag Character or `NULL`. Release tag passed to the generator
+#'   function. Defaults to the release branch name if `NULL`.
+#' @param log Logical. If `TRUE`, audit log events are recorded.
+#'   Default is `TRUE`.
+#' @param log_overwrite Logical. If `TRUE`, overwrites an existing log with
+#'   the same name. Default is `TRUE`.
+#' @param verbose Logical. If `TRUE`, prints progress messages. Default is
+#'   `FALSE`.
+#' @param halt_on_dep_fail Logical. If `TRUE`, stops execution when a
+#'   dependency update fails. Default is `FALSE`.
+#' @param log_save Logical. If `TRUE`, persists the final log to the
+#'   auxiliary metadata path via [pipfun::log_save()]. Default is `FALSE`.
+#' @param log_name Character or `NULL`. Leave it NULL.
 #'
-#' @return Invisibly returns NULL.
+#' @return Invisibly returns `NULL`.
 #' @export
-#' Update specified auxiliary data measures
 #'
-#' Updates the specified auxiliary data measures and their dependencies.
-#' If `measures` is NULL, all available measures are updated in dependency order.
-#'
-#' @export
+#' @examples
+#' \dontrun{
+#' update_aux_measures()
+#' update_aux_measures(measures = c("cpi", "ppp"), verbose = TRUE)
+#' update_aux_measures(measures = "gdp", log_save = TRUE)
+#' }
 update_aux_measures <- function(
   measures = NULL,
   repo = NULL,
@@ -335,7 +409,7 @@ update_aux_measures <- function(
   dependency_order <- names(
     read_dependencies(
       gh_user = "https://raw.githubusercontent.com",
-      owner   = owner
+      owner   = "PIP-Technical-Team"
     )
   )
 

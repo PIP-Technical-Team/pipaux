@@ -2,7 +2,7 @@
 % Please edit documentation in R/update_aux_data.R
 \name{execute_update}
 \alias{execute_update}
-\title{Execute update for GitHub and Y drive}
+\title{Execute GitHub and Y-drive updates for a measure}
 \usage{
 execute_update(
   measure,
@@ -18,30 +18,37 @@ execute_update(
 )
 }
 \arguments{
-\item{measure}{Character. The measure to update.}
+\item{measure}{Character. The measure name.}
 
-\item{update_gh}{Logical. Whether to update GitHub.}
+\item{update_gh}{Logical. If \code{TRUE}, the GitHub release branch is updated.}
 
-\item{update_y}{Logical. Whether to update Y drive.}
+\item{update_y}{Logical. If \code{TRUE}, the Y-drive data file is regenerated.}
 
-\item{release_branch}{Character. Release branch name.}
+\item{release_branch}{Character. Name of the release branch to sync to.}
 
-\item{owner}{Character. Repository owner.}
+\item{owner}{Character. GitHub repository owner.}
 
-\item{repo}{Character. Repository name.}
+\item{repo}{Character. GitHub repository name.}
 
-\item{tag}{Character. Release tag.}
+\item{tag}{Character. Release tag passed to the generator function.}
 
-\item{verbose}{Logical. Verbosity flag.}
+\item{verbose}{Logical. If \code{TRUE}, prints progress messages.}
 
-\item{log}{Logical. Whether to log events.}
+\item{log}{Logical. If \code{TRUE}, log events are recorded.}
 
-\item{log_name}{Character. Explicit log name to use.}
+\item{log_name}{Character or \code{NULL}. Leave it NULL to make the name be internally generated.}
 }
 \value{
-Invisibly returns NULL.
+Invisibly returns \code{NULL}.
 }
 \description{
-Execute update for GitHub and Y drive
+Performs the actual update steps for a measure:
+\itemize{
+\item If \code{update_gh = TRUE}, syncs the release branch on GitHub from \code{DEV} via
+\code{\link[pipfun:sync_release_branch]{pipfun::sync_release_branch()}}.
+\item If \code{update_y = TRUE}, calls the measure's generator function
+(\verb{aux_<measure>()}) with the appropriate arguments to refresh the Y-drive
+data file.
+}
 }
 \keyword{internal}

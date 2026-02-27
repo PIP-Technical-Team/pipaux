@@ -7,9 +7,10 @@
 is_top_level()
 }
 \value{
-Logical. TRUE if the function is called from the top-level (interactive or script), FALSE otherwise.
+Logical. \code{TRUE} if called from the top level, \code{FALSE} otherwise.
 }
 \description{
-Detect if the current call is top-level
+Returns \code{TRUE} if the function is being called from the top-level environment
+(interactive session or script), \code{FALSE} if called from within another function.
 }
 \keyword{internal}

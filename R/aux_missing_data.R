@@ -53,12 +53,11 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     nac <- joyn::joyn(gdp, pce,
                        by         = c(
-                         "country_code", "year", "nac_data_level",
-                         "nac_domain"),
+                         "country_code", "year", "reporting_level"),
                        match_type = "1:1",
                        reportvar  = FALSE,
                        verbose    = FALSE,
-                      keep        = "full")
+                       keep       = "full")
 
     nac <-
       nac[year %in% ref_years

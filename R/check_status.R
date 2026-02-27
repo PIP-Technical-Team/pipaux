@@ -3,13 +3,17 @@
 #' @description
 #' Checks if the release branch for a measure is present and up to date with DEV on GitHub.
 #'
-#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
+#' @param measure Character. Name of the auxiliary data measure (e.g., `"cpi"`).
 #' @param repo Character. GitHub repository name.
 #' @param owner Character. GitHub repository owner.
 #' @param release_branch Character. Name of the release branch to check.
-#' @param verbose Logical. If TRUE, prints status messages.
+#' @param verbose Logical. If `TRUE`, prints status messages. Default is `TRUE`.
 #'
-#' @return A list with `update_gh` (logical or NA) and `reason` (character).
+#' @return A named list with:
+#'   \describe{
+#'     \item{update_gh}{Logical or `NA`. `TRUE` if an update is needed, `FALSE` if up to date, `NA` if status could not be determined.}
+#'     \item{gh_reason}{Character. Human-readable explanation of the status.}
+#'   }
 #' @keywords internal
 #'
 #' @examples
@@ -103,12 +107,18 @@ check_github_status <- function(measure,
 #' @title Check Y-drive status for an auxiliary data measure
 #'
 #' @description
-#' Checks if the local Y-drive version of the auxiliary data is in sync with GitHub and the function code.
+#' Checks if the local Y-drive version of the auxiliary data is in sync with
+#' GitHub (via SHA comparison) and with the current generator function code
+#' (via code hash comparison).
 #'
-#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
-#' @param verbose Logical. If TRUE, prints status messages.
+#' @param measure Character. Name of the auxiliary data measure (e.g., `"cpi"`).
+#' @param verbose Logical. If `TRUE`, prints status messages. Default is `TRUE`.
 #'
-#' @return A list with `update_y` (logical) and `reason` (character).
+#' @return A named list with:
+#'   \describe{
+#'     \item{update_y}{Logical. `TRUE` if the Y-drive data is out of sync and needs updating.}
+#'     \item{reason}{Character. Human-readable explanation of the status.}
+#'   }
 #' @keywords internal
 #'
 #' @examples
@@ -264,15 +274,25 @@ check_y_drive_status <- function(measure,
 #' @title Check overall status for an auxiliary data measure
 #'
 #' @description
-#' Checks both GitHub and Y-drive status for a measure and summarizes whether updates are needed.
+#' Checks both GitHub and Y-drive status for a measure and summarizes whether
+#' updates are needed. If a GitHub update is required, the Y-drive is also
+#' flagged for update (policy: GitHub update implies Y-drive update).
 #'
-#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
-#' @param repo Character. GitHub repository name. Defaults to "aux_<measure>".
-#' @param owner Character. GitHub repository owner.
-#' @param verbose Logical. If TRUE, prints status messages.
-#' @param include_reason Logical. If TRUE, includes reasons in output.
+#' @param measure Character. Name of the auxiliary data measure (e.g., `"cpi"`).
+#' @param repo Character. GitHub repository name. Defaults to `"aux_<measure>"`.
+#' @param owner Character. GitHub repository owner. Defaults to
+#'   `getOption("pipfun.ghowner")`.
+#' @param verbose Logical. If `TRUE`, prints status messages. Default is `TRUE`.
+#' @param include_reason Logical. If `TRUE`, includes `gh_reason` and `y_reason`
+#'   fields in the returned list. Default is `FALSE`.
 #'
-#' @return An (invisible) list with `update_gh`, `update_y` (logical or NA), and optionally `gh_reason`, `y_reason`.
+#' @return An invisible named list with:
+#'   \describe{
+#'     \item{update_gh}{Logical or `NA`. `TRUE` if GitHub needs updating.}
+#'     \item{update_y}{Logical or `NA`. `TRUE` if the Y-drive needs updating.}
+#'     \item{gh_reason}{Character. Included only if `include_reason = TRUE`.}
+#'     \item{y_reason}{Character. Included only if `include_reason = TRUE`.}
+#'   }
 #' @keywords internal
 #'
 #' @examples
@@ -356,14 +376,21 @@ check_status <- function(measure,
 #' @title Get file system status for an auxiliary data measure
 #'
 #' @description
-#' Wrapper for \code{check_status()} with \code{verbose = FALSE}.
+#' A non-verbose wrapper around [check_status()]. Returns the same output
+#' with `verbose = FALSE`.
 #'
-#' @param measure Character. Name of the auxiliary data measure (e.g., "cpi").
-#' @param repo Character. GitHub repository name. Defaults to "aux_<measure>".
-#' @param owner Character. GitHub repository owner.
+#' @param measure Character. Name of the auxiliary data measure (e.g., `"cpi"`).
+#' @param repo Character. GitHub repository name. Defaults to `"aux_<measure>"`.
+#' @param owner Character. GitHub repository owner. Defaults to
+#'   `getOption("pipfun.ghowner")`.
+#' @param include_reason Logical. If `TRUE`, includes `gh_reason` and `y_reason`
+#'   fields in the returned list. Default is `FALSE`.
 #'
-#' @return A list with `update_gh` and `update_y` (logical or NA).
+#' @return A named list with `update_gh` and `update_y` (logical or `NA`), and
+#'   optionally `gh_reason` and `y_reason` if `include_reason = TRUE`.
 #' @keywords internal
+#'
+#' @seealso [check_status()]
 #'
 #' @examples
 #' get_fs_status("cpi")

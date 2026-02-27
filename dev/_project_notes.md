@@ -388,7 +388,7 @@ The `dev/` folder contains **interactive diagnostics and workflow scripts**. Not
    ```r
    # Individual step (recommended for debugging a specific stage)
    source("dev/01_dependency_and_update_runner.R")
-   run_ordered_update_diagnostics(measures = c("cpi", "gdp"), owner = "YourGHUser")
+   run_ordered_update_diagnostics(measures = c("cpi", "gdp"), owner = "RossanaTat") # use this owner for testing
 
    # Full workflow (all steps in sequence)
    source("dev/05_interactive_full_run.R")

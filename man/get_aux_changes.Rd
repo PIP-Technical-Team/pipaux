@@ -7,22 +7,39 @@
 get_aux_changes(measure = "cpi", old_release = NULL, verbose = TRUE)
 }
 \arguments{
-\item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
-If NULL, automatically take last available release of same identity as the current working release}
+\item{measure}{Character. Name of the auxiliary data measure to update
+(e.g., \code{"cpi"}, \code{"ppp"}).}
 
-\item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
+\item{old_release}{Character. The identifier of the previous release to
+compare against (e.g., \code{"20240101_PROD"}). If \code{NULL}, automatically uses
+the last available release matching the same identity as the current
+working release.}
 
-\item{key_cols}{Character vector. Variables used as keys to compare values between releases. Defaults to the \code{pipaux.key_vars} option.}
+\item{verbose}{Logical. If \code{TRUE}, displays messages in the console.
+Default is \code{TRUE}.}
 }
 \value{
-A data frame with detected differences in values, grouped by the specified key variables.
+Invisibly returns a named list with:
+\describe{
+\item{diff_values}{A data table of value-level differences across matched
+rows and columns, with added \code{measure}, \code{new_path.x}, and \code{old_path.y}
+columns. \code{NULL} if no differences found.}
+\item{diff_rows}{A data table of rows added or removed between releases,
+with \code{change_type}, \code{measure}, \code{release}, and \code{old_release} columns.
+\code{NULL} if no row differences found.}
+}
+The list has a \code{"key_cols"} attribute containing the primary key columns
+used for comparison. Returns \code{NULL} invisibly if the old release data
+cannot be loaded.
 }
 \description{
-This function compares the contents of auxiliary data files between the current and a specified previous release.
-It identifies differences for specified key variables
+Compares the contents of auxiliary data files between the current and a
+specified previous release, identifying differences in values and rows for
+a given measure.
 }
 \details{
-The release identifiers must follow the format \code{"YYYYMMDD_identity"} (e.g., \code{"20250101_TEST"}).
+The release identifiers must follow the format \code{"YYYYMMDD_identity"}
+(e.g., \code{"20250101_TEST"}).
 }
 \examples{
 \dontrun{

@@ -13,21 +13,31 @@ check_status(
 )
 }
 \arguments{
-\item{measure}{Character. Name of the auxiliary data measure (e.g., "cpi").}
+\item{measure}{Character. Name of the auxiliary data measure (e.g., \code{"cpi"}).}
 
-\item{repo}{Character. GitHub repository name. Defaults to "aux_\if{html}{\out{<measure>}}".}
+\item{repo}{Character. GitHub repository name. Defaults to \code{"aux_<measure>"}.}
 
-\item{owner}{Character. GitHub repository owner.}
+\item{owner}{Character. GitHub repository owner. Defaults to
+\code{getOption("pipfun.ghowner")}.}
 
-\item{verbose}{Logical. If TRUE, prints status messages.}
+\item{verbose}{Logical. If \code{TRUE}, prints status messages. Default is \code{TRUE}.}
 
-\item{include_reason}{Logical. If TRUE, includes reasons in output.}
+\item{include_reason}{Logical. If \code{TRUE}, includes \code{gh_reason} and \code{y_reason}
+fields in the returned list. Default is \code{FALSE}.}
 }
 \value{
-An (invisible) list with \code{update_gh}, \code{update_y} (logical or NA), and optionally \code{gh_reason}, \code{y_reason}.
+An invisible named list with:
+\describe{
+\item{update_gh}{Logical or \code{NA}. \code{TRUE} if GitHub needs updating.}
+\item{update_y}{Logical or \code{NA}. \code{TRUE} if the Y-drive needs updating.}
+\item{gh_reason}{Character. Included only if \code{include_reason = TRUE}.}
+\item{y_reason}{Character. Included only if \code{include_reason = TRUE}.}
+}
 }
 \description{
-Checks both GitHub and Y-drive status for a measure and summarizes whether updates are needed.
+Checks both GitHub and Y-drive status for a measure and summarizes whether
+updates are needed. If a GitHub update is required, the Y-drive is also
+flagged for update (policy: GitHub update implies Y-drive update).
 }
 \examples{
 check_status("cpi")

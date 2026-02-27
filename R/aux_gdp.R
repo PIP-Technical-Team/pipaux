@@ -44,6 +44,7 @@ aux_gdp <- function(action          = c("update", "load"),
       branch = branch,
       ext = "csv"
     )
+
     # Collect gh attribute from loaded gdp
     gh <- attributes(gdp)$gh
 
@@ -78,8 +79,7 @@ aux_gdp <- function(action          = c("update", "load"),
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_gdp_update <- function(force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_gdp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
@@ -355,6 +355,7 @@ aux_gdp_update <- function(force   = FALSE,
   setattr(gdp,
           "aux_key",
           c("country_code", "year", "reporting_level"))
+  
 
   # validate gdp output data
   gdp_validate_output(gdp = gdp, detail = detail)
@@ -362,6 +363,7 @@ aux_gdp_update <- function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
+
 
   save_aux_to_gh(df        = gdp,
                  owner     = owner,

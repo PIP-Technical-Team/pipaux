@@ -2,31 +2,39 @@
 % Please edit documentation in R/identify_changes.R
 \name{compare_aux_vintages}
 \alias{compare_aux_vintages}
-\title{Compare Vintage Versions for Multiple Auxiliary Data Files}
+\title{Compare vintage versions across multiple auxiliary data measures}
 \usage{
 compare_aux_vintages(measures = NULL, version = -1, verbose = FALSE)
 }
 \arguments{
 \item{measures}{Character vector. Names of auxiliary data measures to compare
-(e.g., \code{c("gdp", "pop", "pfw")}).}
+(e.g., \code{c("gdp", "pop", "pfw")}). If \code{NULL} or empty, returns an empty
+list with a warning.}
 
-\item{version}{Integer. Indicates how many versions before the latest to compare with
-(e.g., \code{-1} for previous).}
+\item{version}{Integer. Indicates how many versions before the latest to
+compare with (e.g., \code{-1} for the immediately previous version).
+Default is \code{-1}.}
 
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are printed.}
+\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
+printed. Default is \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}.}
 }
 \value{
-Invisibly returns a named list of results from \code{\link[=compare_vintage_versions]{compare_vintage_versions()}},
-one element per measure.
+Invisibly returns a named list with one element per measure,
+each being the output of \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}. Elements are \code{NULL}
+for measures where no previous version exists or an error occurred.
 }
 \description{
 Applies \code{\link[=compare_vintage_versions]{compare_vintage_versions()}} across multiple auxiliary data measures.
-Useful for tracking within-release changes across several files.
+Useful for tracking within-release changes across several files simultaneously.
 }
 \examples{
 \dontrun{
 compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
+compare_aux_vintages(measures = c("cpi", "gdp"), version = -2, verbose = TRUE)
 }
+}
+\seealso{
+\code{\link[=compare_vintage_versions]{compare_vintage_versions()}}
 }

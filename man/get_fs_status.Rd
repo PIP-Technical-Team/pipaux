@@ -12,19 +12,28 @@ get_fs_status(
 )
 }
 \arguments{
-\item{measure}{Character. Name of the auxiliary data measure (e.g., "cpi").}
+\item{measure}{Character. Name of the auxiliary data measure (e.g., \code{"cpi"}).}
 
-\item{repo}{Character. GitHub repository name. Defaults to "aux_\if{html}{\out{<measure>}}".}
+\item{repo}{Character. GitHub repository name. Defaults to \code{"aux_<measure>"}.}
 
-\item{owner}{Character. GitHub repository owner.}
+\item{owner}{Character. GitHub repository owner. Defaults to
+\code{getOption("pipfun.ghowner")}.}
+
+\item{include_reason}{Logical. If \code{TRUE}, includes \code{gh_reason} and \code{y_reason}
+fields in the returned list. Default is \code{FALSE}.}
 }
 \value{
-A list with \code{update_gh} and \code{update_y} (logical or NA).
+A named list with \code{update_gh} and \code{update_y} (logical or \code{NA}), and
+optionally \code{gh_reason} and \code{y_reason} if \code{include_reason = TRUE}.
 }
 \description{
-Wrapper for \code{check_status()} with \code{verbose = FALSE}.
+A non-verbose wrapper around \code{\link[=check_status]{check_status()}}. Returns the same output
+with \code{verbose = FALSE}.
 }
 \examples{
 get_fs_status("cpi")
+}
+\seealso{
+\code{\link[=check_status]{check_status()}}
 }
 \keyword{internal}

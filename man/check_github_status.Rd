@@ -7,7 +7,7 @@
 check_github_status(measure, repo, owner, release_branch, verbose = TRUE)
 }
 \arguments{
-\item{measure}{Character. Name of the auxiliary data measure (e.g., "cpi").}
+\item{measure}{Character. Name of the auxiliary data measure (e.g., \code{"cpi"}).}
 
 \item{repo}{Character. GitHub repository name.}
 
@@ -15,10 +15,14 @@ check_github_status(measure, repo, owner, release_branch, verbose = TRUE)
 
 \item{release_branch}{Character. Name of the release branch to check.}
 
-\item{verbose}{Logical. If TRUE, prints status messages.}
+\item{verbose}{Logical. If \code{TRUE}, prints status messages. Default is \code{TRUE}.}
 }
 \value{
-A list with \code{update_gh} (logical or NA) and \code{reason} (character).
+A named list with:
+\describe{
+\item{update_gh}{Logical or \code{NA}. \code{TRUE} if an update is needed, \code{FALSE} if up to date, \code{NA} if status could not be determined.}
+\item{gh_reason}{Character. Human-readable explanation of the status.}
+}
 }
 \description{
 Checks if the release branch for a measure is present and up to date with DEV on GitHub.

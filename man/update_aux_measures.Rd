@@ -5,7 +5,7 @@
 \title{Update specified auxiliary data measures}
 \usage{
 update_aux_measures(
-  measures,
+  measures = NULL,
   repo = NULL,
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
@@ -18,31 +18,49 @@ update_aux_measures(
 )
 }
 \arguments{
-\item{measures}{Character vector. The measures to update. If NULL, all available measures will be updated.}
+\item{measures}{Character vector or \code{NULL}. Names of measures to update
+(e.g., \code{c("cpi", "ppp")}). If \code{NULL}, all available measures are updated
+in dependency order.}
 
-\item{repo}{Character. Default repository name. If NULL, a default repository based on the measure will be used.}
+\item{repo}{Character or \code{NULL}. Default repository name. If \code{NULL}, a
+repository name is derived as \code{"aux_<measure>"} for each measure.}
 
-\item{owner}{Character. Default owner name. If NULL, the owner will be taken from the option "pipfun.ghowner".}
+\item{owner}{Character. GitHub repository owner. Defaults to
+\code{getOption("pipfun.ghowner")}.}
 
-\item{tag}{Character. Release tag. If NULL, the release branch will be used as the tag.}
+\item{tag}{Character or \code{NULL}. Release tag passed to the generator
+function. Defaults to the release branch name if \code{NULL}.}
 
-\item{log}{Logical. Whether to log events. Default is TRUE.}
+\item{log}{Logical. If \code{TRUE}, audit log events are recorded.
+Default is \code{TRUE}.}
 
-\item{log_overwrite}{Logical. Whether to overwrite existing logs. Default is TRUE.}
+\item{log_overwrite}{Logical. If \code{TRUE}, overwrites an existing log with
+the same name. Default is \code{TRUE}.}
 
-\item{verbose}{Logical. Verbosity flag. Default is FALSE.}
+\item{verbose}{Logical. If \code{TRUE}, prints progress messages. Default is
+\code{FALSE}.}
 
-\item{halt_on_dep_fail}{Logical. Whether to halt parent update if a dependency fails. Default is FALSE.}
+\item{halt_on_dep_fail}{Logical. If \code{TRUE}, stops execution when a
+dependency update fails. Default is \code{FALSE}.}
 
-\item{log_save}{Logical. Whether to save the final log. Default is FALSE.}
+\item{log_save}{Logical. If \code{TRUE}, persists the final log to the
+auxiliary metadata path via \code{\link[pipfun:log_save]{pipfun::log_save()}}. Default is \code{FALSE}.}
 
-\item{log_name}{Character. Explicit log name to use. If NULL, a default log name will be generated.}
+\item{log_name}{Character or \code{NULL}. Leave it NULL.}
 }
 \value{
-Invisibly returns NULL.
+Invisibly returns \code{NULL}.
 }
 \description{
-This function updates the specified auxiliary data measures and their dependencies.
-If \code{measures} is NULL, all available measures will be updated. If \code{repo} or \code{tag}
-are NULL, default values will be used based on the measure being updated.
+Updates one or more auxiliary data measures and their dependencies, in
+dependency order. If \code{measures} is \code{NULL}, all measures available under
+\code{owner} are updated. Resolves dependency order by reading the shared
+dependency manifest via \code{\link[=read_dependencies]{read_dependencies()}}.
+}
+\examples{
+\dontrun{
+update_aux_measures()
+update_aux_measures(measures = c("cpi", "ppp"), verbose = TRUE)
+update_aux_measures(measures = "gdp", log_save = TRUE)
+}
 }

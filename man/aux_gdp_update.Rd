@@ -5,7 +5,6 @@
 \title{Update GDP}
 \usage{
 aux_gdp_update(
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = branch,

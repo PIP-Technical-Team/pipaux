@@ -103,14 +103,9 @@ Simulations allow you to test pipeline behavior by creating hypothetical row/val
 - Changing values of existing rows
 - Changing columns (less common)
 
-```{r}
-# Example (not actual production)
-simulate_changes(
-  measures = c("cpi", "pop"),
-  n_new_rows = 2,
-  change_values = TRUE
-)
-```
+Check the following function to do so:
+`simulate_changes()`
+
 
 **Important:** Simulations are optional and primarily for testing pipeline logic. For actual releases, skip this step.
 
