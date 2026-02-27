@@ -36,8 +36,7 @@ This vignette provides an external-user view of the auxiliary data (aux data) pi
 |-------------------------|------------------------------------------------------------------------------------------|
 | `update_aux_measures()` | Updates all or selected auxiliary data measures in dependency order. Handles GitHub/Y-drive updates, logging, and dependency resolution. |
 | `aux_fun()`             | Internal function called by `update_aux_measures()`. Executes measure updates and manages dependencies. |
-| `check_status()`        | Determines whether updates are needed for a measure on GitHub or Y-drive.                |
-| `get_fs_status()`       | Quiet wrapper around `check_status()` to return update flags programmatically.           |
+| `check_status()`        | Determines whether updates are needed for a measure on GitHub or Y-drive.                || `get_fs_status()`       | Wrapper around `check_status()` to return update flags programmatically.           |
 | `compare_aux_releases()`| Compares files across releases to detect new rows, removed rows, or changed values.      |
 | `compare_aux_vintages()`| Compares files within the same release to detect version changes.                        |
 
@@ -84,7 +83,7 @@ update_aux_measures(
     - `update_gh` flag controls GitHub branch updates.  
     - `update_y` flag controls saving updated data to the Y-drive.
 - **Logging:**  
-    - Use and inspect `aux_log_last()`, which provides quick access to the most recent log.
+    - Use and inspect `aux_log_last()`, which provides quick access to the most recent log. Or read log saved to disk with `pipfun::log_load()`
 - **Optional simulations:** For testing, you can simulate row/value changes, but this is not required for production updates.
 
 ```{r}
@@ -93,21 +92,22 @@ pipfun::log_get("pipaux_update_log")[event == "update"]
 pipfun::log_get("pipaux_update_log")[event == "error"]
 ```
 
-- **Halt on dependency error:** Set `halt_on_dep_fail = TRUE` if you want updates to stop when a dependency fails. By default, errors are logged, and processing continues.
 
-# 3️⃣ Step 3 – Simulate Changes (Optional)
+# 3️⃣ Step 3 – Simulate Changes (For TESTING ONLY)
 
 Simulations allow you to test pipeline behavior by creating hypothetical row/value changes in auxiliary files:
 
-- Adding/removing rows
-- Changing values of existing rows
-- Changing columns (less common)
+```{r}
+# Simulate changes for testing
+simulate_changes(
+  measures = c("cpi", "metaregion"),
+  owner    = "RossanaTat",
+  drop = c(1, 2),
+  indices = c(1, 3)
+)
+```
 
-Check the following function to do so:
-`simulate_changes()`
-
-
-**Important:** Simulations are optional and primarily for testing pipeline logic. For actual releases, skip this step.
+**Important:** Simulations are optional and primarily for testing pipeline logic. For actual releases, ignore this step.
 
 # 4️⃣ Step 4 – Compare Auxiliary Data
 
@@ -143,6 +143,6 @@ If no previous version exists, results will be `NULL`.
 
 - Always run updates in dependency order, relying on `update_aux_measures()`.
 - Use logs to trace updates, timing, and errors. Use `{pipfun}` logging functions to inspect and save logs as needed, e.g., `pipfun::log_load()` and `pipfun::log_save()`, which are powered by `{stamp}`.
-- Skip simulations for production releases.
+- Skip simulations for actual releases.
 - Verify release/vintage comparisons to ensure data integrity.
 - Optionally use `get_fs_status()` to programmatically verify if updates are needed for a specific measure. 
