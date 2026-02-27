@@ -102,12 +102,12 @@ aux_pl_clean <- function(l) {
   df[,
      c("is_default", "is_visible", "name", "ppp_year")
      := {
-       id   <- fifelse(name == l$default, TRUE, FALSE)
-
-       iv   <- fifelse(name %in% l$visible, TRUE, FALSE)
+       id <- fifelse(name == l$default, TRUE, FALSE)
 
        n <- fifelse(n_decimals(poverty_line) == 1, paste0(name, "0"), name)
        n <- fifelse(n_decimals(poverty_line) == 0, paste0(n, ".00"), n)
+
+       iv <- fifelse(n %in% l$visible, TRUE, FALSE)
 
        list(id, iv, n, l$ppp_year)
      }]
