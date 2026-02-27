@@ -137,23 +137,41 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
 
   # --- GitHub update ---
   if (update_gh) {
-    pipfun::sync_release_branch(
-      owner         = owner,
-      repo          = repo,
-      ref_branch    = "DEV",
-      target_branch = release_branch,
-      verbose       = verbose
-    )
+    tryCatch(
+      {
+        suppressMessages(
+          pipfun::sync_release_branch(
+            owner         = owner,
+            repo          = repo,
+            ref_branch    = "DEV",
+            target_branch = release_branch,
+            verbose       = verbose
+          )
+        )
 
-    if (use_log) {
-      pipfun::log_add(
-        event   = "update",
-        message = paste0("Updated GitHub for: ", measure),
-        name    = log_name,
-        args = list(),
-        logmeta = list(step = "UPDATE_GH", measure = measure)
-      )
-    }
+        if (use_log) {
+          pipfun::log_add(
+            event   = "update",
+            message = paste0("Updated GitHub for: ", measure),
+            name    = log_name,
+            args    = list(),
+            logmeta = list(step = "UPDATE_GH", measure = measure)
+          )
+        }
+      },
+      error = function(e) {
+        if (use_log) {
+          pipfun::log_add(
+            event   = "error",
+            message = paste0("GitHub sync failed: ", e$message),
+            name    = log_name,
+            args    = list(),
+            logmeta = list(step = "ERROR_GH", measure = measure)
+          )
+        }
+        stop(e)  # re-throw so the caller still sees the failure
+      }
+    )
   }
 
   # --- Y drive update ---
@@ -274,6 +292,17 @@ aux_fun <- function(measure,
 
   # Process dependencies
   process_dependencies(measure, processed, owner, tag, verbose, log, log_name, halt_on_dep_fail)
+
+  # Log START for this measure
+  if (log && !is.null(log_name)) {
+    pipfun::log_add(
+      event   = "info",
+      message = paste0("Starting status check for: ", measure),
+      name    = log_name,
+      args    = list(),
+      logmeta = list(step = "START", measure = measure)
+    )
+  }
 
   # Check update status
   check_result <- tryCatch(
