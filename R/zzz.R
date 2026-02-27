@@ -26,35 +26,39 @@ pipuax_default_options <- list(
 
   if (any(toset)) options(pipuax_default_options[toset])
 
-  wrk_release <- pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- tryCatch(
+    pipfun::get_wrk_release(verbose = FALSE),
+    error = function(e) NULL
+  )
   rlang::env_poke(.pipaux, "wrk_release", wrk_release)
 
-  # Get all pip folder paths
-  pip_folders <- pipfun::get_pip_folders(verbose = FALSE)
+  pip_folders <- tryCatch(
+    pipfun::get_pip_folders(verbose = FALSE),
+    error = function(e) NULL
+  )
   rlang::env_poke(.pipaux, "pip_folders", pip_folders)
 
-  # Get all pip aliases relevant to aux data
-  aux_alias <- pipfun::get_pip_aliases("aux_data", verbose = FALSE)
+  aux_alias <- tryCatch(
+    pipfun::get_pip_aliases("aux_data", verbose = FALSE),
+    error = function(e) NULL
+  )
   rlang::env_poke(.pipaux, "aux_alias", aux_alias)
-  aux_meta_alias <- pipfun::get_pip_aliases("aux_metadata", verbose = FALSE)
+
+  aux_meta_alias <- tryCatch(
+    pipfun::get_pip_aliases("aux_metadata", verbose = FALSE),
+    error = function(e) NULL
+  )
   rlang::env_poke(.pipaux, "aux_meta_alias", aux_meta_alias)
 
-  if (is.null(pip_folders)) stop("Cannot find pip_folders in the environment.")
-  
-  # Attach relevant paths to .pipaux environment
-  aux_data_path      <- pip_folders$aux_data
-  aux_metadata_path  <- pip_folders$aux_metadata
-
-  rlang::env_poke(.pipaux, "aux_data_path", aux_data_path)
-  rlang::env_poke(.pipaux, "aux_metadata_path", aux_metadata_path)
+  if (!is.null(pip_folders)) {
+    aux_data_path     <- pip_folders$aux_data
+    aux_metadata_path <- pip_folders$aux_metadata
+    rlang::env_poke(.pipaux, "aux_data_path", aux_data_path)
+    rlang::env_poke(.pipaux, "aux_metadata_path", aux_metadata_path)
+  }
 
   # Initialize a log
-  pipfun::log_init("pipaux_update_log",
-                   overwrite = TRUE)
-  
-  # ---- Initialize stamp defaults for pipaux ----
-  #pipaux_reset_stamp_options()
-
+  pipfun::log_init("pipaux_update_log", overwrite = TRUE)
 
   invisible()
 }
