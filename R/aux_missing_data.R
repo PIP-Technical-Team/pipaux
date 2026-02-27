@@ -62,7 +62,7 @@ aux_missing_data <- function(action  = c("update", "load"),
     nac <-
       nac[year %in% ref_years
       ][,
-        nac_domain := NULL]
+        intersect("nac_domain", names(nac)) := NULL]
 
 
 
@@ -171,9 +171,9 @@ aux_missing_data <- function(action  = c("update", "load"),
 
 # Join  with pop data -----
     pop <-
-      pop[pop_data_level == "national"
+      pop[reporting_level == "national"
       ][,
-        c("pop_domain", "pop_data_level") := NULL
+        reporting_level := NULL
       ]
 
     setnames(pop, "pop", "reporting_pop")
@@ -200,7 +200,7 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     df <- pipload::load_aux_data(measure = measure)
 
-    return(dl)
+    return(df)  
   }
 
 }
