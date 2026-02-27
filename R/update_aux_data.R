@@ -386,42 +386,22 @@ update_aux_measures <- function(
 ) {
 
   # -------------------------------------------------------------------
-  # 1. Resolve available measures from GitHub
+  # 1. Resolve available measures from dependency manifest (in order)
   # -------------------------------------------------------------------
 
-  if (is.null(owner)) {
-    stop("Owner must be provided or set via option 'pipfun.ghowner'.")
-  }
-
-  # All aux_* repos under owner
-  all_measures_raw <- gh::gh(
-    "GET /users/{username}/repos",
-    username = owner
-  ) |>
-    vapply("[[", "", "name") |>
-    grep("^aux_", x = _, value = TRUE) |>
-    sub("^aux_", "", x = _)
-
-  # -------------------------------------------------------------------
-  # 2. Resolve dependency order
-  # -------------------------------------------------------------------
-
-  dependency_order <- names(
+  available_measures <- names(
     read_dependencies(
       gh_user = "https://raw.githubusercontent.com",
       owner   = "PIP-Technical-Team"
     )
   )
 
-  # Keep only repos that actually exist
-  available_measures <- intersect(dependency_order, all_measures_raw)
-
   if (length(available_measures) == 0) {
     stop("No auxiliary measures found.")
   }
 
   # -------------------------------------------------------------------
-  # 3. Determine final measure list
+  # 2. Determine final measure list
   # -------------------------------------------------------------------
 
   if (is.null(measures)) {
@@ -436,10 +416,8 @@ update_aux_measures <- function(
       )
     }
 
-    # Preserve dependency order
-    final_measures <- available_measures[
-      available_measures %in% measures
-    ]
+    # Preserve dependency order from manifest
+    final_measures <- available_measures[available_measures %in% measures]
   }
 
   if (length(final_measures) == 0) {
