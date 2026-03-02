@@ -525,61 +525,6 @@ hash_code <- function(x) {
   stamp:::st_hash_code(x)
 }
 
-plot_dependencies <- function(dependencies_all) {
-  if (!requireNamespace("igraph", quietly = TRUE)) {
-    stop("Package 'igraph' is required.")
-  }
-
-  measures <- names(dependencies_all)
-
-  # build edge list: measure -> what it depends on
-  edges <- do.call(
-    rbind,
-    lapply(measures, function(x) {
-      deps <- dependencies_all[[x]]
-      if (length(deps) == 0) return(NULL)  # no dependencies, no edges
-      cbind(from = x, to = deps)
-    })
-  )
-
-  # create graph including all measures (even those with no dependencies)
-  g <- igraph::graph_from_data_frame(edges, vertices = measures, directed = TRUE)
-
-  # color nodes: independent = depends on nothing (purple), others = light blue
-  indep <- sapply(dependencies_all, function(x) length(x) == 0)
-  cols <- ifelse(indep,
-                 grDevices::adjustcolor("#C6A0DC", alpha.f = 0.75),  # independent
-                 grDevices::adjustcolor("#9EC9FF", alpha.f = 0.75))  # depends on something
-
-  # layout (Sugiyama works well for dependencies)
-  lay <- igraph::layout_with_sugiyama(g)$layout
-  igraph::E(g)$curved <- 0.15
-
-  plot(
-    g,
-    layout = lay,
-    vertex.size = 26,
-    vertex.color = cols,
-    vertex.frame.color = "white",
-    vertex.label.font = 2,
-    vertex.label.cex = 0.85,
-    vertex.label.color = "grey20",
-    edge.arrow.size = 0.35,
-    edge.color = "grey70",
-    margin = 0.2
-  )
-
-  legend(
-    "topleft",
-    legend = c("independent (no deps)", "depends on others"),
-    fill = grDevices::adjustcolor(c("#C6A0DC", "#9EC9FF"), alpha.f = 0.75),
-    border = NA,
-    bty = "n",
-    cex = 0.9
-  )
-
-  invisible(g)
-}
 
 #' Initialize auxiliary data update log
 #'
@@ -650,3 +595,4 @@ aux_log_last <- function() {
 aux_log_last_name <- function() {
   return(.piplogenv$last_aux_log)
 }
+

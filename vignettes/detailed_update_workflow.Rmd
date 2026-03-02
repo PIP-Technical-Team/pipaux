@@ -119,13 +119,6 @@ cycles.
 
 To inspect the current dependency graph:
 
-```r
-deps <- read_dependencies(
-  gh_user = "https://raw.githubusercontent.com",
-  owner   = "PIP-Technical-Team"
-)
-plot_dependencies(deps)
-```
 
 ## Step 4 — Status Checks (`check_status.R`)
 
