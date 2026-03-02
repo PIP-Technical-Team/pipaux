@@ -1,10 +1,35 @@
 # =====================================================================
 # RELEASE + VINTAGE COMPARISON DIAGNOSTICS
 # =====================================================================
+# Purpose:
+#   - Compare aux data files across releases or vintage versions
+#   - Detect value-level and row-level changes between versions
+#   - Surface which measures changed and how (values, rows, or both)
+#
+# Functions:
+#   run_release_diagnostics()  -- compares current vs. a prior release
+#   run_vintage_diagnostics()  -- compares current vs. a prior vintage
+#                                 within the same release (default: -1)
+#
 # Usage:
-#   source("dev/04_release_comparison_diagnostics.R")
-#   run_release_diagnostics()
-#   run_vintage_diagnostics()
+#   source("dev/04_files_comparison_diagnostics.R")
+#
+#   run_release_diagnostics(
+#     measures    = c("cpi", "pfw"),
+#     old_release = "20260202_TEST"
+#   )
+#
+#   run_vintage_diagnostics(
+#     measures = c("cpi", "pfw"),
+#     version  = -1        # -1 = compare latest vs. previous vintage
+#   )
+#
+# Expected output:
+#   - Per-measure summary table with columns:
+#       measure, status, value_changes, row_changes[, elapsed_sec]
+#   - Status values: no_change | value_change | row_change |
+#                    row_and_value_change | error
+#   - Final table printed to console; data.table returned invisibly
 # =====================================================================
 
 if (!interactive()) {

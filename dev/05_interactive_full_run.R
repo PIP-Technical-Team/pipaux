@@ -4,25 +4,48 @@
 # Purpose:
 #   - Execute the full auxiliary data release workflow interactively
 #   - Run updates, log diagnostics, simulations, and release comparisons
-#   - Track timing and summarize results
+#   - Track timing and summarize results across all steps
 #
 # Usage:
 #   source("dev/05_interactive_full_run.R")
 #   results <- run_all_workflow()
+#
+#   # With optional arguments
+#   results <- run_all_workflow(
+#     measures    = c("cpi", "pfw"),
+#     owner       = "RossanaTat",
+#     old_release = "20260202_TEST",
+#     version     = -1,
+#     log_save    = TRUE,
+#     verbose     = TRUE
+#   )
+#
+# Expected output:
+#   - Step-by-step console output from each diagnostic function
+#   - Per-step elapsed time
+#   - Final workflow summary with total elapsed time
+#   - Invisibly returns a named list with results from all four steps:
+#       $update_results, $log_diagnostics,
+#       $simulation_results, $release_diagnostics, $vintage_diagnostics
+#
+# Notes:
+#   - old_release must be provided for run_release_diagnostics() to run;
+#     if NULL, that sub-step is skipped with a warning
+#   - version = -1 compares latest vs. previous vintage (default)
 # =====================================================================
 
 if (!interactive()) stop("This file is intended for interactive use only.")
 
 run_all_workflow <- function(
-  measures = NULL,
-  owner = "RossanaTat",
-  sim_config = NULL,
+  measures    = NULL,
+  owner       = "RossanaTat",
   old_release = NULL,
-  verbose = TRUE
+  version     = -1L,
+  log_save    = TRUE,
+  verbose     = TRUE
 ) {
 
   start_all <- Sys.time()
-
   workflow_results <- list()
 
   # -------------------------------------------------------------------
@@ -37,7 +60,9 @@ run_all_workflow <- function(
   update_start <- Sys.time()
   update_results <- run_ordered_update_diagnostics(
     measures = measures,
-    owner    = owner
+    owner    = owner,
+    log_save = log_save,
+    verbose  = verbose
   )
   workflow_results$update_results <- update_results
   update_elapsed <- as.numeric(Sys.time() - update_start)
@@ -74,7 +99,7 @@ run_all_workflow <- function(
 
   sim_start <- Sys.time()
   sim_results <- run_simulation_diagnostics(
-    measures = if (is.null(measures)) c("cpi", "pop", "pfw", "gdp", "pce") else measures
+    measures = measures   # NULL falls back to default inside 03_
   )
   workflow_results$simulation_results <- sim_results
   sim_elapsed <- as.numeric(Sys.time() - sim_start)
@@ -92,15 +117,21 @@ run_all_workflow <- function(
 
   diag_start <- Sys.time()
 
-  release_diag <- run_release_diagnostics(
-    measures    = measures,
-    old_release = old_release,
-    owner       = owner
-  )
-  workflow_results$release_diagnostics <- release_diag
+  if (is.null(old_release)) {
+    warning("old_release is NULL -- skipping run_release_diagnostics().")
+    workflow_results$release_diagnostics <- NULL
+  } else {
+    release_diag <- run_release_diagnostics(
+      measures    = measures,
+      old_release = old_release,
+      owner       = owner
+    )
+    workflow_results$release_diagnostics <- release_diag
+  }
 
   vintage_diag <- run_vintage_diagnostics(
-    measures = measures
+    measures = measures,
+    version  = version
   )
   workflow_results$vintage_diagnostics <- vintage_diag
 
@@ -115,11 +146,11 @@ run_all_workflow <- function(
   cat("FULL WORKFLOW COMPLETED\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat(sprintf("Step 1 (Update) elapsed:                  %.2f s\n", update_elapsed))
-  cat(sprintf("Step 2 (Log diagnostics) elapsed:         %.2f s\n", log_elapsed))
-  cat(sprintf("Step 3 (Simulations) elapsed:             %.2f s\n", sim_elapsed))
+  cat(sprintf("Step 1 (Update) elapsed:                      %.2f s\n", update_elapsed))
+  cat(sprintf("Step 2 (Log diagnostics) elapsed:             %.2f s\n", log_elapsed))
+  cat(sprintf("Step 3 (Simulations) elapsed:                 %.2f s\n", sim_elapsed))
   cat(sprintf("Step 4 (Release/Vintage diagnostics) elapsed: %.2f s\n", diag_elapsed))
-  cat(sprintf("TOTAL workflow elapsed:                   %.2f s\n\n", total_elapsed))
+  cat(sprintf("TOTAL workflow elapsed:                       %.2f s\n\n", total_elapsed))
 
   invisible(workflow_results)
 }

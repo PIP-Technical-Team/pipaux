@@ -23,12 +23,12 @@ run_ordered_update_diagnostics <- function(
   measures = NULL,
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
-  log_save = FALSE,
+  log_save = TRUE,
   verbose = TRUE
 ) {
 
   cat("\n", strrep("=", 70), "\n")
-  cat("ORDERED UPDATE ENGINE DIAGNOSTICS\n")
+  cat("AUX DATA UPDATE ENGINE DIAGNOSTICS\n")
   cat(strrep("=", 70), "\n\n")
 
   if (is.null(owner)) {

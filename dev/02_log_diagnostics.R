@@ -1,6 +1,25 @@
 # =====================================================================
 # LOG DIAGNOSTICS
 # =====================================================================
+# Purpose:
+#   - Validate that update_aux_measures() produces a well-formed log
+#   - Inspect log structure (class, columns, row count)
+#   - Confirm measures are correctly recorded in logmeta
+#   - Verify log persistence to the aux metadata repository
+#
+# Usage:
+#   source("dev/02_log_diagnostics.R")
+#   run_log_diagnostics()
+#
+#   # Optional subset of measures
+#   run_log_diagnostics(measures = c("cpi", "pfw"))
+#
+# Expected output:
+#   - Log class, row count, and column names
+#   - Measures found in log entries
+#   - Persistence check (saved log matches in-memory log)
+#   - Final pass/fail summary
+# =====================================================================
 
 if (!interactive()) {
   stop("Interactive use only.")
