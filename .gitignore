@@ -10,3 +10,4 @@ renv/
 docs
 
 /.quarto/
+inst/doc

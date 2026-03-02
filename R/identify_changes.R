@@ -167,7 +167,7 @@ get_aux_changes <- function(measure = "cpi",
 #' Compares auxiliary data files between the current and a previous release
 #' across one or more measures, by calling [get_aux_changes()] for each.
 #'
-#' @param measure Character vector or `NULL`. Specific measures to check
+#' @param measure Character vector of one or more measures, specifying measures to check
 #'   (e.g., `c("cpi", "gdp")`). If `NULL`, all measures available in the
 #'   GitHub organisation are included.
 #' @param owner Character. GitHub owner of the auxiliary data repositories.

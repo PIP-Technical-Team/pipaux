@@ -13,7 +13,7 @@ compare_aux_releases(
 )
 }
 \arguments{
-\item{measure}{Character vector or \code{NULL}. Specific measures to check
+\item{measure}{Character vector of one or more measures, specifying measures to check
 (e.g., \code{c("cpi", "gdp")}). If \code{NULL}, all measures available in the
 GitHub organisation are included.}
 

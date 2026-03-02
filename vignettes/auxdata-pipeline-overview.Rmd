@@ -19,130 +19,224 @@ library(pipaux)
 
 # Overview
 
-This vignette provides an external-user view of the auxiliary data (aux data) pipeline, detailing how measures are updated, logged, and compared across releases and versions. It is intended for those who want to run updates safely, understand dependencies, and inspect changes over time.
+This vignette provides a technical overview of the auxiliary data (aux data)
+pipeline, detailing how measures are updated, logged, and compared across
+releases and versions. It is intended for the PIP Technical Team to run
+updates safely and inspect changes over time.
 
 ## Objectives
 
 - Update auxiliary data measures in dependency-aware order.
 - Synchronize data between GitHub and Y-drive.
-- Inspect logs for timing, success, and errors information.
-- (Optionally simulate changes for testing purposes.)
-- Compare data across releases or versions (vintages).
+- Inspect logs for timing, success, and error information.
+- Optionally simulate changes for testing purposes.
+- Compare data across releases or within vintages.
 
+---
 
 # Key Functions
 
-| Function                | Purpose                                                                                  |
-|-------------------------|------------------------------------------------------------------------------------------|
-| `update_aux_measures()` | Updates all or selected auxiliary data measures in dependency order. Handles GitHub/Y-drive updates, logging, and dependency resolution. |
-| `aux_fun()`             | Internal function called by `update_aux_measures()`. Executes measure updates and manages dependencies. |
-| `check_status()`        | Determines whether updates are needed for a measure on GitHub or Y-drive.                || `get_fs_status()`       | Wrapper around `check_status()` to return update flags programmatically.           |
-| `compare_aux_releases()`| Compares files across releases to detect new rows, removed rows, or changed values.      |
-| `compare_aux_vintages()`| Compares files within the same release to detect version changes.                        |
+| Function                 | Purpose                                                                                        |
+|--------------------------|------------------------------------------------------------------------------------------------|
+| `update_aux_measures()`  | Updates all or selected auxiliary data measures in dependency order. Handles GitHub/Y-drive updates, logging, and dependency resolution. |
+| `aux_fun()`              | Called internally by `update_aux_measures()`. Executes updates for a single measure and manages its dependencies. |
+| `compare_aux_releases()` | Compares aux data files across two releases to detect added/removed rows or changed values.    |
+| `compare_aux_vintages()` | Compares aux data files within the same release across vintage versions.                       |
+| `simulate_changes()`     | Testing only. Simulates row drops and value modifications in an aux data file.                 |
+
+> `check_status()` and `get_fs_status()` are internal functions used by
+> `aux_fun()` to determine whether GitHub or Y-drive updates are needed.
+> They are not intended for direct use in routine workflows.
+
+---
 
 # Key Outputs
 
-- Updated GitHub release branches (`release_branch = <release>_<identity>`) for each measure.
-- Synchronized auxiliary data files saved to Y-drive (`getOption("pipaux.working_dir")`).
+- Updated GitHub release branches (`release_branch = <release>_<identity>`)
+  for each measure.
+- Synchronized auxiliary data files saved to the Y-drive
+  (`getOption("pipaux.working_dir")`).
 - Logs capturing:
     - Measure name
-    - Step type (update, check, error)
+    - Step type (`START`, `UPDATE_GH`, `UPDATE_Y`, `END`, `ERROR_*`)
     - Timing and status
     - Optional error messages
 
+---
+
 # 1️⃣ Step 1 – Set up the Working Release
 
-All operations in the pipeline are tied to a working release, which defines the release name and identity (e.g., TEST). Initialize at the start of each session:
+All pipeline operations are tied to a working release, which defines the
+release name and identity (e.g., `TEST`). Initialize at the start of each
+session:
 
 ```{r}
 pipfun::setup_working_release(
-  release  = "20260202", #for example
+  release  = "20260202",  # e.g. YYYYMMDD
   identity = "TEST"
 )
 ```
 
+---
+
 # 2️⃣ Step 2 – Update Auxiliary Data Measures
 
-You can update all measures or a subset, in dependency-aware order, using `update_aux_measures()`. Logs are automatically captured.
+Update all measures or a subset in dependency-aware order using
+`update_aux_measures()`. Logs are automatically captured.
 
 ```{r}
 # Update specific measures with logging enabled
 update_aux_measures(
-  measures = c("cpi", "metaregion"),
+  measures         = c("cpi", "metaregion"),
+  owner            = "RossanaTat",
+  log              = TRUE,
+  log_save         = FALSE,       # set TRUE to persist log to disk
+  halt_on_dep_fail = FALSE        # continue even if a dependency fails
+)
+
+# Update ALL available measures (dependency order is resolved automatically)
+update_aux_measures(
   owner    = "RossanaTat",
   log      = TRUE,
-  log_save = FALSE,        # Optional: save log to disk
-  halt_on_dep_fail = FALSE # Continue updates even if a dependency fails
+  log_save = TRUE
 )
 ```
 
 ## Notes on Updates
 
-- **Dependency handling:** Measures are updated in the correct order based on their dependencies.
-- **GitHub/Y-drive updates:**  
-    - `update_gh` flag controls GitHub branch updates.  
-    - `update_y` flag controls saving updated data to the Y-drive.
-- **Logging:**  
-    - Use and inspect `aux_log_last()`, which provides quick access to the most recent log. Or read log saved to disk with `pipfun::log_load()`
-- **Optional simulations:** For testing, you can simulate row/value changes, but this is not required for production updates.
+- **Dependency handling:** Measures are updated in the correct order based
+  on the shared dependency manifest. You do not need to manage ordering
+  manually.
+- **GitHub/Y-drive updates:** The `update_gh` and `update_y` flags are
+  determined automatically by `get_fs_status()` — no need to set them
+  directly. A GitHub update always implies a Y-drive update.
+- **`measures = NULL`:** Passing `NULL` (the default) updates all available
+  measures in dependency order.
+
+## Inspecting the Log
 
 ```{r}
-# Inspect log events
+# Option 1: retrieve the last log from the in-memory logging environment
+last_log <- aux_log_last()
+
+# Option 2: filter for update events only (using pipfun directly)
 pipfun::log_get("pipaux_update_log")[event == "update"]
-pipfun::log_get("pipaux_update_log")[event == "error"]
-```
 
-
-# 3️⃣ Step 3 – Simulate Changes (For TESTING ONLY)
-
-Simulations allow you to test pipeline behavior by creating hypothetical row/value changes in auxiliary files:
-
-```{r}
-# Simulate changes for testing
-simulate_changes(
-  measures = c("cpi", "metaregion"),
-  owner    = "RossanaTat",
-  drop = c(1, 2),
-  indices = c(1, 3)
+# Option 3: load a previously saved log from disk (requires log_save = TRUE)
+pipfun::log_load(
+  id    = "pipaux_update_log",
+  alias = get_from_auxenv("aux_meta_alias")
 )
 ```
 
-**Important:** Simulations are optional and primarily for testing pipeline logic. For actual releases, ignore this step.
+> `aux_log_last()` is an internal helper that returns the most recent log
+> object from the `.piplogenv` environment. `aux_log_last_name()` returns
+> its name as a character string.
+
+---
+
+# 3️⃣ Step 3 – Simulate Changes (Testing Only)
+
+`simulate_changes()` lets you introduce hypothetical row drops and value
+modifications into an aux data file. The modified file is saved to the
+Y-drive and can then be used to test the comparison functions in Step 4.
+
+```{r}
+# Simulate changes for a single measure
+simulate_changes(
+  measure = "cpi",    # scalar — one measure at a time
+  drop    = c(1, 2),  # row indices to drop
+  indices = c(1, 3),  # row indices to modify values
+  seed    = 123
+)
+```
+
+> **Note:** `measure` takes a single character string, not a vector.
+> Call `simulate_changes()` once per measure.
+
+**Important:** Simulations are only for testing pipeline logic. During a
+production workflow, skip this step entirely.
+
+---
 
 # 4️⃣ Step 4 – Compare Auxiliary Data
 
-Once updates are applied, you can inspect changes across releases or within vintages.
+Once updates (or simulations) are complete, inspect changes across releases
+or within vintages using the comparison functions.
 
 ## Compare Across Releases
 
+`compare_aux_releases()` compares the current working release against a
+prior release for one or more measures. If `old_release` is not specified,
+it automatically identifies the most recent prior release with the same
+identity.
+
 ```{r}
+# Compare a single measure (old_release auto-detected)
 changes_pop <- compare_aux_releases(
-  measure     = "pop"
+  measure = "pop"
 )
+
+# Compare multiple measures against a specific prior release
+changes <- compare_aux_releases(
+  measure     = c("cpi", "gdp"),
+  old_release = "20260101_TEST",
+  verbose     = TRUE
+)
+```
+
+The result is a named list (one element per measure). Each element contains:
+
+- `diff_values`: data table of value-level differences (`NULL` if none).
+- `diff_rows`: data table of added/removed rows (`NULL` if none).
+- `attr(result$<measure>, "key_cols")`: primary key columns used for
+  comparison (stored as an attribute, not a list element).
+
+```{r}
+# Access key columns used for a specific measure
+attr(changes$cpi, "key_cols")
 ```
 
 ## Compare Within the Same Release (Vintage Versions)
 
+`compare_aux_vintages()` compares the latest version of a file against an
+earlier vintage within the same release.
+
 ```{r}
-vintage_changes_cpi <- compare_aux_vintages(
-  measures = "cpi",
-  version  = -1  # Compare to previous version
+# Compare latest vs. immediately previous vintage (default: version = -1)
+vintage_changes <- compare_aux_vintages(
+  measures = c("cpi", "gdp"),
+  version  = -1
 )
 
+# Go two versions back
+vintage_changes_v2 <- compare_aux_vintages(
+  measures = "cpi",
+  version  = -2,
+  verbose  = TRUE
+)
 ```
 
-Each comparison provides:
+Each element of the result list contains:
 
-- `diff_values`: Changed values
-- `diff_rows`: Added/removed rows
-- `key_cols`: Key cols used for comparison
+- `diff_values`: data table of value-level differences (`NULL` if none).
+- `diff_rows`: data table of added/removed rows (`NULL` if none).
+- `key_cols`: character vector of primary key columns used for comparison.
 
-If no previous version exists, results will be `NULL`.
+If no previous version exists, all elements will be `NULL`.
+
+---
 
 # 5️⃣ Best Practices
 
-- Always run updates in dependency order, relying on `update_aux_measures()`.
-- Use logs to trace updates, timing, and errors. Use `{pipfun}` logging functions to inspect and save logs as needed, e.g., `pipfun::log_load()` and `pipfun::log_save()`, which are powered by `{stamp}`.
-- Skip simulations for actual releases.
-- Verify release/vintage comparisons to ensure data integrity.
-- Optionally use `get_fs_status()` to programmatically verify if updates are needed for a specific measure. 
+- Always run updates via `update_aux_measures()` — it handles dependency
+  order, status checks, and logging automatically.
+- Use `log_save = TRUE` when running updates for a formal release so that
+  the log is persisted to disk and retrievable later.
+- Use log inspection (`aux_log_last()`, `pipfun::log_get()`) to verify
+  that all measures updated successfully before proceeding.
+- Skip `simulate_changes()` for actual production releases.
+- Run `compare_aux_releases()` and `compare_aux_vintages()` after updates
+  to confirm expected changes and detect unintended modifications.
+- `compare_aux_releases()` requires a prior release with the same identity
+  to exist on the Y-drive. If none is found, it will error.
