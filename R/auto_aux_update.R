@@ -4,24 +4,26 @@
 #'   them
 #' @inheritParams pip_pop_update
 #' @export
-auto_aux_update <- function(measure = NULL,
-                            force   = FALSE,
-                            from    = c("gh", "file", "api"),
-                            maindir = gls$PIP_DATA_DIR,
-                            owner   = getOption("pipfun.ghowner"),
-                            branch  = c("DEV", "PROD", "main"),
-                            tag     = match.arg(branch)) {
-
+auto_aux_update <- function(
+  measure = NULL,
+  force = FALSE,
+  from = c("gh", "file", "api"),
+  maindir = gls$PIP_DATA_DIR,
+  owner = getOption("pipfun.ghowner"),
+  branch = c("DEV", "PROD", "main"),
+  tag = match.arg(branch)
+) {
   pipfun::check_pkg_active("pipaux")
 
-  branch    <- match.arg(branch)
-  from      <- match.arg(from)
+  branch <- match.arg(branch)
+  from <- match.arg(from)
   files_changed <- FALSE
 
   cli::cli_progress_step("Retrieving information from Github")
 
   isgls <- ls(sys.frame(), pattern = "^gls$") |>
-    length() > 0
+    length() >
+    0
 
   if (isFALSE(isgls)) {
     cli::cli_abort(
@@ -31,21 +33,20 @@ auto_aux_update <- function(measure = NULL,
     )
   }
 
-
   creds <- pipfun::get_github_creds()
-  gh_user   <- "https://raw.githubusercontent.com"
-  org_data  <- paste(gh_user,
-                     owner,
-                     "pipaux/metadata/Data/git_metadata.csv",
-                     sep = "/")  |>
+  gh_user <- "https://raw.githubusercontent.com"
+  org_data <- paste(
+    gh_user,
+    owner,
+    "pipaux/metadata/Data/git_metadata.csv",
+    sep = "/"
+  ) |>
     readr::read_csv(show_col_types = FALSE) |>
     setDT()
 
-
   dependencies <- read_dependencies(gh_user, owner)
   # Get all repositories under PIP-Technical-Team
-  all_repos <- gh::gh("GET /users/{username}/repos",
-                      username = owner) |>
+  all_repos <- gh::gh("GET /users/{username}/repos", username = owner) |>
     vapply("[[", "", "name") |>
     #Keep only those repos that start with "aux_"
     grep("^aux_", x = _, value = TRUE)
@@ -55,16 +56,18 @@ auto_aux_update <- function(measure = NULL,
   }
   # get hashs
   hash <-
-    purrr::map(all_repos,
-               .f = ~ {
-                 gh::gh(
-                   "GET /repos/{owner}/{repo}/commits/{branch}",
-                   owner = owner,
-                   repo  = .x,
-                   branch = branch
-                 )
-               }) |>
-    purrr::map_chr( ~ .x[["sha"]])
+    purrr::map(
+      all_repos,
+      .f = ~ {
+        gh::gh(
+          "GET /repos/{owner}/{repo}/commits/{branch}",
+          owner = owner,
+          repo = .x,
+          branch = branch
+        )
+      }
+    ) |>
+    purrr::map_chr(~ .x[["sha"]])
 
   cli::cli_progress_step("Comparing dependencies")
 
@@ -78,9 +81,8 @@ auto_aux_update <- function(measure = NULL,
 
   br <- branch
   old_data <- org_data |>
-    fsubset(branch == br)  |>
+    fsubset(branch == br) |>
     frename(hash_original = hash)
-
 
   repos_in_all <- all_data[, Repo] |>
     sort() |>
@@ -90,53 +92,60 @@ auto_aux_update <- function(measure = NULL,
     sort() |>
     fs::path_file()
 
-
-  diff_text <- list("Repos not available in git_metadata.csv",
-                    "Aux measures that do not have a corresponding repository")
-  diffs  <- list(setdiff(repos_in_all, repos_in_old), setdiff(repos_in_old, repos_in_all))
+  diff_text <- list(
+    "Repos not available in git_metadata.csv",
+    "Aux measures that do not have a corresponding repository"
+  )
+  diffs <- list(
+    setdiff(repos_in_all, repos_in_old),
+    setdiff(repos_in_old, repos_in_all)
+  )
   ldiffs <- sapply(diffs, length)
 
-  if (any(ldiffs != 0) ) {
+  if (any(ldiffs != 0)) {
     wdiffs <- which(ldiffs != 0)
     for (i in wdiffs) {
       cli::cli_alert_danger("{diff_text[[i]]}: {.field {diffs[[i]]}}")
     }
-    cli::cli_alert_info("Both the numbers above should be equal or else some
-                      debugging is required.", wrap = TRUE)
+    cli::cli_alert_info(
+      "Both the numbers above should be equal or else some
+                      debugging is required.",
+      wrap = TRUE
+    )
   }
 
-
   old_data <- old_data |>
-    join(all_data,
-         on = c("Repo", "branch"),
-         how = "inner")
+    join(all_data, on = c("Repo", "branch"), how = "inner")
 
   new_data <- old_data |>
-    fsubset(hash != hash_original |
-                    is.na(hash_original) |
-                    is.na(hash))
+    fsubset(
+      hash != hash_original |
+        is.na(hash_original) |
+        is.na(hash)
+    )
 
-
-  # Remove everything till the last underscore so
-  # PIP-Technical-Team/aux_ppp changes to ppp
-  aux_fns <- sub(".*_", "", new_data$Repo) |>
+  # Remove prefix to get repo name
+  # PIP-Technical-Team/aux_ppp changes to ppp and PIP-Technical-Team/aux_missing_countries becomes missing_countries
+  aux_fns <- sub(paste0(owner, "/aux_"), "", new_data$Repo) |>
     # Keep only those whose dependencies we know
     intersect(names(dependencies))
 
   # For each auxiliary data to be updated
-  cli::cli_alert_info("Updating data for {length(aux_fns)} file{?s}.
-                      {.field {aux_fns}}")
+  cli::cli_alert_info(
+    "Updating data for {length(aux_fns)} file{?s}.
+                      {.field {aux_fns}}"
+  )
 
   for (aux in aux_fns) {
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
     fn <- ""
-    # cli::cli_progress_message("updating {aux} -- dependency: {fn}")
+
     list_of_funcs <- paste0("pip_", c(dependencies[[aux]], aux))
 
     for (fn in list_of_funcs) {
       # cli::cli_progress_update()
-
+      cli::cli_inform("updating {aux} -- dependency {fn}")
       aux_file <- sub("pip_", "", fn)
 
       before_hash <- read_signature_file(aux_file, maindir, branch)
@@ -146,25 +155,24 @@ auto_aux_update <- function(measure = NULL,
       after_hash <- read_signature_file(aux_file, maindir, branch)
 
       if (before_hash != after_hash) {
-
         files_changed <- TRUE
 
         # find rows of of org to be modified
-        aux_row_org <-  org_data$Repo |>
+        aux_row_org <- org_data$Repo |>
           fs::path_file() |>
-          sub('aux_', '', x =  _) %in% aux_file &
+          sub('aux_', '', x = _) %in%
+          aux_file &
           org_data$branch == branch
 
         # find rows in new that will be copied to org
         aux_row_new <- new_data$Repo |>
           fs::path_file() |>
-          sub('aux_', '', x =  _) %in% aux_file &
+          sub('aux_', '', x = _) %in%
+          aux_file &
           new_data$branch == branch
 
         org_data$hash[aux_row_org] <- new_data$hash[aux_row_new]
-
       } # end of before_hash condition
-
     } # end of list_of_funcs loop
   } # end of aux_fns loop
 
@@ -179,22 +187,22 @@ auto_aux_update <- function(measure = NULL,
     # content - base64 of changed data
     out <- gh::gh(
       "GET /repos/{owner}/{repo}/contents/{file_path}",
-      owner     = "PIP-Technical-Team",
-      repo      = "pipaux",
+      owner = "PIP-Technical-Team",
+      repo = "pipaux",
       file_path = "Data/git_metadata.csv",
-      .params   = list(ref = "metadata")
+      .params = list(ref = "metadata")
     )
     # There is no way to update only the lines which has changed using Github API
     # We need to update the entire file every time. Refer - https://stackoverflow.com/a/21315234/3962914
     res <- gh::gh(
       "PUT /repos/{owner}/{repo}/contents/{path}",
-      owner   = "PIP-Technical-Team",
-      repo    = "pipaux",
-      path    = "Data/git_metadata.csv",
+      owner = "PIP-Technical-Team",
+      repo = "pipaux",
+      path = "Data/git_metadata.csv",
       .params = list(
-        branch  = "metadata",
+        branch = "metadata",
         message = "updating csv file",
-        sha     = out$sha,
+        sha = out$sha,
         content = convert_df_to_base64(org_data)
       ),
       .token = creds$password
@@ -203,7 +211,6 @@ auto_aux_update <- function(measure = NULL,
   cli::cli_h2("File updated status.")
   knitr::kable(last_updated_time)
 }
-
 
 
 return_value <- function(aux, dependencies) {
@@ -229,9 +236,7 @@ return_value <- function(aux, dependencies) {
 #' }
 convert_df_to_base64 <- function(df) {
   df |>
-    write.table(quote = FALSE,
-                row.names = FALSE,
-                sep = ",") |>
+    write.table(quote = FALSE, row.names = FALSE, sep = ",") |>
     capture.output() |>
     paste(collapse = "\n") |>
     charToRaw() |>
@@ -241,38 +246,45 @@ convert_df_to_base64 <- function(df) {
 aux_file_last_updated <- function(data_dir, aux_files, branch) {
   filenames <-
     glue::glue("{data_dir}/_aux/{branch}/{aux_files}/{aux_files}.qs")
-  data <- sapply(filenames, function(x)
-    qs::qattributes(x)$datetime)
+  data <- sapply(filenames, function(x) {
+    qs::qattributes(x)$datetime
+  })
   data.frame(
     filename = basename(names(data)),
     time_last_update = as.POSIXct(data, format = "%Y%m%d%H%M%S"),
     row.names = NULL
   ) |>
     dplyr::arrange(desc(time_last_update))
-
 }
 
 read_dependencies <- function(gh_user, owner) {
-  dependencies <- paste(gh_user,
-                        owner,
-                        "pipaux/metadata/Data/new_dependency.yml",
-                        sep = "/") |>
+  dependencies <- paste(
+    gh_user,
+    owner,
+    "pipaux/metadata/Data/new_dependency.yml",
+    sep = "/"
+  ) |>
     yaml::read_yaml()
 
-  sapply(dependencies, \(x) if (length(x))
-    strsplit(x, ",\\s+")[[1]]
-    else
-      character())
+  sapply(dependencies, \(x) {
+    if (length(x)) {
+      strsplit(x, ",\\s+")[[1]]
+    } else {
+      character()
+    }
+  })
 }
 
 read_signature_file <- function(aux_file, maindir, branch) {
   # Construct the path to data signature aux file
   data_signature_path <-
-    fs::path(maindir,
-             "_aux",
-             branch,
-             aux_file,
-             glue::glue("{aux_file}_datasignature.txt"))
+    fs::path(
+      maindir,
+      "_aux",
+      branch,
+      aux_file,
+      glue::glue("{aux_file}_datasignature.txt")
+    )
   signature_hash <- readr::read_lines(data_signature_path)
   return(signature_hash)
 }
