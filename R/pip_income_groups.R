@@ -31,12 +31,12 @@ pip_income_groups <- function(action       = c("update", "load"),
     ) |>
       get_vars(c('code',
                  'year_data',
-                 'incgroup_historical',
-                 'fcv_historical',
-                 'region_SSA')) |>
+                 'incgroup',
+                 'fcv',
+                 'regionssa')) |>
       # create variables for future development
       ftransform(year         = year_data,
-                 income_group = incgroup_historical)
+                 income_group = incgroup)
 
     ig[,
        income_group_code := fcase(income_group == "High income", "HIC",
@@ -45,7 +45,7 @@ pip_income_groups <- function(action       = c("update", "load"),
                                   income_group == "Low income", "LIC",
                                   default = "")]
     setnames(ig,
-             c("code", "region_SSA"),
+             c("code", "regionssa"),
              c("country_code", "ssa_subregion_code"))
 
 

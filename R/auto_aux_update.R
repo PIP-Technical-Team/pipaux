@@ -116,10 +116,9 @@ auto_aux_update <- function(measure = NULL,
                     is.na(hash_original) |
                     is.na(hash))
 
-
-  # Remove everything till the last underscore so
-  # PIP-Technical-Team/aux_ppp changes to ppp
-  aux_fns <- sub(".*_", "", new_data$Repo) |>
+  # Remove prefix to get repo name
+  # PIP-Technical-Team/aux_ppp changes to ppp and PIP-Technical-Team/aux_missing_countries becomes missing_countries
+  aux_fns <- sub("PIP-Technical-Team/aux_", "", new_data$Repo) |>
     # Keep only those whose dependencies we know
     intersect(names(dependencies))
 
@@ -131,12 +130,12 @@ auto_aux_update <- function(measure = NULL,
     # Find the corresponding functions to be run
     # Add pip_ suffix so that it becomes function name
     fn <- ""
-    # cli::cli_progress_message("updating {aux} -- dependency: {fn}")
+
     list_of_funcs <- paste0("pip_", c(dependencies[[aux]], aux))
 
     for (fn in list_of_funcs) {
       # cli::cli_progress_update()
-
+      cli::cli_inform("updating {aux} -- dependency {fn}")
       aux_file <- sub("pip_", "", fn)
 
       before_hash <- read_signature_file(aux_file, maindir, branch)
@@ -146,7 +145,7 @@ auto_aux_update <- function(measure = NULL,
       after_hash <- read_signature_file(aux_file, maindir, branch)
 
       if (before_hash != after_hash) {
-
+        #browser()
         files_changed <- TRUE
 
         # find rows of of org to be modified
