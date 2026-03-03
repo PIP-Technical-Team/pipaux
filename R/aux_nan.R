@@ -4,19 +4,15 @@
 #'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
-#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
-#'   and "gh" are synonymous
 #' @export
 aux_nan <- function(action          = c("update", "load"),
-                    force           = FALSE,
-                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL) {
 
   measure    <- "nan"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -31,39 +27,32 @@ aux_nan <- function(action          = c("update", "load"),
     # load nowcast growth rates
     nan <- pipfun::load_from_gh(
       measure = "nan",
-      owner  = owner,
+      owner  = "PIP-Technical-Team",
       branch = branch,
       filename = "nan.csv"
     )
+
+    gh <- attributes(nan)$gh
+
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
-    # ----- function raw sha ----------------------
+    key_cols <- c("country_code", "year", "gdp_data_level")
+    setattr(nan, "aux_key", key_cols)
 
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-
-    setattr(nan,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = nan,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = nan,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_nan,
+      code_label = "aux_nan"
     )
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
-} # end of pip_gdp
+}

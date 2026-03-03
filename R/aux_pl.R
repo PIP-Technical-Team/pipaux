@@ -7,9 +7,7 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_pl <- function(action = c("update", "load"),
-                   force = FALSE,
                    owner   = getOption("pipfun.ghowner"),
-                   maindir = getOption("pipaux.working_dir"),
                    tag     = NULL,
                    detail  = getOption("pipaux.detail.raw")
                    ) {
@@ -17,7 +15,7 @@ aux_pl <- function(action = c("update", "load"),
   measure <- "pl"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -39,6 +37,8 @@ aux_pl <- function(action = c("update", "load"),
       ext    = "yaml"
     )
 
+    gh <- lapply(dl, function(x) attributes(x)$gh)
+
     dt <- purrr::map_df(dl,aux_pl_clean)
 
   # Save
@@ -49,33 +49,25 @@ aux_pl <- function(action = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-  # ----- function raw sha ----------------------
 
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
+    key_cols <- c("poverty_line")
+    setattr(dt, "aux_key", key_cols)
 
-
-  setattr(dt,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = dt,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = dt,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_pl,
+      code_label = "aux_pl"
     )
+
 
     return(invisible(saved))
 
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
 
     return(df)
   }
@@ -110,12 +102,12 @@ aux_pl_clean <- function(l) {
   df[,
      c("is_default", "is_visible", "name", "ppp_year")
      := {
-       id   <- fifelse(name == l$default, TRUE, FALSE)
-
-       iv   <- fifelse(name %in% l$visible, TRUE, FALSE)
+       id <- fifelse(name == l$default, TRUE, FALSE)
 
        n <- fifelse(n_decimals(poverty_line) == 1, paste0(name, "0"), name)
        n <- fifelse(n_decimals(poverty_line) == 0, paste0(n, ".00"), n)
+
+       iv <- fifelse(n %in% l$visible, TRUE, FALSE)
 
        list(id, iv, n, l$ppp_year)
      }]

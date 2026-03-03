@@ -14,16 +14,14 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_weo <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "weo"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -53,49 +51,39 @@ aux_weo <- function(action  = c("update", "load"),
     weo_validate_raw(weo = dt, detail = detail)
 
     dt <- aux_weo_clean(dt,
-                        maindir = maindir,
                         branch = branch)
 
     # Save dataset
+
     setattr(dt, "aux_name", "weo")
-    setattr(dt,
-            "aux_key",
-            c("country_code", "year"))
+    key_cols <- c("country_code", "year")
+    setattr(dt, "aux_key", key_cols)
 
     setattr(dt, "gh", gh)
 
     # validate weo clean data
     weo_validate_output(weo = dt, detail = detail)
 
-    # ----- function raw sha -----------------------------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-    setattr(dt,
-            "raw_sha_fun",
-            raw_sha_fun)
-
     if (branch == "main") {
       branch <- ""
     }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
-  cat('\nDir : ', msrdir)
-    saved <- pipfun::pip_sign_save(
-      x       = dt,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+
+    saved <- pip_aux_save(
+      x        = dt,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_weo,
+      code_label = "aux_weo"
     )
+
     return(invisible(saved))
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -103,27 +91,12 @@ aux_weo <- function(action  = c("update", "load"),
 #' Clean WEO data
 #'
 #' @param dt database with weo raw data
-#' @param maindir directory where auxiliary data is stored (to load pop)
 #' @param branch character: branch to be loaded
 #'
 #' @return data.table
 #' @export
 aux_weo_clean <- function(dt,
-                          maindir = getOption("pipaux.working_dir"),
                           branch  = NULL) {
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-
-  }
-
-
-
 
   #   _________________________________________
   #   Computations                        ####
@@ -203,9 +176,7 @@ aux_weo_clean <- function(dt,
   # ---- Merge with population ----
 
 
-  pop <- load_aux(measure = "pop",
-                  maindir = maindir,
-                  branch = branch)
+  pop <- pipload::load_aux_data(measure = "pop")
 
   setDT(pop)
   pop <- pop[reporting_level == "national", ] #pop_data_level = reporting_level
@@ -223,15 +194,6 @@ aux_weo_clean <- function(dt,
   dt[, weo_gdp := chain_val(ori_var = weo_gdp_ppp2017,
                             rep_var = weo_gdp_lcu),
      by = country_code]
-  #
-  # dt <- chain_values(
-  #   dt,
-  #   base_var        = "weo_gdp_ppp2017",
-  #   replacement_var = "weo_gdp_lcu",
-  #   new_name        = "weo_gdp",
-  #   by              = "country_code"
-  # )
-
 
   # --- Sign and save ----
 

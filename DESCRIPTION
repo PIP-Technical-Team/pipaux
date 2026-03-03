@@ -30,15 +30,17 @@ Suggests:
     rmarkdown,
     covr,
     dm,
-    config,
-    myrror
+    myrror,
+    gh,
+    httr,
+    wbstats
 Imports: 
+    stamp,
     haven,
     digest,
     fst,
     readr,
     data.table,
-    wbstats,
     purrr,
     fs,
     magrittr,
@@ -49,15 +51,12 @@ Imports:
     yaml,
     qs,
     glue,
-    gh,
-    httr,
     pipfun (>=  0.0.2),
     lifecycle,
     collapse,
     joyn,
     data.validator,
     assertr,
-    blastula,
     rlang
 VignetteBuilder: knitr
 Remotes:  

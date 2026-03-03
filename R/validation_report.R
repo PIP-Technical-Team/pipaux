@@ -56,7 +56,6 @@ clean_validation_report <- function(){
 
 #' Send an email that contains auxiliary data validation report
 #'
-#' @import blastula
 #'
 #' @export
 send_report <- function(){

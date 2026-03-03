@@ -5,26 +5,18 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
-#' @param maindir character: Main directory of project.
-#' @param force logical: If TRUE data will be overwritten.
-#' @param branch GitHub branch to use. By default, this is the release branch set in your R session.
-#'   To ensure correct behavior, call `pipfun::setup_working_release()` once per session, followed by
-#'   `pipfun::get_wrk_release()` to retrieve the active release. These steps ensure the function uses the
-#'   correct release branch (e.g., `"release_2024Q1"`). Alternatively, you can explicitly specify other
-#'   branches among `"DEV"`, `"PROD"`, or `"main"` if needed
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 aux_pfw <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    ...) {
   measure <- "pfw"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -35,20 +27,16 @@ aux_pfw <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pfw_update(maindir = maindir,
-                   force   = force,
-                   owner   = owner,
+    aux_pfw_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                  ...)
 
   } else {
 
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -57,12 +45,9 @@ aux_pfw <- function(action  = c("update", "load"),
 #' Clean PFW data from Datalibweb to meet PIP protocols.
 #'
 #' @param y dataset with PPP data from `aux_pfw_update()`.
-#' @inheritParams load_aux
 #'
 #' @keywords internal
-aux_pfw_clean <- function(y,
-                          maindir = getOption("pipaux.working_dir"),
-                          branch) {
+aux_pfw_clean <- function(y) {
 
   #branch <- match.arg(branch)
 
@@ -77,10 +62,7 @@ aux_pfw_clean <- function(y,
 
   # change variable names
   old_var <-
-    c(
-      "region",
-      "reg_pcn",
-      "code",
+    c("code",
       "ref_year",
       "survname",
       "comparability",
@@ -89,16 +71,14 @@ aux_pfw_clean <- function(y,
     )
 
   new_var <-
-    c(
-      "wb_region_code",
-      "pcn_region_code",
-      "country_code",
+    c("country_code",
       "survey_year",
       "survey_acronym",
       "survey_comparability",
       "welfare_type",
       "reporting_year"
     )
+
 
   setnames(x,
            old = old_var,
@@ -161,9 +141,8 @@ aux_pfw_clean <- function(y,
 
   # Load countries and filter
 
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
+
   x <- x[country_code %in% cl$country_code]
 
   x <- unique(x) # remove duplicates
@@ -175,23 +154,11 @@ aux_pfw_clean <- function(y,
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
-                           detail  = getOption("pipaux.detail.raw")) {
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-
-  }
+                           detail  = getOption("pipaux.detail.raw"),
+                          ...) {
 
   measure <- "pfw"
   tag <- branch
@@ -201,13 +168,13 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
                               owner = owner,
                               branch = branch,
                               ext = "dta")
+  # Collect gh attribute from loaded pfw
+  gh <- attributes(pfw)$gh
   # validate pfw raw data
   pfw_validate_raw(pfw = pfw, detail = detail)
 
   # Clean data
-  pfw <- aux_pfw_clean(pfw,
-                       maindir = maindir,
-                       branch = branch)
+  pfw <- aux_pfw_clean(pfw)
 
   # validate pfw raw data
   pfw_validate_output(pfw    = pfw,
@@ -217,41 +184,36 @@ aux_pfw_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
   setattr(pfw, "aux_name", "pfw")
 
-  setattr(pfw,
-          "raw_sha_fun",
-          raw_sha_fun)
+  key_cols <-  c("country_code", "surveyid_year", "welfare_type")
 
   setattr(pfw,
           "aux_key",
-          c("country_code", "surveyid_year", "welfare_type"))
+         key_cols)
 
-  saved <- pipfun::pip_sign_save(
-    x       = pfw,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  saved <- pip_aux_save(
+    x        = pfw,
+    id       = measure,
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_pfw_update,
+    code_label = "aux_pfw_update",
+    ...
   )
+
   return(invisible(saved))
 }
 
 #' Generate a dataset that contains pfw keys
+#' @param maindir main directory of the project, default value is set to the option "pipaux.working_dir"
 #'
 #' @return data.table
 #' @export
 #'
 aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
 
-  pfw_temp <- load_aux("pfw",
-                       maindir = getOption("pipaux.working_dir"))
+  pfw_temp <- pipload::load_aux_data(measure = "pfw")
 
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
@@ -259,8 +221,7 @@ aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
                                   cpi_domain_var)]
 
 
-  cpi_temp <- load_aux("cpi",
-                       maindir = getOption("pipaux.working_dir"))
+  cpi_temp <- pipload::load_aux_data(measure = "cpi")
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &
@@ -295,7 +256,8 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
   validate(pfw, name = "PFW raw data validation") |>
     validate_if(is.character(region),
                 description = "`region` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
+    validate_cols(in_set(c("Sub-Saharan Africa", "Europe & Central Asia", "Middle East, North Africa, Afghanistan & Pakistan",
+                           "Middle East, North Africa, Afghanistan & Pakistan", "Latin America & Caribbean", "East Asia & Pacific", "South Asia", "North America")),
                   region, description = "`region` values within range") |>
     validate_if(is.character(code),
                 description = "`code` should be character") |>
@@ -338,8 +300,8 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
     # validate_cols(in_set(c("national", "partial", "rural", "urban")),
     #               survey_coverage,
     #               description = "`survey_coverage` values within range") |>
-    # validate_cols(in_set(c("N", "R", "U")),
-    #               survey_coverage, description = "`survey_coverage` values within range") |>
+    validate_cols(in_set(c("N", "U", "R")),
+                  survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(datatype),
                 description = "`datatype` should be character") |>
     validate_cols(in_set(c("C", "I", "c", "i")),
@@ -487,16 +449,12 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
   report <- data_validation_report()
 
   validate(pfw, name = "PFW output data validation") |>
-    validate_if(is.character(wb_region_code),
-                description = "`wb_region_code` should be character") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
-                  wb_region_code, description = "`wb_region_code` values within range") |>
+    validate_cols(in_set(c( "SSF", "ECS", "MEA", "LCN", "EAS", "SAS", "NAC")),
+                  region_code, description = "`wb_region_code` values within range") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
-    validate_if(is.character(pcn_region_code),
-                description = "`pcn_region_code` should be character") |>
     validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
-                  pcn_region_code, description = "`pcn_region_code` values within range") |>
+                  reg_pcn, description = "`reg_pcn` values within range") |>
     validate_if(is.character(ctryname),
                 description = "`ctryname` should be character") |>
     validate_if(is.numeric(year),

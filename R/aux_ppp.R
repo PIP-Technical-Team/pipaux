@@ -3,19 +3,18 @@
 #' Load or update PPP data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @param ppp_defaults logical: whether to set default PPP
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),
-                    maindir = getOption("pipaux.working_dir"),
                     owner   = getOption("pipfun.ghowner"),
-                    force   = FALSE,
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
                     ppp_defaults = TRUE) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -51,20 +50,14 @@ aux_ppp <- function(action = c("update", "load"),
   #   ____________________________________________________________________________
   #   Computations                                                            ####
   if (action == "update") {
-    aux_ppp_update(maindir = maindir,
-                   force   = force,
-                   owner   = owner,
+
+    aux_ppp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
   }
   else {
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch,
-      ppp_defaults = ppp_defaults
-    )
+    pipload::load_aux_data(measure = measure)
   }
 
 
@@ -168,23 +161,12 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 #'
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force   = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw")) {
 
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
-
   tag <- branch
-
 
   #   ____________________________________________________________________________
   #   set up                                                                  ####
@@ -217,9 +199,7 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   ppp <- ppp[country_code %in% cl$country_code]
 
@@ -259,29 +239,15 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
     branch <- ""
   }
 
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(ppp,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-
   # Set other attributes ________________ #
 
   # Aux measure name
   setattr(ppp, "aux_name", "ppp")
 
-  # Keys identifying the data
-  keys <-  c("country_code", "reporting_level", "ppp_year")
 
-  setattr(ppp,
-          "aux_key",
-          keys)
+  # Keys identifying the data
+  key_cols <- c("country_code", "reporting_level", "ppp_year", "adaptation_version", "release_version")
+  setattr(ppp, "aux_key", key_cols)
 
   setorderv(ppp,
            c("country_code", "reporting_level", "ppp_year"))
@@ -292,16 +258,19 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
   # _____________________ #####
   # Saving ####
 
-  saved <- pipfun::pip_sign_save(
-    x       = ppp,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+
+  saved <-  pip_aux_save(
+    x        = ppp,
+    id       = measure,
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_ppp_update,
+    code_label = "aux_ppp_update"
   )
 
 
-  #   ____________________________________________________________________________
-  #   PPP vintages data                                                     ####
+  # #   ____________________________________________________________________________
+  # #   PPP vintages data                                                     ####
 
   vars        <- c("ppp_year", "release_version", "adaptation_version")
   ppp_vintage <- unique(ppp[, ..vars], by = vars)
@@ -312,12 +281,15 @@ aux_ppp_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
 
-  # Save
-  pipfun::pip_sign_save(
-    x = ppp_vintage,
-    measure = "ppp_vintage",
-    msrdir = msrdir,
-    force = force
+  # # Save
+
+  # # Define key columns for ppp_vintage
+  key_cols_vintage <- c("ppp_year", "ppp_rv", "ppp_av")
+  setattr(ppp_vintage, "aux_key", key_cols_vintage)
+  pip_aux_save(
+    x        = ppp_vintage,
+    id       = "ppp_vintage",
+    pk       = key_cols_vintage
   )
 
   return(invisible(saved))
@@ -440,8 +412,8 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
                 description = "`Seriesname` should be character") |>
     validate_if(is.character(note_may192020),
                 description = "`note_may192020` should be character") |>
-    validate_if(is.character(ppp_2017_v1_v2_note),
-                description = "`ppp_2017_v1_v2_note` should be character") |>
+    # validate_if(is.character(note_ppp_2017_v1_v2),
+    #             description = "`note_ppp_2017_v1_v2` should be character") |>
     validate_cols(not_na, code, CoverageType, datalevel,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(code, CoverageType, datalevel),

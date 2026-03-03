@@ -408,11 +408,13 @@ get_gh <- function(owner,
 
 }
 
-#' SAve auxiliary file to Github Repo
+#' Save auxiliary file to Github Repo
 #'
 #' Sometimes we need to save auxiliary files to Github repo.
 #' This function allows for this.
-#'
+#' @param measure character: Name of the measure, e.g. "wdi". This will be used to construct the repo name and the filename.
+#' @param tag character: Tag. Defaults to the branch name.
+#' @param ... Additional arguments to be passed to `pipfun::save_to_gh()`
 #' @inheritParams pipfun::save_to_gh
 #' @export
 #' @return NULL
@@ -424,8 +426,7 @@ save_aux_to_gh <- function(df,
                        tag       = branch,
                        filename  = measure,
                        ext       = "csv",
-                         ...
-                         ) {
+                       ...) {
 
   pipfun::save_to_gh(df = df,
                      repo = repo,
@@ -435,6 +436,55 @@ save_aux_to_gh <- function(df,
                      filename = filename,
                      ext = ext,
                      ...)
+}
+
+#' Extract value from `.pipaux` environment
+#'
+#' @param key Value to be extracted from `.pipaux` environment
+#'
+#' @returns Value for the key or NULL if key is not found
+#'
+get_from_auxenv <- \(key) {
+  rlang::env_get(.pipaux, key, default = NULL) # Returns NULL if key doesn't exist
+}
+
+#' Save data to auxiliary data path
+#'
+#' @param x Data to be saved
+#' @param id Name of the file
+#' @param ... Additional arguments to be passed to `pipload::pip_write()`
+#'
+#' @returns Fully qualified name of the new file, invisibly
+#'
+pip_aux_save <- \(x,
+                  id,
+                  ...) {
+
+  # alias to pass into pipload::pip_write
+  alias <- get_from_auxenv("aux_alias")
+
+  # Save to the aux_data_path using pipload::pip_write
+  pipload::pip_write(
+    x        = x,
+    id = id,
+    alias = alias,
+    ...
+  )
+
+  invisible(TRUE)
+}
+
+read_dependencies <- function(gh_user, owner) {
+  dependencies <- paste(gh_user,
+                        owner,
+                        "pipaux/metadata/Data/new_dependency.yml",
+                        sep = "/") |>
+    yaml::read_yaml()
+
+  sapply(dependencies, \(x) if (length(x))
+    strsplit(x, ",\\s+")[[1]]
+    else
+      character())
 }
 
 
@@ -467,7 +517,84 @@ NULL
 NULL
 
 
+#' Hash code using stamp's hashing logic
+#'
+#' Internal wrapper around stamp:::st_hash_code()
+#'
+#' @param x A function, expression, or character vector
+#' @keywords internal
+hash_code <- function(x) {
+  stamp:::st_hash_code(x)
+}
 
 
+#' Initialize auxiliary data update log
+#'
+#' Creates a new log for tracking auxiliary data updates within a cascade.
+#' If a log already exists in the current cascade, reuses the existing log
+#' instead of creating a new one.
+#'
+#' @param overwrite logical: If `TRUE` (default), overwrites existing log file.
+#'   If `FALSE`, appends to existing log.
+#'
+#' @return character: Name of the initialized log
+#'
+#' @keywords internal
+init_aux_log <- function(overwrite = TRUE) {
 
+  # If already inside a cascade, reuse existing log
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    return(.piplogenv$active_aux_log)
+  }
+
+  # Unique name per cascade
+  # log_name <- paste0(
+  #   "pipaux_update_log_",
+  #   format(Sys.time(), "%Y%m%d_%H%M%S")
+  # )
+  log_name <- "pipaux_update_log"  
+  pipfun::log_init(log_name, overwrite = overwrite)
+
+  .piplogenv$active_aux_log <- log_name
+  .piplogenv$last_aux_log   <- log_name
+
+  log_name
+}
+
+#' Finalize auxiliary data update log
+#'
+#' Cleans up the active log reference from the logging environment.
+#' Called at the end of an auxiliary data update cascade to release
+#' the active log.
+#'
+#' @return NULL (invisibly)
+#'
+#' @keywords internal
+finalize_aux_log <- function() {
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    rlang::env_unbind(.piplogenv, "active_aux_log")
+  }
+}
+
+#' Retrieve the last auxiliary data update log
+#'
+#' Returns the log object from the most recent auxiliary data update cascade.
+#'
+#' @return A log object containing entries from the last update cascade
+#'
+#' @keywords internal
+aux_log_last <- function() {
+  pipfun::log_get(.piplogenv$last_aux_log)
+}
+
+#' Retrieve the name of the last auxiliary data update log
+#'
+#' Returns the name of the log file from the most recent auxiliary data update cascade.
+#'
+#' @return A character string containing the name of the last update log
+#'
+#' @keywords internal
+aux_log_last_name <- function() {
+  return(.piplogenv$last_aux_log)
+}
 

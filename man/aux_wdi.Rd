@@ -6,8 +6,6 @@
 \usage{
 aux_wdi(
   action = c("update", "load"),
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   detail = getOption("pipaux.detail.raw")
@@ -17,19 +15,12 @@ aux_wdi(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
-
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 }
 \description{
 Update or load wdi data.

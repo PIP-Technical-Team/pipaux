@@ -5,8 +5,6 @@
 \title{Update POP}
 \usage{
 aux_pop_update(
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = branch,
@@ -14,18 +12,14 @@ aux_pop_update(
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
+
+\item{branch}{character: branch name to load data from GH. If NULL, it will be set to the current release branch.}
 
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
-
-\item{from}{character: Source for population data.}
 }
 \description{
 Update POP

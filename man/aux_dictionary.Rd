@@ -6,9 +6,7 @@
 \usage{
 aux_dictionary(
   action = c("update", "load"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   tag = NULL
 )
 }
@@ -16,12 +14,8 @@ aux_dictionary(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

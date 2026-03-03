@@ -2,11 +2,10 @@
 % Please edit documentation in R/identify_changes.R
 \name{compare_aux_releases}
 \alias{compare_aux_releases}
-\title{Inventory of changes in auxiliary data across measures}
+\title{Compare auxiliary data across measures between two releases}
 \usage{
 compare_aux_releases(
   measure = NULL,
-  maindir = getOption("pipaux.working_dir"),
   owner = "PIP-Technical-Team",
   old_release = NULL,
   verbose = FALSE,
@@ -14,27 +13,35 @@ compare_aux_releases(
 )
 }
 \arguments{
-\item{measure}{Optional character vector. Specific measures to check (e.g., \code{c("cpi", "gdp")}). If \code{NULL}, all available measures are included.}
+\item{measure}{Character vector of one or more measures, specifying measures to check
+(e.g., \code{c("cpi", "gdp")}). If \code{NULL}, all measures available in the
+GitHub organisation are included.}
 
-\item{maindir}{Path to the local auxiliary data directory. Defaults to \code{getOption("pipaux.working_dir")}.}
+\item{owner}{Character. GitHub owner of the auxiliary data repositories.
+Defaults to \code{"PIP-Technical-Team"}.}
 
-\item{owner}{GitHub owner of aux data repos. Defaults to \code{"PIP-Technical-Team"}.}
+\item{old_release}{Character. The identifier of the previous release to
+compare against (e.g., \code{"20240101_PROD"}). If \code{NULL}, automatically uses
+the last available release matching the same identity as the current
+working release.}
 
-\item{old_release}{Character. The identifier of the previous release to compare against (e.g., \code{"20240101_PROD"}).
-If NULL, automatically take last available release of same identity as the current working release}
+\item{verbose}{Logical. If \code{TRUE}, displays messages in the console.
+Default is \code{TRUE}.}
 
-\item{verbose}{Logical. If \code{TRUE}, displays messages in the console.}
-
-\item{...}{Additional arguments passed to \code{get_aux_changes()}.}
+\item{...}{Additional arguments passed to \code{\link[=get_aux_changes]{get_aux_changes()}}.}
 }
 \value{
-Named list of data frames with value differences for each measure. Measures with no differences or errors return \code{NULL}.
+A named list with one element per measure. Each element is the
+output of \code{\link[=get_aux_changes]{get_aux_changes()}} — a list with \code{diff_values} and \code{diff_rows}
+data tables — or \code{NULL} for measures with no differences or load errors.
 }
 \description{
-Compares auxiliary data files between the current and a previous release across one or more measures.
+Compares auxiliary data files between the current and a previous release
+across one or more measures, by calling \code{\link[=get_aux_changes]{get_aux_changes()}} for each.
 }
 \examples{
 \dontrun{
-inventory_aux_changes(old_release = "20240101_PROD", verbose = TRUE)
+compare_aux_releases(old_release = "20240101_PROD", verbose = TRUE)
+compare_aux_releases(measure = c("cpi", "gdp"), old_release = "20240101_PROD")
 }
 }

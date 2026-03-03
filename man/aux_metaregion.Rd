@@ -6,11 +6,8 @@
 \usage{
 aux_metaregion(
   action = c("update", "load"),
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
-  branch = NULL,
-  tag = match.arg(branch)
+  tag = NULL
 )
 }
 \arguments{
@@ -18,15 +15,8 @@ aux_metaregion(
 "update" data will be updated on the system. If "load" data is loaded in
 memory.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
-
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
-will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 }

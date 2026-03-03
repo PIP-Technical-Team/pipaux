@@ -6,8 +6,6 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_regions <- function(action  = c("update", "load"),
-                        force   = FALSE,
-                        maindir = getOption("pipaux.working_dir"),
                         owner   = getOption("pipfun.ghowner"),
                         tag     = NULL
                         ) {
@@ -16,7 +14,7 @@ aux_regions <- function(action  = c("update", "load"),
   measure <- "regions"
   action  <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -31,9 +29,7 @@ aux_regions <- function(action  = c("update", "load"),
     ##  ............................................................................
     ##  Load country_list table                                                 ####
 
-    cl <- load_aux(maindir = maindir,
-                   measure = "country_list",
-                   branch  = branch)
+    cl <- pipload::load_aux_data(measure = "country_list")
 
     setnames(cl, "country_code", "id") # to make it work w/o problems
 
@@ -77,7 +73,8 @@ aux_regions <- function(action  = c("update", "load"),
 
     byv <- c("region", "region_code", "grouping_type")
     dt <- unique(dt[, ..byv], by = byv)
-    dt <- dt[grouping_type != "pcn_region" & region_code != ""]
+    #dt <- dt[grouping_type != "pcn_region" & region_code != ""]
+    dt <- dt[grouping_type != "region" & region_code != ""]
     setorder(dt, grouping_type, region_code)
 
 
@@ -88,42 +85,31 @@ aux_regions <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
 
   setattr(dt, "aux_name", "regions")
-  setattr(dt,
-          "aux_key",
-          c("region_code"))
+  key_cols <- c("region_code")
+  setattr(dt, "aux_key", key_cols)
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-   setattr(dt,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = dt,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = dt,
+      id       = measure,
+      pk       = key_cols,
+      code     = aux_regions,
+      code_label = "aux_regions"
     )
+
     return(invisible(saved))
 
 
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 
-} # end of function
+}
 
 
 

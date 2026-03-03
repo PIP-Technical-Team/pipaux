@@ -5,12 +5,8 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
-#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
-#'   and "gh" are synonymous
 #' @export
 aux_wdi <- function(action          = c("update", "load"),
-                    force           = FALSE,
-                    maindir         = getOption("pipaux.working_dir"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
                     detail          = getOption("pipaux.detail.raw")) {
@@ -18,7 +14,7 @@ aux_wdi <- function(action          = c("update", "load"),
   measure    <- "wdi"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -30,49 +26,37 @@ aux_wdi <- function(action          = c("update", "load"),
 
 
   if (action == "update") {
-    aux_wdi_update(maindir = maindir,
-                   force   = force,
-                   owner   = owner,
+    aux_wdi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
-} # end of pip_wdi
+}
+
 
 #' Update National accounts data from WDI
 #'
 #' GDP and HFCE data from WDI.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @param branch character, branch in which to find the data, default is NULL, which means it will be determined based on the current release and identity
 #' @inheritParams aux_gdp
 #' @return data.table with gdp and pce variables
 #' @export
 #'
 #' @examples
-#' aux_wdi_update()
-aux_wdi_update <- function(force   = FALSE,
-                           maindir = getOption("pipaux.working_dir"),
-                           owner   = getOption("pipfun.ghowner"),
+#' \dontrun{
+#' aux_wdi_update()}
+aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
 
 
   #   ______________________________________________________
@@ -83,9 +67,11 @@ aux_wdi_update <- function(force   = FALSE,
   ##  From file                                          ####
 
     wdi <- pipfun::load_from_gh(measure = measure,
-                                owner = owner,
-                                branch = branch,
-                                ext    = "csv")
+                  owner = owner,
+                  branch = branch,
+                  ext    = "csv")
+
+    gh <- attributes(wdi)$gh
 
 
   # validate wdi raw data
@@ -97,29 +83,19 @@ aux_wdi_update <- function(force   = FALSE,
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+
 
   setattr(wdi, "aux_name", "wdi")
-  setattr(wdi,
-          "aux_key",
-          c("country_code", "year"))
+  key_cols <- c("country_code", "year")
+  setattr(wdi, "aux_key", key_cols)
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(wdi,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-  saved <- pipfun::pip_sign_save(
-    x       = wdi,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force,
-    save_dta = FALSE
+  saved <-  pip_aux_save(
+    x        = wdi,
+    id       = measure,
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_wdi_update,
+    code_label = "aux_wdi_update"
   )
 
   return(invisible(saved))

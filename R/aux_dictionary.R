@@ -6,13 +6,11 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_dictionary <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
                            tag     = NULL) {
   measure <- "dictionary"
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -27,39 +25,31 @@ aux_dictionary <- function(action  = c("update", "load"),
   if (action == "update") {
 
     df <- pipfun::load_from_gh(measure = measure,
-                       owner           = owner,
-                       branch          = branch,
-                       tag             = tag,
-                       ext             = "csv")
+                              owner           = owner,
+                              branch          = branch,
+                              tag             = tag,
+                              ext             = "csv")
+    gh <- attributes(df)$gh
     # Save dataset
     if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-  # ----- function raw sha ------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-  setattr(df,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = df,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    # Define key columns for dictionary data
+    key_cols <- names(df)
+    setattr(df, "aux_key", key_cols)
+    saved <- pip_aux_save(
+      x        = df,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_dictionary,
+      code_label = "aux_dictionary"
     )
 
     return(invisible(saved))
 
   } else {
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
+
   }
 }

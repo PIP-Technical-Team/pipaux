@@ -6,8 +6,6 @@
 \usage{
 aux_regions(
   action = c("update", "load"),
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL
 )
@@ -16,10 +14,6 @@ aux_regions(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in
 memory.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}

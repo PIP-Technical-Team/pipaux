@@ -26,11 +26,11 @@ data.table with key information
 Merge auxiliary datasets
 }
 \examples{
-pfw <- load_aux("pfw")
-ppp <- load_aux("ppp")
+pfw <- pipload::load_aux_data("pfw")
+ppp <- pipload::load_aux_data("ppp")
 pfw_ppp <- merger_aux(pfw, ppp)
 
-cpi <- load_aux("cpi")
+cpi <- pipload::load_aux_data("cpi")
 pfw_cpi <- merger_aux(cpi, pfw, merge_type = "right", commn_vars = FALSE)
 cpi_pfw <- merger_aux(cpi, pfw)
 

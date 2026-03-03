@@ -1,0 +1,279 @@
+---
+title: "Auxiliary Data Release Checklist Workflow"
+output: html_document
+---
+
+## Auxiliary Data Release Checklist Workflow
+
+This workflow provides a structured, stepwise process for updating,
+verifying, and validating auxiliary data for a specific release. It
+leverages the modular scripts in the `dev/` folder and ensures
+dependency order, log diagnostics, simulations of file changes, and
+release/vintage comparisons are executed systematically.
+
+---
+
+## Pre-requisites
+
+Ensure your R environment has the following packages installed:
+
+- `pipfun`
+- `pipload`
+- `stamp`
+- `data.table`
+- `devtools`
+- `rlang`
+- `testthat`
+- `gh`
+
+Set up the working release for testing:
+
+```r
+pipfun::setup_working_release(release = "YYYYMMDD", identity = "TEST")
+devtools::load_all()
+```
+
+Confirm the `dev/` folder contains the following scripts:
+
+- `01_dependency_and_update_runner.R`
+- `02_log_diagnostics.R`
+- `03_simulation_tools.R`
+- `04_files_comparison_diagnostics.R`
+- `05_interactive_full_run.R`
+
+---
+
+## Step 1 – Dependency-Aware Update
+
+**File:** `01_dependency_and_update_runner.R`  
+**Purpose:** Update auxiliary measures respecting dependency order.
+Track success, errors, and timing per measure.
+
+**Usage:**
+```r
+source("dev/01_dependency_and_update_runner.R")
+update_results <- run_ordered_update_diagnostics(
+  measures = c("cpi", "pfw"),  # optional; NULL updates all
+  owner    = "RossanaTat",
+  log_save = TRUE,
+  verbose  = TRUE
+)
+```
+
+**Key Outputs:**
+
+A `data.table` with one row per measure:
+
+- `measure`: measure name
+- `status`: `success` or `error`
+- `n_log_entries`: number of log events recorded
+- `n_errors`: count of error events
+
+**Tips:**
+
+- Always run Step 1 before any diagnostics.
+- If `verbose = TRUE`, progress is printed per measure.
+- Error details are printed automatically if any measure fails.
+
+---
+
+## Step 2 – Log Diagnostics
+
+**File:** `02_log_diagnostics.R`  
+**Purpose:** Validate the in-memory log structure produced by
+`update_aux_measures()`. Confirm log persistence to the aux metadata
+repository.
+
+**Usage:**
+```r
+source("dev/02_log_diagnostics.R")
+log_results <- run_log_diagnostics(
+  measures = c("cpi", "pfw"),
+  owner    = "RossanaTat"
+)
+```
+
+**Key Outputs:**
+
+A named list:
+
+- `n_rows`: total log entries
+- `measures`: character vector of measures found in the log
+- `persistence_ok`: logical — in-memory log matches persisted log
+
+**Key Checks:**
+
+- Log class and dimensions
+- Measures recorded in `logmeta`
+- Row count match between in-memory and persisted logs
+
+**Tips:**
+
+- Run immediately after Step 1.
+- `persistence_ok = FALSE` means the saved log differs from the
+  in-memory one — investigate before proceeding.
+
+---
+
+## Step 3 – Simulations
+
+**File:** `03_simulation_tools.R`  
+**Purpose:** Simulate data changes (row drops and value modifications)
+for selected measures. Validates that the update pipeline correctly
+detects and handles changes.
+
+**Usage:**
+```r
+source("dev/03_simulation_tools.R")
+sim_results <- run_simulation_diagnostics(
+  measures = c("cpi", "pop", "pfw", "gdp", "pce")
+)
+```
+
+**Notes on `measures`:**
+
+- Default measures (`cpi`, `pop`, `pfw`, `gdp`, `pce`) have
+  pre-configured `drop`/`indices` settings.
+- Any other measure passed will use a default config
+  (`drop = 1`, `indices = 10`) with an info message.
+
+**Key Outputs:**
+
+A `data.table` with one row per measure:
+
+- `measure`: measure name
+- `status`: `success` or `error`
+- `elapsed_sec`: runtime per measure
+
+**Tips:**
+
+- Run simulations before Step 4 so that release/vintage comparisons
+  have trackable changes to detect.
+- Error messages are printed inline if `simulate_changes()` fails.
+
+---
+
+## Step 4 – Release & Vintage Comparison Diagnostics
+
+**File:** `04_files_comparison_diagnostics.R`  
+**Purpose:** Compare current aux data files against a prior release or
+a prior vintage within the same release. Identifies row and value
+changes per measure.
+
+**Usage:**
+```r
+source("dev/04_files_comparison_diagnostics.R")
+
+# Compare against a prior release
+release_diag <- run_release_diagnostics(
+  measures    = c("cpi", "pfw"),
+  old_release = "20260101_TEST",
+  owner       = "RossanaTat"
+)
+
+# Compare latest vs. previous vintage within current release
+vintage_diag <- run_vintage_diagnostics(
+  measures = c("cpi", "pfw"),
+  version  = -1   # -1 = latest vs. one version back
+)
+```
+
+**Key Outputs:**
+
+A `data.table` with one row per measure:
+
+- `measure`: measure name
+- `status`: `no_change` | `value_change` | `row_change` |
+  `row_and_value_change` | `error`
+- `value_changes`: count of changed values
+- `row_changes`: count of added/removed rows
+- `elapsed_sec`: runtime per measure (`run_release_diagnostics` only)
+
+**Tips:**
+
+- Run both sub-functions; they answer different questions.
+- `run_release_diagnostics()` requires `old_release` — use the tag
+  of the previous production release.
+- Review `status = error` rows before proceeding to final release.
+
+---
+
+## Step 5 – Full Interactive Workflow
+
+**File:** `05_interactive_full_run.R`  
+**Purpose:** Sequentially run Steps 1–4 in a single call. Aggregates
+results, tracks per-step timing, and returns a structured list.
+
+**Usage:**
+```r
+source("dev/05_interactive_full_run.R")
+results <- run_all_workflow(
+  measures    = c("cpi", "pfw"),
+  owner       = "RossanaTat",
+  old_release = "20260101_TEST",
+  version     = -1L,
+  log_save    = TRUE,
+  verbose     = TRUE
+)
+```
+
+**Output Structure:**
+```r
+names(results)
+# [1] "update_results"      "log_diagnostics"
+# [3] "simulation_results"  "release_diagnostics"
+# [5] "vintage_diagnostics"
+```
+
+**Notes:**
+
+- If `old_release = NULL`, `run_release_diagnostics()` is skipped
+  with a warning and `$release_diagnostics` will be `NULL`.
+- `version = -1` compares the latest vintage against the previous one.
+- `measures = NULL` runs all available measures (each step falls back
+  to its own defaults).
+
+**Tips:**
+
+- Use this for end-to-end validation before publishing a new release.
+- Individual step results are accessible from the returned list for
+  further inspection.
+
+---
+
+## Step 6 – Optional: Direct Use of `update_aux_measures()`
+
+**Purpose:** Programmatically update a specific set of measures with
+full logging, without running diagnostics.
+
+**Usage:**
+```r
+update_aux_measures(
+  measures         = c("cpi", "pfw"),
+  owner            = "RossanaTat",
+  log              = TRUE,
+  log_save         = TRUE,
+  halt_on_dep_fail = FALSE
+)
+```
+
+**Notes:**
+
+- Respects dependency order automatically.
+- Logs are stored in `.piplogenv` and optionally persisted to disk.
+- Use `halt_on_dep_fail = FALSE` to continue even if a dependency
+  measure fails.
+
+---
+
+## General Recommendations
+
+1. Always start with **Step 1** (dependency-aware update).
+2. Run **Step 2** (log diagnostics) immediately after to confirm the
+   log is well-formed and persisted.
+3. Run **Step 3** (simulations) to introduce trackable changes before
+   running comparisons.
+4. Run **Step 4** (release/vintage comparisons) to validate what
+   changed relative to previous versions.
+5. Use **Step 5** for full end-to-end runs in testing environments.
+6. Track timing across steps to identify bottlenecks.

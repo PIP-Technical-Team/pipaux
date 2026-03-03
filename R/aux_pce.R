@@ -8,16 +8,14 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_pce <- function(action  = c("update", "load"),
-                    force   = FALSE,
                     owner   = getOption("pipfun.ghowner"),
-                    maindir = getOption("pipaux.working_dir"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pce"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -28,19 +26,15 @@ aux_pce <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_pce_update(maindir = maindir,
-                   force   = force,
-                   owner   = owner,
+    aux_pce_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
                    detail  = detail)
 
   } else {
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
   }
 }
@@ -52,30 +46,17 @@ aux_pce <- function(action  = c("update", "load"),
 #' @inheritParams aux_gdp
 #' @inheritParams pipfun::load_from_gh
 #' @keywords internal
-aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
-                           force = FALSE,
-                           owner   = getOption("pipfun.ghowner"),
+aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch = NULL,
                            tag     = branch,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
 
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-
-  }
-
   #   ________________________________________________________________
   #   Load data                                             ####
   #
 
-  wpce   <- load_aux(measure = "wdi",
-                     maindir = maindir,
-                     branch = branch)
+  wpce   <- pipload::load_aux_data(measure = "wdi")
 
   setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
 
@@ -269,10 +250,7 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
 
 
   # Remove any non-WDI countries
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
-
+  cl <- pipload::load_aux_data(measure = "country_list")
 
   pce <- pce[country_code %in% cl$country_code]
 
@@ -282,11 +260,13 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
   ## ---- Sign and save ----
   pce <- pce |> setnames("pce_data_level", "reporting_level",
                          skip_absent=TRUE)
+  
+  key_cols = c("country_code", "year", "reporting_level")
 
   setattr(pce, "aux_name", "pce")
   setattr(pce,
           "aux_key",
-          c("country_code", "year", "reporting_level"))
+          key_cols)
 
   # validate pce output data
   pce_validate_output(pce = pce, detail = detail)
@@ -295,34 +275,15 @@ aux_pce_update <- function(maindir = getOption("pipaux.working_dir"),
     branch <- ""
   }
 
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(pce,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(pce,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-  saved <- pipfun::pip_sign_save(
-    x       = pce,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  # Collect gh attribute from sna (main external GH source)
+  gh <- attributes(sna)$gh
+  saved <-  pip_aux_save(
+    x        = pce,
+    id       = measure,
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_pce_update,
+    code_label = "aux_pce_update"
   )
 
   return(invisible(saved))

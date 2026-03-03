@@ -7,9 +7,7 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_npl <- function(action  = c("update", "load"),
-                   force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
-                   maindir = getOption("pipaux.working_dir"),
                    tag     = NULL,
                    detail  = getOption("pipaux.detail.raw")) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,7 +16,7 @@ aux_npl <- function(action  = c("update", "load"),
   measure <- "npl"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -39,6 +37,8 @@ aux_npl <- function(action  = c("update", "load"),
                                 ext    = "dta") |>
       setDT()
 
+    gh <- attributes(npl)$gh
+
     # validate npl raw data
     npl_validate_raw(npl = npl, detail = detail)
 
@@ -56,10 +56,10 @@ aux_npl <- function(action  = c("update", "load"),
     npl <- npl |> setnames("reporting_year", "year",
                            skip_absent=TRUE)
 
+
     setattr(npl, "aux_name", "npl")
-    setattr(npl,
-            "aux_key",
-            c("country_code", "year"))
+    key_cols <- c("country_code", "year")
+    setattr(npl, "aux_key", key_cols)
 
     # validate npl output data
     npl_validate_output(npl = npl, detail = detail)
@@ -67,24 +67,15 @@ aux_npl <- function(action  = c("update", "load"),
     if (branch == "main") {
       branch <- ""
     }
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-    # ----- function raw sha ----------------------
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
 
 
-    setattr(npl,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = npl,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <-  pip_aux_save(
+      x        = npl,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_npl,
+      code_label = "aux_npl"
     )
 
 
@@ -92,11 +83,8 @@ aux_npl <- function(action  = c("update", "load"),
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## load --------
 
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
+
 
   }
 }

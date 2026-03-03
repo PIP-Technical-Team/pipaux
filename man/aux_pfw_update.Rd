@@ -5,31 +5,26 @@
 \title{Update PFW}
 \usage{
 aux_pfw_update(
-  maindir = getOption("pipaux.working_dir"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = NULL,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ...
 )
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
-\item{branch}{GitHub branch to use. By default, this is the release branch set in your R session.
-To ensure correct behavior, call \code{pipfun::setup_working_release()} once per session, followed by
-\code{pipfun::get_wrk_release()} to retrieve the active release. These steps ensure the function uses the
-correct release branch (e.g., \code{"release_2024Q1"}). Alternatively, you can explicitly specify other
-branches among \code{"DEV"}, \code{"PROD"}, or \code{"main"} if needed}
+\item{branch}{character: either "DEV" or "PROD". Refers to the branch that
+will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{...}{parameters to be passed to the loading functions depending of the
+extension used}
 }
 \description{
 Update PFW

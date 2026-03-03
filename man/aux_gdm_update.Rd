@@ -5,21 +5,15 @@
 \title{Update GDM}
 \usage{
 aux_gdm_update(
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   branch,
   tag = branch,
   detail = getOption("pipaux.detail.raw")
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{tag}{character: specific release to be used in the update.}
 

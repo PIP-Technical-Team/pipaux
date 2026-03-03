@@ -6,14 +6,13 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_cp <- function(action  = c("update", "load"),
-                   force   = FALSE,
                    owner   = getOption("pipfun.ghowner"),
-                   maindir = getOption("pipaux.working_dir"),
-                   tag     = NULL) {
+                   tag     = NULL,
+                  ...) {
   measure <- "cp"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -24,28 +23,18 @@ aux_cp <- function(action  = c("update", "load"),
   }
 
   if (action == "update") {
-    aux_cp_update(maindir = maindir,
-                  force   = force,
-                  owner   = owner,
+    aux_cp_update(owner   = owner,
                   branch  = branch,
-                  tag     = tag)
+                  tag     = tag,
+                ...)
   } else {
 
-    dl <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dl <- pipload::load_aux_data(measure = measure)
+
     return(dl)
   }
 }
 
-#' Clean country profile data
-#'
-#' @param x database from pip_cp_update
-#' @param file_names character: vector with names of files
-#'
-#' @return data.table
 aux_cp_clean <- function(x,
                          file_names) {
 
@@ -59,67 +48,54 @@ aux_cp_clean <- function(x,
 
   ## Key Indicators ----------
 
-  # Create list of key indicators datasets
-  key_indicators <- merge(dl$KI1, dl$KI5_KI6_KI7,
-                          all = TRUE,
-                          by = c("country_code", "reporting_year")
+  key_indicators <- merge(
+    dl$KI1,
+    dl$KI5_KI6_KI7,
+    all = TRUE,
+    by = c("country_code", "reporting_year")
   )
 
   key_indicators <- merge(
     x = key_indicators,
-    y = dl$chart5[,
-                  c("country_code",
-                    "reporting_year",
-                    "mpm_headcount",
-                    "ppp_year")
-    ],
+    y = dl$chart5[, c(
+      "country_code",
+      "reporting_year",
+      "mpm_headcount",
+      "ppp_year"
+    )],
     all = TRUE,
     by = c("country_code", "reporting_year")
   )
 
   key_indicators <- list(
-    headcount_national = key_indicators[,
-                                        c("country_code",
-                                          "reporting_year",
-                                          "headcount_national",
-                                          "ppp_year")],
-    mpm_headcount = key_indicators[,
-                                   c("country_code",
-                                     "reporting_year",
-                                     "mpm_headcount",
-                                     "ppp_year")],
-
-    reporting_pop = key_indicators[,
-                                   c("country_code",
-                                     "reporting_year",
-                                     "reporting_pop")],
-
-    gni = key_indicators[, c("country_code",
-                             "reporting_year",
-                             "gni")],
-
-    gdp_growth = key_indicators[, c("country_code",
-                                    "reporting_year",
-                                    "gdp_growth")]
+    headcount_national = key_indicators[, c(
+      "country_code",
+      "reporting_year",
+      "headcount_national",
+      "ppp_year"
+    )],
+    mpm_headcount = key_indicators[, c(
+      "country_code",
+      "reporting_year",
+      "mpm_headcount",
+      "ppp_year"
+    )],
+    reporting_pop = key_indicators[, c(
+      "country_code",
+      "reporting_year",
+      "reporting_pop"
+    )],
+    gni = key_indicators[, c(
+      "country_code",
+      "reporting_year",
+      "gni"
+    )],
+    gdp_growth = key_indicators[, c(
+      "country_code",
+      "reporting_year",
+      "gdp_growth"
+    )]
   )
-
-  # kg1 <- c("headcount_national", "mpm_headcount", "reporting_pop")
-
-  #
-  # for (i in seq_along(kg1)) {
-  #
-  #   var <- kg1[i]
-  #
-  #   key_indicators[[var]] <-
-  #     key_indicators[[var]] %>%
-  #   # ff <- key_indicators[[var]] %>%
-  #       dplyr::filter(!is.na(.data[[var]])) %>%
-  #       dplyr::group_by(country_code, ppp_year) %>%
-  #       dplyr::filter(reporting_year == max(reporting_year)) %>%
-  #       dplyr::ungroup() %>%
-  #       data.table::as.data.table()
-  #
-  # }
 
   kg1 <- c("headcount_national", "mpm_headcount")
   for (i in seq_along(kg1)) {
@@ -133,7 +109,6 @@ aux_cp_clean <- function(x,
         .SD[which.max(reporting_year)],
         by = c("country_code", "ppp_year")
       ]
-
   }
 
   key_indicators$reporting_pop <-
@@ -144,34 +119,33 @@ aux_cp_clean <- function(x,
       by = c("country_code")
     ]
 
-  key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
-    x <- x %>%
-      dplyr::filter(!is.na(x[, 3])) %>%
-      dplyr::group_by(country_code) %>%
-      dplyr::slice_tail(n = 2) %>%
-      dplyr::mutate(
-        latest =
-          dplyr::if_else(reporting_year == max(reporting_year),
-                         TRUE, FALSE
-          )
-      ) %>%
-      dplyr::ungroup() %>%
-      data.table::as.data.table()
-  })
+  ## ---- FIXED SECTION (warning removal, same output) ----
 
+  key_indicators[4:5] <- lapply(key_indicators[4:5], function(x) {
+
+  val_col <- setdiff(names(x), c("country_code", "reporting_year"))
+
+  x %>%
+    dplyr::filter(!is.na(.data[[val_col]])) %>%   # ✅ fixed
+    dplyr::group_by(country_code) %>%
+    dplyr::slice_tail(n = 2) %>%
+    dplyr::mutate(
+      latest = reporting_year == max(reporting_year)
+    ) %>%
+    dplyr::ungroup() %>%
+    data.table::as.data.table()
+})
 
   ## Additional charts ----------
 
-
-  ### Merge chart1_chart2_KI2 ID variables ---------------
-
-  ab <-
-    joyn::merge(x = dl$chart1_chart2_KI2_data,
-                y = dl$chart1_chart2_KI2_ID,
-                by = "id",
-                match_type = "m:1",
-                reportvar = FALSE,
-                verbose = FALSE)
+  ab <- joyn::merge(
+    x = dl$chart1_chart2_KI2_data,
+    y = dl$chart1_chart2_KI2_ID,
+    by = "id",
+    match_type = "m:1",
+    reportvar = FALSE,
+    verbose = FALSE
+  )
   ab[, id := NULL]
 
   dl$chart1_chart2_KI2      <- ab
@@ -179,39 +153,47 @@ aux_cp_clean <- function(x,
   dl$chart1_chart2_KI2_ID   <- NULL
   rm(ab)
 
-  ### chart6 ------------
-  ki4 <- dl$chart6_KI4[, c("country_code",
-                           "year_range",
-                           "distribution",
-                           "shared_prosperity",
-                           "ppp_year")]
+  ## chart6 ------------
+
+  ki4 <- dl$chart6_KI4[, c(
+    "country_code",
+    "year_range",
+    "distribution",
+    "shared_prosperity",
+    "ppp_year"
+  )]
 
   ki4$year1 <- sapply(strsplit(ki4$year_range, "-"), \(x) x[[1]])
   ki4$year2 <- sapply(strsplit(ki4$year_range, "-"), \(x) x[[2]])
+
   ki4 <- ki4 %>%
     dplyr::group_by(country_code, ppp_year) %>%
     dplyr::filter(distribution %in% c("b40", "tot")) %>%
     dplyr::filter(year2 == max(year2)) %>%
     dplyr::filter(year1 == max(year1)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(country_code,
-                  year_range,
-                  distribution,
-                  shared_prosperity,
-                  ppp_year) %>%
+    dplyr::select(
+      country_code,
+      year_range,
+      distribution,
+      shared_prosperity,
+      ppp_year
+    ) %>%
     data.table::as.data.table() %>%
-    data.table::dcast(country_code + ppp_year + year_range ~ distribution,
-                      value.var = "shared_prosperity"
+    data.table::dcast(
+      country_code + ppp_year + year_range ~ distribution,
+      value.var = "shared_prosperity"
     )
 
-  setnames(x = ki4,
-           old = c("b40", "tot"),
-           new = c("share_below_40", "share_total"))
+  setnames(
+    ki4,
+    old = c("b40", "tot"),
+    new = c("share_below_40", "share_total")
+  )
 
   key_indicators <- append(key_indicators, list(shared_prosperity = ki4))
 
-  # Create list of charts datasets
-  mpm_cols <- grep("mpm_", names(dl$chart5), value = TRUE)
+  ## Charts ----------
 
   charts <- list(
     ineq_trend =
@@ -241,17 +223,18 @@ aux_cp_clean <- function(x,
         "reporting_level",
         "ppp_year"
       )][,
-         agegroup_label := fcase(
-           agegroup == "0-14", "0 to 14 years old",
-           agegroup == "15-64", "15 to 64 years old",
-           agegroup == ">65", "65 and older",
-           default = ""
-         )][,
-            `:=`(
-              education_label = education,
-              gender_label    = gender
-            )
-         ],
+        agegroup_label := fcase(
+          agegroup == "0-14", "0 to 14 years old",
+          agegroup == "15-64", "15 to 64 years old",
+          agegroup == ">65", "65 and older",
+          default = ""
+        )
+      ][,
+        `:=`(
+          education_label = education,
+          gender_label    = gender
+        )
+      ],
     mpm =
       dl$chart5[, c(
         "country_code",
@@ -268,19 +251,24 @@ aux_cp_clean <- function(x,
         "reporting_level"
       )],
     sp =
-      dl$chart6_KI4[, c("country_code",
-                        "year_range",
-                        "welfare_type",
-                        "distribution",
-                        "shared_prosperity",
-                        "ppp_year",
-                        "reporting_level")
-      ]
-  ) ## end of chart lists
+      dl$chart6_KI4[, c(
+        "country_code",
+        "year_range",
+        "welfare_type",
+        "distribution",
+        "shared_prosperity",
+        "ppp_year",
+        "reporting_level"
+      )]
+  )
 
-  cp <- list(key_indicators = key_indicators, charts = charts)
+  cp <- list(
+    key_indicators = key_indicators,
+    charts = charts
+  )
+
+  return(cp)
 }
-
 
 
 
@@ -361,14 +349,13 @@ clean_cp_names <- function(x) {
 #'
 #' @inheritParams aux_cp
 #' @keywords internal
-aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
-                          force = FALSE,
-                          owner   = getOption("pipfun.ghowner"),
-                          branch = paste0(wrk_release$release, "_", wrk_release$identity),
-                          tag     = match.arg(branch)) {
+aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
+                          branch,
+                          tag     = tag,
+                          ...) {
 
   measure <- "cp"
-  #branch  <- match.arg(branch)
+
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## chart files --------
 
@@ -394,6 +381,9 @@ aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
                               filename = .x,
                               ext = "csv")
                           })
+  # Collect gh attributes from all raw files
+  gh_list <- lapply(raw_files, function(x) attributes(x)$gh)
+  gh_list <- gh_list[!vapply(gh_list, is.null, logical(1))] # remove NULLs
 
 
   dl <- aux_cp_clean(raw_files,
@@ -424,24 +414,19 @@ aux_cp_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
 
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(dl,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-  saved <- pipfun::pip_sign_save(
-    x       = dl,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+  # Define key columns for country profiles data
+  key_cols <- names(dl)
+  setattr(dl, "aux_key", key_cols)
+  
+  saved <- pip_aux_save(
+    x        = dl,
+    id       = measure,
+    metadata = list(gh = gh_list),
+    code     = aux_cp_update,
+    code_label = "aux_cp_update",
+    #pk       = key_cols, removed because of list
+    ...
   )
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

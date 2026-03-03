@@ -7,14 +7,17 @@
 #' @inheritParams load_raw_indicators
 #' @export
 aux_metadata <- function(action  = c("update", "load"),
-                         force   = FALSE,
                          owner   = getOption("pipfun.ghowner"),
-                         maindir = getOption("pipaux.working_dir"),
-                         branch = paste0(wrk_release$release, "_", wrk_release$identity),
                          tag     = NULL,
                          detail  = getOption("pipaux.detail.raw")) {
   measure <- "metadata"
   action <- match.arg(action)
+
+  wrk_release <- get_from_auxenv(key = "wrk_release")
+
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
   if (is.null(tag)) {
     tag <- paste0(release, "_", identity)
@@ -23,8 +26,6 @@ aux_metadata <- function(action  = c("update", "load"),
   if (action == "update") {
 
     aux_metadata_update(
-      maindir = maindir,
-      force   = force,
       owner   = owner,
       branch  = branch,
       tag     = tag,
@@ -33,11 +34,7 @@ aux_metadata <- function(action  = c("update", "load"),
 
   } else {
 
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
 
   }
 }
@@ -49,23 +46,12 @@ aux_metadata <- function(action  = c("update", "load"),
 #' @inheritParams aux_metadata
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
-aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
-                                force = FALSE,
-                                owner   = getOption("pipfun.ghowner"),
+aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
                                 branch  = NULL,
                                 tag     = branch,
                                 detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "metadata"
-
-  pipfun::get_wrk_release(verbose = FALSE)
-
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
-  }
 
   #   ____________________________________________________________________________
   #   Computations                                                            ####
@@ -76,18 +62,13 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
                              tag = tag,
                              ext = "csv")
 
-  # Get gh attributes before they get removed
-  gh <- attr(df, "gh")
+  gh <- attributes(df)$gh
 
   # validate raw metdata data
   metadata_validate_raw(metadata = df, detail = detail)
 
   # Load pfw
-  pfw <- load_aux(measure = "pfw",
-                  maindir = maindir,
-                  branch = branch)
-
-
+  pfw <- pipload::load_aux_data(measure = "pfw")
 
   # Create distribution type column (data type)
 
@@ -164,10 +145,10 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
   ##  Save                                                                    ####
   df <- df |> setnames("reporting_year", "year", skip_absent=TRUE)
 
+
   setattr(df, "aux_name", "metadata")
-  setattr(df,
-          "aux_key",
-          c("country_code", "year", "welfare_type"))
+  key_cols <- c("country_code", "year", "welfare_type")
+  setattr(df, "aux_key", key_cols)
 
   # validate raw metdata data
   metadata_validate_output(metadata = df, detail = detail)
@@ -175,25 +156,17 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-  # ----- function raw sha -----------------------------
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(df,
-          "raw_sha_fun",
-          raw_sha_fun)
 
   setattr(df, "gh", gh)
 
-  saved <- pipfun::pip_sign_save(
-    x       = df,
-    measure = measure,
-    msrdir  = msrdir,
-    force   = force
+
+  saved <-  pip_aux_save(
+    x        = df,
+    id       = measure,
+    pk       = key_cols,
+    metadata = list(gh = gh),
+    code     = aux_metadata_update,
+    code_label = "aux_metadata_update"
   )
 
   #   ____________________________________________________________________________
@@ -210,31 +183,30 @@ aux_metadata_update <- function(maindir = getOption("pipaux.working_dir"),
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_metaregion <- function(action = c("update", "load"),
-                           force = FALSE,
-                           maindir = getOption("pipaux.working_dir"),
                            owner   = getOption("pipfun.ghowner"),
-                           branch  = NULL,
-                           tag     = match.arg(branch)
+                           tag     = NULL
 ) {
+
   measure <- "metaregion"
   action  <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
+  release        <- wrk_release$release
+  identity       <- wrk_release$identity
+  branch         <- paste0(release, "_", identity)
 
-  if (is.null(branch)) {
-
-    release        <- wrk_release$release
-    identity       <- wrk_release$identity
-    branch         <- paste0(release, "_", identity)
+  if (is.null(tag)) {
+    tag <- paste0(release, "_", identity)
   }
-
 
   if (action == "update") {
     mr <- pipfun::load_from_gh(measure = measure,
-                               owner    = owner,
-                               branch   = branch,
-                               ext = "csv")
+                   owner    = owner,
+                   branch   = branch,
+                   ext = "csv")
+
+    gh <- attributes(mr)$gh
 
 
     ##  ............................................................................
@@ -244,34 +216,26 @@ aux_metaregion <- function(action = c("update", "load"),
       branch <- ""
     }
 
-    msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+    key_cols <- c("region_code")
+    setattr(mr, "aux_name", "metaregion")
+    setattr(mr, "aux_key", key_cols)
 
-    # ----- function raw sha ----------------------
-
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
+    saved <-  pip_aux_save(
+      x        = mr,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_metaregion,
+      code_label = "aux_metaregion"
     )
 
-
-    setattr(mr,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = mr,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
-    )
     return(invisible(saved))
 
 
   } else {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 
@@ -388,8 +352,9 @@ metadata_validate_output <- function(metadata, detail = getOption("pipaux.detail
                 description = "`survey_conductor` should be character") |>
     validate_if(is.character(survey_coverage),
                 description = "`survey_coverage` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")),
-                  survey_coverage, description = "`survey_coverage` values within range") |>
+    # TO FIX
+    # validate_cols(in_set(c("national", "rural", "urban")),
+    #               survey_coverage, description = "`survey_coverage` values within range") |>
     validate_if(is.character(welfare_type),
                 description = "`welfare_type` should be character") |>
     validate_cols(in_set(c("consumption", "income")),

@@ -6,9 +6,7 @@
 \usage{
 aux_income_groups(
   action = c("update", "load"),
-  force = FALSE,
   owner = getOption("pipfun.ghowner"),
-  maindir = getOption("pipaux.working_dir"),
   detail = getOption("pipaux.detail.raw")
 )
 }
@@ -17,12 +15,8 @@ aux_income_groups(
 "update" data will be updated on the system. If "load" data is loaded in
 memory.}
 
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{maindir}{character: Main directory of project.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }

@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 library(pipaux)
 ```
 
-The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these functions push the changes to the DEV branch of the respective auxiliary data repository. The DEV branch of each auxiliary data repository is therefore updated with changes. 
+The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these release branches in GitHub of each auxiliary data repository are also updated.
 
 To ensure that the version of auxiliary data used for each release is properly tracked, 2 steps are necessary:
 
@@ -94,7 +94,7 @@ In this case, given that the release branch has just been created, it is up to d
 ```
 
 
-
+Note that these functions are using internally by the `update_aux_measures()` function, which updates auxiliary data measures and synchronizes GitHub release branches and Y-drive files. Therefore, users can simply call `update_aux_measures()` to ensure that all auxiliary data measures are updated and that the corresponding release branches are synchronized with DEV.
 
 
 

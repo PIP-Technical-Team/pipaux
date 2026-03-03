@@ -9,20 +9,19 @@
 #' If `action = "load"`, the function reads the previously saved local version of the
 #' censoring data and returns it as a list of data.tables.
 #'
-#'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param ... Additional arguments passed to [pip_aux_save()] when `action = "update"`.
 #' @export
 aux_censoring  <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
-                           tag     = NULL) {
+                           tag     = NULL,
+                           ...) {
 
   measure <- "censoring"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -58,35 +57,26 @@ aux_censoring  <- function(action  = c("update", "load"),
     if (branch == "main") {
     branch <- ""
     }
-    # ----- function raw sha ----------------------
 
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
+    # Define key columns for censoring data
+    key_cols <- c("countries", "regions")
+    setattr(dl, "aux_key", key_cols)
+
+    saved <- pip_aux_save(
+      x        = dl,
+      id       = measure,
+      code     = aux_censoring,
+      code_label = "aux_censoring",
+      #pk       = key_cols,  rm this because of dl being list
+      ...
     )
 
-
-    setattr(dl,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
-
-    saved <- pipfun::pip_sign_save(
-      x       = dl,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force,
-      verbose = FALSE
-    )
     return(invisible(saved))
 
   } else {
 
-    dt <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    dt <- pipload::load_aux_data(measure = measure)
+
     return(dt)
 
   }

@@ -4,25 +4,25 @@
 \alias{get_last_release}
 \title{Get the most recent previous release of a specific identity}
 \usage{
-get_last_release(
-  maindir = getOption("pipaux.working_dir"),
-  current_release,
-  identity
-)
+get_last_release(aux_data_path, current_release, identity)
 }
 \arguments{
-\item{maindir}{Character. The root directory where \code{aux_data} subfolder is located.}
+\item{aux_data_path}{Character. Path to the current release's \code{aux_data}
+directory. The function moves up one level to find sibling release folders.}
 
-\item{current_release}{Character. Current release string in the format \code{"YYYYMMDD_identity"}.}
+\item{current_release}{Character. Current release string in the format
+\code{"YYYYMMDD_identity"} (e.g., \code{"20260202_TEST"}).}
 
-\item{identity}{Character. The identity suffix to filter releases (e.g., \code{"prod"}).}
+\item{identity}{Character. The identity suffix to filter releases
+(e.g., \code{"PROD"}, \code{"TEST"}). Case-sensitive.}
 }
 \value{
-A character string representing the most recent previous release.
+A character scalar with the most recent matching release prior to
+\code{current_release}. Throws an error if no older matching release is found.
 }
 \description{
-This function searches the \code{aux_data} directory inside the given main directory
-and returns the latest available release (prior to a given current release)
-that matches the specified identity (e.g., \code{"prod"} or \code{"dev"}).
+Searches the \code{aux_data} parent directory for release folders and returns
+the latest one prior to \code{current_release} that matches the specified
+identity (e.g., \code{"PROD"} or \code{"TEST"}).
 }
 \keyword{internal}

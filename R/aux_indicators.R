@@ -6,14 +6,12 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_indicators <- function(action  = c("update", "load"),
-                           force   = FALSE,
                            owner   = getOption("pipfun.ghowner"),
-                           maindir = getOption("pipaux.working_dir"),
                            tag     = NULL) {
   measure <- "indicators"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -23,7 +21,6 @@ aux_indicators <- function(action  = c("update", "load"),
     tag <- paste0(release, "_", identity)
   }
 
-
   if (action == "update") {
     df <-
       pipfun::load_from_gh(
@@ -32,6 +29,8 @@ aux_indicators <- function(action  = c("update", "load"),
         branch = branch,
         ext    = "csv"
       )
+
+    gh <- attributes(df)$gh
 
     # Convert empty strings to NA in all character variables
     chr_df <-
@@ -51,33 +50,25 @@ aux_indicators <- function(action  = c("update", "load"),
   if (branch == "main") {
     branch <- ""
   }
-  msrdir <- fs::path(maindir, "aux_data", branch, measure) # measure dir
+    
+  key_cols <- c("page", "indicator_name")
+    
 
-
-  # ----- function raw sha ----------------------
-
-  raw_sha_fun <- digest::digest(body(
-    paste0("aux_", measure))
-  )
-
-
-  setattr(df,
-          "raw_sha_fun",
-          raw_sha_fun)
-
-    saved  <- pipfun::pip_sign_save(
-      x       = df,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+  saved <- pip_aux_save(
+      x        = df,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_indicators,
+      code_label = "aux_indicators"
     )
+
     return(invisible(saved))
+
   } else  {
-    df <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+
+    df <- pipload::load_aux_data(measure = measure)
+
     return(df)
   }
 }

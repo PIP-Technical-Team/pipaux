@@ -5,8 +5,6 @@
 \title{Update National accounts data from WDI}
 \usage{
 aux_wdi_update(
-  force = FALSE,
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = branch,
@@ -14,12 +12,10 @@ aux_wdi_update(
 )
 }
 \arguments{
-\item{force}{logical: If TRUE data will be overwritten.}
-
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
+
+\item{branch}{character, branch in which to find the data, default is NULL, which means it will be determined based on the current release and identity}
 
 \item{tag}{character: specific release to be used in the update.}
 
@@ -32,5 +28,6 @@ data.table with gdp and pce variables
 GDP and HFCE data from WDI.
 }
 \examples{
-aux_wdi_update()
+\dontrun{
+aux_wdi_update()}
 }

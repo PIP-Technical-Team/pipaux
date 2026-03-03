@@ -1,28 +1,19 @@
+gls <- pipfun::pip_create_globals()
 
-# gls <- pipfun::pip_create_globals()
 pipuax_default_options <- list(
   pipaux.cpivar        = "cpi2017",
   pipaux.pppvar        = "icp2017",
   pipaux.pppyear       = 2017,
   pipaux.popsrc        = "emi",
   pipaux.madsrc        = "https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/mpd2020.dta",
-  # pipaux.maindir     = gls$PIP_DATA_DIR,
-  pipaux.working_dir   = fs::path(Sys.getenv("PIP_ROOT_DIR"),
-                                  "PIP_ingestion_pipeline_V2"),
-  pipaux.log_directory = fs::path(Sys.getenv("PIP_ROOT_DIR"),
-                                  "PIP_ingestion_pipeline_V2",
-                                  "aux_data"),
-  pipaux.key_vars      = c("country_code", "year", "reporting_level",
-                         "survey_acronym", "welfare_type"),
   pipfun.ghowner       = "PIP-Technical-Team",
   joyn.verbose         = FALSE,
-  pipfun.verbose       = TRUE,
+  joyn.reportvar       = ".joyn",
   pipaux.detail.raw    = FALSE,
   pipaux.detail.output = FALSE,
   pipfun.verbose       = FALSE,
-  #joyn.reportvar       = "report"
-  joyn.reportvar       = ".joyn"
-
+  pipload.verbose      = FALSE,
+  pipaux.working_dir   = "Y:/PIP_ingestion_pipeline_v2"
 )
 
 .onLoad <- function(libname, pkgname) {
@@ -32,17 +23,42 @@ pipuax_default_options <- list(
 
   op    <- options()
   toset <- !(names(pipuax_default_options) %in% names(op))
+
   if (any(toset)) options(pipuax_default_options[toset])
 
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ## defined values --------
+  wrk_release <- tryCatch(
+    pipfun::get_wrk_release(verbose = FALSE),
+    error = function(e) NULL
+  )
+  rlang::env_poke(.pipaux, "wrk_release", wrk_release)
 
-  # pipload::add_gls_to_env()
+  pip_folders <- tryCatch(
+    pipfun::get_pip_folders(verbose = FALSE),
+    error = function(e) NULL
+  )
+  rlang::env_poke(.pipaux, "pip_folders", pip_folders)
+
+  aux_alias <- tryCatch(
+    pipfun::get_pip_aliases("aux_data", verbose = FALSE),
+    error = function(e) NULL
+  )
+  rlang::env_poke(.pipaux, "aux_alias", aux_alias)
+
+  aux_meta_alias <- tryCatch(
+    pipfun::get_pip_aliases("aux_metadata", verbose = FALSE),
+    error = function(e) NULL
+  )
+  rlang::env_poke(.pipaux, "aux_meta_alias", aux_meta_alias)
+
+  if (!is.null(pip_folders)) {
+    aux_data_path     <- pip_folders$aux_data
+    aux_metadata_path <- pip_folders$aux_metadata
+    rlang::env_poke(.pipaux, "aux_data_path", aux_data_path)
+    rlang::env_poke(.pipaux, "aux_metadata_path", aux_metadata_path)
+  }
 
   # Initialize a log
-  pipfun::log_init("pipaux_dependencies_log",
-                   overwrite = TRUE)
-
+  pipfun::log_init("pipaux_update_log", overwrite = TRUE)
 
   invisible()
 }

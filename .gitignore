@@ -8,3 +8,6 @@ renv/
 /sessionInfoLog
 .DS_Store
 docs
+
+/.quarto/
+inst/doc

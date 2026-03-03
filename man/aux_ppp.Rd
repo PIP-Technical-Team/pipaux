@@ -6,9 +6,7 @@
 \usage{
 aux_ppp(
   action = c("update", "load"),
-  maindir = getOption("pipaux.working_dir"),
   owner = getOption("pipfun.ghowner"),
-  force = FALSE,
   tag = NULL,
   detail = getOption("pipaux.detail.raw"),
   ppp_defaults = TRUE
@@ -18,16 +16,14 @@ aux_ppp(
 \item{action}{character: Either "load" or "update". Default is "update". If
 "update" data will be updated on the system. If "load" data is loaded in memory.}
 
-\item{maindir}{character: Main directory of project.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{ppp_defaults}{logical: whether to set default PPP}
 }
 \description{
 Load or update PPP data.

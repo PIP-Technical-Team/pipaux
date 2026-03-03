@@ -1,0 +1,337 @@
+---
+title: "A Closer Look at the Update Workflow"
+author: "PIP Technical Team"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A Closer Look at the Update Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  eval     = FALSE
+)
+library(pipaux)
+```
+
+# Overview
+
+This vignette describes what happens internally when
+`update_aux_measures()` or `aux_fun()` is called. It is intended for
+team members who need to understand, debug, or extend the update
+pipeline.
+
+The update workflow performs two broad operations:
+
+1. **GitHub synchronization** — ensures the release branch of each
+   `aux_*` repository is in sync with `DEV`.
+2. **Y-drive refresh** — regenerates and saves the formatted data file
+   to the Y-drive, but only when a change is actually detected.
+
+---
+
+# Entry Points
+
+| Function               | When to use                                              |
+|------------------------|----------------------------------------------------------|
+| `update_aux_measures()`| Update one or more measures (handles dependency order)   |
+| `aux_fun()`            | Update a single measure directly (lower-level)           |
+
+Both functions are exported. In practice, `update_aux_measures()` is
+the standard entry point. `aux_fun()` is called recursively by the
+dependency resolution logic and can be called directly for debugging.
+
+---
+
+# The `.pipaux` Runtime Environment
+
+All pipeline operations depend on the `.pipaux` environment, which is
+populated by `pipfun::setup_working_release()` at the start of each
+session (and called automatically on package load via `zzz.R`).
+
+Key fields:
+
+| Field               | Description                                           |
+|---------------------|-------------------------------------------------------|
+| `wrk_release`       | List: `release` (YYYYMMDD) and `identity` (TEST/PROD) |
+| `aux_data_path`     | Y-drive path for `.qs2` data artifacts                |
+| `aux_metadata_path` | Y-drive path for sidecar metadata files               |
+| `aux_alias`         | `stamp` alias for the aux data folder                 |
+| `aux_meta_alias`    | `stamp` alias for the aux metadata folder             |
+
+The release branch name used throughout the pipeline is derived as:
+
+```r
+release_branch <- paste0(wrk_release$release, "_", wrk_release$identity)
+# e.g. "20260202_TEST"
+```
+
+---
+
+# Step-by-Step: What Happens Inside `aux_fun()`
+**Check decision logic graph at the end of this file**
+
+## Step 1 — Initialization (top-level calls only)
+
+`is_top_level()` detects whether `aux_fun()` is being called from an
+interactive session or script (`sys.nframe() <= 2`). If so:
+
+- A new audit log is initialized via `init_aux_log()`.
+- A `processed` environment is created to track already-updated
+  measures and prevent cyclic re-processing.
+- `on.exit(finalize_aux_log())` ensures the log is closed cleanly even
+  if an error occurs.
+
+When `aux_fun()` is called recursively (for dependencies), these steps
+are skipped — the same log and `processed` environment from the
+top-level call are reused.
+
+## Step 2 — Repo and Owner Resolution
+
+`resolve_measure_repo_owner()` applies special-case overrides before
+any GitHub call is made:
+
+| Measure                          | Repo override | Owner override          |
+|----------------------------------|---------------|-------------------------|
+| `"income_groups"`, `"country_list"` | `"Class"`  | _(unchanged)_           |
+| `"nan"`                          | _(unchanged)_ | `"PIP-Technical-Team"`  |
+| All others                       | `"aux_<measure>"` | `getOption("pipfun.ghowner")` |
+
+## Step 3 — Dependency Resolution
+
+`process_dependencies()` reads the dependency manifest from GitHub:
+
+```r
+deps <- read_dependencies(
+  gh_user = "https://raw.githubusercontent.com",
+  owner   = "PIP-Technical-Team"
+)
+```
+
+For each upstream dependency of the requested measure that has not yet
+been processed, `aux_fun()` is called recursively. The `processed`
+environment is checked before each call — if the measure is already
+marked, it is skipped. This prevents both redundant work and infinite
+cycles.
+
+To inspect the current dependency graph:
+
+
+## Step 4 — Status Checks (`check_status.R`)
+
+Before any update is performed, the pipeline checks whether an update
+is actually needed. This logic lives in `R/check_status.R` and runs
+two sequential checks.
+
+### 4a — GitHub Status (`check_github_status()`)
+
+Checks whether the release branch on GitHub is present and in sync
+with `DEV`:
+
+| Condition                                      | `update_gh` | Next step        |
+|------------------------------------------------|-------------|------------------|
+| Measure is `"countries"` or `"missing_data"`   | `FALSE`     | Proceed to Y-drive check |
+| Release branch does not exist on GitHub        | `TRUE`      | Skip Y-drive check |
+| Release branch content differs from `DEV`      | `TRUE`      | Skip Y-drive check |
+| Release branch is in sync with `DEV`           | `FALSE`     | Proceed to Y-drive check |
+
+**Policy:** if `update_gh = TRUE`, the Y-drive is always updated.
+The Y-drive check is only reached when `update_gh = FALSE`.
+
+### 4b — Y-drive Status (`check_y_drive_status()`)
+
+Reads the sidecar metadata file for the measure and runs two
+sub-checks:
+
+**SHA check:** for each GitHub source file recorded in the sidecar's
+`gh` field, the stored raw SHA (`gh_raw_sha`) is compared against the
+current SHA fetched from GitHub via
+`pipfun::get_file_info_from_gh()`. A mismatch in any file triggers
+`update_y = TRUE`.
+
+**Code hash check:** the body of the measure's generator function
+(e.g. `aux_cpi()`) is hashed via `hash_code()` and compared against
+`sidecar$code_hash`. If the function has changed since the last save,
+`update_y = TRUE`.
+
+| Condition                                         | `update_y` |
+|---------------------------------------------------|------------|
+| Sidecar or artifact file missing                  | `TRUE`     |
+| Any source file SHA differs from sidecar record   | `TRUE`     |
+| Generator function body has changed               | `TRUE`     |
+| All checks pass                                   | `FALSE`    |
+
+If `update_y = FALSE`, the measure is skipped entirely — no file is
+read, reformatted, or written.
+
+## Step 5 — Execute Update (`execute_update()`)
+
+If either `update_gh` or `update_y` is `TRUE`, `execute_update()` is
+called.
+
+### GitHub update (`update_gh = TRUE`)
+
+```r
+pipfun::sync_release_branch(
+  owner         = owner,
+  repo          = repo,
+  ref_branch    = "DEV",
+  target_branch = release_branch
+)
+```
+
+### Y-drive update (`update_y = TRUE`)
+
+The generator function for the measure is resolved dynamically:
+
+```r
+func_name <- paste0("aux_", measure)
+func      <- get(func_name, envir = asNamespace("pipaux"))
+```
+
+Only arguments accepted by the function's `formals()` are passed,
+so each `aux_*` function can have a different signature without
+breaking the dispatcher:
+
+```r
+update_args    <- list(action = "update", branch = release_branch,
+                       owner  = owner,    tag    = tag, repo = repo)
+filtered_args  <- update_args[names(update_args) %in% names(formals(func))]
+do.call(func, filtered_args)
+```
+
+The generator function is responsible for:
+
+1. Loading raw data from GitHub (`pipfun::load_from_gh()`) or from
+   other aux measures (`pipload::load_aux_data()`).
+2. Validating and formatting the data.
+3. Saving the result to the Y-drive via `pip_aux_save()`.
+
+## Step 6 — Saving to the Y-drive (`pip_aux_save()`)
+
+`pip_aux_save()` wraps `pipload::pip_write()` / `stamp::st_save()` and
+persists the following alongside each data artifact:
+
+| Sidecar field | Content                                                  |
+|---------------|----------------------------------------------------------|
+| `gh`          | GitHub metadata: owner, repo, branch, file path, raw SHA |
+| `code_hash`   | Hash of the generator function body at save time         |
+| `code_label`  | Name of the generator function (used at check time)      |
+| `pk`          | Primary key columns for the measure                      |
+
+For measures with multiple source files (e.g. `aux_cp`), `gh` is a
+list of entries, one per file. A mismatch in any single entry triggers
+a full re-save.
+
+For derived measures that do not read directly from GitHub (e.g.
+`aux_countries`, `aux_regions`), the `gh` attribute is inherited from
+the input aux data objects. Change detection therefore propagates
+automatically through the dependency graph.
+
+> **Exception:** `aux_maddison` downloads from an external URL
+> (option `pipaux.madsrc`) and does not carry a `gh` attribute.
+> Change detection for this measure relies solely on `code_hash`.
+
+---
+
+# Logging
+
+Log entries are appended at each significant step using
+`pipfun::log_add()`. Each entry carries a `logmeta` field with:
+
+- `step`: one of `START`, `UPDATE_GH`, `UPDATE_Y`, `END`,
+  `ERROR_CHECK`, `ERROR_GH`, `ERROR_Y`, `ERROR_DEP`, `ERROR_UPDATE`
+- `measure`: the measure name
+
+```r
+# Inspect the in-memory log after an update
+aux_log_last()
+
+# Load a persisted log from disk (only if log_save = TRUE was used)
+pipfun::log_load(
+  id    = aux_log_last_name(),
+  alias = get_from_auxenv("aux_meta_alias")
+)
+
+# Filter for errors only
+log_dt <- data.table::as.data.table(aux_log_last())
+log_dt[event == "error"]
+```
+
+---
+
+# Versioning Behaviour
+
+`pipaux` uses the `stamp` package to manage artifact versioning on the
+Y-drive. The active mode controls when a new version is written:
+
+| Mode        | Behaviour                                                  |
+|-------------|------------------------------------------------------------|
+| `"content"` | **(default)** New version only when data or code changes   |
+| `"timestamp"` | New version on every save (useful for debugging)         |
+| `"off"`     | Overwrite current artifact with no version history         |
+
+```r
+pipaux_set_versioning("content")    # default
+pipaux_set_versioning("timestamp")  # force new version every run
+pipaux_set_versioning("off")        # overwrite, no history
+
+pipaux_get_versioning()             # query active mode
+pipaux_reset_stamp_options()        # restore pipaux defaults
+```
+
+Default `stamp` options set by `pipaux`:
+
+| Option                | Default   |
+|-----------------------|-----------|
+| `versioning`          | `"content"` |
+| `retain_versions`     | `Inf`     |
+| `force_on_code_change`| `TRUE`    |
+| `code_hash`           | `TRUE`    |
+
+---
+
+# Error Handling
+
+Errors at each step are caught by `tryCatch()` and logged with the
+appropriate `ERROR_*` step code. Whether execution continues after an
+error depends on `halt_on_dep_fail`:
+
+| `halt_on_dep_fail` | Behaviour on error                                  |
+|--------------------|-----------------------------------------------------|
+| `FALSE` (default)  | Error is logged; next measure proceeds              |
+| `TRUE`             | Error is re-thrown; full pipeline stops             |
+
+GitHub-unreachable errors (`update_gh = NA`) do not trigger a Y-drive
+check — the measure is skipped and logged.
+
+---
+
+# Quick Reference: Decision Logic
+
+```
+aux_fun(measure)
+  │
+  ├─ is_top_level()?
+  │     YES → init_aux_log(), create processed env
+  │
+  ├─ resolve_measure_repo_owner()
+  │
+  ├─ process_dependencies()
+  │     └─ for each dep not in processed:
+  │           aux_fun(dep)   ← recursive
+  │
+  ├─ check_github_status()
+  │     update_gh = TRUE  ──────────────────────────────┐
+  │     update_gh = FALSE → check_y_drive_status()      │
+  │                              update_y = TRUE ───────┤
+  │                              update_y = FALSE → skip│
+  │                                                     │
+  └─ execute_update() ◄────────────────────────────────-┘
+        ├─ update_gh → sync_release_branch()
+        └─ update_y  → do.call(aux_<measure>(), ...)
+                            └─ pip_aux_save()
+```

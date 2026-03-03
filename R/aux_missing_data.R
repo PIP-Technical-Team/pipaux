@@ -7,20 +7,19 @@
 #'   a data.table
 #' @export
 aux_missing_data <- function(action  = c("update", "load"),
-                             force   = FALSE,
                              owner   = getOption("pipfun.ghowner"),
-                             maindir = getOption("pipaux.working_dir"),
                              tag     = NULL
                              ) {
 
   measure <- "missing_data"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
   branch         <- paste0(release, "_", identity)
+
 
   if (is.null(tag)) {
     tag <- paste0(release, "_", identity)
@@ -34,30 +33,15 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     # Load data ------
 
-    # pipload::pip_load_all_aux(aux = c("gdp", "pce", "pfw", "country_list"),
-    #                           aux_names = c("gdp", "pce", "pfw", "cl"),
-    #                           replace = TRUE)
+    gdp <- pipload::load_aux_data(measure = "gdp")
 
-    gdp <- load_aux(maindir = maindir,
-                    branch  = branch,
-                    measure = "gdp")
+    pce <- pipload::load_aux_data(measure = "pce")
 
-    pce <- load_aux(maindir = maindir,
-                    branch  = branch,
-                    measure = "pce")
+    pfw <- pipload::load_aux_data(measure = "pfw")
 
-    pfw <- load_aux(maindir = maindir,
-                    branch  = branch,
-                    measure = "pfw")
+    pop <- pipload::load_aux_data(measure = "pop")
 
-    pop <- load_aux(maindir = maindir,
-                    branch  = branch,
-                    measure = "pop")
-
-    cl <- load_aux(maindir = maindir,
-                   branch  = branch,
-                    measure = "country_list")
-
+    cl <- pipload::load_aux_data(measure = "country_list")
 
     ref_years <- gls$PIP_REF_YEARS
 
@@ -68,18 +52,17 @@ aux_missing_data <- function(action  = c("update", "load"),
     setnames(gdp, names(gdp) ,sub("^gdp[_]", "nac_", names(gdp)))
 
     nac <- joyn::joyn(gdp, pce,
-                       by = c(
-                         "country_code", "year", "nac_data_level",
-                         "nac_domain"),
+                       by         = c(
+                         "country_code", "year", "reporting_level"),
                        match_type = "1:1",
-                       reportvar = FALSE,
-                       verbose = FALSE,
-                      keep = "full")
+                       reportvar  = FALSE,
+                       verbose    = FALSE,
+                       keep       = "full")
 
     nac <-
       nac[year %in% ref_years
       ][,
-        nac_domain := NULL]
+        intersect("nac_domain", names(nac)) := NULL]
 
 
 
@@ -87,11 +70,8 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     cl <- cl[, c("country_code", "region_code")]
 
-    gr <-
-      expand.grid(country_code = cl$country_code,
-                  year = ref_years,
-                  stringsAsFactors = FALSE) |>
-      as.data.table()
+    gr <- CJ(cl$country_code, ref_years)
+    setnames(gr, c("country_code", "year"))
 
     setorder(gr, country_code, year)
 
@@ -191,9 +171,9 @@ aux_missing_data <- function(action  = c("update", "load"),
 
 # Join  with pop data -----
     pop <-
-      pop[pop_data_level == "national"
+      pop[reporting_level == "national"
       ][,
-        c("pop_domain", "pop_data_level") := NULL
+        reporting_level := NULL
       ]
 
     setnames(pop, "pop", "reporting_pop")
@@ -202,36 +182,25 @@ aux_missing_data <- function(action  = c("update", "load"),
       pop[ct_miss_data,
           on = c("country_code", "year")]
 
-#  .................................................................
 ##  Save data                                                    ####
-    msrdir  <- fs::path(maindir, "aux_data", branch, measure)
+    key_cols <- c("country_code", "year")
+    setattr(pop_md, "aux_key", key_cols)
 
-    # ----- function raw sha -----------------------------
-    raw_sha_fun <- digest::digest(body(
-      paste0("aux_", measure))
-    )
-
-
-    setattr(pop_md,
-            "raw_sha_fun",
-            raw_sha_fun)
-
-    saved <- pipfun::pip_sign_save(
-      x       = pop_md,
-      measure = measure,
-      msrdir  = msrdir,
-      force   = force
+    saved <- pip_aux_save(
+      x        = pop_md,
+      id       = measure,
+      pk       = key_cols,
+      code     = aux_missing_data,
+      code_label = "aux_missing_data"
     )
 
     return(invisible(saved))
 
   } else {
-    dl <- load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
-    return(dl)
+
+    df <- pipload::load_aux_data(measure = measure)
+
+    return(df)  
   }
 
-} # end of function pip_missing_data
+}

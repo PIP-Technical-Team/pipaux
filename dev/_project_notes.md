@@ -1,0 +1,401 @@
+# pipaux — Technical Guide
+
+**Audience:** PIP Technical Team maintaining or running the PIP auxiliary-data workflow.  
+**Assumes:** Access to PIP servers and a valid GitHub PAT.
+
+---
+
+## Table of Contents
+1. [Purpose](#purpose)
+2. [Quickstart](#quickstart)
+3. [Core Concepts](#core-concepts)
+4. [Update Pipeline](#update-pipeline)
+5. [Logging](#logging)
+6. [Per-Measure Notes](#per-measure-notes)
+7. [Troubleshooting](#troubleshooting)
+8. [Developer Snippets](#developer-snippets)
+
+---
+
+## Purpose
+
+`pipaux` orchestrates 2 main processes. These processes perform operations both in the GitHub auxiliary data repositories and in the PIP Y drive.
+
+**Process 1.** Updating auxiliary data files, from GitHub or raw source to the PIP Y drive. This consists of 3 broad operations:
+1. Loading raw auxiliary data from GitHub or other sources, while ensuring the most recent version is loaded and that GitHub branches are correctly in sync with DEV.
+2. Validating and formatting the raw data according to measure-specific rules.
+3. Saving the formatted data to the Y drive with appropriate metadata for provenance tracking and change detection.
+
+**Change detection — how unnecessary work is avoided:**  
+The update pipeline checks multiple signals before deciding whether to re-run any step:
+- **GH branch sync:** if the release branch of an `aux_*` GitHub repo is behind `DEV`, it is updated first.
+- **GH content change:** the raw file SHA on GitHub is compared against the SHA stored in the Y-drive sidecar. A mismatch triggers reformatting and re-saving.
+- **Function code change:** a hash of the `aux_*` function body is compared against the hash stored in the Y-drive sidecar. A mismatch triggers reformatting and re-saving.
+- **Dependency cascade:** auxiliary measures are interdependent. When a change is detected in any measure, all downstream dependents are automatically updated.
+
+**Process 2.** Comparing auxiliary data files across releases or vintages, to identify changes in Y-drive files and produce diffs.
+
+**Key backend components:**
+
+| Component | Location |
+|---|---|
+| Measure-specific update functions | `R/aux_*.R` |
+| Update orchestration | `R/update_aux_data.R` |
+| Check synchronization status across GH / Y-drive | `R/check_status.R` |
+| Change detection and comparison functions | `R/identify_changes.R` |
+
+---
+
+## Quickstart
+
+```r
+# 1. MANDATORY: populate .pipaux environment with all release information and paths
+pipfun::setup_working_release()
+
+# 2. Load package sources (development)
+devtools::load_all()
+
+# 3. Verify runtime state
+ls(envir = .pipaux)
+get_from_auxenv("wrk_release")       # list: release (YYYYMMDD) + identity (TEST/PROD)
+get_from_auxenv("aux_data_path")     # Y-drive path for QS artifacts
+get_from_auxenv("aux_metadata_path") # Y-drive path for sidecar metadata
+get_from_auxenv("aux_alias")         # stamp alias for aux data folder
+get_from_auxenv("aux_meta_alias")    # stamp alias for aux metadata folder
+
+# 4. Read a previously saved measure (read-only, no update)
+pipload::load_aux_data(measure = "gdp")
+
+# 5. Update a single measure (resolves all dependencies automatically)
+aux_fun(measure = "gdp", force = FALSE, verbose = TRUE, owner = "RossanaTat")
+
+# 6. Update all or selected measures
+update_aux_measures(measures = c("cpi", "gdp"), owner = "RossanaTat", log_save = TRUE)
+
+# 6a. Inspect the saved log (only if log_save = TRUE was used above)
+pipfun::log_load(
+  id    = aux_log_last_name(),               # name of the most recent log file
+  alias = get_from_auxenv("aux_meta_alias")  # stamp alias for aux metadata folder
+)
+
+# 7. Compare releases or vintages
+compare_aux_releases(old_release = "YYYYMMDD_ID")
+compare_aux_vintages(measures = c("cpi", "gdp"), version = -1)
+```
+
+---
+
+## Core Concepts
+
+### `.pipaux` Runtime Environment
+
+Populated by `pipfun::setup_working_release()` (called automatically in `R/zzz.R` on package load).
+
+| Field | Description |
+|---|---|
+| `wrk_release` | List: `release` (YYYYMMDD), `identity` (TEST/PROD) |
+| `pip_folders` | Y-drive and repository paths from `pipfun::get_pip_folders()` |
+| `aux_data_path` | Concrete Y-drive path for QS/aux artifacts |
+| `aux_metadata_path` | Concrete Y-drive path for sidecar metadata |
+| `aux_alias` | Stamp alias for aux data folder |
+| `aux_meta_alias` | Stamp alias for aux metadata folder |
+
+Release-scoped options (e.g. `pipaux.madsrc`, `pipfun.ghowner`, `pipaux.pppyear`) are set in `R/zzz.R`.
+
+### Stamp Versioning Options
+
+`pipaux` uses the `stamp` package to manage artifact versioning. Three high-level modes are available:
+
+| Mode | Behaviour |
+|---|---|
+| `"content"` | **(default)** Save a new version only when data content or function code changes |
+| `"timestamp"` | Save a new version on every call (useful for debugging) |
+| `"off"` | Overwrite the current artifact with no versioning |
+
+```r
+# Set mode
+pipaux_set_versioning("content")     # default
+pipaux_set_versioning("timestamp")   # force new version every run
+pipaux_set_versioning("off")         # overwrite, no version history
+
+# Query active mode
+pipaux_get_versioning()
+
+# Reset to pipaux defaults
+pipaux_reset_stamp_options()
+
+# Advanced: pass options directly to stamp::st_opts()
+pipaux_set_stamp_option(force_on_code_change = FALSE)
+```
+
+The pipaux defaults (restored by `pipaux_reset_stamp_options()`) are:
+- `versioning = "content"`
+- `retain_versions = Inf`
+- `force_on_code_change = TRUE`
+- `code_hash = TRUE`
+
+### GH Provenance & SHA Semantics
+
+- Measure-specific update functions call `pipfun::load_from_gh()` to retrieve raw data. The returned object carries a `gh` attribute (`attributes(x)$gh`) with GitHub metadata, including the raw file SHA that identifies content. **This attribute must be present for the change-detection logic to work.**
+- Saved artifacts carry this GH information via `pip_aux_save(..., metadata = list(gh = <gh>))`.
+- For derived measures (not read directly from GH), `attributes(...)$gh` is a list aggregating the `gh` attributes of all input artifacts.
+
+**Key sidecar fields saved per artifact:**
+
+| Field | Purpose |
+|---|---|
+| `gh` | GitHub metadata: raw file SHA, repo owner, branch, file path, etc. |
+| `code_hash` | Hash of the formatter function body (for code-change detection) |
+| `code_label` | Name of the formatter function (used to look it up at check time) |
+| `pk` | Primary key columns |
+
+---
+
+## Update Pipeline
+
+Implemented in `R/update_aux_data.R`. Entry point: `aux_fun()`.
+
+### Step 1 — Initialization (top-level only)
+
+When `is_top_level()` is `TRUE`, `aux_fun()`:
+- Initializes the update log.
+- Creates a `processed` environment to track completed measures in the cascade.
+
+### Step 2 — Resolve Repo / Branch / Tag
+
+`resolve_measure_repo_owner()` computes `owner`, `repo`, `branch`, and `tag`.  
+By convention: `branch = paste0(release, "_", identity)`. The value `"main"` is converted to `""` for loaders.  
+This is needed because some auxiliary data measure repositories live under different GH accounts (e.g. `GPID-WB/Class` vs `PIP-Technical-Team`).
+
+### Step 3 — Dependency Resolution
+
+`read_dependencies()` loads the dependency map (stored on GitHub, updated manually when needed). `process_dependencies()` builds a graph and recursively calls `aux_fun()` for each dependency. The `processed` environment prevents repeated work and breaks cycles.
+
+**Inspect the current dependency graph:**
+
+```r
+deps <- read_dependencies(
+    gh_user = "https://raw.githubusercontent.com",
+    owner   = "PIP-Technical-Team"
+  )
+plot_dependencies(deps)
+```
+
+### Step 4 — Per-Measure Update
+
+**Load sources:**
+
+| Source type | Loader |
+|---|---|
+| GH-raw | `pipfun::load_from_gh()` |
+| Derived | `pipload::load_aux_data()` |
+
+**Validate:** Measure-specific validators (`*_validate_raw`, `*_validate_output`) run and abort on errors.
+
+**Decide whether to publish to the Y drive (`execute_update()`):**
+
+The decision logic lives in `R/check_status.R` and involves two sequential checks:
+
+**`check_github_status()`** — inspects the GitHub release branch:
+
+| Condition | `update_gh` | Consequence |
+|---|---|---|
+| Measure skipped (`countries`, `missing_data`) | `FALSE` | No GH update; proceed to Y-drive check |
+| Release branch does not exist on GH | `TRUE` | Branch created / updated; Y-drive update also triggered |
+| Release branch content differs from `DEV` | `TRUE` | Branch updated; Y-drive update also triggered |
+| Release branch is in sync with `DEV` | `FALSE` | Proceed to Y-drive check |
+
+**Policy:** if `update_gh = TRUE`, the Y-drive is always updated (no separate Y-drive check needed).
+
+**`check_y_drive_status()`** — inspects the Y-drive artifact (only reached when `update_gh = FALSE`):
+
+| Condition | `update_y` |
+|---|---|
+| Sidecar or artifact file missing | `TRUE` |
+| Any GH raw SHA in sidecar differs from current GH SHA | `TRUE` |
+| Hash of current formatter function differs from `sidecar$code_hash` | `TRUE` |
+| All checks pass | `FALSE` |
+
+For multi-file measures (e.g. `aux_cp`), every file's SHA is checked; a mismatch in any one file triggers an update.
+
+**Publishing:**
+
+```r
+pip_aux_save(
+  x          = result,
+  id         = measure,
+  metadata   = list(gh = <gh>),
+  code       = <formatter_function>,
+  code_label = "<formatter_function_name>",
+  pk         = <aux_key>
+)
+```
+
+### Step 5 — Post-Publish
+
+- Mark measure as processed in the cascade state.
+- Append a success/failure entry to the log (paths, SHA recorded, errors with stack traces).
+- Optionally save log to disk with `pipfun::log_save()`.
+
+---
+
+## Logging
+
+### Initialization
+
+On package load (`.onLoad` in `R/zzz.R`), a log named `"pipaux_update_log"` is initialized in `.piplogenv`.
+
+### When Entries Are Written
+
+Each time `aux_fun()` is called for a measure, an entry is appended with: measure name, timestamp, success/failure, GH SHAs involved, and any errors with stack traces.  
+If `update_aux_measures()` is called with `log_save = TRUE`, the full log is saved to disk at the end.
+
+### Reading Logs
+
+```r
+devtools::load_all()
+pipfun::setup_working_release()
+
+# Option A: load the most recently saved log
+pipfun::log_load(
+  id    = aux_log_last_name(),
+  alias = get_from_auxenv("aux_meta_alias")
+)
+
+# Option B: inspect the in-memory log (if log_save was not used)
+latest_log <- aux_log_last()
+```
+
+---
+
+## Per-Measure Notes
+
+Source types: **GH-raw** (input comes directly from GitHub), **Derived** (computed from other aux measures), **External** (downloaded from a URL).
+
+### `aux_censoring`
+- **Source:** GH-raw (`countries.csv`, `regions.csv`)
+- **Loader:** `pipfun::load_from_gh(..., filename = "countries.csv")` and `"regions.csv"`
+- **Attributes:** `raw_sha_fun`, `aux_key = c("countries", "regions")`
+- **Notes:** Per-file GH raw SHAs compared against saved sidecar metadata to decide republication.
+
+### `aux_countries`
+- **Source:** Derived (`country_list` + `pfw`)
+- **Loader:** `pipload::load_aux_data(measure = "country_list")`, `pipload::load_aux_data(measure = "pfw")`
+- **Logic:** Subsets `country_list` to only the `country_code` values present in `pfw` where `inpovcal == 1`. No raw GH file is read directly.
+- **Attributes:** `aux_key = c("country_code")`, `code_label = "aux_countries"`
+- **Change detection:** driven entirely by `code_hash` (function body change) and the inherited `gh` attributes of `country_list` and `pfw` inputs.
+- **Validation:** `countries_validate_output()` checks column types, `region_code` membership (`EAP`, `ECA`, `LAC`, `MNA`, `OHI`, `SAS`, `SSA`), `africa_split_code` membership (`AFE`, `AFW`), no NAs in `country_code`, and uniqueness of `country_code`.
+
+### `aux_country_list`
+- **Source:** GH-raw (`GPID-WB/Class` repo)
+- **Loader:** `pipfun::load_from_gh(..., owner = "GPID-WB", repo = "Class", filename = "OutputData/CLASS", ext = "dta")`
+- **Attributes:** `aux_key = c("country_code")`, `raw_sha_fun`; persists `metadata$gh`
+- **Notes:** Uses `owner = "GPID-WB"` — not `PIP-Technical-Team`.
+
+### `aux_cp` (Country Profiles)
+- **Source:** GH-raw multi-file (multiple CSV/DTA files)
+- **Key pattern:**
+  ```r
+  gh_list <- lapply(raw_files, function(x) attributes(x)$gh)
+  pip_aux_save(..., metadata = list(gh = gh_list))
+  ```
+- **Notes:** A change in any single input file triggers republication.
+
+### `aux_cpi`
+- **Source:** GH-raw primary; also uses `country_list` and other aux inputs.
+- **Notes:** Month helpers (`get_month_number`, `days_in_month`) and decimal/precision validators — preserve month metadata and `aux_key`.
+
+### `aux_dictionary`
+- **Source:** GH-raw (dictionary CSV)
+- **Attributes:** `metadata$gh`, `raw_sha_fun`
+
+### `aux_gdm`
+- **Source:** GH-raw primary (PCN Masterfile CSV); merges with derived inputs (`pfw` via `pipload::load_aux_data()`, inventory via `fst::read_fst()`)
+- **Loader:** `pipfun::load_from_gh(..., ext = "csv")`
+- **Logic:** Filters to grouped-data surveys (`DistributionFileName` matching `.T01/.T02/.T05`), recodes columns, merges with `pfw` for `surveyid_year` and `survey_acronym`, merges with inventory for `survey_id`, filters to `inpovcal == 1`, then subsets to WDI countries via `country_list`.
+- **Attributes:** `aux_key = c("country_code", "year", "reporting_level", "welfare_type")`, `metadata$gh` from the raw GH file, `code_label = "aux_gdm_update"`
+- **Notes:** The inventory is read directly from a fixed Y-drive path (`Y:\PIP_ingestion_pipeline_v2\_inventory\inventory.fst`), not from GH. This is a known external dependency.
+
+### `aux_gdp`
+- **Source:** Derived composite (WDI + WEO + Maddison + SNA + NAN + population)
+- **Publish flow:**
+  1. `save_aux_to_gh()` writes a CSV to the `aux_gdp` GitHub repo.
+  2. `pipfun::load_from_gh(measure = "gdp", ...)` reads it back to capture GH metadata.
+  3. `pip_aux_save(..., metadata = list(gh = attributes(gdp_gh)$gh))` persists to Y-drive.
+
+### `aux_income_groups`
+- **Source:** GH-raw (`GPID-WB/Class`, same repo as `country_list`)
+- **Notes:** Uses `owner = "GPID-WB"` — not `PIP-Technical-Team`. Persists `attributes(ig)$gh` and `raw_sha_fun`.
+
+### `aux_maddison`
+- **Source:** External URL (option `pipaux.madsrc`); not GH-raw.
+- **Notes:** No `attributes(x)$gh`. Consider adding a download digest attribute for change detection.
+
+### `aux_metadata`
+- **Source:** Derived from `pfw` and `country_list`
+- **Notes:** Preserves input provenance via inherited `gh` attributes.
+
+### `aux_missing_data`
+- **Source:** Derived diagnostic; no GH raw output.
+- **Notes:** GitHub check is skipped for this measure (handled in `check_github_status()`). Preserve input provenance if needed.
+
+### `aux_nan`
+- **Source:** GH-raw (`PIP-Technical-Team`) or internal fallback.
+- **Notes:** Keep `attributes(...)$gh` intact.
+
+### `aux_regions`
+- **Source:** Derived from `country_list` (no raw GH file)
+- **Loader:** `pipload::load_aux_data(measure = "country_list")`
+- **Logic:** Melts `country_list` on all `*_code` columns to get a `(region_code, grouping_type)` table, then joins back to get the corresponding region labels. Deduplicates and drops rows where `grouping_type == "region"` or `region_code == ""`. Result is a unique mapping of `region_code → region + grouping_type`.
+- **Attributes:** `aux_key = c("region_code")`, `code_label = "aux_regions"`
+- **Change detection:** driven entirely by `code_hash` and the inherited `gh` attribute of the `country_list` input.
+
+### Remaining Measures
+
+`aux_indicators`, `aux_labels_pip`, `aux_npl`, `aux_pce`, `aux_pfw`, `aux_pl`, `aux_pop`, `aux_ppp`, `aux_sna`, `aux_wdi`, `aux_weo` all follow the same patterns:
+- GH-raw sources use `pipfun::load_from_gh()` → `attributes(x)$gh` present.
+- Derived sources use `pipload::load_aux_data()`.
+- All persist `metadata$gh` and `code_label` via `pip_aux_save()`.
+
+---
+
+## Development Scripts (`dev/`)
+
+The `dev/` folder contains **interactive diagnostics and workflow scripts**. Nothing here is part of the installed package — all scripts are excluded via `.Rbuildignore` and each guards against non-interactive execution.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `_project_notes` | This document. Read first when onboarding or returning after a break. |
+| `01_dependency_and_update_runner.R` | Run `update_aux_measures()` and extract structured diagnostics (e.g., time spent) |
+| `02_log_diagnostics.R` | Validate log structure, dependency ordering, and persistence after an update run |
+| `03_simulation_tools.R` | Simulate data changes (row drops, value edits) to test change-detection logic |
+| `04_files_comparison_diagnostics.R` | Compare aux data across releases or vintages and summarise diffs |
+| `05_interactive_full_run.R` | Orchestrator: runs steps 1–4 in sequence as a full workflow |
+
+### Rules
+
+1. **Always start a session the same way** before running anything in `dev/`:
+   ```r
+   
+   pipfun::setup_working_release()
+   devtools::load_all()
+
+   ```
+
+2. **Run scripts individually or as a full workflow:**
+   ```r
+   # Individual step (recommended for debugging a specific stage)
+   source("dev/01_dependency_and_update_runner.R")
+   run_ordered_update_diagnostics(measures = c("cpi", "gdp"), owner = "RossanaTat") # use this owner for testing
+
+   # Full workflow (all steps in sequence)
+   source("dev/05_interactive_full_run.R")
+   results <- run_all_workflow(owner = "YourGHUser")
+   ```
+
+3. **`dev/` is not for package code.** Any function that belongs to the package logic goes in `R/`. `dev/` is strictly for interactive workflows, diagnostics, and notes.
+
+4. **Keep `_project_notes` updated** when the package logic changes. It is the single source of truth for the team.
+---

@@ -4,12 +4,10 @@
 \alias{aux_weo_clean}
 \title{Clean WEO data}
 \usage{
-aux_weo_clean(dt, maindir = getOption("pipaux.working_dir"), branch = NULL)
+aux_weo_clean(dt, branch = NULL)
 }
 \arguments{
 \item{dt}{database with weo raw data}
-
-\item{maindir}{directory where auxiliary data is stored (to load pop)}
 
 \item{branch}{character: branch to be loaded}
 }

@@ -8,16 +8,15 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_income_groups <- function(action       = c("update", "load"),
-                              force        = FALSE,
+                              #force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
-                              maindir      = getOption("pipaux.working_dir"),
                               detail       = getOption("pipaux.detail.raw")
 ) {
 
   measure <- "income_groups"
   action <- match.arg(action)
 
-  pipfun::get_wrk_release(verbose = FALSE)
+  wrk_release <- get_from_auxenv(key = "wrk_release")
 
   release        <- wrk_release$release
   identity       <- wrk_release$identity
@@ -38,12 +37,12 @@ aux_income_groups <- function(action       = c("update", "load"),
     ) |>
       get_vars(c('code',
                  'year_data',
-                 'incgroup_historical',
-                 'fcv_historical',
-                 'region_SSA')) |>
+                 'incgroup',
+                 'fcv',
+                 'regionssa')) |>
       # create variables for future development
       ftransform(year         = year_data,
-                 income_group = incgroup_historical)
+                 income_group = incgroup)
 
     ig[,
        income_group_code := fcase(income_group == "High income", "HIC",
@@ -52,7 +51,7 @@ aux_income_groups <- function(action       = c("update", "load"),
                                   income_group == "Low income", "LIC",
                                   default = "")]
     setnames(ig,
-             c("code", "region_SSA"),
+             c("code", "regionssa"),
              c("country_code", "ssa_subregion_code"))
 
     ### Get info
@@ -62,24 +61,16 @@ aux_income_groups <- function(action       = c("update", "load"),
     gh <- attr(ig,
                "gh")
 
-    # ----- function raw sha ------
-    raw_sha_fun <- digest::digest(body(
-      aux_income_groups)
-      )
-
-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## save --------
     # ig <- ig |> setnames("year_data", "year", skip_absent=TRUE)
 
     setattr(ig, "aux_name", "income_groups")
-    setattr(ig,
-            "aux_key",
-            c("country_code", "year"))
 
-    setattr(ig,
-           "raw_sha_fun",
-           raw_sha_fun)
+      key_cols <- c("country_code", "year")
+      setattr(ig, "aux_key", key_cols)
+
+    # ...existing code...
 
     # validate income group output data
     incgroup_validate_output(incgroup = ig, detail = detail)
@@ -88,26 +79,21 @@ aux_income_groups <- function(action       = c("update", "load"),
       branch <- ""
     }
 
-    msrdir <- fs::path(maindir,
-                       "aux_data",
-                       branch, #should be the name of release with identity, e.g., 20250203_TEST
-                       measure) # measure dir
 
-    saved <- pipfun::pip_sign_save(
-      x = ig,
-      measure = measure,
-      msrdir = msrdir,
-      force = force
+    saved <-  pip_aux_save(
+      x        = ig,
+      id       = measure,
+      pk       = key_cols,
+      metadata = list(gh = gh),
+      code     = aux_income_groups,
+      code_label = "aux_income_groups"
     )
+
     return(invisible(saved))
 
   } else  {
 
-    load_aux(
-      maindir = maindir,
-      measure = measure,
-      branch  = branch
-    )
+    pipload::load_aux_data(measure = measure)
 
   }
 }
@@ -140,12 +126,12 @@ incgroup_validate_output <- function(incgroup, detail = getOption("pipaux.detail
                 description = "`income_group_code` should be character") |>
     validate_cols(in_set(c("HIC", "LIC", "LMIC", "UMIC")),
                   income_group_code, description = "`income_group_code` values within range") |>
-    validate_if(is.character(incgroup_historical),
+    validate_if(is.character(incgroup),
                 description = "`incgroup_historical` should be character") |>
     validate_cols(in_set(c("High income", "Low income", "Lower middle income", "Upper middle income")),
-                  incgroup_historical, description = "`incgroup_historical` values within range") |>
-    validate_if(is.character(fcv_historical),
-                description = "`fcv_historical` should be character") |>
+                  incgroup, description = "`incgroup` values within range") |>
+    validate_if(is.character(fcv),
+                description = "`fcv` should be character") |>
     validate_if(is.character(ssa_subregion_code),
                 description = "`ssa_subregion_code` should be character") |>
     validate_cols(not_na, country_code, year_data,

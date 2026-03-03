@@ -4,23 +4,15 @@
 \alias{aux_cp_update}
 \title{Update Country Profiles}
 \usage{
-aux_cp_update(
-  maindir = getOption("pipaux.working_dir"),
-  force = FALSE,
-  owner = getOption("pipfun.ghowner"),
-  branch = paste0(wrk_release$release, "_", wrk_release$identity),
-  tag = match.arg(branch)
-)
+aux_cp_update(owner = getOption("pipfun.ghowner"), branch, tag = tag, ...)
 }
 \arguments{
-\item{maindir}{character: Main directory of project.}
-
-\item{force}{logical: If TRUE data will be overwritten.}
-
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \description{
 Update a list with country profiles data

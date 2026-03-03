@@ -6,6 +6,9 @@
 \usage{
 aux_pfw_key(maindir = getOption("pipaux.working_dir"))
 }
+\arguments{
+\item{maindir}{main directory of the project, default value is set to the option "pipaux.working_dir"}
+}
 \value{
 data.table
 }
