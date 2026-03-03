@@ -126,7 +126,7 @@ auto_aux_update <- function(
 
   # Remove prefix to get repo name
   # PIP-Technical-Team/aux_ppp changes to ppp and PIP-Technical-Team/aux_missing_countries becomes missing_countries
-  aux_fns <- sub(paste0(owner, "/aux_", "", new_data$Repo)) |>
+  aux_fns <- sub(paste0(owner, "/aux_"), "", new_data$Repo) |>
     # Keep only those whose dependencies we know
     intersect(names(dependencies))
 
