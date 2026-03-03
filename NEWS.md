@@ -1,5 +1,7 @@
 # pipaux 0.1.4
 
+- fix pip_income_groups function based on new data
+
 # pipaux 0.1.3
 
 - Save data to GitHub for GDP data. 
