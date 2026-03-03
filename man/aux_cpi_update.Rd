@@ -15,6 +15,8 @@ aux_cpi_update(
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
+\item{detail}{has an option TRUE/FALSE, default value is pipaux.detail.raw option}
+
 \item{tag}{character: specific release to be used in the update.}
 }
 \description{

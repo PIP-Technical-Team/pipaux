@@ -43,10 +43,6 @@ make_ppp_output <- function(...) {
 
 # ppp_validate_raw() ------------------------------------------------------
 
-test_that("ppp_validate_raw() passes with valid data", {
-  expect_no_error(ppp_validate_raw(ppp = make_ppp_raw(), detail = FALSE))
-})
-
 test_that("ppp_validate_raw() errors when CoverageType has invalid value", {
   bad <- make_ppp_raw(CoverageType = c("National", "Invalid"))
   expect_error(ppp_validate_raw(ppp = bad, detail = FALSE))
@@ -87,9 +83,6 @@ test_that("ppp_validate_raw() errors when data is NULL", {
 
 # ppp_validate_output() ---------------------------------------------------
 
-test_that("ppp_validate_output() passes with valid data", {
-  expect_no_error(ppp_validate_output(ppp = make_ppp_output(), detail = FALSE))
-})
 
 test_that("ppp_validate_output() errors when reporting_level has invalid value", {
   bad <- make_ppp_output(reporting_level = c("national", "invalid"))

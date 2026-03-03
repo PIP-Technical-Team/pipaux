@@ -18,9 +18,6 @@ aux_sna(
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
-
-\item{from}{character: Either "gh", "file" or "api". Default is "gh". "file"
-and "gh" are synonymous}
 }
 \description{
 Update special national accounts data

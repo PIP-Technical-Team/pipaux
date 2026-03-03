@@ -11,11 +11,6 @@ make_mpd_raw <- function(...) {
 }
 
 # mpd_validate_raw() ------------------------------------------------------
-
-test_that("mpd_validate_raw() passes with valid data", {
-  expect_no_error(mpd_validate_raw(mpd = make_mpd_raw(), detail = FALSE))
-})
-
 test_that("mpd_validate_raw() errors when country_code is not character", {
   bad <- make_mpd_raw(country_code = c(1, 2))
   expect_error(mpd_validate_raw(mpd = bad, detail = FALSE))

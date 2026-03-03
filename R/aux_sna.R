@@ -4,8 +4,6 @@
 #'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
-#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
-#'   and "gh" are synonymous
 #' @export
 aux_sna <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),

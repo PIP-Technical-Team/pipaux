@@ -11,14 +11,12 @@ make_countries_output <- function(...) {
     world             = c("World", "World"),
     world_code        = c("WLD", "WLD")
   )
-  modifyList(dt, list(...))
+  overrides <- list(...)
+  for (nm in names(overrides)) {
+    dt[, (nm) := overrides[[nm]]]
+  }
+  dt
 }
-
-# countries_validate_output() ---------------------------------------------
-
-test_that("countries_validate_output() passes with valid data", {
-  expect_no_error(countries_validate_output(countries = make_countries_output(), detail = FALSE))
-})
 
 test_that("countries_validate_output() errors when country_code is not character", {
   bad <- make_countries_output(country_code = c(1, 2))

@@ -412,7 +412,9 @@ get_gh <- function(owner,
 #'
 #' Sometimes we need to save auxiliary files to Github repo.
 #' This function allows for this.
-#'
+#' @param measure character: Name of the measure, e.g. "wdi". This will be used to construct the repo name and the filename.
+#' @param tag character: Tag. Defaults to the branch name.
+#' @param ... Additional arguments to be passed to `pipfun::save_to_gh()`
 #' @inheritParams pipfun::save_to_gh
 #' @export
 #' @return NULL
@@ -424,8 +426,7 @@ save_aux_to_gh <- function(df,
                        tag       = branch,
                        filename  = measure,
                        ext       = "csv",
-                         ...
-                         ) {
+                       ...) {
 
   pipfun::save_to_gh(df = df,
                      repo = repo,
@@ -451,6 +452,7 @@ get_from_auxenv <- \(key) {
 #'
 #' @param x Data to be saved
 #' @param id Name of the file
+#' @param ... Additional arguments to be passed to `pipload::pip_write()`
 #'
 #' @returns Fully qualified name of the new file, invisibly
 #'

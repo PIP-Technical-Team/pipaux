@@ -5,7 +5,6 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
-#' @param from character: Source for population data.
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
@@ -42,7 +41,7 @@ aux_pop <- function(action = c("update", "load"),
 #' Update POP
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
-#' @param from character: Source for population data.
+#' @param branch character: branch name to load data from GH. If NULL, it will be set to the current release branch.
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pop
 aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),

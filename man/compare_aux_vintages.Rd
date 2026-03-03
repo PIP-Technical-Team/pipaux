@@ -17,8 +17,6 @@ Default is \code{-1}.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
 printed. Default is \code{FALSE}.}
-
-\item{...}{Additional arguments passed to \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}.}
 }
 \value{
 Invisibly returns a named list with one element per measure,

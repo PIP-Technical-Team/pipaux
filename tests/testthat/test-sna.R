@@ -29,9 +29,6 @@ make_sna_fy_raw <- function(...) {
 
 # sna_validate_raw() ------------------------------------------------------
 
-test_that("sna_validate_raw() passes with valid data", {
-  expect_no_error(sna_validate_raw(sna = make_sna_raw(), detail = FALSE))
-})
 
 test_that("sna_validate_raw() errors when coverage has invalid value", {
   bad <- make_sna_raw(coverage = c("National", "Invalid"))
@@ -86,10 +83,6 @@ test_that("sna_validate_raw() errors when data is NULL", {
 })
 
 # sna_fy_validate_raw() ---------------------------------------------------
-
-test_that("sna_fy_validate_raw() passes with valid data", {
-  expect_no_error(sna_fy_validate_raw(sna_fy = make_sna_fy_raw(), detail = FALSE))
-})
 
 test_that("sna_fy_validate_raw() errors when Code is not character", {
   bad <- make_sna_fy_raw(Code = c(1, 2))

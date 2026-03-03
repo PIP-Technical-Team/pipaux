@@ -15,11 +15,11 @@ aux_pop_update(
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
+\item{branch}{character: branch name to load data from GH. If NULL, it will be set to the current release branch.}
+
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
-
-\item{from}{character: Source for population data.}
 }
 \description{
 Update POP

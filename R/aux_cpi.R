@@ -7,7 +7,7 @@
 #'   memory.
 #' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
-#'
+#' @param detail has an option TRUE/FALSE, default value is pipaux.detail.raw option
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),

@@ -25,8 +25,6 @@ aux_pfw(
 
 \item{...}{parameters to be passed to the loading functions depending of the
 extension used}
-
-\item{force}{logical: If TRUE data will be overwritten.}
 }
 \description{
 Load or update PIP Price Framework data.

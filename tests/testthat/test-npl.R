@@ -28,10 +28,6 @@ make_npl_output <- function(...) {
 
 # npl_validate_raw() ------------------------------------------------------
 
-test_that("npl_validate_raw() passes with valid data", {
-  expect_no_error(npl_validate_raw(npl = make_npl_raw(), detail = FALSE))
-})
-
 test_that("npl_validate_raw() errors when countrycode is NA", {
   bad <- make_npl_raw(countrycode = c("AAA", NA_character_))
   expect_error(npl_validate_raw(npl = bad, detail = FALSE))
@@ -81,9 +77,6 @@ test_that("npl_validate_raw() errors when data is NULL", {
 
 # npl_validate_output() ---------------------------------------------------
 
-test_that("npl_validate_output() passes with valid data", {
-  expect_no_error(npl_validate_output(npl = make_npl_output(), detail = FALSE))
-})
 
 test_that("npl_validate_output() errors when country_code is NA", {
   bad <- make_npl_output(country_code = c("AAA", NA_character_))

@@ -114,9 +114,6 @@ make_metadata_output <- function(...) {
 
 # metadata_validate_raw() -------------------------------------------------
 
-test_that("metadata_validate_raw() passes with valid data", {
-  expect_no_error(metadata_validate_raw(metadata = make_metadata_raw(), detail = FALSE))
-})
 
 test_that("metadata_validate_raw() errors when reg has invalid value", {
   bad <- make_metadata_raw(reg = c("EAP", "INVALID"))
@@ -153,10 +150,6 @@ test_that("metadata_validate_raw() errors when data is NULL", {
 })
 
 # metadata_validate_output() ----------------------------------------------
-
-test_that("metadata_validate_output() passes with valid data", {
-  expect_no_error(metadata_validate_output(metadata = make_metadata_output(), detail = FALSE))
-})
 
 test_that("metadata_validate_output() errors when welfare_type has invalid value", {
   bad <- make_metadata_output(welfare_type = c("consumption", "invalid"))

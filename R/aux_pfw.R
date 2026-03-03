@@ -5,7 +5,6 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
-#' @param force logical: If TRUE data will be overwritten.
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table
@@ -207,6 +206,7 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
 }
 
 #' Generate a dataset that contains pfw keys
+#' @param maindir main directory of the project, default value is set to the option "pipaux.working_dir"
 #'
 #' @return data.table
 #' @export

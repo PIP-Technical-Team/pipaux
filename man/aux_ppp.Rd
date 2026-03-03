@@ -22,6 +22,8 @@ aux_ppp(
 \item{tag}{character: specific release to be used in the update.}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
+
+\item{ppp_defaults}{logical: whether to set default PPP}
 }
 \description{
 Load or update PPP data.

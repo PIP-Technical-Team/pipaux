@@ -20,6 +20,8 @@ memory.}
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{detail}{has an option TRUE/FALSE, default value is pipaux.detail.raw option}
 }
 \description{
 Load or update PIP CPI data.

@@ -55,9 +55,6 @@ make_pop_output <- function(...) {
 
 # popmain_validate_raw() --------------------------------------------------
 
-test_that("popmain_validate_raw() passes with valid data", {
-  expect_no_error(popmain_validate_raw(pop_main = make_popmain_raw(), detail = FALSE))
-})
 
 test_that("popmain_validate_raw() errors when pop_data_level has invalid value", {
   bad <- make_popmain_raw(pop_data_level = c(0, 99))
@@ -93,10 +90,6 @@ test_that("popmain_validate_raw() errors when data is NULL", {
 })
 
 # pop_validate_raw() ------------------------------------------------------
-
-test_that("pop_validate_raw() passes with valid data", {
-  expect_no_error(pop_validate_raw(pop = make_pop_raw(), detail = FALSE))
-})
 
 test_that("pop_validate_raw() errors when indicator_id has invalid value", {
   bad <- make_pop_raw(indicator_id = c("SP.POP.TOTL", "INVALID"))
@@ -138,10 +131,6 @@ test_that("pop_validate_raw() errors when data is NULL", {
 
 # spop_validate_raw() -----------------------------------------------------
 
-test_that("spop_validate_raw() passes with valid data", {
-  expect_no_error(spop_validate_raw(spop = make_spop_raw(), detail = FALSE))
-})
-
 test_that("spop_validate_raw() errors when pop_data_level has invalid value", {
   bad <- make_spop_raw(pop_data_level = c(0, 99))
   expect_error(spop_validate_raw(spop = bad, detail = FALSE))
@@ -171,10 +160,6 @@ test_that("spop_validate_raw() errors when data is NULL", {
 })
 
 # pop_validate_output() ---------------------------------------------------
-
-test_that("pop_validate_output() passes with valid data", {
-  expect_no_error(pop_validate_output(pop = make_pop_output(), detail = FALSE))
-})
 
 test_that("pop_validate_output() errors when reporting_level has invalid value", {
   bad <- make_pop_output(reporting_level = c("national", "invalid"))

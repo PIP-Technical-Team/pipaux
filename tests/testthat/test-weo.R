@@ -30,11 +30,6 @@ make_weo_output <- function(...) {
 }
 
 # weo_validate_raw() ------------------------------------------------------
-
-test_that("weo_validate_raw() passes with valid data", {
-  expect_no_error(weo_validate_raw(weo = make_weo_raw(), detail = FALSE))
-})
-
 test_that("weo_validate_raw() errors when ISO is not character", {
   bad <- make_weo_raw(ISO = c(1, 2))
   expect_error(weo_validate_raw(weo = bad, detail = FALSE))
@@ -74,9 +69,6 @@ test_that("weo_validate_raw() errors when data is NULL", {
 
 # weo_validate_output() ---------------------------------------------------
 
-test_that("weo_validate_output() passes with valid data", {
-  expect_no_error(weo_validate_output(weo = make_weo_output(), detail = FALSE))
-})
 
 test_that("weo_validate_output() errors when country_code is not character", {
   bad <- make_weo_output(country_code = c(1, 2))

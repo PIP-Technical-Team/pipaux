@@ -447,7 +447,6 @@ compare_vintage_versions <- function(measure,
 #'   Default is `-1`.
 #' @param verbose Logical. If `TRUE`, messages about the comparison process are
 #'   printed. Default is `FALSE`.
-#' @param ... Additional arguments passed to [compare_vintage_versions()].
 #'
 #' @return Invisibly returns a named list with one element per measure,
 #'   each being the output of [compare_vintage_versions()]. Elements are `NULL`

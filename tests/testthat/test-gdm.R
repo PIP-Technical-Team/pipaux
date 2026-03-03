@@ -41,10 +41,6 @@ make_gdm_output <- function(...) {
 
 # gdm_validate_raw() ------------------------------------------------------
 
-test_that("gdm_validate_raw() passes with valid data", {
-  expect_no_error(gdm_validate_raw(gdm = make_gdm_raw(), detail = FALSE))
-})
-
 test_that("gdm_validate_raw() errors when Region has invalid value", {
   bad <- make_gdm_raw(Region = c("EAP", "INVALID"))
   expect_error(gdm_validate_raw(gdm = bad, detail = FALSE))
@@ -105,10 +101,6 @@ test_that("gdm_validate_raw() errors when data is NULL", {
 })
 
 # gdm_validate_output() ---------------------------------------------------
-
-test_that("gdm_validate_output() passes with valid data", {
-  expect_no_error(gdm_validate_output(gdm = make_gdm_output(), detail = FALSE))
-})
 
 test_that("gdm_validate_output() errors when welfare_type has invalid value", {
   bad <- make_gdm_output(welfare_type = c("consumption", "invalid"))

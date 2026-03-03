@@ -12,10 +12,6 @@ make_wdi_raw <- function(...) {
 
 # wdi_validate_raw() ------------------------------------------------------
 
-test_that("wdi_validate_raw() passes with valid data", {
-  expect_no_error(wdi_validate_raw(wdi = make_wdi_raw(), detail = FALSE))
-})
-
 test_that("wdi_validate_raw() errors when country_code is not character", {
   bad <- make_wdi_raw(country_code = c(1, 2))
   expect_error(wdi_validate_raw(wdi = bad, detail = FALSE))

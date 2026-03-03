@@ -21,6 +21,8 @@ save_aux_to_gh(
 update an existing file. The dataframe will be converted into a base64-encoded
 string before being uploaded}
 
+\item{measure}{character: Name of the measure, e.g. "wdi". This will be used to construct the repo name and the filename.}
+
 \item{owner}{A character string specifying the GitHub username or organization
 that owns the repository. Defaults to \code{pipfun.ghowner} option}
 
@@ -30,10 +32,14 @@ where the file will be uploaded or updated}
 \item{branch}{A character string specifying the branch of the repository where
 the file should be uploaded or updated. The default is \code{DEV} branch}
 
+\item{tag}{character: Tag. Defaults to the branch name.}
+
 \item{filename}{A character string specifying the name of the file to be created
 or updated in the GitHub repository. If not provided, it defaults to repo name}
 
 \item{ext}{A character string representing the file extension (e.g., \code{.csv}). Default is \code{csv}}
+
+\item{...}{Additional arguments to be passed to \code{pipfun::save_to_gh()}}
 }
 \description{
 Sometimes we need to save auxiliary files to Github repo.

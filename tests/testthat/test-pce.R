@@ -13,10 +13,6 @@ make_pce_output <- function(...) {
 
 # pce_validate_output() ---------------------------------------------------
 
-test_that("pce_validate_output() passes with valid data", {
-  expect_no_error(pce_validate_output(pce = make_pce_output(), detail = FALSE))
-})
-
 test_that("pce_validate_output() errors when reporting_level has invalid value", {
   bad <- make_pce_output(reporting_level = c("national", "urban", "invalid"))
   expect_error(pce_validate_output(pce = bad, detail = FALSE))

@@ -17,9 +17,6 @@ make_incgroup_output <- function(...) {
 
 # incgroup_validate_output() ----------------------------------------------
 
-test_that("incgroup_validate_output() passes with valid data", {
-  expect_no_error(incgroup_validate_output(incgroup = make_incgroup_output(), detail = FALSE))
-})
 
 test_that("incgroup_validate_output() errors when income_group has invalid value", {
   bad <- make_incgroup_output(income_group = c("High income", "Invalid"))

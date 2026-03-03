@@ -3,6 +3,7 @@
 #' Load or update PPP data.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @param ppp_defaults logical: whether to set default PPP
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @export

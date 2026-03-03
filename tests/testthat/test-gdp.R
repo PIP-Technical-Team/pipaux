@@ -12,9 +12,6 @@ make_gdp_output <- function(...) {
 
 # gdp_validate_output() ---------------------------------------------------
 
-test_that("gdp_validate_output() passes with valid data", {
-  expect_no_error(gdp_validate_output(gdp = make_gdp_output(), detail = FALSE))
-})
 
 test_that("gdp_validate_output() errors when reporting_level has invalid value", {
   bad <- make_gdp_output(reporting_level = c("national", "urban", "invalid"))

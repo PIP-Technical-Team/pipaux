@@ -10,8 +10,6 @@ aux_weo_clean(dt, branch = NULL)
 \item{dt}{database with weo raw data}
 
 \item{branch}{character: branch to be loaded}
-
-\item{maindir}{directory where auxiliary data is stored (to load pop)}
 }
 \value{
 data.table

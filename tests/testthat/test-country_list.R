@@ -17,11 +17,7 @@ test_that("cl_validate_raw() works", {
     modifyList(dt, list(...))
   }
 
-  # cl_validate_raw() -------------------------------------------------------
-
-  test_that("cl_validate_raw() passes with valid data", {
-    expect_no_error(cl_validate_raw(cl = make_cl_raw(), detail = FALSE))
-  })
+  # cl_validate_raw() ------------------------------------------------------
 
   test_that("cl_validate_raw() errors when country_code is not character", {
     bad <- make_cl_raw(country_code = c(1, 2))

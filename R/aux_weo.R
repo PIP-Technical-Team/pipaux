@@ -91,7 +91,6 @@ aux_weo <- function(action  = c("update", "load"),
 #' Clean WEO data
 #'
 #' @param dt database with weo raw data
-#' @param maindir directory where auxiliary data is stored (to load pop)
 #' @param branch character: branch to be loaded
 #'
 #' @return data.table

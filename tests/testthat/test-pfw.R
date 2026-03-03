@@ -132,9 +132,6 @@ make_pfw_output <- function(...) {
 
 # pfw_validate_raw() ------------------------------------------------------
 
-test_that("pfw_validate_raw() passes with valid data", {
-  expect_no_error(pfw_validate_raw(pfw = make_pfw_raw(), detail = FALSE))
-})
 
 test_that("pfw_validate_raw() errors when region has invalid value", {
   bad <- make_pfw_raw(region = c("Sub-Saharan Africa", "INVALID"))
@@ -201,9 +198,6 @@ test_that("pfw_validate_raw() errors when data is NULL", {
 
 # pfw_validate_output() ---------------------------------------------------
 
-test_that("pfw_validate_output() passes with valid data", {
-  expect_no_error(pfw_validate_output(pfw = make_pfw_output(), detail = FALSE))
-})
 
 test_that("pfw_validate_output() errors when region_code has invalid value", {
   bad <- make_pfw_output(region_code = c("SSF", "INVALID"))

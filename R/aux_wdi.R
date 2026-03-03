@@ -5,8 +5,6 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
-#' @param from character: Either "gh", "file" or "api". Default is "gh". "file"
-#'   and "gh" are synonymous
 #' @export
 aux_wdi <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
@@ -47,12 +45,14 @@ aux_wdi <- function(action          = c("update", "load"),
 #' GDP and HFCE data from WDI.
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @param branch character, branch in which to find the data, default is NULL, which means it will be determined based on the current release and identity
 #' @inheritParams aux_gdp
 #' @return data.table with gdp and pce variables
 #' @export
 #'
 #' @examples
-#' aux_wdi_update()
+#' \dontrun{
+#' aux_wdi_update()}
 aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,

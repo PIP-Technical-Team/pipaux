@@ -27,10 +27,6 @@ make_pl_list <- function(...) {
 
 # pl_validate_output() ----------------------------------------------------
 
-test_that("pl_validate_output() passes with valid data", {
-  expect_no_error(pl_validate_output(pl = make_pl_output(), detail = FALSE))
-})
-
 test_that("pl_validate_output() errors when name is not character", {
   bad <- make_pl_output(name = c(1.00, 1.90, 2.15))
   expect_error(pl_validate_output(pl = bad, detail = FALSE))

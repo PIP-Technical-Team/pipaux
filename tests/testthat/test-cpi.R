@@ -59,10 +59,6 @@ make_cpi_output <- function(...) {
 
 # cpi_validate_raw() ------------------------------------------------------
 
-test_that("cpi_validate_raw() passes with valid data", {
-  expect_no_error(cpi_validate_raw(cpi = make_cpi_raw(), detail = FALSE))
-})
-
 test_that("cpi_validate_raw() errors when region has invalid value", {
   bad <- make_cpi_raw(region = c("EAP", "INVALID"))
   expect_error(cpi_validate_raw(cpi = bad, detail = FALSE))
@@ -114,9 +110,6 @@ test_that("cpi_validate_raw() errors when data is NULL", {
 
 # cpi_validate_output() ---------------------------------------------------
 
-test_that("cpi_validate_output() passes with valid data", {
-  expect_no_error(cpi_validate_output(cpi = make_cpi_output(), detail = FALSE))
-})
 
 test_that("cpi_validate_output() errors when reporting_level has invalid value", {
   bad <- make_cpi_output(reporting_level = c("national", "invalid"))

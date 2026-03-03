@@ -10,6 +10,8 @@ pip_aux_save(x, id, ...)
 \item{x}{Data to be saved}
 
 \item{id}{Name of the file}
+
+\item{...}{Additional arguments to be passed to \code{pipload::pip_write()}}
 }
 \value{
 Fully qualified name of the new file, invisibly
