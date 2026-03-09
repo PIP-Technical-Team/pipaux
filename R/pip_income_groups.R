@@ -45,8 +45,8 @@ pip_income_groups <- function(action       = c("update", "load"),
                                   income_group == "Low income", "LIC",
                                   default = "")]
     setnames(ig,
-             c("code", "regionssa"),
-             c("country_code", "ssa_subregion_code"))
+             c("code", "regionssa", "incgroup"),
+             c("country_code", "ssa_subregion_code", "incgroup_historical"))
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,6 +64,8 @@ pip_income_groups <- function(action       = c("update", "load"),
       msrdir = msrdir,
       force = force
     )
+    # Push data (ig) to GitHub as ig
+    pipfun::save_to_gh(ig, measure = measure, branch = branch)
     return(invisible(saved))
 
   } else  {
