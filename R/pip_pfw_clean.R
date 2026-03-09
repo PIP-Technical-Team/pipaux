@@ -6,10 +6,11 @@
 #' @inheritParams load_aux
 #'
 #' @keywords internal
-pip_pfw_clean <- function(y,
-                          maindir = gls$PIP_DATA_DIR,
-                          branch  = c("DEV", "PROD", "main")) {
-
+pip_pfw_clean <- function(
+  y,
+  maindir = gls$PIP_DATA_DIR,
+  branch = c("DEV", "PROD", "main")
+) {
   branch <- match.arg(branch)
 
   if (!inherits(y, "data.table")) {
@@ -20,10 +21,10 @@ pip_pfw_clean <- function(y,
 
   # get just inpovcal data
 
-
   # change variable names
   old_var <-
-    c("code",
+    c(
+      "code",
       "region",
       "ref_year",
       "survname",
@@ -33,7 +34,8 @@ pip_pfw_clean <- function(y,
     )
 
   new_var <-
-    c("country_code",
+    c(
+      "country_code",
       "region_code",
       "survey_year",
       "survey_acronym",
@@ -42,41 +44,44 @@ pip_pfw_clean <- function(y,
       "reporting_year"
     )
 
-  
-  setnames(x,
-    old = old_var,
-    new = new_var
-  )
+  setnames(x, old = old_var, new = new_var)
 
   # Recode some variables
 
-  x[
-    ,
+  x[,
     `:=`(
       # Recode survey coverage
       survey_coverage = fcase(
-        survey_coverage == "N", "national",
-        survey_coverage == "R", "rural",
-        survey_coverage == "U", "urban",
+        survey_coverage == "N" , "national" ,
+        survey_coverage == "R" , "rural"    ,
+        survey_coverage == "U" , "urban"    ,
         default = "partial"
       ),
       # Recode welfare type
       welfare_type = fcase(
-        grepl("[Ii]", welfare_type), "income",
-        grepl("[Cc]", welfare_type), "consumption",
+        grepl("[Ii]", welfare_type) , "income"      ,
+        grepl("[Cc]", welfare_type) , "consumption" ,
         default = ""
       ),
       surveyid_year = as.integer(surveyid_year),
-      survey_year   = round(survey_year, 2)
+      survey_year = round(survey_year, 2)
     )
   ]
 
-  cl <- load_aux(maindir = maindir,
-                 measure = "country_list",
-                 branch = branch)
+  cl <- load_aux(maindir = maindir, measure = "country_list", branch = branch)
   x <- x[country_code %in% cl$country_code]
+
+  cl_uni <- unique(cl[, .(country_code, region_code)])
+  x <- joyn::joyn(
+    x,
+    cl_uni,
+    by = "country_code",
+    match_type = "m:1",
+    keep = "left",
+    update_values = TRUE,
+    reportvar = FALSE
+  )
 
   x <- unique(x) # remove duplicates
   return(x)
 }
-
