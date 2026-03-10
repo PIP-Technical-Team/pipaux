@@ -428,9 +428,9 @@ compare_vintage_versions <- function(measure,
   # ------------------------------------------------------------#
   result <- list(
     diff_values = diff_vals,
-    diff_rows   = diff_rows,
-    key_cols    = key_cols
+    diff_rows   = diff_rows
   )
+  setattr(result, "key_cols", key_cols)
 
   return(invisible(result))
 }
