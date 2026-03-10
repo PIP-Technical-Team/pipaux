@@ -475,24 +475,56 @@ compare_vintage_versions <- function(measure,
 
   return(invisible(result))
 }
+
 #' Compare vintage versions across multiple auxiliary data measures
 #'
-#' Applies [compare_vintage_versions()] across multiple auxiliary data measures.
+#' Applies vintage version comparison across multiple auxiliary data measures.
 #' Useful for tracking within-release changes across several files simultaneously.
+#'
+#' Vintage versions are snapshots of data files created at different points in
+#' time within the same release. This function compares the latest version of
+#' each measure against an earlier "vintage" version, identifying differences in
+#' values and rows.
 #'
 #' @param measures Character vector. Names of auxiliary data measures to compare
 #'   (e.g., `c("gdp", "pop", "pfw")`). If `NULL` or empty, a warning is issued
 #'   and an empty list is returned.
 #' @param version Integer. A negative integer indicating how many versions
-#'   before the latest to compare with. Default is `-1`.
+#'   before the latest to compare with. Default is `-1` (compares with the
+#'   immediately previous version). Use `-2` to compare with the version two
+#'   steps back, and so on.
 #' @param verbose Logical. If `TRUE`, displays informative messages in the console.
 #'   Default is `FALSE`.
 #'
 #' @return Invisibly returns a named list with one element per measure.
-#'   Each element is the output of [compare_vintage_versions()]. Elements are
-#'   `NULL` for measures where no previous version exists or an error occurred.
+#'   Each element is a list containing:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences across matched
+#'       rows and columns. Columns with `.x` suffix refer to the latest version
+#'       (new data); `.y` suffix refers to the earlier version (old data).
+#'       `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between versions,
+#'       with `change_type` column (`"added"` = in latest version only,
+#'       `"removed"` = in earlier version only). `NULL` if no row differences found.}
+#'   }
+#'   
+#'   Each measure's list also has attributes:
+#'   \describe{
+#'     \item{key_cols}{Character vector of primary key columns used for comparison.}
+#'     \item{measure}{Character string of the measure name.}
+#'     \item{new_version_id}{Character string of the latest version ID.}
+#'     \item{old_version_id}{Character string of the earlier version ID (`NA_character_`
+#'       if not available).}
+#'     \item{new_path}{Character string path to the latest version snapshot directory.}
+#'     \item{old_path}{Character string path to the earlier version snapshot directory
+#'       (`NA_character_` if not available).}
+#'     \item{release}{Character string of the current release identifier.}
+#'   }
+#'   
+#'   Elements are `NULL` for measures where no previous version exists or an
+#'   error occurred during comparison.
 #'
-#' @seealso [compare_vintage_versions()]
+#' @seealso [pipload::load_aux_data()], [myrror::myrror()]
 #' @export
 #'
 #' @examples
