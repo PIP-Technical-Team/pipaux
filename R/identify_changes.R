@@ -18,18 +18,22 @@
 #' @param verbose Logical. If `TRUE`, displays messages in the console.
 #'   Default is `TRUE`.
 #'
-#' @return Invisibly returns a named list with:
+#' @return A named list with one element per measure. Each element is a list containing:
 #'   \describe{
 #'     \item{diff_values}{A data table of value-level differences across matched
-#'       rows and columns, with added `measure`, `new_path.x`, and `old_path.y`
-#'       columns. `NULL` if no differences found.}
+#'       rows and columns. Columns with `.x` suffix refer to the current release
+#'       (new data); `.y` suffix refers to the previous release (old data).
+#'       `NULL` if no differences found.}
 #'     \item{diff_rows}{A data table of rows added or removed between releases,
-#'       with `change_type`, `measure`, `release`, and `old_release` columns.
-#'       `NULL` if no row differences found.}
+#'       with `change_type` column (`"added"` = in current release only,
+#'       `"removed"` = in previous release only). `NULL` if no row differences found.}
 #'   }
-#'   The list has a `"key_cols"` attribute containing the primary key columns
-#'   used for comparison. Returns `NULL` invisibly if the old release data
-#'   cannot be loaded.
+#'   
+#'   Each measure's list also has attributes: `key_cols` (primary key columns used
+#'   for comparison), `measure`, `new_path` (current release path), `old_path`
+#'   (previous release path), `release`, and `old_release`.
+#'   
+#'   Returns `NULL` for a measure if data cannot be loaded or comparison fails.
 #'
 #' @keywords internal
 #'
@@ -134,20 +138,9 @@ get_aux_changes <- function(measure = "cpi",
     diff_rows <- NULL
   }
 
-  # Add metadata: file paths, measure
-  if (!is.null(diff_table)) {
-    diff_table <- diff_table |>
-      fmutate(measure = measure,
-              new_path.x = aux_data_path,
-              old_path.y = fs::path(aux_data_path, old_release))
-  }
+  # Add metadata as attributes
   if (!is.null(diff_rows)) {
     diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
-    diff_rows[, `:=`(
-      measure = measure,
-      release = release,
-      old_release = old_release
-    )]
   }
 
   if (verbose) {
@@ -159,6 +152,12 @@ get_aux_changes <- function(measure = "cpi",
     "diff_rows"   = diff_rows
   )
   setattr(result, "key_cols", key_cols)
+  setattr(result, "measure", measure)
+  setattr(result, "new_path", aux_data_path)
+  setattr(result, "old_path", fs::path(aux_data_path, old_release))
+  setattr(result, "release", release)
+  setattr(result, "old_release", old_release)
+  
   return(invisible(result))
 }
 
@@ -175,15 +174,26 @@ get_aux_changes <- function(measure = "cpi",
 #' @inheritParams get_aux_changes
 #' @param ... Additional arguments passed to [get_aux_changes()].
 #'
-#' @return A named list with one element per measure. Each element is the
-#'   output of [get_aux_changes()] — a list with `diff_values` and `diff_rows`
-#'   data tables — or `NULL` for measures with no differences or load errors.
-#'
+#' @return A named list with one element per measure. Each element is a list containing:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences across matched
+#'       rows and columns. Columns with `.x` suffix refer to the current release
+#'       (new data); `.y` suffix refers to the previous release (old data).
+#'       `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between releases,
+#'       with `change_type` column (`"added"` = in current release only,
+#'       `"removed"` = in previous release only). `NULL` if no row differences found.}
+#'   }
+#'   
+#'   Each measure's list also has attributes: `key_cols` (primary key columns used
+#'   for comparison), `measure`, `new_path` (current release path), `old_path`
+#'   (previous release path), `release`, and `old_release`.
+#'   
+#'   Returns `NULL` for a measure if data cannot be loaded or comparison fails.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' compare_aux_releases(old_release = "20240101_PROD", verbose = TRUE)
 #' compare_aux_releases(measure = c("cpi", "gdp"), old_release = "20240101_PROD")
 #' }
 compare_aux_releases <- function(measure     = NULL,
@@ -222,7 +232,7 @@ compare_aux_releases <- function(measure     = NULL,
         verbose     = verbose
       )
 
-       }),
+      }),
 
     all_measures
   )
@@ -300,13 +310,16 @@ get_last_release <- function(aux_data_path,
 #'
 #' @return Invisibly returns a named list with:
 #'   \describe{
-#'     \item{diff_values}{A data table of value-level differences, or `NULL`
-#'       if none found.}
-#'     \item{diff_rows}{A data table of added/removed rows, or `NULL` if none
-#'       found.}
-#'     \item{key_cols}{Character vector of primary key columns used for
-#'       comparison.}
+#'     \item{diff_values}{A data table of value-level differences. Columns with
+#'       `.x` suffix refer to the latest version (new data); `.y` suffix refers
+#'       to the earlier version (old data). `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between versions,
+#'       with `change_type` column (`"added"` = in latest version only,
+#'       `"removed"` = in earlier version only). `NULL` if no row differences found.}
 #'   }
+#'   The list has attributes: `key_cols` (primary key columns), `measure`,
+#'   `new_path` (path to latest version), `old_path` (path to earlier version),
+#'   `new_version_id`, `old_version_id`, and `release`.
 #'   If no previous version is available, returns a list with all elements set
 #'   to `NULL`.
 #'
@@ -323,13 +336,14 @@ compare_vintage_versions <- function(measure,
                                      verbose = FALSE,
                                      version = -1) {
 
-  # ------------------------------------------------------------#
+  # Get release info early for consistent returns
+  wrk_release <- get_from_auxenv("wrk_release")
+  release <- paste0(wrk_release$release, "_", wrk_release$identity)
+
   # Load the most recent version
-  # ------------------------------------------------------------#
   new_df <- tryCatch({
     pipload::load_aux_data(measure = measure)
   },
-
   error = function(e) {
     cli::cli_alert_danger("Failed to load latest version of {.strong {measure}}.")
     stop(e)
@@ -337,12 +351,9 @@ compare_vintage_versions <- function(measure,
 
   # Load previous version
   old_df <- tryCatch({
-
     pipload::load_aux_data(measure = measure,
                            version = version)
-
   },
-
   error = function(e) {
     cli::cli_alert_warning(
       "Failed to load previous version of {.strong {measure}}. Not enough versions?"
@@ -351,19 +362,59 @@ compare_vintage_versions <- function(measure,
   })
 
   if (is.null(old_df)) {
-
     cli::cli_alert_warning(
       "Previous version of {.strong {measure}} is NULL. Comparison skipped."
     )
-
-    return(invisible(list(diff_values = NULL,
-                          diff_rows   = NULL,
-                          key_cols    = NULL)))
+    result <- list(diff_values = NULL, diff_rows = NULL)
+    key_cols <- stamp::st_get_pk(new_df)
+    setattr(result, "key_cols", key_cols)
+    setattr(result, "measure", measure)
+    setattr(result, "new_path", NA_character_)
+    setattr(result, "old_path", NA_character_)
+    setattr(result, "new_version_id", NA_character_)
+    setattr(result, "old_version_id", NA_character_)
+    setattr(result, "release", release)
+    return(invisible(result))
   }
 
-  # ------------------------------------------------------------#
+  # Get version metadata using stamp::st_info
+  st_info <- tryCatch({
+    stamp::st_info(path = paste0(measure, ".qs2"), alias = "aux")
+  }, error = function(e) {
+    cli::cli_alert_danger("Failed to retrieve version metadata for {.strong {measure}}: {e$message}")
+    NULL
+  })
+
+  if (is.null(st_info)) {
+    result <- list(diff_values = NULL, diff_rows = NULL)
+    key_cols <- stamp::st_get_pk(new_df)
+    setattr(result, "key_cols", key_cols)
+    setattr(result, "measure", measure)
+    setattr(result, "new_path", NA_character_)
+    setattr(result, "old_path", NA_character_)
+    setattr(result, "new_version_id", NA_character_)
+    setattr(result, "old_version_id", NA_character_)
+    setattr(result, "release", release)
+    return(invisible(result))
+  }
+
+  new_version_id <- st_info$catalog$latest_version_id
+  new_path <- st_info$snapshot_dir
+  
+  # Get old version ID from version history
+  if (!is.null(st_info$catalog$version_ids) && 
+      length(st_info$catalog$version_ids) > abs(version)) {
+    old_version_id <- st_info$catalog$version_ids[length(st_info$catalog$version_ids) - abs(version)]
+    old_path <- fs::path(fs::path_dir(new_path), old_version_id)
+  } else {
+    cli::cli_alert_warning(
+      "Cannot retrieve old version ID. Ensure enough versions exist."
+    )
+    old_version_id <- NA_character_
+    old_path <- NA_character_
+  }
+
   # Determine key columns
-  # ------------------------------------------------------------#
   key_cols <- stamp::st_get_pk(new_df)
 
   if (length(key_cols) == 0) {
@@ -379,58 +430,73 @@ compare_vintage_versions <- function(measure,
     )
   }
 
-  data.table::setorderv(new_df,
-                        cols = key_cols)
-  data.table::setorderv(old_df,
-                        cols = key_cols)
+  data.table::setorderv(new_df, cols = key_cols)
+  data.table::setorderv(old_df, cols = key_cols)
 
-  # ------------------------------------------------------------#
   # Compare using myrror
-  # ------------------------------------------------------------#
-  myr <- myrror::myrror(
-    dfx                 = new_df,
-    dfy                 = old_df,
-    by                  = key_cols,
-    compare_type        = FALSE,
-    compare_values      = TRUE,
-    extract_diff_values = TRUE,
-    interactive         = FALSE,
-    verbose             = verbose
-  )
+  myr <- tryCatch({
+    myrror::myrror(
+      dfx                 = new_df,
+      dfy                 = old_df,
+      by                  = key_cols,
+      compare_type        = FALSE,
+      compare_values      = TRUE,
+      extract_diff_values = TRUE,
+      interactive         = FALSE,
+      verbose             = verbose
+    )
+  }, error = function(e) {
+    cli::cli_alert_danger(
+      "myrror comparison failed for measure {.strong {measure}}: {e$message}"
+    )
+    NULL
+  })
 
-  diff_vals <- myrror::extract_diff_table(myrror_object = myr,
-                                          by = key_cols,
-                                          output = "simple")
-  diff_rows <- myrror::extract_diff_rows(myrror_object = myr,
-                                         by = key_cols,
-                                         output = "simple")
+  if (is.null(myr)) {
+    diff_vals <- NULL
+    diff_rows <- NULL
+  } else {
+    diff_vals <- myrror::extract_diff_table(myrror_object = myr,
+                                            by = key_cols,
+                                            output = "simple",
+                                            interactive = FALSE)
+    diff_rows <- myrror::extract_diff_rows(myrror_object = myr,
+                                           by = key_cols,
+                                           output = "simple",
+                                           verbose = verbose)
+  }
 
   # Handle empty diff_rows
   if (is.null(diff_rows) || nrow(diff_rows) == 0) diff_rows <- NULL
 
-  # ------------------------------------------------------------#
+  # Add change_type to diff_rows
+  if (!is.null(diff_rows)) {
+    diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
+  }
+
   # Report results
-  # ------------------------------------------------------------#
   if (!is.null(diff_vals) || !is.null(diff_rows)) {
     cli::cli_alert_success(
       "Vintage comparison complete for {.strong {measure}}. Differences detected."
     )
-  }
-
-  else {
+  } else {
     cli::cli_alert_success(
       "Vintage comparison complete for {.strong {measure}}. No differences found."
     )
   }
 
-  # ------------------------------------------------------------#
-  # Return result (always a list)
-  # ------------------------------------------------------------#
+  # Return result with attributes
   result <- list(
     diff_values = diff_vals,
     diff_rows   = diff_rows
   )
   setattr(result, "key_cols", key_cols)
+  setattr(result, "measure", measure)
+  setattr(result, "new_path", new_path)
+  setattr(result, "old_path", old_path)
+  setattr(result, "new_version_id", new_version_id)
+  setattr(result, "old_version_id", old_version_id)
+  setattr(result, "release", release)
 
   return(invisible(result))
 }
