@@ -8,20 +8,19 @@ compare_aux_vintages(measures = NULL, version = -1, verbose = FALSE)
 }
 \arguments{
 \item{measures}{Character vector. Names of auxiliary data measures to compare
-(e.g., \code{c("gdp", "pop", "pfw")}). If \code{NULL} or empty, returns an empty
-list with a warning.}
+(e.g., \code{c("gdp", "pop", "pfw")}). If \code{NULL} or empty, a warning is issued
+and an empty list is returned.}
 
-\item{version}{Integer. Indicates how many versions before the latest to
-compare with (e.g., \code{-1} for the immediately previous version).
-Default is \code{-1}.}
+\item{version}{Integer. A negative integer indicating how many versions
+before the latest to compare with. Default is \code{-1}.}
 
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
-printed. Default is \code{FALSE}.}
+\item{verbose}{Logical. If \code{TRUE}, displays informative messages in the console.
+Default is \code{FALSE}.}
 }
 \value{
-Invisibly returns a named list with one element per measure,
-each being the output of \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}. Elements are \code{NULL}
-for measures where no previous version exists or an error occurred.
+Invisibly returns a named list with one element per measure.
+Each element is the output of \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}. Elements are
+\code{NULL} for measures where no previous version exists or an error occurred.
 }
 \description{
 Applies \code{\link[=compare_vintage_versions]{compare_vintage_versions()}} across multiple auxiliary data measures.
@@ -29,8 +28,15 @@ Useful for tracking within-release changes across several files simultaneously.
 }
 \examples{
 \dontrun{
+# Compare multiple measures against their previous versions
 compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
-compare_aux_vintages(measures = c("cpi", "gdp"), version = -2, verbose = TRUE)
+
+# Compare against versions two steps back with verbose output
+compare_aux_vintages(
+  measures = c("cpi", "gdp"),
+  version = -2,
+  verbose = TRUE
+)
 }
 }
 \seealso{

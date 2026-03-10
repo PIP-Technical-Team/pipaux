@@ -1,5 +1,94 @@
 # Auxiliary function that creates an inventory of value changes per country/year of the following measures:
-# cpi, ppp, pfw, pop, gdp, pce
+# cpi, ppp, pfw, pop, gdp
+
+#' Compare auxiliary data files across releases
+#'
+#' Compares the contents of auxiliary data files between the current and a
+#' specified previous release, identifying differences in values and rows for
+#' one or more measures.
+#'
+#' The release identifiers must follow the format `"YYYYMMDD_identity"`
+#' (e.g., `"20250101_TEST"`).
+#'
+#' @param measure Character vector of one or more measures to compare
+#'   (e.g., `c("cpi", "gdp")`). If `NULL`, all measures available are included.
+#' @param owner Character. GitHub owner of the auxiliary data repositories.
+#'   Defaults to `"PIP-Technical-Team"`.
+#' @param old_release Character. The identifier of the previous release to
+#'   compare against (e.g., `"20240101_PROD"`). If `NULL`, automatically uses
+#'   the most recent release with the same identity as the current working release.
+#' @param verbose Logical. If `TRUE`, displays informative messages in the console.
+#'   Default is `FALSE`.
+#'
+#' @return A named list with one element per measure. Each element contains:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences across matched
+#'       rows and columns. Columns with `.x` suffix refer to the current release
+#'       (new data); `.y` suffix refers to the previous release (old data).
+#'       `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between releases,
+#'       with `change_type` column (`"added"` = in current release only,
+#'       `"removed"` = in previous release only). `NULL` if no row differences found.}
+#'   }
+#'   
+#'   Each measure's list also has attributes:
+#'   \describe{
+#'     \item{key_cols}{Character vector of primary key columns used for comparison.}
+#'     \item{measure}{Character string of the measure name.}
+#'     \item{release}{Character string of the current release identifier.}
+#'     \item{old_release}{Character string of the previous release identifier.}
+#'     \item{new_path}{Character string path to the current release data.}
+#'     \item{old_path}{Character string path to the previous release data.}
+#'   }
+#'   
+#'   Returns `NULL` for a measure if data cannot be loaded or comparison fails.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Compare multiple measures between releases
+#' compare_aux_releases(
+#'   measure = c("cpi", "gdp"),
+#'   owner = "RossanaTat",
+#'   old_release = "20240101_PROD"
+#' )
+#' 
+#' # Compare using last available release
+#' compare_aux_releases(
+#'   measure = "cpi",
+#'   owner = "RossanaTat"
+#' )
+#' }
+compare_aux_releases <- function(measure = NULL,
+                                 owner = "PIP-Technical-Team",
+                                 old_release = NULL,
+                                 verbose = FALSE) {
+
+  if (is.null(measure) || length(measure) == 0) {
+    cli::cli_alert_warning("No measures provided. Nothing to compare.")
+    return(invisible(list()))
+  }
+
+  results <- lapply(measure, function(m) {
+    tryCatch({
+      get_aux_changes(
+        measure = m,
+        old_release = old_release,
+        verbose = verbose
+      )
+    }, error = function(e) {
+      if (verbose) {
+        cli::cli_alert_danger("Error comparing measure {.strong {m}}: {e$message}")
+      }
+      return(NULL)
+    })
+  })
+
+  names(results) <- measure
+
+  return(invisible(results))
+}
 
 #' Compare auxiliary data files across releases
 #'
@@ -10,7 +99,8 @@
 #' The release identifiers must follow the format `"YYYYMMDD_identity"`
 #' (e.g., `"20250101_TEST"`).
 #'
-#' @inheritParams aux_fun
+#' @param measure Character. The name of the auxiliary measure to compare
+#'   (e.g., `"cpi"`, `"gdp"`).
 #' @param old_release Character. The identifier of the previous release to
 #'   compare against (e.g., `"20240101_PROD"`). If `NULL`, automatically uses
 #'   the last available release matching the same identity as the current
@@ -18,7 +108,7 @@
 #' @param verbose Logical. If `TRUE`, displays messages in the console.
 #'   Default is `TRUE`.
 #'
-#' @return A named list with one element per measure. Each element is a list containing:
+#' @return A named list containing:
 #'   \describe{
 #'     \item{diff_values}{A data table of value-level differences across matched
 #'       rows and columns. Columns with `.x` suffix refer to the current release
@@ -154,147 +244,14 @@ get_aux_changes <- function(measure = "cpi",
   setattr(result, "key_cols", key_cols)
   setattr(result, "measure", measure)
   setattr(result, "new_path", aux_data_path)
-  setattr(result, "old_path", fs::path(aux_data_path, old_release))
+  setattr(result, "old_path", fs::path(fs::path_dir(aux_data_path), old_release))
   setattr(result, "release", release)
   setattr(result, "old_release", old_release)
   
   return(invisible(result))
 }
 
-#' Compare auxiliary data across measures between two releases
-#'
-#' Compares auxiliary data files between the current and a previous release
-#' across one or more measures, by calling [get_aux_changes()] for each.
-#'
-#' @param measure Character vector of one or more measures, specifying measures to check
-#'   (e.g., `c("cpi", "gdp")`). If `NULL`, all measures available in the
-#'   GitHub organisation are included.
-#' @param owner Character. GitHub owner of the auxiliary data repositories.
-#'   Defaults to `"PIP-Technical-Team"`.
-#' @inheritParams get_aux_changes
-#' @param ... Additional arguments passed to [get_aux_changes()].
-#'
-#' @return A named list with one element per measure. Each element is a list containing:
-#'   \describe{
-#'     \item{diff_values}{A data table of value-level differences across matched
-#'       rows and columns. Columns with `.x` suffix refer to the current release
-#'       (new data); `.y` suffix refers to the previous release (old data).
-#'       `NULL` if no differences found.}
-#'     \item{diff_rows}{A data table of rows added or removed between releases,
-#'       with `change_type` column (`"added"` = in current release only,
-#'       `"removed"` = in previous release only). `NULL` if no row differences found.}
-#'   }
-#'   
-#'   Each measure's list also has attributes: `key_cols` (primary key columns used
-#'   for comparison), `measure`, `new_path` (current release path), `old_path`
-#'   (previous release path), `release`, and `old_release`.
-#'   
-#'   Returns `NULL` for a measure if data cannot be loaded or comparison fails.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' compare_aux_releases(measure = c("cpi", "gdp"), old_release = "20240101_PROD")
-#' }
-compare_aux_releases <- function(measure     = NULL,
-                                 owner       = "PIP-Technical-Team",
-                                 old_release = NULL,
-                                 verbose     = FALSE,
-                                 ...) {
-
-  # _______________________________________#
-  # Get arguments ####
-
-  # Get all measures from repos in PIP-Technical-Team that start with "aux_"
-
-  all_measures <- gh::gh("GET /users/{username}/repos",
-                         username = owner) |>
-    vapply("[[", "", "name") |>
-    grep("^aux_", x = _, value = TRUE) |>
-    (\(x) sub("^aux_", "", x))()
-
-  if (!is.null(measure)) {
-    all_measures <- all_measures[all_measures %in% measure]
-  }
-
-  # _______________________________________#
-  # Extract changes ####
-
-  # Initialize result list
-
-  res <- setNames(
-
-    lapply(all_measures, \(x) {
-
-      get_aux_changes(
-        measure     = x,
-        old_release = old_release,
-        verbose     = verbose
-      )
-
-      }),
-
-    all_measures
-  )
-
-  # _______________________________________#
-  # Return ####
-
-
-  # Return named list of changes for every measure
-
-  return(res)
-
-}
-
-#' Get the most recent previous release of a specific identity
-#'
-#' Searches the `aux_data` parent directory for release folders and returns
-#' the latest one prior to `current_release` that matches the specified
-#' identity (e.g., `"PROD"` or `"TEST"`).
-#'
-#' @param aux_data_path Character. Path to the current release's `aux_data`
-#'   directory. The function moves up one level to find sibling release folders.
-#' @param current_release Character. Current release string in the format
-#'   `"YYYYMMDD_identity"` (e.g., `"20260202_TEST"`).
-#' @param identity Character. The identity suffix to filter releases
-#'   (e.g., `"PROD"`, `"TEST"`). Case-sensitive.
-#'
-#' @return A character scalar with the most recent matching release prior to
-#'   `current_release`. Throws an error if no older matching release is found.
-#'
-#' @keywords internal
-get_last_release <- function(aux_data_path,
-                             current_release,
-                             identity) {
-  # Move up one level if aux_data_path already includes the release
-  release_root <- fs::path_dir(aux_data_path)
-
-  # List all release folders under the root
-  release_names <- fs::dir_ls(release_root,
-                              type = "directory",
-                              recurse = FALSE) |>
-    fs::path_file()
-
-  # Keep only folders matching pattern YYYYMMDD_identity
-  valid_releases <- release_names[
-    grepl(paste0("^\\d{8}_", identity, "$"), release_names)
-  ]
-
-  # Sort and pick the one just before current_release
-  candidates <- sort(valid_releases[valid_releases < current_release],
-                     decreasing = TRUE)
-
-  if (length(candidates) == 0) {
-    cli::cli_abort("No older release found with identity {.strong {identity}} prior to {.strong {current_release}}.")
-  }
-
-  return(candidates[1])
-}
-
-
-
-#' Compare two vintage versions of an auxiliary data file
+#' Compare vintage versions of auxiliary data
 #'
 #' Compares the most recent (latest) version of an auxiliary data file with an
 #' earlier "vintage" version stored under the same release, identifying
@@ -302,13 +259,13 @@ get_last_release <- function(aux_data_path,
 #'
 #' @param measure Character. The name of the auxiliary measure to compare
 #'   (e.g., `"gdp"`, `"pop"`).
-#' @param verbose Logical. If `TRUE`, messages about the comparison process are
-#'   printed. Default is `FALSE`.
 #' @param version Integer. A negative integer indicating how many versions
 #'   before the latest to compare with. For example, `-1` (default) compares
-#'   with the version immediately prior; `-2` goes two versions back.
+#'   with the version immediately prior; `-2` compares two versions back.
+#' @param verbose Logical. If `TRUE`, displays informative messages in the console.
+#'   Default is `FALSE`.
 #'
-#' @return Invisibly returns a named list with:
+#' @return Invisibly returns a named list containing:
 #'   \describe{
 #'     \item{diff_values}{A data table of value-level differences. Columns with
 #'       `.x` suffix refer to the latest version (new data); `.y` suffix refers
@@ -317,11 +274,22 @@ get_last_release <- function(aux_data_path,
 #'       with `change_type` column (`"added"` = in latest version only,
 #'       `"removed"` = in earlier version only). `NULL` if no row differences found.}
 #'   }
-#'   The list has attributes: `key_cols` (primary key columns), `measure`,
-#'   `new_path` (path to latest version), `old_path` (path to earlier version),
-#'   `new_version_id`, `old_version_id`, and `release`.
-#'   If no previous version is available, returns a list with all elements set
-#'   to `NULL`.
+#'   
+#'   The list also has attributes:
+#'   \describe{
+#'     \item{key_cols}{Character vector of primary key columns used for comparison.}
+#'     \item{measure}{Character string of the measure name.}
+#'     \item{new_version_id}{Character string of the latest version ID.}
+#'     \item{old_version_id}{Character string of the earlier version ID (`NA_character_`
+#'       if not available).}
+#'     \item{new_path}{Character string path to the latest version snapshot directory.}
+#'     \item{old_path}{Character string path to the earlier version snapshot directory
+#'       (`NA_character_` if not available).}
+#'     \item{release}{Character string of the current release identifier.}
+#'   }
+#'   
+#'   If no previous version is available, returns a list with `diff_values` and
+#'   `diff_rows` set to `NULL`, with version IDs and paths set to `NA_character_`.
 #'
 #' @seealso [compare_aux_vintages()], [pipload::load_aux_data()],
 #'   [myrror::myrror()]
@@ -329,7 +297,10 @@ get_last_release <- function(aux_data_path,
 #'
 #' @examples
 #' \dontrun{
+#' # Compare latest vs immediately previous version
 #' compare_vintage_versions("cpi")
+#' 
+#' # Compare latest vs two versions back with verbose output
 #' compare_vintage_versions("gdp", version = -2, verbose = TRUE)
 #' }
 compare_vintage_versions <- function(measure,
@@ -377,15 +348,15 @@ compare_vintage_versions <- function(measure,
     return(invisible(result))
   }
 
-  # Get version metadata using stamp::st_info
-  st_info <- tryCatch({
-    stamp::st_info(path = paste0(measure, ".qs2"), alias = "aux")
+  # Get version metadata using stamp::st_versions
+  versions_table <- tryCatch({
+    stamp::st_versions(path = paste0(measure, ".qs2"), alias = "aux")
   }, error = function(e) {
     cli::cli_alert_danger("Failed to retrieve version metadata for {.strong {measure}}: {e$message}")
     NULL
   })
 
-  if (is.null(st_info)) {
+  if (is.null(versions_table) || nrow(versions_table) == 0) {
     result <- list(diff_values = NULL, diff_rows = NULL)
     key_cols <- stamp::st_get_pk(new_df)
     setattr(result, "key_cols", key_cols)
@@ -398,21 +369,25 @@ compare_vintage_versions <- function(measure,
     return(invisible(result))
   }
 
-  new_version_id <- st_info$catalog$latest_version_id
-  new_path <- st_info$snapshot_dir
+  # Get version IDs - newest is first row, older versions below
+  new_version_id <- versions_table$version_id[1]
   
-  # Get old version ID from version history
-  if (!is.null(st_info$catalog$version_ids) && 
-      length(st_info$catalog$version_ids) > abs(version)) {
-    old_version_id <- st_info$catalog$version_ids[length(st_info$catalog$version_ids) - abs(version)]
-    old_path <- fs::path(fs::path_dir(new_path), old_version_id)
+  # Get old version ID based on version parameter
+  if (nrow(versions_table) > abs(version)) {
+    old_version_id <- versions_table$version_id[abs(version) + 1]
   } else {
     cli::cli_alert_warning(
       "Cannot retrieve old version ID. Ensure enough versions exist."
     )
     old_version_id <- NA_character_
-    old_path <- NA_character_
   }
+  
+  # Construct paths to version snapshots
+  aux_data_path <- get_from_auxenv("aux_data_path")
+  versions_dir <- fs::path(aux_data_path, paste0(measure, ".qs2"), "versions")
+  
+  new_path <- if (!is.na(new_version_id)) fs::path(versions_dir, new_version_id) else NA_character_
+  old_path <- if (!is.na(old_version_id)) fs::path(versions_dir, old_version_id) else NA_character_
 
   # Determine key columns
   key_cols <- stamp::st_get_pk(new_df)
@@ -506,25 +481,31 @@ compare_vintage_versions <- function(measure,
 #' Useful for tracking within-release changes across several files simultaneously.
 #'
 #' @param measures Character vector. Names of auxiliary data measures to compare
-#'   (e.g., `c("gdp", "pop", "pfw")`). If `NULL` or empty, returns an empty
-#'   list with a warning.
-#' @param version Integer. Indicates how many versions before the latest to
-#'   compare with (e.g., `-1` for the immediately previous version).
-#'   Default is `-1`.
-#' @param verbose Logical. If `TRUE`, messages about the comparison process are
-#'   printed. Default is `FALSE`.
+#'   (e.g., `c("gdp", "pop", "pfw")`). If `NULL` or empty, a warning is issued
+#'   and an empty list is returned.
+#' @param version Integer. A negative integer indicating how many versions
+#'   before the latest to compare with. Default is `-1`.
+#' @param verbose Logical. If `TRUE`, displays informative messages in the console.
+#'   Default is `FALSE`.
 #'
-#' @return Invisibly returns a named list with one element per measure,
-#'   each being the output of [compare_vintage_versions()]. Elements are `NULL`
-#'   for measures where no previous version exists or an error occurred.
+#' @return Invisibly returns a named list with one element per measure.
+#'   Each element is the output of [compare_vintage_versions()]. Elements are
+#'   `NULL` for measures where no previous version exists or an error occurred.
 #'
 #' @seealso [compare_vintage_versions()]
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' # Compare multiple measures against their previous versions
 #' compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
-#' compare_aux_vintages(measures = c("cpi", "gdp"), version = -2, verbose = TRUE)
+#' 
+#' # Compare against versions two steps back with verbose output
+#' compare_aux_vintages(
+#'   measures = c("cpi", "gdp"),
+#'   version = -2,
+#'   verbose = TRUE
+#' )
 #' }
 compare_aux_vintages <- function(measures = NULL,
                                  version = -1,
@@ -563,4 +544,49 @@ compare_aux_vintages <- function(measures = NULL,
   names(results) <- measures
 
   return(invisible(results))
+}
+
+#' Get the most recent previous release of a specific identity
+#'
+#' Searches the `aux_data` parent directory for release folders and returns
+#' the latest one prior to `current_release` that matches the specified
+#' identity (e.g., `"PROD"` or `"TEST"`).
+#'
+#' @param aux_data_path Character. Path to the current release's `aux_data`
+#'   directory. The function moves up one level to find sibling release folders.
+#' @param current_release Character. Current release string in the format
+#'   `"YYYYMMDD_identity"` (e.g., `"20260202_TEST"`).
+#' @param identity Character. The identity suffix to filter releases
+#'   (e.g., `"PROD"`, `"TEST"`). Case-sensitive.
+#'
+#' @return A character scalar with the most recent matching release prior to
+#'   `current_release`. Throws an error if no older matching release is found.
+#'
+#' @keywords internal
+get_last_release <- function(aux_data_path,
+                             current_release,
+                             identity) {
+  # Move up one level if aux_data_path already includes the release
+  release_root <- fs::path_dir(aux_data_path)
+
+  # List all release folders under the root
+  release_names <- fs::dir_ls(release_root,
+                              type = "directory",
+                              recurse = FALSE) |>
+    fs::path_file()
+
+  # Keep only folders matching pattern YYYYMMDD_identity
+  valid_releases <- release_names[
+    grepl(paste0("^\\d{8}_", identity, "$"), release_names)
+  ]
+
+  # Sort and pick the one just before current_release
+  candidates <- sort(valid_releases[valid_releases < current_release],
+                     decreasing = TRUE)
+
+  if (length(candidates) == 0) {
+    cli::cli_abort("No older release found with identity {.strong {identity}} prior to {.strong {current_release}}.")
+  }
+
+  return(candidates[1])
 }
