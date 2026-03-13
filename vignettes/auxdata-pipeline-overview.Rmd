@@ -188,13 +188,24 @@ changes <- compare_aux_releases(
 The result is a named list (one element per measure). Each element contains:
 
 - `diff_values`: data table of value-level differences (`NULL` if none).
-- `diff_rows`: data table of added/removed rows (`NULL` if none).
-- `attr(result$<measure>, "key_cols")`: primary key columns used for
-  comparison (stored as an attribute, not a list element).
+- `diff_rows`: data table of added/removed rows with `change_type` column
+  (`"added"` = in current release only; `"removed"` = in previous release only).
+  `NULL` if no row differences found.
+
+Each measure also carries attributes accessible via `attr(result$<measure>, "name")`:
+
+- `key_cols`: primary key columns used for comparison.
+- `measure`: name of the measure.
+- `release`: current release identifier.
+- `old_release`: previous release identifier.
+- `new_path`: path to the current release data directory.
+- `old_path`: path to the previous release data directory.
 
 ```{r}
-# Access key columns used for a specific measure
+# Access attributes for a specific measure
 attr(changes$cpi, "key_cols")
+attr(changes$cpi, "release")
+attr(changes$cpi, "old_release")
 ```
 
 ## Compare Within the Same Release (Vintage Versions)
@@ -220,10 +231,30 @@ vintage_changes_v2 <- compare_aux_vintages(
 Each element of the result list contains:
 
 - `diff_values`: data table of value-level differences (`NULL` if none).
-- `diff_rows`: data table of added/removed rows (`NULL` if none).
-- `key_cols`: character vector of primary key columns used for comparison.
+- `diff_rows`: data table of added/removed rows with `change_type` column
+  (`"added"` = in latest version only; `"removed"` = in earlier version only).
+  `NULL` if no row differences found.
 
-If no previous version exists, all elements will be `NULL`.
+Each measure also carries attributes accessible via `attr(result$<measure>, "name")`:
+
+- `key_cols`: primary key columns used for comparison.
+- `measure`: name of the measure.
+- `new_version_id`: latest version ID.
+- `old_version_id`: earlier version ID (`NA_character_` if not available).
+- `new_path`: path to the latest version snapshot directory.
+- `old_path`: path to the earlier version snapshot directory (`NA_character_`
+  if not available).
+- `release`: current release identifier.
+
+```{r}
+# Access attributes for a specific measure
+attr(vintage_changes$cpi, "key_cols")
+attr(vintage_changes$cpi, "new_version_id")
+attr(vintage_changes$cpi, "old_version_id")
+```
+
+If no previous version exists for a measure, all elements will be `NULL` with
+version IDs and paths set to `NA_character_`.
 
 ---
 

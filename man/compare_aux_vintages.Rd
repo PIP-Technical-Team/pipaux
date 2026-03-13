@@ -8,31 +8,69 @@ compare_aux_vintages(measures = NULL, version = -1, verbose = FALSE)
 }
 \arguments{
 \item{measures}{Character vector. Names of auxiliary data measures to compare
-(e.g., \code{c("gdp", "pop", "pfw")}). If \code{NULL} or empty, returns an empty
-list with a warning.}
+(e.g., \code{c("gdp", "pop", "pfw")}). If \code{NULL} or empty, a warning is issued
+and an empty list is returned.}
 
-\item{version}{Integer. Indicates how many versions before the latest to
-compare with (e.g., \code{-1} for the immediately previous version).
-Default is \code{-1}.}
+\item{version}{Integer. A negative integer indicating how many versions
+before the latest to compare with. Default is \code{-1} (compares with the
+immediately previous version). Use \code{-2} to compare with the version two
+steps back, and so on.}
 
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
-printed. Default is \code{FALSE}.}
+\item{verbose}{Logical. If \code{TRUE}, displays informative messages in the console.
+Default is \code{FALSE}.}
 }
 \value{
-Invisibly returns a named list with one element per measure,
-each being the output of \code{\link[=compare_vintage_versions]{compare_vintage_versions()}}. Elements are \code{NULL}
-for measures where no previous version exists or an error occurred.
+Invisibly returns a named list with one element per measure.
+Each element is a list containing:
+\describe{
+\item{diff_values}{A data table of value-level differences across matched
+rows and columns. Columns with \code{.x} suffix refer to the latest version
+(new data); \code{.y} suffix refers to the earlier version (old data).
+\code{NULL} if no differences found.}
+\item{diff_rows}{A data table of rows added or removed between versions,
+with \code{change_type} column (\code{"added"} = in latest version only,
+\code{"removed"} = in earlier version only). \code{NULL} if no row differences found.}
+}
+
+Each measure's list also has attributes:
+\describe{
+\item{key_cols}{Character vector of primary key columns used for comparison.}
+\item{measure}{Character string of the measure name.}
+\item{new_version_id}{Character string of the latest version ID.}
+\item{old_version_id}{Character string of the earlier version ID (\code{NA_character_}
+if not available).}
+\item{new_path}{Character string path to the latest version snapshot directory.}
+\item{old_path}{Character string path to the earlier version snapshot directory
+(\code{NA_character_} if not available).}
+\item{release}{Character string of the current release identifier.}
+}
+
+Elements are \code{NULL} for measures where no previous version exists or an
+error occurred during comparison.
 }
 \description{
-Applies \code{\link[=compare_vintage_versions]{compare_vintage_versions()}} across multiple auxiliary data measures.
+Applies vintage version comparison across multiple auxiliary data measures.
 Useful for tracking within-release changes across several files simultaneously.
+}
+\details{
+Vintage versions are snapshots of data files created at different points in
+time within the same release. This function compares the latest version of
+each measure against an earlier "vintage" version, identifying differences in
+values and rows.
 }
 \examples{
 \dontrun{
+# Compare multiple measures against their previous versions
 compare_aux_vintages(measures = c("cpi", "pop", "gdp"))
-compare_aux_vintages(measures = c("cpi", "gdp"), version = -2, verbose = TRUE)
+
+# Compare against versions two steps back with verbose output
+compare_aux_vintages(
+  measures = c("cpi", "gdp"),
+  version = -2,
+  verbose = TRUE
+)
 }
 }
 \seealso{
-\code{\link[=compare_vintage_versions]{compare_vintage_versions()}}
+\code{\link[pipload:load_aux_data]{pipload::load_aux_data()}}, \code{\link[myrror:myrror]{myrror::myrror()}}
 }

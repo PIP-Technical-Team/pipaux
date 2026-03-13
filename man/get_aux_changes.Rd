@@ -7,8 +7,8 @@
 get_aux_changes(measure = "cpi", old_release = NULL, verbose = TRUE)
 }
 \arguments{
-\item{measure}{Character. Name of the auxiliary data measure to update
-(e.g., \code{"cpi"}, \code{"ppp"}).}
+\item{measure}{Character. The name of the auxiliary measure to compare
+(e.g., \code{"cpi"}, \code{"gdp"}).}
 
 \item{old_release}{Character. The identifier of the previous release to
 compare against (e.g., \code{"20240101_PROD"}). If \code{NULL}, automatically uses
@@ -19,18 +19,22 @@ working release.}
 Default is \code{TRUE}.}
 }
 \value{
-Invisibly returns a named list with:
+A named list containing:
 \describe{
 \item{diff_values}{A data table of value-level differences across matched
-rows and columns, with added \code{measure}, \code{new_path.x}, and \code{old_path.y}
-columns. \code{NULL} if no differences found.}
+rows and columns. Columns with \code{.x} suffix refer to the current release
+(new data); \code{.y} suffix refers to the previous release (old data).
+\code{NULL} if no differences found.}
 \item{diff_rows}{A data table of rows added or removed between releases,
-with \code{change_type}, \code{measure}, \code{release}, and \code{old_release} columns.
-\code{NULL} if no row differences found.}
+with \code{change_type} column (\code{"added"} = in current release only,
+\code{"removed"} = in previous release only). \code{NULL} if no row differences found.}
 }
-The list has a \code{"key_cols"} attribute containing the primary key columns
-used for comparison. Returns \code{NULL} invisibly if the old release data
-cannot be loaded.
+
+Each measure's list also has attributes: \code{key_cols} (primary key columns used
+for comparison), \code{measure}, \code{new_path} (current release path), \code{old_path}
+(previous release path), \code{release}, and \code{old_release}.
+
+Returns \code{NULL} for a measure if data cannot be loaded or comparison fails.
 }
 \description{
 Compares the contents of auxiliary data files between the current and a

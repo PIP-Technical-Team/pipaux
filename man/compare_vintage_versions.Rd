@@ -2,7 +2,7 @@
 % Please edit documentation in R/identify_changes.R
 \name{compare_vintage_versions}
 \alias{compare_vintage_versions}
-\title{Compare two vintage versions of an auxiliary data file}
+\title{Compare vintage versions of auxiliary data}
 \usage{
 compare_vintage_versions(measure, verbose = FALSE, version = -1)
 }
@@ -10,25 +10,39 @@ compare_vintage_versions(measure, verbose = FALSE, version = -1)
 \item{measure}{Character. The name of the auxiliary measure to compare
 (e.g., \code{"gdp"}, \code{"pop"}).}
 
-\item{verbose}{Logical. If \code{TRUE}, messages about the comparison process are
-printed. Default is \code{FALSE}.}
+\item{verbose}{Logical. If \code{TRUE}, displays informative messages in the console.
+Default is \code{FALSE}.}
 
 \item{version}{Integer. A negative integer indicating how many versions
 before the latest to compare with. For example, \code{-1} (default) compares
-with the version immediately prior; \code{-2} goes two versions back.}
+with the version immediately prior; \code{-2} compares two versions back.}
 }
 \value{
-Invisibly returns a named list with:
+Invisibly returns a named list containing:
 \describe{
-\item{diff_values}{A data table of value-level differences, or \code{NULL}
-if none found.}
-\item{diff_rows}{A data table of added/removed rows, or \code{NULL} if none
-found.}
-\item{key_cols}{Character vector of primary key columns used for
-comparison.}
+\item{diff_values}{A data table of value-level differences. Columns with
+\code{.x} suffix refer to the latest version (new data); \code{.y} suffix refers
+to the earlier version (old data). \code{NULL} if no differences found.}
+\item{diff_rows}{A data table of rows added or removed between versions,
+with \code{change_type} column (\code{"added"} = in latest version only,
+\code{"removed"} = in earlier version only). \code{NULL} if no row differences found.}
 }
-If no previous version is available, returns a list with all elements set
-to \code{NULL}.
+
+The list also has attributes:
+\describe{
+\item{key_cols}{Character vector of primary key columns used for comparison.}
+\item{measure}{Character string of the measure name.}
+\item{new_version_id}{Character string of the latest version ID.}
+\item{old_version_id}{Character string of the earlier version ID (\code{NA_character_}
+if not available).}
+\item{new_path}{Character string path to the latest version snapshot directory.}
+\item{old_path}{Character string path to the earlier version snapshot directory
+(\code{NA_character_} if not available).}
+\item{release}{Character string of the current release identifier.}
+}
+
+If no previous version is available, returns a list with \code{diff_values} and
+\code{diff_rows} set to \code{NULL}, with version IDs and paths set to \code{NA_character_}.
 }
 \description{
 Compares the most recent (latest) version of an auxiliary data file with an
@@ -37,7 +51,10 @@ differences in values and rows.
 }
 \examples{
 \dontrun{
+# Compare latest vs immediately previous version
 compare_vintage_versions("cpi")
+
+# Compare latest vs two versions back with verbose output
 compare_vintage_versions("gdp", version = -2, verbose = TRUE)
 }
 }
