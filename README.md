@@ -168,33 +168,6 @@ pipaux_set_versioning("timestamp")  # force new version every run
 pipaux_set_versioning("off")        # overwrite without versioning
 ```
 
-**Update Workflow (Visual Overview)**
-
-``` mermaid
-flowchart TD
-    A["aux_fun() or update_aux_measures()"] --> B[Init release + top-level log]
-    B --> C[Resolve repo / owner]
-    C --> D[Process dependencies recursively]
-    D --> E[get_fs_status()]
-    E --> F{GitHub update needed?}
-    F -->|Yes| G["update_gh = TRUE<br>update_y = TRUE"]
-    F -->|No| H[Check Y-drive status]
-    H --> I{SHA mismatch<br>or code hash mismatch?}
-    I -->|Yes| J[update_y = TRUE]
-    I -->|No| K[No update needed exit]
-    G --> L[execute_update()]
-    J --> L
-    L --> M{update_gh?}
-    M -->|Yes| N[Sync release branch from DEV]
-    M -->|No| O[Skip GH sync]
-    N --> P{update_y?}
-    O --> P
-    P -->|Yes| Q["Call aux_<measure>(action = 'update')"]
-    P -->|No| R[Skip Y update]
-    Q --> S[Save artifact + sidecar metadata]
-    S --> T[Log success]
-```
-
 ### Logging
 
 Every update call generates structured log entries including:
