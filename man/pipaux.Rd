@@ -2,15 +2,9 @@
 % Please edit documentation in R/pipaux.R
 \docType{package}
 \name{pipaux}
+\alias{pipaux-package}
 \alias{pipaux}
-\alias{.datatable.aware}
-\title{pipaux: A package for computating the notorious bar statistic}
-\format{
-An object of class \code{logical} of length 1.
-}
-\usage{
-.datatable.aware
-}
+\title{pipaux: A package for processing Auxiliary data in the PIP process}
 \description{
 Description bla blab
 }
@@ -19,4 +13,21 @@ Description bla blab
 The pipaux functions ...
 }
 
-\keyword{datasets}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://pip-technical-team.github.io/pipaux/}
+}
+
+}
+\author{
+\strong{Maintainer}: R.Andres Castaneda \email{acastanedaa@worldbank.org}
+
+Authors:
+\itemize{
+  \item Tony Fujs \email{tfujs@worldbank.org}
+  \item Aleksander Eilertsen \email{aeilertsen@worldbank.org}
+}
+
+}
+\keyword{internal}

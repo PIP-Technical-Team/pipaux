@@ -1,0 +1,101 @@
+---
+title: "Auxiliary Data - Version Control"
+subtitle: "Release branch management"
+author: Rossana Tatulli
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Auxiliary Data - Version Control}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+```{r setup}
+library(pipaux)
+```
+
+The {pipaux} package manages auxiliary data used across PIP. It includes functions like `aux_ppp()` for PPP data and `aux_gdp()` for GDP data (formerly pip_*()), which allow users to update or load specific auxiliary data. For example, calling `aux_gdp()` will update or load GDP data depending on user specification. When updating data, these release branches in GitHub of each auxiliary data repository are also updated.
+
+To ensure that the version of auxiliary data used for each release is properly tracked, 2 steps are necessary:
+
+- Each auxiliary data repository should have a dedicated **release branch**.
+- The release branch must be periodically **updated** with changes from the **DEV branch**.
+To facilitate the management of release branches and synchronization with the DEV branch, the {pipfun} package provides functions designed for this purpose.
+
+Specifically, 
+
+### 1. Check if release branch is there, and if not, create it 
+
+```{r initial-setup}
+# install.packages("pak")
+#pak::pak("PIP-Technical-Team/pipfun@DEV_v2")
+
+library("pipfun")
+
+```
+
+
+```{r}
+
+# Get branches in repo
+
+# Example 1: TEST repo
+repo_branches <- pipfun::get_repo_branches(repo  = "aux_test", 
+                                           owner = getOption("pipfun.ghowner"))
+repo_branches
+
+# Example 2: PPP repo
+
+pipfun::get_repo_branches(repo  = "aux_ppp", 
+                          owner = getOption("pipfun.ghowner"))
+
+
+# As no release branch is found, create it from DEV
+# create_new_branch(new_branch = "20241005",
+#                   ref_branch = "DEV",
+#                   repo = "aux_ppp")
+
+```
+
+
+### 2. Check that release branch is updated with DEV
+```{r}
+
+pipfun::compare_branch_content(repo    = "aux_test",
+                               branch1 = "DEV",
+                               branch2 = "main")
+
+```
+
+### 3. Update release branch if needed
+
+In this case, given that the release branch has just been created, it is up to date with DEV. However, had "same_content" been `FALSE`, we need to update release branch accordingly as follows:
+
+
+```{r}
+
+# Option 1: Make release branch point to the latest commit as in DEV
+# pipfun::update_branches(repo    = "aux_test",
+#                         branch1 = "DEV",
+#                         branch2 = "20241005")
+
+# Option 2: Merge DEV into release branch
+
+# pipfun::merge_branch_into(repo          = "aux_test",
+#                           source_branch = "DEV",
+#                           target_branch = "20241005")
+```
+
+
+Note that these functions are using internally by the `update_aux_measures()` function, which updates auxiliary data measures and synchronizes GitHub release branches and Y-drive files. Therefore, users can simply call `update_aux_measures()` to ensure that all auxiliary data measures are updated and that the corresponding release branches are synchronized with DEV.
+
+
+
+

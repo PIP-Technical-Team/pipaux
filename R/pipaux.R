@@ -1,17 +1,23 @@
-#' pipaux: A package for computating the notorious bar statistic
+#' pipaux: A package for processing Auxiliary data in the PIP process
 #'
 #' Description bla blab
 #'
 #' @section pipaux functions:
 #' The pipaux functions ...
 #'
+#' @keywords internal
 #' @docType package
 #' @name pipaux
-#' @import data.table
-#' @importFrom pipload pip_create_globals add_gls_to_env
+#' @rawNamespace import(collapse, except = fdroplevels)
+#' @rawNamespace import(data.table, except = fdroplevels)
+#' @importFrom lifecycle deprecated
+#' @importFrom pipfun pip_create_globals
 #' @importFrom magrittr "%>%" "%<>%"
+#' @importFrom glue glue
+"_PACKAGE"
 
 # Make sure data.table knows we know we're using it
+#' @noRd
 .datatable.aware = TRUE
 
 # Prevent R CMD check from complaining about the use of pipe expressions
@@ -67,7 +73,7 @@ if (getRversion() >= "2.15.1") {
       "patterns",
       "pce_data_level",
       "pce_domain",
-      "pcn_region_code",
+      "region_code",
       "pop_data_level",
       "pop_domain",
       "ppp_data_level",
@@ -110,7 +116,47 @@ if (getRversion() >= "2.15.1") {
       "weo_subject_code",
       "year2",
       "year_range",
-      "..keep_vars"
+      "..keep_vars",
+      "..tokeep",
+      "..vars",
+      "PCE",
+      "bck",
+      "domain_check",
+      "filename",
+      "fwd",
+      "gd_type",
+      "id",
+      "inpovcal",
+      "module",
+      "na.omit",
+      "name",
+      "pcn_source_file",
+      "poverty_line",
+      "reporting_level",
+      "surv_title",
+      "survey_acronym",
+      "survey_id",
+      "use_groupdata",
+      "use_imputed",
+      "use_microdata",
+      "weo_gdp",
+      "..byv",
+      "..grs",
+      "agegroup",
+      "agegroup_label",
+      "country_name",
+      "education",
+      "gender",
+      "grouping_type",
+      "indicator_code",
+      "inpovcal",
+      "..keepv",
+      "mdom",
+      "nac_data_level",
+      "nac_domain",
+      "report",
+      "reporting_pop",
+      "year1"
     ),
     package = utils::packageName()
   )

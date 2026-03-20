@@ -10,3 +10,6 @@
 ^\.github$
 tmp/
 .vscode/
+^codecov\.yml$
+^data-raw$
+^vignettes/articles$

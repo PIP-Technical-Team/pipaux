@@ -55,6 +55,18 @@ days_in_month <- function(month, year) {
 
 }
 
+#' Get number of decimals
+#' @param x A numeric vector
+#' @noRd
+n_decimals <- function(x) {
+  vapply(x, function(x) {
+    if (abs(x - round(x)) > .Machine$double.eps^0.5) {
+      nchar(strsplit(sub('0+$', '', as.character(x)), ".", fixed = TRUE)[[1]][[2]])
+    } else {
+      return(0)
+    }
+  }, FUN.VALUE = numeric(1))
+}
 
 #' Find latest dlw directory
 #' @noRd
@@ -136,8 +148,8 @@ last_item <- function(x, word = "and") {
 #' @keywords internal
 chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_code") {
 
-  # anyNA
-  anyNA <- function(x) all(is.na(x))
+  # allNA
+  allNA <- function(x) all(is.na(x))
 
   # Add rowid by group
   dt$n <- data.table::rowidv(dt, cols = by)
@@ -146,7 +158,7 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_
   # all observations of base_var
   dt_na <- dt[,
               .SDcols = base_var, by = by,
-              .(all_na = purrr::map_lgl(.SD, anyNA))
+              .(all_na = purrr::map_lgl(.SD, allNA))
   ]
   dt <- data.table::merge.data.table(dt, dt_na, by = by)
 
@@ -182,13 +194,26 @@ chain_values <- function(dt, base_var, replacement_var, new_name, by = "country_
   ]
 
   # Chain forwards
-  dt[, new_var := chain_forwards(.SD), by = by]
+  # dt[, new_var := chain_forwards(.SD), by = by]
+  setorderv(dt, c(by, "year"))
+  dt[, new_var :=
+       fifelse(is.na(new_var) & !is.na(rep_var) & !is.na(fwd),
+               shift(new_var) * fwd,
+               new_var
+               ),
+     by = by]
 
   # Chain backwards
-  dt[, new_var := chain_backwards(.SD), by = by]
+  # dt[, new_var := chain_backwards(.SD), by = by]
+  dt[, new_var :=
+       fifelse(is.na(new_var) & !is.na(rep_var) & !is.na(bck),
+               shift(new_var, type = "lead") * bck,
+               new_var
+       ),
+     by = by]
 
   # Set new name
-  data.table::setnames(dt, "new_var", new_name)
+  setnames(dt, "new_var", new_name)
 
   # Remove temporary columns
   dt <- dt[, !c(
@@ -232,3 +257,344 @@ chain_backwards <- function(dt) {
   data.table::setorder(dt, year)
   return(dt$new_var)
 }
+
+#' chain forward and then backward
+#'
+#' @param ori_var numeric: orignal variablke
+#' @param rep_var numeric: replacement variable
+#'
+#' @keywords internal
+chain <- function(ori_var,
+                  rep_var) {
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Defensive setup   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Defenses --------
+    stopifnot( exprs = {
+        is.numeric(ori_var)
+        is.numeric(rep_var)
+      }
+    )
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## Early Return --------
+
+  # If no missing values, return original vector
+  if (!anyNA(ori_var)) {
+    return(ori_var)
+  }
+  # if all missing values, return replacement vector
+  if (all(is.na(ori_var))) {
+    return(rep_var)
+  }
+  if (all(is.na(rep_var))) {
+    return(ori_var)
+  }
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Calculations   ---------
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # find obs where rep_var  is  NOT missing but ori_var is
+
+
+  working_obs <- which(!is.na(rep_var))
+  x <- ori_var[working_obs]
+  y <- rep_var[working_obs]
+
+  # if the numb of obs to replace is 0 or one the algorithm
+  # does not work.
+  if (length(x) %in% c(0, 1)) {
+
+    return(ori_var)
+  }
+
+  while (any(is.na(x))) {
+
+    ns   <-  which(is.na(x)) # index of NA obs
+    dns  <- c(0, diff(ns))   # Difference between indexes of NA
+    jns  <- which(dns > 1)   # those whose diff is greater than 1
+
+    # IF there are NO differences greater than 1, ti means that all missing
+    # values come one after the other. In that case, we get the last index of
+    # missing values. If there is differences greater than one, it mees that
+    # there is actual data between NAs, which will be used for calculations.
+    if (length(jns) == 0) {
+
+      # We are in a scenratio where there is only one series of missing values.
+      # If there were more than one, we will be on `max(ns[jns])` below. In this
+      # scenario, we don't know whether the series of missing is at the end of
+      # at the beginning. So, if the higher index is the same as the length of
+      # the vector, we start from the start. Otherwise, we start from the end.
+      if (max(ns) == length(x)) {
+        i <- min(ns)
+      } else {
+        i <-  max(ns)          # get the last obs with NA
+      }
+    } else {
+      i    <- max(ns[jns])     # get the the one with greater diff
+    }
+
+    if (i > 1 &&
+        !is.na(x[i - 1]) &&
+        !is.na(y[i - 1])) {
+      # chain forward
+      x[i] <- x[i - 1] * (y[i] / y[i - 1])
+
+    } else if (i < length(x)  &&
+               !is.na(x[i + 1]) &&
+               !is.na(y[i + 1])) {
+      # chain backwards
+      x[i] <- x[i + 1] * (y[i] / y[i + 1])
+    }
+
+  } # end of while
+
+  ori_var[working_obs] <- x
+  return(ori_var)
+}
+
+chain_val <- compiler::cmpfun(chain)
+
+
+#' Get tags from specific Github repo
+#'
+#' @param owner character: Github username that owns the repo
+#' @param repo character: Github repository name
+#' @param what character: either "tags" or "branches"
+#'
+#' @return character vector with tags
+get_gh <- function(owner,
+                   repo,
+                   what = c("tags", "branches")) {
+
+  # on.exit ------------
+  on.exit({
+
+  })
+
+  # Defenses -----------
+  what <- match.arg(what)
+  stopifnot( exprs = {
+
+    }
+  )
+
+  # Early returns ------
+  if (FALSE) {
+    return()
+  }
+
+  # Computations -------
+
+  rs <-
+    gh::gh("/repos/{owner}/{repo}/{what}",
+           owner = owner,
+           repo = repo,
+           what = what,
+           .limit = Inf)  |>
+    purrr::map_chr("name")
+
+  if (what == "tags") {
+    rs <- sort(rs, decreasing = TRUE)
+  }
+
+
+  # Return -------------
+  return(rs)
+
+}
+
+#' Save auxiliary file to Github Repo
+#'
+#' Sometimes we need to save auxiliary files to Github repo.
+#' This function allows for this.
+#' @param measure character: Name of the measure, e.g. "wdi". This will be used to construct the repo name and the filename.
+#' @param tag character: Tag. Defaults to the branch name.
+#' @param ... Additional arguments to be passed to `pipfun::save_to_gh()`
+#' @inheritParams pipfun::save_to_gh
+#' @export
+#' @return NULL
+save_aux_to_gh <- function(df,
+                       measure,
+                       owner     = getOption("pipfun.ghowner"),
+                       repo      = paste0("aux_", measure),
+                       branch    = "DEV",
+                       tag       = branch,
+                       filename  = measure,
+                       ext       = "csv",
+                       ...) {
+
+  pipfun::save_to_gh(df = df,
+                     repo = repo,
+                     owner = owner,
+                     branch = branch,
+                     #tag = tag,
+                     filename = filename,
+                     ext = ext,
+                     ...)
+}
+
+#' Extract value from `.pipaux` environment
+#'
+#' @param key Value to be extracted from `.pipaux` environment
+#'
+#' @returns Value for the key or NULL if key is not found
+#'
+get_from_auxenv <- \(key) {
+  rlang::env_get(.pipaux, key, default = NULL) # Returns NULL if key doesn't exist
+}
+
+#' Save data to auxiliary data path
+#'
+#' @param x Data to be saved
+#' @param id Name of the file
+#' @param ... Additional arguments to be passed to `pipload::pip_write()`
+#'
+#' @returns Fully qualified name of the new file, invisibly
+#'
+pip_aux_save <- \(x,
+                  id,
+                  ...) {
+
+  # alias to pass into pipload::pip_write
+  alias <- get_from_auxenv("aux_alias")
+
+  # Save to the aux_data_path using pipload::pip_write
+  pipload::pip_write(
+    x        = x,
+    id = id,
+    alias = alias,
+    ...
+  )
+
+  invisible(TRUE)
+}
+
+read_dependencies <- function(gh_user, owner) {
+  dependencies <- paste(gh_user,
+                        owner,
+                        "pipaux/metadata/Data/new_dependency.yml",
+                        sep = "/") |>
+    yaml::read_yaml()
+
+  sapply(dependencies, \(x) if (length(x))
+    strsplit(x, ",\\s+")[[1]]
+    else
+      character())
+}
+
+
+# data.table is generally careful to minimize the scope for namespace
+# conflicts (i.e., functions with the same name as in other packages);
+# a more conservative approach using @importFrom should be careful to
+# import any needed data.table special symbols as well, e.g., if you
+# run DT[ , .N, by='grp'] in your package, you'll need to add
+# @importFrom data.table .N to prevent the NOTE from R CMD check.
+# See ?data.table::`special-symbols` for the list of such symbols
+# data.table defines; see the 'Importing data.table' vignette for more
+# advice (vignette('datatable-importing', 'data.table')).
+#
+#' @import data.table
+NULL
+
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+#' @param lhs A value or the magrittr placeholder.
+#' @param rhs A function call using the magrittr semantics.
+#' @return The result of calling `rhs(lhs)`.
+NULL
+
+
+#' Hash code using stamp's hashing logic
+#'
+#' Internal wrapper around stamp:::st_hash_code()
+#'
+#' @param x A function, expression, or character vector
+#' @keywords internal
+hash_code <- function(x) {
+  stamp:::st_hash_code(x)
+}
+
+
+#' Initialize auxiliary data update log
+#'
+#' Creates a new log for tracking auxiliary data updates within a cascade.
+#' If a log already exists in the current cascade, reuses the existing log
+#' instead of creating a new one.
+#'
+#' @param overwrite logical: If `TRUE` (default), overwrites existing log file.
+#'   If `FALSE`, appends to existing log.
+#'
+#' @return character: Name of the initialized log
+#'
+#' @keywords internal
+init_aux_log <- function(overwrite = TRUE) {
+
+  # If already inside a cascade, reuse existing log
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    return(.piplogenv$active_aux_log)
+  }
+
+  # Unique name per cascade
+  # log_name <- paste0(
+  #   "pipaux_update_log_",
+  #   format(Sys.time(), "%Y%m%d_%H%M%S")
+  # )
+  log_name <- "pipaux_update_log"  
+  pipfun::log_init(log_name, overwrite = overwrite)
+
+  .piplogenv$active_aux_log <- log_name
+  .piplogenv$last_aux_log   <- log_name
+
+  log_name
+}
+
+#' Finalize auxiliary data update log
+#'
+#' Cleans up the active log reference from the logging environment.
+#' Called at the end of an auxiliary data update cascade to release
+#' the active log.
+#'
+#' @return NULL (invisibly)
+#'
+#' @keywords internal
+finalize_aux_log <- function() {
+  if (rlang::env_has(.piplogenv, "active_aux_log")) {
+    rlang::env_unbind(.piplogenv, "active_aux_log")
+  }
+}
+
+#' Retrieve the last auxiliary data update log
+#'
+#' Returns the log object from the most recent auxiliary data update cascade.
+#'
+#' @return A log object containing entries from the last update cascade
+#'
+#' @keywords internal
+aux_log_last <- function() {
+  pipfun::log_get(.piplogenv$last_aux_log)
+}
+
+#' Retrieve the name of the last auxiliary data update log
+#'
+#' Returns the name of the log file from the most recent auxiliary data update cascade.
+#'
+#' @return A character string containing the name of the last update log
+#'
+#' @keywords internal
+aux_log_last_name <- function() {
+  return(.piplogenv$last_aux_log)
+}
+

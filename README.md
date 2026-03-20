@@ -4,13 +4,18 @@
 # pipaux
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/PIP-Technical-Team/pipaux/workflows/R-CMD-check/badge.svg)](https://github.com/PIP-Technical-Team/pipaux/actions?workflow=R-CMD-check)
+[![Codecov test
+coverage](https://codecov.io/gh/PIP-Technical-Team/pipaux/branch/master/graph/badge.svg)](https://app.codecov.io/gh/PIP-Technical-Team/pipaux?branch=master)
 <!-- badges: end -->
 
-`pipaux` manages the auxiliary data used in the PIP workflow. It
-basically does two things. \[1\] It updates the auxiliary data and makes
-sure to keep it unchanged when it the raw data has not been modified.
-\[2\] it loads the data into memory.
+`pipaux` manages the auxiliary data used in the PIP workflow. It allows
+two main actions: \[1\] It efficiently updates the auxiliary data in the
+Y drive, while making sure it is in sync with the raw data in Github,
+and that the right dependencies are processed. It also logs the updates,
+so that users can inspect timing, success, and errors information. \[2\]
+It tracks changes across and within releases
 
 ## Installation
 
@@ -23,64 +28,247 @@ devtools::install_github("PIP-Technical-Team/pipaux")
 ```
 
 ``` r
-library(pipaux)
+# library(pipaux)
+devtools::load_all()
 ```
 
-Even though `pipaux` has more than 20 functions, most of its features
-can be executed by only using functions `pipaux::load_aux` and
-`pipaux::update_aux`, which wrappers of other measure-specific
-functions.
+Even though `pipaux` has many functions, one per each auxiliary data
+measure, most of its features can be executed through the following key
+functions:
 
-## Loading data
+- `update_aux_measures()`: to update auxiliary data measures, either one
+  at a time or all together, in the right order of dependencies.
+- `pipload::load_aux_data()`: to load the auxiliary data into memory.
+  This function is a wrapper around the measure-specific loading
+  functions (e.g., `aux_cpi("load")`), and it allows users to load one
+  or more measures together.
+- `compare_aux_releases()`: to compare auxiliary data across releases,
+  and detect new rows, removed rows, or changed values.
+- `compare_aux_vintages()`: to compare auxiliary data within the same
+  release, and detect version changes.
 
-Loading auxiliary data can be done using the function
-`pipaux::load_aux`, whose first argument is the name of the `measure` to
-be loaded. The measures available are **cpi, gdp, pce, pfw, pop, and
-ppp**.
+## Mandatory Setup (Working Release)
 
-So, loading the `cpi` database could be done by typing,
-`load_aux(measure = "cpi")` or `pip_cpi("load")`.
+Before using any update or comparison functions, you must initialize the
+working release:
 
 ``` r
-identical(load_aux(measure = "cpi"), pip_cpi("load"))
-#> [1] TRUE
-identical(load_aux(measure = "ppp"), pip_ppp("load"))
-#> [1] TRUE
-identical(load_aux(measure = "pop"), pip_pop("load"))
-#> [1] TRUE
+pipfun::setup_working_release(
+  release  = "20260202", #for example
+  identity = "TEST"
+)
 ```
 
-## Updating data
+This populates the internal .pipaux environment with:
 
-Updating the auxiliary data in PIP uses the same syntax as loading it.
-Data could be updated using the function `pipaux::load_aux` of any of
-the measure specific functions. Before each version of `pipaux` is
-released, it is verified whether there is any auxiliary database that is
-not up to date. So, these functions are seldom used.
+- Release date (e.g. `YYYYMMDD`)
+
+- Identity (e.g., `TEST`, `PROD`)
+
+- Y-drive data path
+
+- Y-drive metadata path
+
+- Stamp aliases for versioned artifacts
+
+You can inspect the active release:
 
 ``` r
-# this, 
-update_aux(measure = "cpi")
-#> Data signature is up to date.
-#> No update performed
-
-# is equivalent to this, 
-pip_cpi("update")
-#> Data signature is up to date.
-#> No update performed
-
-# And this
-update_aux(measure = "ppp")
-#> Data signature is up to date.
-#> No update performed
-
-# is equivalent to this, 
-pip_ppp("update")
-#> Data signature is up to date.
-#> No update performed
+get_from_auxenv("wrk_release")
+get_from_auxenv("aux_data_path")
 ```
 
-`pipaux` checks whether the hash of each database has changed and
-updates the data in case it has changed. If it has not changed, it
-notifies the user. The user can force the update by using `force = TRUE`
-as part of the arguments.
+## Core concepts
+
+Although pipaux contains one `aux_*` function per measure, most
+workflows rely on these main functions:
+
+**1. Load auxiliary data (read-only)**
+
+``` r
+pipload::load_aux_data(measure = "gdp")
+```
+
+Loads previously saved auxiliary data from the Y drive, in the release
+specific folder. This does not trigger an update.
+
+**2. Update one measure**
+
+``` r
+aux_fun(measure = "gdp", owner = "YourGHUser")
+```
+
+This:
+
+- Checks whether the GitHub release branch is up to date
+
+- Detects raw data SHA changes
+
+- Detects formatter function code changes
+
+- Resolves and updates dependencies automatically
+
+- Saves new versions only if needed
+
+**3. Update multiple measures in dependency-aware order**
+
+``` r
+update_aux_measures(
+  measures = c("cpi", "metaregion"),
+  owner    = "YourGHUser",
+  log      = TRUE,  
+  log_save = FALSE,        # Optional: save log to disk
+  halt_on_dep_fail = FALSE # Continue updates even if a dependency fails
+)
+```
+
+This:
+
+- Processes measures in dependency order
+
+- Avoids unnecessary work
+
+- Optionally saves a structured update log
+
+**4. Compare auxiliary data across releases**
+
+``` r
+compare_aux_releases(old_release = "YYYYMMDD_ID")
+```
+
+These functions identify:
+
+- Added rows
+
+- Removed rows
+
+- Changed values
+
+### How Updates Decide Whether to Run
+
+`pipaux` avoids unnecessary recomputation using multiple checks:
+
+- GitHub release branch vs `DEV`
+
+- Raw file SHA changes
+
+- `aux_*` function code hash changes
+
+- Dependency cascade detection
+
+- Presence and integrity of Y-drive sidecar metadata
+
+If none of these signals change, the measure is not republished.
+
+Versioning is handled via the stamp framework:
+
+``` r
+pipaux_set_versioning("content")    # default
+pipaux_set_versioning("timestamp")  # force new version every run
+pipaux_set_versioning("off")        # overwrite without versioning
+```
+
+**Update Workflow (Visual Overview)**
+
+``` mermaid
+flowchart TD
+    A["aux_fun() or update_aux_measures()"] --> B[Init release + top-level log]
+    B --> C[Resolve repo / owner]
+    C --> D[Process dependencies recursively]
+    D --> E[get_fs_status()]
+    E --> F{GitHub update needed?}
+    F -->|Yes| G["update_gh = TRUE<br>update_y = TRUE"]
+    F -->|No| H[Check Y-drive status]
+    H --> I{SHA mismatch<br>or code hash mismatch?}
+    I -->|Yes| J[update_y = TRUE]
+    I -->|No| K[No update needed exit]
+    G --> L[execute_update()]
+    J --> L
+    L --> M{update_gh?}
+    M -->|Yes| N[Sync release branch from DEV]
+    M -->|No| O[Skip GH sync]
+    N --> P{update_y?}
+    O --> P
+    P -->|Yes| Q["Call aux_<measure>(action = 'update')"]
+    P -->|No| R[Skip Y update]
+    Q --> S[Save artifact + sidecar metadata]
+    S --> T[Log success]
+```
+
+### Logging
+
+Every update call generates structured log entries including:
+
+- Measure name
+
+- Timestamp
+
+- Success / failure
+
+- GitHub SHAs
+
+- Error stack traces (if any)
+
+If `log_save = TRUE`, call `pipfun::log_load()`
+
+If not saved, the most recent in-memory log can be accessed via
+`aux_log_last()`.
+
+## Typical Workflow
+
+``` r
+# 1. Initialize release
+pipfun::setup_working_release()
+
+# 2. Update selected measures
+update_aux_measures(
+  measures = c("cpi", "gdp"),
+  owner = "YourGHUser",
+  log_save = TRUE
+)
+
+# 3. Load updated data
+gdp <- pipload::load_aux_data("gdp")
+
+# 4. Compare to previous release
+compare_aux_releases(old_release = "YYYYMMDD_TEST")
+```
+
+## Scope
+
+*pipaux* is intended for:
+
+- PIP Technical Team workflows
+
+- Controlled release environments (TEST / PROD)
+
+- Server environments with Y-drive access
+
+- Users with valid GitHub PAT credentials
+
+It is not intended as a general-purpose data pipeline framework.
+
+## Further Documentation
+
+For deeper technical details (dependency graph logic, sidecar metadata
+structure, SHA semantics, logging internals, development diagnostics),
+see the project technical guide in `dev/_project_notes`
+
+## Summary
+
+`pipaux` ensures that auxiliary data in the PIP workflow are:
+
+- Reproducible
+
+- Versioned
+
+- Dependency-aware
+
+- Provenance-tracked
+
+- Efficiently updated
+
+- Fully auditable
+
+It is the orchestration layer between GitHub auxiliary repositories and
+the PIP Y-drive release system.
