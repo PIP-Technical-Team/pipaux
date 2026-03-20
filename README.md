@@ -38,14 +38,13 @@ functions:
 
 - `update_aux_measures()`: to update auxiliary data measures, either one
   at a time or all together, in the right order of dependencies.
-- `pipload::load_aux_data()`: to load the auxiliary data into memory.
-  This function is a wrapper around the measure-specific loading
-  functions (e.g., `aux_cpi("load")`), and it allows users to load one
-  or more measures together.
+  - Note: use `pipload::load_aux_data()`to load the auxiliary data into memory.
+  This function in {pipload} is a wrapper around the measure-specific loading
+  functions (e.g., `aux_cpi("load")`).
 - `compare_aux_releases()`: to compare auxiliary data across releases,
-  and detect new rows, removed rows, or changed values.
+  and detect new rows, removed rows, or changed values. Accepts one or more measures.
 - `compare_aux_vintages()`: to compare auxiliary data within the same
-  release, and detect version changes.
+  release, and detect version changes. Accepts one or more measures.
 
 ## Mandatory Setup (Working Release)
 
@@ -139,9 +138,7 @@ compare_aux_releases(old_release = "YYYYMMDD_ID")
 These functions identify:
 
 - Added rows
-
 - Removed rows
-
 - Changed values
 
 ### How Updates Decide Whether to Run
@@ -151,11 +148,8 @@ These functions identify:
 - GitHub release branch vs `DEV`
 
 - Raw file SHA changes
-
 - `aux_*` function code hash changes
-
 - Dependency cascade detection
-
 - Presence and integrity of Y-drive sidecar metadata
 
 If none of these signals change, the measure is not republished.
@@ -173,13 +167,9 @@ pipaux_set_versioning("off")        # overwrite without versioning
 Every update call generates structured log entries including:
 
 - Measure name
-
 - Timestamp
-
 - Success / failure
-
 - GitHub SHAs
-
 - Error stack traces (if any)
 
 If `log_save = TRUE`, call `pipfun::log_load()`
@@ -212,11 +202,8 @@ compare_aux_releases(old_release = "YYYYMMDD_TEST")
 *pipaux* is intended for:
 
 - PIP Technical Team workflows
-
 - Controlled release environments (TEST / PROD)
-
 - Server environments with Y-drive access
-
 - Users with valid GitHub PAT credentials
 
 It is not intended as a general-purpose data pipeline framework.
@@ -232,15 +219,10 @@ see the project technical guide in `dev/_project_notes`
 `pipaux` ensures that auxiliary data in the PIP workflow are:
 
 - Reproducible
-
 - Versioned
-
 - Dependency-aware
-
 - Provenance-tracked
-
 - Efficiently updated
-
 - Fully auditable
 
 It is the orchestration layer between GitHub auxiliary repositories and
