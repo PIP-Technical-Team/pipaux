@@ -1,6 +1,10 @@
 # pipaux 0.1.4
 
 - fix pip_income_groups function based on new data
+- make `auto_aux_update()` resilient to GitHub rate limits by caching
+    `git_metadata.csv` and `new_dependency.yml` locally and falling back to
+    cached or packaged metadata when the remote files are temporarily
+    unavailable
 
 # pipaux 0.1.3
 

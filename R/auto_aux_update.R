@@ -35,16 +35,16 @@ auto_aux_update <- function(
 
   creds <- pipfun::get_github_creds()
   gh_user <- "https://raw.githubusercontent.com"
-  org_data <- paste(
-    gh_user,
-    owner,
-    "pipaux/metadata/Data/git_metadata.csv",
-    sep = "/"
-  ) |>
-    readr::read_csv(show_col_types = FALSE) |>
-    setDT()
+  org_data <- read_git_metadata(
+    owner = owner,
+    token = creds$password
+  )
 
-  dependencies <- read_dependencies(gh_user, owner)
+  dependencies <- read_dependencies(
+    gh_user = gh_user,
+    owner = owner,
+    token = creds$password
+  )
   # Get all repositories under PIP-Technical-Team
   all_repos <- gh::gh("GET /users/{username}/repos", username = owner) |>
     vapply("[[", "", "name") |>
@@ -257,22 +257,217 @@ aux_file_last_updated <- function(data_dir, aux_files, branch) {
     dplyr::arrange(desc(time_last_update))
 }
 
-read_dependencies <- function(gh_user, owner) {
-  dependencies <- paste(
-    gh_user,
-    owner,
-    "pipaux/metadata/Data/new_dependency.yml",
-    sep = "/"
-  ) |>
-    yaml::read_yaml()
+metadata_cache_dir <- function() {
+  # Cache remote metadata locally so auto_aux_update() can recover from
+  # transient GitHub failures, including HTTP 429 rate limiting.
+  cache_dir <- tools::R_user_dir("pipaux", which = "cache")
+  fs::dir_create(cache_dir)
+  cache_dir
+}
 
-  sapply(dependencies, \(x) {
-    if (length(x)) {
-      strsplit(x, ",\\s+")[[1]]
-    } else {
-      character()
+metadata_cache_file <- function(filename, owner) {
+  fs::path(metadata_cache_dir(), glue::glue("{owner}_{filename}"))
+}
+
+packaged_metadata_file <- function(filename) {
+  installed_file <- system.file("extdata", filename, package = "pipaux")
+
+  if (nzchar(installed_file) && fs::file_exists(installed_file)) {
+    return(installed_file)
+  }
+
+  dev_file <- fs::path("inst", "extdata", filename)
+
+  if (fs::file_exists(dev_file)) {
+    return(dev_file)
+  }
+
+  NA_character_
+}
+
+download_metadata_text <- function(
+  owner,
+  path,
+  token = NULL,
+  ref = "metadata"
+) {
+  # Retrieve files from the metadata branch through the GitHub contents API.
+  # This supports authenticated requests and avoids depending on unauthenticated
+  # raw URLs, which are more prone to rate limiting.
+  response <- gh::gh(
+    "GET /repos/{owner}/{repo}/contents/{path}",
+    owner = owner,
+    repo = "pipaux",
+    path = path,
+    .params = list(ref = ref),
+    .token = token
+  )
+
+  response$content |>
+    gsub(pattern = "\\n", replacement = "", x = _) |>
+    base64enc::base64decode() |>
+    rawToChar()
+}
+
+write_metadata_cache <- function(text, cache_file) {
+  fs::dir_create(fs::path_dir(cache_file))
+  writeLines(text, cache_file, useBytes = TRUE)
+  invisible(cache_file)
+}
+
+read_metadata_cache <- function(cache_file) {
+  if (!fs::file_exists(cache_file)) {
+    return(NULL)
+  }
+
+  readr::read_file(cache_file)
+}
+
+parse_dependencies <- function(dependencies) {
+  if (is.null(dependencies) || length(dependencies) == 0) {
+    return(list())
+  }
+
+  lapply(dependencies, \(x) {
+    if (is.null(x) || length(x) == 0 || all(is.na(x))) {
+      return(character())
     }
+
+    values <- as.character(x)
+
+    if (length(values) == 1) {
+      values <- strsplit(values, ",\\s*")[[1]]
+    }
+
+    values <- trimws(values)
+    values[nzchar(values)]
   })
+}
+
+parse_dependencies_text <- function(text) {
+  text |>
+    yaml::yaml.load() |>
+    parse_dependencies()
+}
+
+parse_git_metadata_text <- function(text) {
+  text |>
+    I() |>
+    readr::read_csv(show_col_types = FALSE) |>
+    setDT()
+}
+
+read_git_metadata <- function(owner, token = NULL) {
+  # Resolution order:
+  #   1. live file from GitHub
+  #   2. last successful local cache
+  #   3. packaged copy in inst/extdata
+  # Git metadata is required for auto_aux_update(), so this helper aborts only
+  # if all three sources are unavailable.
+  cache_file <- metadata_cache_file("git_metadata.csv", owner)
+  packaged_file <- packaged_metadata_file("git_metadata.csv")
+
+  remote_text <- tryCatch(
+    download_metadata_text(
+      owner = owner,
+      path = "Data/git_metadata.csv",
+      token = token
+    ),
+    error = identity
+  )
+
+  if (!inherits(remote_text, "error")) {
+    write_metadata_cache(remote_text, cache_file)
+    return(parse_git_metadata_text(remote_text))
+  }
+
+  cli::cli_alert_warning(c(
+    "Could not retrieve {.file Data/git_metadata.csv} from GitHub.",
+    "i" = "Trying cached metadata instead.",
+    "x" = conditionMessage(remote_text)
+  ))
+
+  cached_text <- tryCatch(read_metadata_cache(cache_file), error = identity)
+
+  if (!inherits(cached_text, "error") && !is.null(cached_text)) {
+    return(parse_git_metadata_text(cached_text))
+  }
+
+  if (inherits(cached_text, "error")) {
+    cli::cli_alert_warning(c(
+      "Could not read cached {.file git_metadata.csv}.",
+      "i" = "Trying packaged metadata instead.",
+      "x" = conditionMessage(cached_text)
+    ))
+  }
+
+  if (!is.na(packaged_file)) {
+    return(
+      readr::read_csv(packaged_file, show_col_types = FALSE) |>
+        setDT()
+    )
+  }
+
+  cli::cli_abort(c(
+    "Unable to load {.file git_metadata.csv}.",
+    "x" = conditionMessage(remote_text),
+    "i" = "No cached or packaged fallback was found."
+  ))
+}
+
+read_dependencies <- function(gh_user, owner, token = NULL) {
+  # Dependency metadata changes over time, so prefer a fresh download and store
+  # the result in the local cache. If GitHub is temporarily unavailable, fall
+  # back to the cache, then to any packaged copy. Unlike git metadata, missing
+  # dependencies are non-fatal: auto_aux_update() can still proceed, although
+  # it may skip dependency expansion for that run.
+  cache_file <- metadata_cache_file("new_dependency.yml", owner)
+  packaged_file <- packaged_metadata_file("new_dependency.yml")
+
+  remote_text <- tryCatch(
+    download_metadata_text(
+      owner = owner,
+      path = "Data/new_dependency.yml",
+      token = token
+    ),
+    error = identity
+  )
+
+  if (!inherits(remote_text, "error")) {
+    write_metadata_cache(remote_text, cache_file)
+    return(parse_dependencies_text(remote_text))
+  }
+
+  cli::cli_alert_warning(c(
+    "Could not retrieve {.file Data/new_dependency.yml} from GitHub.",
+    "i" = "Trying cached dependency metadata instead.",
+    "x" = conditionMessage(remote_text)
+  ))
+
+  cached_text <- tryCatch(read_metadata_cache(cache_file), error = identity)
+
+  if (!inherits(cached_text, "error") && !is.null(cached_text)) {
+    return(parse_dependencies_text(cached_text))
+  }
+
+  if (inherits(cached_text, "error")) {
+    cli::cli_alert_warning(c(
+      "Could not read cached {.file new_dependency.yml}.",
+      "i" = "Trying packaged dependency metadata instead.",
+      "x" = conditionMessage(cached_text)
+    ))
+  }
+
+  if (!is.na(packaged_file)) {
+    return(yaml::read_yaml(packaged_file) |> parse_dependencies())
+  }
+
+  cli::cli_alert_warning(c(
+    "Proceeding without dependency metadata.",
+    "i" = "No remote, cached, or packaged {.file new_dependency.yml} was available."
+  ))
+
+  list()
 }
 
 read_signature_file <- function(aux_file, maindir, branch) {
