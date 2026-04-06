@@ -184,11 +184,12 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
     func <- get(func_name, envir = asNamespace("pipaux"))
 
     update_args <- list(
-      action = "update",
-      branch = release_branch,
-      owner  = owner,
-      tag    = tag,
-      repo   = repo
+      action  = "update",
+      branch  = release_branch,
+      owner   = owner,
+      tag     = tag,
+      repo    = repo,
+      verbose = verbose
     )
 
     filtered_args <- update_args[names(update_args) %in% names(formals(func))]

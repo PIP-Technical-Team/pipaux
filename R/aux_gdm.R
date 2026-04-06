@@ -16,7 +16,8 @@
 aux_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE) {
 
   measure <- "gdm"
   action <- match.arg(action)
@@ -36,11 +37,12 @@ aux_gdm <- function(action  = c("update", "load"),
     aux_gdm_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -55,7 +57,8 @@ aux_gdm <- function(action  = c("update", "load"),
 aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch,
                            tag     = branch,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE) {
   measure <- "gdm"
 
   #   _________________________________________________________
@@ -135,7 +138,7 @@ aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
   ##  ............................................................................
   ##  Merge with PFW                                                          ####
 
-  pfw    <-  pipload::load_aux_data(measure = "pfw")
+  pfw    <-  pipload::load_aux_data(measure = "pfw", verbose = verbose)
   setattr(df, "aux_name", "gdm")
   key_cols <- c("country_code", "year", "reporting_level")
   setattr(df, "aux_key", key_cols)
@@ -239,7 +242,7 @@ aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
   # aux_country_list(force   = force,
   #                  branch  = branch)
 
-  cl   <- pipload::load_aux_data(measure = "country_list")
+  cl   <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
   df <- df[country_code %in% cl$country_code]
 
@@ -279,7 +282,8 @@ aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_gdm_update,
-    code_label = "aux_gdm_update"
+    code_label = "aux_gdm_update",
+    verbose  = verbose
   )
 
   return(invisible(saved))

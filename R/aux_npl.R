@@ -9,7 +9,8 @@
 aux_npl <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
-                   detail  = getOption("pipaux.detail.raw")) {
+                   detail  = getOption("pipaux.detail.raw"),
+                   verbose = FALSE) {
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   ## setup --------
 
@@ -75,7 +76,8 @@ aux_npl <- function(action  = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_npl,
-      code_label = "aux_npl"
+      code_label = "aux_npl",
+      verbose  = verbose
     )
 
 
@@ -83,7 +85,7 @@ aux_npl <- function(action  = c("update", "load"),
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ## load --------
 
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
 
 
   }

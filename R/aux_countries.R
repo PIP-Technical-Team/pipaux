@@ -8,6 +8,7 @@
 aux_countries <- function(action  = c("update", "load"),
                           owner   = getOption("pipfun.ghowner"),
                           tag     = NULL,
+                          verbose = FALSE,
                           ...) {
 
   measure <- "countries"
@@ -26,9 +27,9 @@ aux_countries <- function(action  = c("update", "load"),
   if (action == "update") {
 
     ## Special national accounts --------
-    cl <- pipload::load_aux_data(measure = "country_list")
+    cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
-    pfw <- pipload::load_aux_data(measure = "pfw")
+    pfw <- pipload::load_aux_data(measure = "pfw", verbose = verbose)
 
 
     pfw <- pfw[inpovcal == 1,
@@ -61,12 +62,13 @@ aux_countries <- function(action  = c("update", "load"),
       pk       = key_cols,
       code     = aux_countries,
       code_label = "aux_countries",
+      verbose  = verbose,
       ...
     )
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }

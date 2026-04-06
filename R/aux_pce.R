@@ -10,7 +10,8 @@
 aux_pce <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE) {
 
   measure <- "pce"
   action <- match.arg(action)
@@ -29,11 +30,12 @@ aux_pce <- function(action  = c("update", "load"),
     aux_pce_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -49,14 +51,15 @@ aux_pce <- function(action  = c("update", "load"),
 aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch = NULL,
                            tag     = branch,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE) {
   measure <- "pce"
 
   #   ________________________________________________________________
   #   Load data                                             ####
   #
 
-  wpce   <- pipload::load_aux_data(measure = "wdi")
+  wpce   <- pipload::load_aux_data(measure = "wdi", verbose = verbose)
 
   setnames(wpce, "NE.CON.PRVT.PC.KD", "wdi_pce")
 
@@ -250,7 +253,7 @@ aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
   pce <- pce[country_code %in% cl$country_code]
 
@@ -283,7 +286,8 @@ aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_pce_update,
-    code_label = "aux_pce_update"
+    code_label = "aux_pce_update",
+    verbose  = verbose
   )
 
   return(invisible(saved))

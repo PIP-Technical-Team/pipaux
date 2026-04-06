@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="PIP Technical Team" />
+
+
+<title>A Closer Look at the Update Workflow</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">A Closer Look at the Update Workflow</h1>
+<h4 class="author">PIP Technical Team</h4>
+
+
+
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<p>This vignette describes what happens internally when
+<code>update_aux_measures()</code> or <code>aux_fun()</code> is called.
+It is intended for team members who need to understand, debug, or extend
+the update pipeline.</p>
+<p>The update workflow performs two broad operations:</p>
+<ol style="list-style-type: decimal">
+<li><strong>GitHub synchronization</strong> — ensures the release branch
+of each <code>aux_*</code> repository is in sync with
+<code>DEV</code>.</li>
+<li><strong>Y-drive refresh</strong> — regenerates and saves the
+formatted data file to the Y-drive, but only when a change is actually
+detected.</li>
+</ol>
+<hr />
+</div>
+<div id="entry-points" class="section level1">
+<h1>Entry Points</h1>
+<table>
+<colgroup>
+<col width="29%" />
+<col width="70%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>update_aux_measures()</code></td>
+<td>Update one or more measures (handles dependency order)</td>
+</tr>
+<tr class="even">
+<td><code>aux_fun()</code></td>
+<td>Update a single measure directly (lower-level)</td>
+</tr>
+</tbody>
+</table>
+<p>Both functions are exported. In practice,
+<code>update_aux_measures()</code> is the standard entry point.
+<code>aux_fun()</code> is called recursively by the dependency
+resolution logic and can be called directly for debugging.</p>
+<hr />
+</div>
+<div id="the-.pipaux-runtime-environment" class="section level1">
+<h1>The <code>.pipaux</code> Runtime Environment</h1>
+<p>All pipeline operations depend on the <code>.pipaux</code>
+environment, which is populated by
+<code>pipfun::setup_working_release()</code> at the start of each
+session (and called automatically on package load via
+<code>zzz.R</code>).</p>
+<p>Key fields:</p>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="72%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>wrk_release</code></td>
+<td>List: <code>release</code> (YYYYMMDD) and <code>identity</code>
+(TEST/PROD)</td>
+</tr>
+<tr class="even">
+<td><code>aux_data_path</code></td>
+<td>Y-drive path for <code>.qs2</code> data artifacts</td>
+</tr>
+<tr class="odd">
+<td><code>aux_metadata_path</code></td>
+<td>Y-drive path for sidecar metadata files</td>
+</tr>
+<tr class="even">
+<td><code>aux_alias</code></td>
+<td><code>stamp</code> alias for the aux data folder</td>
+</tr>
+<tr class="odd">
+<td><code>aux_meta_alias</code></td>
+<td><code>stamp</code> alias for the aux metadata folder</td>
+</tr>
+</tbody>
+</table>
+<p>The release branch name used throughout the pipeline is derived
+as:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>release_branch <span class="ot">&lt;-</span> <span class="fu">paste0</span>(wrk_release<span class="sc">$</span>release, <span class="st">&quot;_&quot;</span>, wrk_release<span class="sc">$</span>identity)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># e.g. &quot;20260202_TEST&quot;</span></span></code></pre></div>
+<hr />
+</div>
+<div id="step-by-step-what-happens-inside-aux_fun" class="section level1">
+<h1>Step-by-Step: What Happens Inside <code>aux_fun()</code></h1>
+<p><strong>Check decision logic graph at the end of this
+file</strong></p>
+<div id="step-1-initialization-top-level-calls-only" class="section level2">
+<h2>Step 1 — Initialization (top-level calls only)</h2>
+<p><code>is_top_level()</code> detects whether <code>aux_fun()</code> is
+being called from an interactive session or script
+(<code>sys.nframe() &lt;= 2</code>). If so:</p>
+<ul>
+<li>A new audit log is initialized via <code>init_aux_log()</code>.</li>
+<li>A <code>processed</code> environment is created to track
+already-updated measures and prevent cyclic re-processing.</li>
+<li><code>on.exit(finalize_aux_log())</code> ensures the log is closed
+cleanly even if an error occurs.</li>
+</ul>
+<p>When <code>aux_fun()</code> is called recursively (for dependencies),
+these steps are skipped — the same log and <code>processed</code>
+environment from the top-level call are reused.</p>
+</div>
+<div id="step-2-repo-and-owner-resolution" class="section level2">
+<h2>Step 2 — Repo and Owner Resolution</h2>
+<p><code>resolve_measure_repo_owner()</code> applies special-case
+overrides before any GitHub call is made:</p>
+<table>
+<colgroup>
+<col width="45%" />
+<col width="20%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Measure</th>
+<th>Repo override</th>
+<th>Owner override</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&quot;income_groups&quot;</code>, <code>&quot;country_list&quot;</code></td>
+<td><code>&quot;Class&quot;</code></td>
+<td><em>(unchanged)</em></td>
+</tr>
+<tr class="even">
+<td><code>&quot;nan&quot;</code></td>
+<td><em>(unchanged)</em></td>
+<td><code>&quot;PIP-Technical-Team&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>All others</td>
+<td><code>&quot;aux_&lt;measure&gt;&quot;</code></td>
+<td><code>getOption(&quot;pipfun.ghowner&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="step-3-dependency-resolution" class="section level2">
+<h2>Step 3 — Dependency Resolution</h2>
+<p><code>process_dependencies()</code> reads the dependency manifest
+from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>deps <span class="ot">&lt;-</span> <span class="fu">read_dependencies</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">gh_user =</span> <span class="st">&quot;https://raw.githubusercontent.com&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">owner   =</span> <span class="st">&quot;PIP-Technical-Team&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>For each upstream dependency of the requested measure that has not
+yet been processed, <code>aux_fun()</code> is called recursively. The
+<code>processed</code> environment is checked before each call — if the
+measure is already marked, it is skipped. This prevents both redundant
+work and infinite cycles.</p>
+<p>To inspect the current dependency graph:</p>
+<p><code>r{eval = TRUE} deps &lt;- read_dependencies(   gh_user = &quot;https://raw.githubusercontent.com&quot;,   owner   = &quot;PIP-Technical-Team&quot; )</code></p>
+</div>
+<div id="step-4-status-checks-check_status.r" class="section level2">
+<h2>Step 4 — Status Checks (<code>check_status.R</code>)</h2>
+<p>Before any update is performed, the pipeline checks whether an update
+is actually needed. This logic lives in <code>R/check_status.R</code>
+and runs two sequential checks.</p>
+<div id="a-github-status-check_github_status" class="section level3">
+<h3>4a — GitHub Status (<code>check_github_status()</code>)</h3>
+<p>Checks whether the release branch on GitHub is present and in sync
+with <code>DEV</code>:</p>
+<table>
+<colgroup>
+<col width="60%" />
+<col width="16%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th><code>update_gh</code></th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Measure is <code>&quot;countries&quot;</code> or
+<code>&quot;missing_data&quot;</code></td>
+<td><code>FALSE</code></td>
+<td>Proceed to Y-drive check</td>
+</tr>
+<tr class="even">
+<td>Release branch does not exist on GitHub</td>
+<td><code>TRUE</code></td>
+<td>Skip Y-drive check</td>
+</tr>
+<tr class="odd">
+<td>Release branch content differs from <code>DEV</code></td>
+<td><code>TRUE</code></td>
+<td>Skip Y-drive check</td>
+</tr>
+<tr class="even">
+<td>Release branch is in sync with <code>DEV</code></td>
+<td><code>FALSE</code></td>
+<td>Proceed to Y-drive check</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Policy:</strong> if <code>update_gh = TRUE</code>, the
+Y-drive is always updated. The Y-drive check is only reached when
+<code>update_gh = FALSE</code>.</p>
+</div>
+<div id="b-y-drive-status-check_y_drive_status" class="section level3">
+<h3>4b — Y-drive Status (<code>check_y_drive_status()</code>)</h3>
+<p>Reads the sidecar metadata file for the measure and runs two
+sub-checks:</p>
+<p><strong>SHA check:</strong> for each GitHub source file recorded in
+the sidecar’s <code>gh</code> field, the stored raw SHA
+(<code>gh_raw_sha</code>) is compared against the current SHA fetched
+from GitHub via <code>pipfun::get_file_info_from_gh()</code>. A mismatch
+in any file triggers <code>update_y = TRUE</code>.</p>
+<p><strong>Code hash check:</strong> the body of the measure’s generator
+function (e.g. <code>aux_cpi()</code>) is hashed via
+<code>hash_code()</code> and compared against
+<code>sidecar$code_hash</code>. If the function has changed since the
+last save, <code>update_y = TRUE</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th><code>update_y</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sidecar or artifact file missing</td>
+<td><code>TRUE</code></td>
+</tr>
+<tr class="even">
+<td>Any source file SHA differs from sidecar record</td>
+<td><code>TRUE</code></td>
+</tr>
+<tr class="odd">
+<td>Generator function body has changed</td>
+<td><code>TRUE</code></td>
+</tr>
+<tr class="even">
+<td>All checks pass</td>
+<td><code>FALSE</code></td>
+</tr>
+</tbody>
+</table>
+<p>If <code>update_y = FALSE</code>, the measure is skipped entirely —
+no file is read, reformatted, or written.</p>
+</div>
+</div>
+<div id="step-5-execute-update-execute_update" class="section level2">
+<h2>Step 5 — Execute Update (<code>execute_update()</code>)</h2>
+<p>If either <code>update_gh</code> or <code>update_y</code> is
+<code>TRUE</code>, <code>execute_update()</code> is called.</p>
+<div id="github-update-update_gh-true" class="section level3">
+<h3>GitHub update (<code>update_gh = TRUE</code>)</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>pipfun<span class="sc">::</span><span class="fu">sync_release_branch</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">owner         =</span> owner,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">repo          =</span> repo,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">ref_branch    =</span> <span class="st">&quot;DEV&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">target_branch =</span> release_branch</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="y-drive-update-update_y-true" class="section level3">
+<h3>Y-drive update (<code>update_y = TRUE</code>)</h3>
+<p>The generator function for the measure is resolved dynamically:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>func_name <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;aux_&quot;</span>, measure)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>func      <span class="ot">&lt;-</span> <span class="fu">get</span>(func_name, <span class="at">envir =</span> <span class="fu">asNamespace</span>(<span class="st">&quot;pipaux&quot;</span>))</span></code></pre></div>
+<p>Only arguments accepted by the function’s <code>formals()</code> are
+passed, so each <code>aux_*</code> function can have a different
+signature without breaking the dispatcher:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>update_args    <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">action =</span> <span class="st">&quot;update&quot;</span>, <span class="at">branch =</span> release_branch,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                       <span class="at">owner  =</span> owner,    <span class="at">tag    =</span> tag, <span class="at">repo =</span> repo)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>filtered_args  <span class="ot">&lt;-</span> update_args[<span class="fu">names</span>(update_args) <span class="sc">%in%</span> <span class="fu">names</span>(<span class="fu">formals</span>(func))]</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">do.call</span>(func, filtered_args)</span></code></pre></div>
+<p>The generator function is responsible for:</p>
+<ol style="list-style-type: decimal">
+<li>Loading raw data from GitHub (<code>pipfun::load_from_gh()</code>)
+or from other aux measures (<code>pipload::load_aux_data()</code>).</li>
+<li>Validating and formatting the data.</li>
+<li>Saving the result to the Y-drive via
+<code>pip_aux_save()</code>.</li>
+</ol>
+</div>
+</div>
+<div id="step-6-saving-to-the-y-drive-pip_aux_save" class="section level2">
+<h2>Step 6 — Saving to the Y-drive (<code>pip_aux_save()</code>)</h2>
+<p><code>pip_aux_save()</code> wraps <code>pipload::pip_write()</code> /
+<code>stamp::st_save()</code> and persists the following alongside each
+data artifact:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="79%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Sidecar field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>gh</code></td>
+<td>GitHub metadata: owner, repo, branch, file path, raw SHA</td>
+</tr>
+<tr class="even">
+<td><code>code_hash</code></td>
+<td>Hash of the generator function body at save time</td>
+</tr>
+<tr class="odd">
+<td><code>code_label</code></td>
+<td>Name of the generator function (used at check time)</td>
+</tr>
+<tr class="even">
+<td><code>pk</code></td>
+<td>Primary key columns for the measure</td>
+</tr>
+</tbody>
+</table>
+<p>For measures with multiple source files (e.g. <code>aux_cp</code>),
+<code>gh</code> is a list of entries, one per file. A mismatch in any
+single entry triggers a full re-save.</p>
+<p>For derived measures that do not read directly from GitHub (e.g.
+<code>aux_countries</code>, <code>aux_regions</code>), the
+<code>gh</code> attribute is inherited from the input aux data objects.
+Change detection therefore propagates automatically through the
+dependency graph.</p>
+<blockquote>
+<p><strong>Exception:</strong> <code>aux_maddison</code> downloads from
+an external URL (option <code>pipaux.madsrc</code>) and does not carry a
+<code>gh</code> attribute. Change detection for this measure relies
+solely on <code>code_hash</code>.</p>
+</blockquote>
+<hr />
+</div>
+</div>
+<div id="logging" class="section level1">
+<h1>Logging</h1>
+<p>Log entries are appended at each significant step using
+<code>pipfun::log_add()</code>. Each entry carries a
+<code>logmeta</code> field with:</p>
+<ul>
+<li><code>step</code>: one of <code>START</code>,
+<code>UPDATE_GH</code>, <code>UPDATE_Y</code>, <code>END</code>,
+<code>ERROR_CHECK</code>, <code>ERROR_GH</code>, <code>ERROR_Y</code>,
+<code>ERROR_DEP</code>, <code>ERROR_UPDATE</code></li>
+<li><code>measure</code>: the measure name</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Inspect the in-memory log after an update</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">aux_log_last</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Load a persisted log from disk (only if log_save = TRUE was used)</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>pipfun<span class="sc">::</span><span class="fu">log_load</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="at">id    =</span> <span class="fu">aux_log_last_name</span>(),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="at">alias =</span> <span class="fu">get_from_auxenv</span>(<span class="st">&quot;aux_meta_alias&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co"># Filter for errors only</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>log_dt <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">as.data.table</span>(<span class="fu">aux_log_last</span>())</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>log_dt[event <span class="sc">==</span> <span class="st">&quot;error&quot;</span>]</span></code></pre></div>
+<hr />
+</div>
+<div id="versioning-behaviour" class="section level1">
+<h1>Versioning Behaviour</h1>
+<p><code>pipaux</code> uses the <code>stamp</code> package to manage
+artifact versioning on the Y-drive. The active mode controls when a new
+version is written:</p>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="82%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&quot;content&quot;</code></td>
+<td><strong>(default)</strong> New version only when data or code
+changes</td>
+</tr>
+<tr class="even">
+<td><code>&quot;timestamp&quot;</code></td>
+<td>New version on every save (useful for debugging)</td>
+</tr>
+<tr class="odd">
+<td><code>&quot;off&quot;</code></td>
+<td>Overwrite current artifact with no version history</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">pipaux_set_versioning</span>(<span class="st">&quot;content&quot;</span>)    <span class="co"># default</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">pipaux_set_versioning</span>(<span class="st">&quot;timestamp&quot;</span>)  <span class="co"># force new version every run</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">pipaux_set_versioning</span>(<span class="st">&quot;off&quot;</span>)        <span class="co"># overwrite, no history</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">pipaux_get_versioning</span>()             <span class="co"># query active mode</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">pipaux_reset_stamp_options</span>()        <span class="co"># restore pipaux defaults</span></span></code></pre></div>
+<p>Default <code>stamp</code> options set by <code>pipaux</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>versioning</code></td>
+<td><code>&quot;content&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>retain_versions</code></td>
+<td><code>Inf</code></td>
+</tr>
+<tr class="odd">
+<td><code>force_on_code_change</code></td>
+<td><code>TRUE</code></td>
+</tr>
+<tr class="even">
+<td><code>code_hash</code></td>
+<td><code>TRUE</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="error-handling" class="section level1">
+<h1>Error Handling</h1>
+<p>Errors at each step are caught by <code>tryCatch()</code> and logged
+with the appropriate <code>ERROR_*</code> step code. Whether execution
+continues after an error depends on <code>halt_on_dep_fail</code>:</p>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="72%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>halt_on_dep_fail</code></th>
+<th>Behaviour on error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>FALSE</code> (default)</td>
+<td>Error is logged; next measure proceeds</td>
+</tr>
+<tr class="even">
+<td><code>TRUE</code></td>
+<td>Error is re-thrown; full pipeline stops</td>
+</tr>
+</tbody>
+</table>
+<p>GitHub-unreachable errors (<code>update_gh = NA</code>) do not
+trigger a Y-drive check — the measure is skipped and logged.</p>
+<hr />
+</div>
+<div id="quick-reference-decision-logic" class="section level1">
+<h1>Quick Reference: Decision Logic</h1>
+<pre><code>aux_fun(measure)
+  │
+  ├─ is_top_level()?
+  │     YES → init_aux_log(), create processed env
+  │
+  ├─ resolve_measure_repo_owner()
+  │
+  ├─ process_dependencies()
+  │     └─ for each dep not in processed:
+  │           aux_fun(dep)   ← recursive
+  │
+  ├─ check_github_status()
+  │     update_gh = TRUE  ──────────────────────────────┐
+  │     update_gh = FALSE → check_y_drive_status()      │
+  │                              update_y = TRUE ───────┤
+  │                              update_y = FALSE → skip│
+  │                                                     │
+  └─ execute_update() ◄────────────────────────────────-┘
+        ├─ update_gh → sync_release_branch()
+        └─ update_y  → do.call(aux_&lt;measure&gt;(), ...)
+                            └─ pip_aux_save()</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

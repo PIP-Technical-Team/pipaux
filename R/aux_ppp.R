@@ -12,7 +12,8 @@ aux_ppp <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
-                    ppp_defaults = TRUE) {
+                    ppp_defaults = TRUE,
+                    verbose = FALSE) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -54,10 +55,11 @@ aux_ppp <- function(action = c("update", "load"),
     aux_ppp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
   }
   else {
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
   }
 
 
@@ -164,7 +166,8 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE) {
 
   tag <- branch
 
@@ -199,7 +202,7 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
   ppp <- ppp[country_code %in% cl$country_code]
 
@@ -265,7 +268,8 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_ppp_update,
-    code_label = "aux_ppp_update"
+    code_label = "aux_ppp_update",
+    verbose  = verbose
   )
 
 
@@ -289,7 +293,8 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
   pip_aux_save(
     x        = ppp_vintage,
     id       = "ppp_vintage",
-    pk       = key_cols_vintage
+    pk       = key_cols_vintage,
+    verbose  = verbose
   )
 
   return(invisible(saved))

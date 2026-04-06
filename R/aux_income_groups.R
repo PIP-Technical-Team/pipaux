@@ -10,7 +10,8 @@
 aux_income_groups <- function(action       = c("update", "load"),
                               #force        = FALSE,
                               owner        = getOption("pipfun.ghowner"),
-                              detail       = getOption("pipaux.detail.raw")
+                              detail       = getOption("pipaux.detail.raw"),
+                              verbose      = FALSE
 ) {
 
   measure <- "income_groups"
@@ -86,14 +87,15 @@ aux_income_groups <- function(action       = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_income_groups,
-      code_label = "aux_income_groups"
+      code_label = "aux_income_groups",
+      verbose  = verbose
     )
 
     return(invisible(saved))
 
   } else  {
 
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
 
   }
 }

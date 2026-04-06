@@ -8,7 +8,8 @@
 #' @export
 aux_missing_data <- function(action  = c("update", "load"),
                              owner   = getOption("pipfun.ghowner"),
-                             tag     = NULL
+                             tag     = NULL,
+                             verbose = FALSE
                              ) {
 
   measure <- "missing_data"
@@ -33,15 +34,15 @@ aux_missing_data <- function(action  = c("update", "load"),
 
     # Load data ------
 
-    gdp <- pipload::load_aux_data(measure = "gdp")
+    gdp <- pipload::load_aux_data(measure = "gdp", verbose = verbose)
 
-    pce <- pipload::load_aux_data(measure = "pce")
+    pce <- pipload::load_aux_data(measure = "pce", verbose = verbose)
 
-    pfw <- pipload::load_aux_data(measure = "pfw")
+    pfw <- pipload::load_aux_data(measure = "pfw", verbose = verbose)
 
-    pop <- pipload::load_aux_data(measure = "pop")
+    pop <- pipload::load_aux_data(measure = "pop", verbose = verbose)
 
-    cl <- pipload::load_aux_data(measure = "country_list")
+    cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
     ref_years <- gls$PIP_REF_YEARS
 
@@ -191,14 +192,15 @@ aux_missing_data <- function(action  = c("update", "load"),
       id       = measure,
       pk       = key_cols,
       code     = aux_missing_data,
-      code_label = "aux_missing_data"
+      code_label = "aux_missing_data",
+      verbose  = verbose
     )
 
     return(invisible(saved))
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)  
   }

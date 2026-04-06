@@ -48,7 +48,7 @@ run_ordered_update_diagnostics <- function(
     log_overwrite = TRUE,
     verbose = verbose,
     halt_on_dep_fail = FALSE,
-    log_save = log_save,
+    log_save = TRUE,
     log_name = NULL
   )
 

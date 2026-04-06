@@ -13,7 +13,8 @@
 aux_cpi <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -48,12 +49,13 @@ aux_cpi <- function(action = c("update", "load"),
     aux_cpi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
   }
   else {
 
     # By def load most recent version
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -124,7 +126,7 @@ aux_cpi_clean <- function(x,
   x <- unique(x) # remove duplicates
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = FALSE)
 
   x <- x[country_code %in% cl$country_code]
 
@@ -140,8 +142,8 @@ aux_cpi_clean <- function(x,
 aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
                            detail  = getOption("pipaux.detail.raw"),
                            branch  = NULL,
-                           tag = tag
-                           ) {
+                           tag     = tag,
+                           verbose = FALSE) {
 
   measure <- "cpi"
 
@@ -238,7 +240,8 @@ aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
   pk       = key_cols,
   metadata = list(gh = gh),
   code     = aux_cpi_update,
-  code_label = "aux_cpi_update"
+  code_label = "aux_cpi_update",
+  verbose  = verbose
 )
 
   return(invisible(saved))

@@ -12,6 +12,7 @@ aux_pfw <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE,
                     ...) {
   measure <- "pfw"
   action <- match.arg(action)
@@ -31,11 +32,12 @@ aux_pfw <- function(action  = c("update", "load"),
                    branch  = branch,
                    tag     = tag,
                    detail  = detail,
+                   verbose = verbose,
                   ...)
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -141,7 +143,7 @@ aux_pfw_clean <- function(y) {
 
   # Load countries and filter
 
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = FALSE)
 
   x <- x[country_code %in% cl$country_code]
 
@@ -158,6 +160,7 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE,
                           ...) {
 
   measure <- "pfw"
@@ -199,6 +202,7 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
     metadata = list(gh = gh),
     code     = aux_pfw_update,
     code_label = "aux_pfw_update",
+    verbose  = verbose,
     ...
   )
 
@@ -211,9 +215,10 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
 #' @return data.table
 #' @export
 #'
-aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
+aux_pfw_key <- function(maindir = getOption("pipaux.working_dir"),
+                        verbose = FALSE) {
 
-  pfw_temp <- pipload::load_aux_data(measure = "pfw")
+  pfw_temp <- pipload::load_aux_data(measure = "pfw", verbose = verbose)
 
   pfw_key_options <- pfw_temp[, .(country_code,
                                   survey_year,
@@ -221,7 +226,7 @@ aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
                                   cpi_domain_var)]
 
 
-  cpi_temp <- pipload::load_aux_data(measure = "cpi")
+  cpi_temp <- pipload::load_aux_data(measure = "cpi", verbose = verbose)
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &

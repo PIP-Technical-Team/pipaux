@@ -452,12 +452,15 @@ get_from_auxenv <- \(key) {
 #'
 #' @param x Data to be saved
 #' @param id Name of the file
+#' @param verbose Logical. If `TRUE`, prints progress messages from
+#'   `pipload::pip_write()`. Default is `FALSE`.
 #' @param ... Additional arguments to be passed to `pipload::pip_write()`
 #'
 #' @returns Fully qualified name of the new file, invisibly
 #'
 pip_aux_save <- \(x,
                   id,
+                  verbose = FALSE,
                   ...) {
 
   # alias to pass into pipload::pip_write
@@ -466,8 +469,9 @@ pip_aux_save <- \(x,
   # Save to the aux_data_path using pipload::pip_write
   pipload::pip_write(
     x        = x,
-    id = id,
-    alias = alias,
+    id       = id,
+    alias    = alias,
+    verbose  = verbose,
     ...
   )
 

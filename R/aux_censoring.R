@@ -16,6 +16,7 @@
 aux_censoring  <- function(action  = c("update", "load"),
                            owner   = getOption("pipfun.ghowner"),
                            tag     = NULL,
+                           verbose = FALSE,
                            ...) {
 
   measure <- "censoring"
@@ -67,6 +68,7 @@ aux_censoring  <- function(action  = c("update", "load"),
       id       = measure,
       code     = aux_censoring,
       code_label = "aux_censoring",
+      verbose  = verbose,
       #pk       = key_cols,  rm this because of dl being list
       ...
     )
@@ -75,7 +77,7 @@ aux_censoring  <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
 

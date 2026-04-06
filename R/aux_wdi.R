@@ -9,7 +9,8 @@
 aux_wdi <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
-                    detail          = getOption("pipaux.detail.raw")) {
+                    detail          = getOption("pipaux.detail.raw"),
+                    verbose         = FALSE) {
 
   measure    <- "wdi"
   action <- match.arg(action)
@@ -29,11 +30,12 @@ aux_wdi <- function(action          = c("update", "load"),
     aux_wdi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -56,7 +58,8 @@ aux_wdi <- function(action          = c("update", "load"),
 aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE) {
 
 
   #   ______________________________________________________
@@ -95,7 +98,8 @@ aux_wdi_update <- function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_wdi_update,
-    code_label = "aux_wdi_update"
+    code_label = "aux_wdi_update",
+    verbose  = verbose
   )
 
   return(invisible(saved))

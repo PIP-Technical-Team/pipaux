@@ -9,7 +9,8 @@
 aux_metadata <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          tag     = NULL,
-                         detail  = getOption("pipaux.detail.raw")) {
+                         detail  = getOption("pipaux.detail.raw"),
+                         verbose = FALSE) {
   measure <- "metadata"
   action <- match.arg(action)
 
@@ -29,12 +30,13 @@ aux_metadata <- function(action  = c("update", "load"),
       owner   = owner,
       branch  = branch,
       tag     = tag,
-      detail  = detail
+      detail  = detail,
+      verbose = verbose
     )
 
   } else {
 
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
 
   }
 }
@@ -49,7 +51,8 @@ aux_metadata <- function(action  = c("update", "load"),
 aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
                                 branch  = NULL,
                                 tag     = branch,
-                                detail  = getOption("pipaux.detail.raw")) {
+                                detail  = getOption("pipaux.detail.raw"),
+                                verbose = FALSE) {
 
   measure <- "metadata"
 
@@ -68,7 +71,7 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
   metadata_validate_raw(metadata = df, detail = detail)
 
   # Load pfw
-  pfw <- pipload::load_aux_data(measure = "pfw")
+  pfw <- pipload::load_aux_data(measure = "pfw", verbose = verbose)
 
   # Create distribution type column (data type)
 
@@ -166,7 +169,8 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = gh),
     code     = aux_metadata_update,
-    code_label = "aux_metadata_update"
+    code_label = "aux_metadata_update",
+    verbose  = verbose
   )
 
   #   ____________________________________________________________________________
@@ -184,7 +188,8 @@ aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),
 #' @export
 aux_metaregion <- function(action = c("update", "load"),
                            owner   = getOption("pipfun.ghowner"),
-                           tag     = NULL
+                           tag     = NULL,
+                           verbose = FALSE
 ) {
 
   measure <- "metaregion"
@@ -226,7 +231,8 @@ aux_metaregion <- function(action = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_metaregion,
-      code_label = "aux_metaregion"
+      code_label = "aux_metaregion",
+      verbose  = verbose
     )
 
     return(invisible(saved))
@@ -234,7 +240,7 @@ aux_metaregion <- function(action = c("update", "load"),
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }

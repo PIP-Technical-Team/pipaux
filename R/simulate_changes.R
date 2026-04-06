@@ -15,7 +15,7 @@ simulate_changes <- function(measure,
                                  verbose = TRUE) {
   
   # Load data from current working release
-  dt <- pipload::load_aux_data(measure = measure)
+  dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
   if (!data.table::is.data.table(dt)) dt <- data.table::as.data.table(dt)
 
   set.seed(seed)

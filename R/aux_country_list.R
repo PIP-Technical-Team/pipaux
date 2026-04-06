@@ -15,6 +15,7 @@
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),
                              detail       = getOption("pipaux.detail.raw"),
+                             verbose      = FALSE,
                              ...
                              ) {
 
@@ -54,6 +55,7 @@ aux_country_list <- function(action       = c("update", "load"),
       metadata = list(gh = gh),
       code     = aux_country_list,
       code_label = "aux_country_list",
+      verbose  = verbose,
       ...
     )
 
@@ -61,7 +63,7 @@ aux_country_list <- function(action       = c("update", "load"),
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }

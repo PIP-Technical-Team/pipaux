@@ -16,7 +16,8 @@
 aux_weo <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE) {
 
   measure <- "weo"
   action <- match.arg(action)
@@ -51,7 +52,8 @@ aux_weo <- function(action  = c("update", "load"),
     weo_validate_raw(weo = dt, detail = detail)
 
     dt <- aux_weo_clean(dt,
-                        branch = branch)
+                        branch  = branch,
+                        verbose = verbose)
 
     # Save dataset
 
@@ -75,14 +77,15 @@ aux_weo <- function(action  = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_weo,
-      code_label = "aux_weo"
+      code_label = "aux_weo",
+      verbose  = verbose
     )
 
     return(invisible(saved))
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -96,7 +99,8 @@ aux_weo <- function(action  = c("update", "load"),
 #' @return data.table
 #' @export
 aux_weo_clean <- function(dt,
-                          branch  = NULL) {
+                          branch  = NULL,
+                          verbose = FALSE) {
 
   #   _________________________________________
   #   Computations                        ####
@@ -176,7 +180,7 @@ aux_weo_clean <- function(dt,
   # ---- Merge with population ----
 
 
-  pop <- pipload::load_aux_data(measure = "pop")
+  pop <- pipload::load_aux_data(measure = "pop", verbose = verbose)
 
   setDT(pop)
   pop <- pop[reporting_level == "national", ] #pop_data_level = reporting_level

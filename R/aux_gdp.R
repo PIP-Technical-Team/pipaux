@@ -9,7 +9,8 @@
 aux_gdp <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
-                    detail          = getOption("pipaux.detail.raw")) {
+                    detail          = getOption("pipaux.detail.raw"),
+                    verbose         = FALSE) {
 
   measure    <- "gdp"
 
@@ -32,7 +33,8 @@ aux_gdp <- function(action          = c("update", "load"),
     aux_gdp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose)
 
     # load raw data from gh together with its metadata
 
@@ -59,12 +61,13 @@ aux_gdp <- function(action          = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_gdp_update,
-      code_label = "aux_gdp_update"
+      code_label = "aux_gdp_update",
+      verbose  = verbose
     )
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -80,7 +83,8 @@ aux_gdp <- function(action          = c("update", "load"),
 aux_gdp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = branch,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           verbose = FALSE) {
 
   #branch <- match.arg(branch)
   measure <- "gdp"
@@ -88,12 +92,12 @@ aux_gdp_update <- function(owner   = getOption("pipfun.ghowner"),
   #   ____________________________________________________________________________
   #   Load Data                                                               ####
 
-  madd   <- pipload::load_aux_data(measure = "maddison")
+  madd   <- pipload::load_aux_data(measure = "maddison", verbose = verbose)
 
-  weo    <-  pipload::load_aux_data(measure = "weo")
+  weo    <-  pipload::load_aux_data(measure = "weo", verbose = verbose)
 
 
-  wgdp   <- pipload::load_aux_data(measure = "wdi")
+  wgdp   <- pipload::load_aux_data(measure = "wdi", verbose = verbose)
 
   setnames(wgdp, "NY.GDP.PCAP.KD", "wdi_gdp")
 
@@ -125,7 +129,7 @@ aux_gdp_update <- function(owner   = getOption("pipfun.ghowner"),
   )
 
 
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
 
   #   ____________________________________________________________________________

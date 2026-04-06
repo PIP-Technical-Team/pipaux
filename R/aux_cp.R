@@ -8,6 +8,7 @@
 aux_cp <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
+                   verbose = FALSE,
                   ...) {
   measure <- "cp"
   action <- match.arg(action)
@@ -26,10 +27,11 @@ aux_cp <- function(action  = c("update", "load"),
     aux_cp_update(owner   = owner,
                   branch  = branch,
                   tag     = tag,
+                  verbose = verbose,
                 ...)
   } else {
 
-    dl <- pipload::load_aux_data(measure = measure)
+    dl <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dl)
   }
@@ -352,6 +354,7 @@ clean_cp_names <- function(x) {
 aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
                           branch,
                           tag     = tag,
+                          verbose = FALSE,
                           ...) {
 
   measure <- "cp"
@@ -425,6 +428,7 @@ aux_cp_update <- function(owner   = getOption("pipfun.ghowner"),
     metadata = list(gh = gh_list),
     code     = aux_cp_update,
     code_label = "aux_cp_update",
+    verbose  = verbose,
     #pk       = key_cols, removed because of list
     ...
   )

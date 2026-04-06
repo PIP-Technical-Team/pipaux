@@ -9,7 +9,8 @@
 aux_pop <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE) {
   measure <- "pop"
   action <- match.arg(action)
 
@@ -28,11 +29,12 @@ aux_pop <- function(action = c("update", "load"),
       owner   = owner,
       branch  = branch,
       tag     = tag,
-      detail  = detail)
+      detail  = detail,
+      verbose = verbose)
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }
@@ -47,7 +49,8 @@ aux_pop <- function(action = c("update", "load"),
 aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
                             branch  = NULL,
                             tag     = branch,
-                            detail  = getOption("pipaux.detail.raw")) {
+                            detail  = getOption("pipaux.detail.raw"),
+                            verbose = FALSE) {
 
 
   tag     <- branch
@@ -151,7 +154,7 @@ aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
 
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
   setDT(cl)
   pop <- pop[country_code %in% cl$country_code] |>
@@ -194,7 +197,8 @@ aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
     pk       = key_cols,
     metadata = list(gh = list(gh_spop = gh_spop, gh_pop_main = gh_pop_main)),
     code     = aux_pop_update,
-    code_label = "aux_pop_update"
+    code_label = "aux_pop_update",
+    verbose  = verbose
   )
 
 

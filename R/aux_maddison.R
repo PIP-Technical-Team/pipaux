@@ -10,7 +10,8 @@
 aux_maddison <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
                          tag     = NULL,
-                         detail  = getOption("pipaux.detail.raw")) {
+                         detail  = getOption("pipaux.detail.raw"),
+                         verbose = FALSE) {
   measure <- "maddison"
   action  <- match.arg(action)
 
@@ -53,14 +54,15 @@ aux_maddison <- function(action  = c("update", "load"),
       pk       = key_cols,
       metadata = list(gh = gh),
       code     = aux_maddison,
-      code_label = "aux_maddison"
+      code_label = "aux_maddison",
+      verbose  = verbose
     )
 
     return(invisible(saved))
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }
