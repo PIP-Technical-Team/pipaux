@@ -8,6 +8,7 @@
 aux_cp <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
+                   verbose = FALSE,
                   ...) {
   measure <- "cp"
   action <- match.arg(action)
@@ -29,7 +30,7 @@ aux_cp <- function(action  = c("update", "load"),
                 ...)
   } else {
 
-    dl <- pipload::load_aux_data(measure = measure)
+    dl <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dl)
   }

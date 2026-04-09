@@ -7,6 +7,7 @@
 #' @export
 aux_nan <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
+                    verbose         = FALSE,
                     tag             = NULL) {
 
   measure    <- "nan"
@@ -51,7 +52,7 @@ aux_nan <- function(action          = c("update", "load"),
     )
 
   } else {
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }

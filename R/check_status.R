@@ -149,7 +149,7 @@ check_y_drive_status <- function(measure,
 
   # Try loading aux data ONCE
   dt <- tryCatch(
-    pipload::load_aux_data(measure = measure),
+    pipload::load_aux_data(measure = measure, verbose = FALSE),
     error = function(e) {
       if (verbose) {
         cli::cli_alert_danger(

@@ -9,6 +9,7 @@
 aux_pl <- function(action = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),
                    tag     = NULL,
+                   verbose = FALSE,
                    detail  = getOption("pipaux.detail.raw")
                    ) {
 
@@ -67,7 +68,7 @@ aux_pl <- function(action = c("update", "load"),
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }

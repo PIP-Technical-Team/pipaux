@@ -10,6 +10,7 @@
 aux_pce <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "pce"
@@ -33,7 +34,7 @@ aux_pce <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -49,6 +50,7 @@ aux_pce <- function(action  = c("update", "load"),
 aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch = NULL,
                            tag     = branch,
+                           verbose = FALSE,
                            detail  = getOption("pipaux.detail.raw")) {
   measure <- "pce"
 
@@ -250,7 +252,7 @@ aux_pce_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
   pce <- pce[country_code %in% cl$country_code]
 

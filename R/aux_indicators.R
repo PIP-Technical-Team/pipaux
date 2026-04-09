@@ -7,6 +7,7 @@
 #' @export
 aux_indicators <- function(action  = c("update", "load"),
                            owner   = getOption("pipfun.ghowner"),
+                           verbose = FALSE,
                            tag     = NULL) {
   measure <- "indicators"
   action <- match.arg(action)
@@ -67,7 +68,7 @@ aux_indicators <- function(action  = c("update", "load"),
 
   } else  {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }

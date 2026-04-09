@@ -16,6 +16,7 @@
 aux_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
@@ -40,7 +41,7 @@ aux_gdm <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }

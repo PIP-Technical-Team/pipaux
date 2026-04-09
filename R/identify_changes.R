@@ -153,7 +153,7 @@ get_aux_changes <- function(measure = "cpi",
 
   # Load new data (current release)
   new_df <- tryCatch({
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
   }, error = function(e) {
     cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
     stop(e)
@@ -330,7 +330,8 @@ compare_vintage_versions <- function(measure,
   # Load previous version
   old_df <- tryCatch({
     pipload::load_aux_data(measure = measure,
-                           version = version)
+                           version = version,
+                           verbose = verbose)
   },
   error = function(e) {
     cli::cli_alert_warning(

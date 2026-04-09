@@ -7,7 +7,8 @@
 #' @export
 aux_regions <- function(action  = c("update", "load"),
                         owner   = getOption("pipfun.ghowner"),
-                        tag     = NULL
+                        tag     = NULL,
+                        verbose = FALSE
                         ) {
 
 
@@ -29,7 +30,7 @@ aux_regions <- function(action  = c("update", "load"),
     ##  ............................................................................
     ##  Load country_list table                                                 ####
 
-    cl <- pipload::load_aux_data(measure = "country_list")
+    cl <- pipload::load_aux_data(measure = "country_list", verbose = verbose)
 
     setnames(cl, "country_code", "id") # to make it work w/o problems
 
@@ -104,7 +105,7 @@ aux_regions <- function(action  = c("update", "load"),
 
   } else {
 
-    df <- pipload::load_aux_data(measure = measure)
+    df <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(df)
   }
