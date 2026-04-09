@@ -24,7 +24,7 @@ run_ordered_update_diagnostics <- function(
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   log_save = TRUE,
-  verbose = TRUE
+  verbose = FALSE
 ) {
 
   cat("\n", strrep("=", 70), "\n")
