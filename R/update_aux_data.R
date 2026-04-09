@@ -136,7 +136,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
   use_log <- log && !is.null(log_name)
 
   # --- GitHub update ---
-  if (update_gh) {
+  if (isTRUE(update_gh)) {
     tryCatch(
       {
         suppressMessages(
@@ -175,7 +175,7 @@ execute_update <- function(measure, update_gh, update_y, release_branch, owner, 
   }
 
   # --- Y drive update ---
-  if (update_y) {
+    if (isTRUE(update_y)) {
     func_name <- paste0("aux_", measure)
     if (!exists(func_name, envir = asNamespace("pipaux"))) {
       cli::cli_abort(paste0("Function '", func_name, "' does not exist in pipaux namespace"))
@@ -326,7 +326,7 @@ aux_fun <- function(measure,
   update_gh <- check_result$update_gh
   update_y  <- check_result$update_y
 
-  if (!update_gh && !update_y) {
+  if (!isTRUE(update_gh) && !isTRUE(update_y)) {
     if (log && !is.null(log_name)) {
       pipfun::log_add(
         event   = "info",
