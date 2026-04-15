@@ -16,6 +16,7 @@
 aux_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "gdm"
@@ -40,7 +41,7 @@ aux_gdm <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -192,6 +193,9 @@ aux_gdm_update <- function(owner   = getOption("pipfun.ghowner"),
                  "surveyid_year",
                  "survey_acronym",
                  "survey_id")]
+
+  # Keep only one survey_id per key to avoid fan-out on merge
+  inv <- unique(inv, by = c("country_code", "surveyid_year", "survey_acronym"))
 
   # Merge to add PIP survey_id
   df <- merge(df, inv,
@@ -395,7 +399,7 @@ gdm_validate_output <- function(gdm, detail = getOption("pipaux.detail.output"))
                 description = "`pcn_survey_id` should be character") |>
     validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, reporting_level),
+    validate_if(is_uniq(country_code, year, reporting_level, welfare_type),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

@@ -9,6 +9,7 @@
 aux_gdp <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
                     tag             = NULL,
+                    verbose         = FALSE,
                     detail          = getOption("pipaux.detail.raw")) {
 
   measure    <- "gdp"
@@ -64,7 +65,7 @@ aux_gdp <- function(action          = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }

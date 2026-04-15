@@ -7,6 +7,7 @@
 #' @export
 aux_sna <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
+                    verbose         = FALSE,
                     tag             = NULL) {
 
   measure <- "sna"
@@ -50,7 +51,7 @@ aux_sna <- function(action          = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }

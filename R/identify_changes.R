@@ -153,7 +153,7 @@ get_aux_changes <- function(measure = "cpi",
 
   # Load new data (current release)
   new_df <- tryCatch({
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
   }, error = function(e) {
     cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
     stop(e)
@@ -196,15 +196,22 @@ get_aux_changes <- function(measure = "cpi",
   # old_df <- old_df[, common_cols, with = FALSE]
 
   myr_obj <- tryCatch(
-    myrror::myrror(
-      dfx = new_df,
-      dfy = old_df,
-      by = key_cols,
-      compare_type = FALSE,
-      compare_values = TRUE,
-      extract_diff_values = TRUE,
-      interactive = FALSE,
-      verbose = verbose
+    withCallingHandlers(
+      myrror::myrror(
+        dfx = new_df,
+        dfy = old_df,
+        by = key_cols,
+        compare_type = FALSE,
+        compare_values = TRUE,
+        extract_diff_values = TRUE,
+        interactive = FALSE,
+        verbose = verbose
+      ),
+      warning = function(w) {
+        if (grepl("Overidentified match/join", conditionMessage(w))) {
+          invokeRestart("muffleWarning")
+        }
+      }
     ),
     error = function(e) {
       cli::cli_alert_danger(glue::glue(
@@ -323,7 +330,8 @@ compare_vintage_versions <- function(measure,
   # Load previous version
   old_df <- tryCatch({
     pipload::load_aux_data(measure = measure,
-                           version = version)
+                           version = version,
+                           verbose = verbose)
   },
   error = function(e) {
     cli::cli_alert_warning(
@@ -410,15 +418,22 @@ compare_vintage_versions <- function(measure,
 
   # Compare using myrror
   myr <- tryCatch({
-    myrror::myrror(
-      dfx                 = new_df,
-      dfy                 = old_df,
-      by                  = key_cols,
-      compare_type        = FALSE,
-      compare_values      = TRUE,
-      extract_diff_values = TRUE,
-      interactive         = FALSE,
-      verbose             = verbose
+    withCallingHandlers(
+      myrror::myrror(
+        dfx                 = new_df,
+        dfy                 = old_df,
+        by                  = key_cols,
+        compare_type        = FALSE,
+        compare_values      = TRUE,
+        extract_diff_values = TRUE,
+        interactive         = FALSE,
+        verbose             = verbose
+      ),
+      warning = function(w) {
+        if (grepl("Overidentified match/join", conditionMessage(w))) {
+          invokeRestart("muffleWarning")
+        }
+      }
     )
   }, error = function(e) {
     cli::cli_alert_danger(

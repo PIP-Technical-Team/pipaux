@@ -8,7 +8,7 @@
 #' @inheritParams pipfun::load_from_gh
 #' @export
 aux_income_groups <- function(action       = c("update", "load"),
-                              #force        = FALSE,
+                              verbose = FALSE,
                               owner        = getOption("pipfun.ghowner"),
                               detail       = getOption("pipaux.detail.raw")
 ) {
@@ -93,7 +93,7 @@ aux_income_groups <- function(action       = c("update", "load"),
 
   } else  {
 
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
 
   }
 }

@@ -16,6 +16,7 @@
 aux_weo <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw")) {
 
   measure <- "weo"
@@ -82,7 +83,7 @@ aux_weo <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -262,9 +263,20 @@ weo_validate_raw <- function(weo, detail = getOption("pipaux.detail.raw")){
 
   weo <- weo[!is.na(`WEO Subject Code`), ]
 
+  # Check Country/Series-specific Notes outside validate chain
+  # since data.validator evaluates column refs before || can short-circuit
+  if ("Country/Series-specific Notes" %in% names(weo)) {
+    if (!is.character(weo[["Country/Series-specific Notes"]])) {
+      cli::cli_abort(
+        "Description of invalid cases for WEO raw data validation,
+         `Country/Series-specific Notes` should be character if present"
+      )
+    }
+  }
+
   validate(weo, name = "WEO raw data validation") |>
-    validate_if(is.character(`WEO Country Code`),
-                description = "`WEO Country Code` should be character") |>
+    validate_if(is.numeric(`WEO Country Code`),
+                description = "`WEO Country Code` should be numeric") |>
     validate_if(is.character(ISO),
                 description = "ISO should be character") |>
     validate_if(is.character(`WEO Subject Code`),
@@ -279,10 +291,8 @@ weo_validate_raw <- function(weo, detail = getOption("pipaux.detail.raw")){
                 description = "`Units` should be character") |>
     validate_if(is.character(Scale),
                 description = "`Scale` should be character") |>
-    validate_if(is.character(`Country/Series-specific Notes`),
-                description = "`Country/Series-specific Notes` should be character") |>
-    validate_if(is.numeric(`Estimates Start After`),
-                description = "`Estimates Start After` should be numeric") |>
+    validate_if(is.character(`Estimates Start After`),
+                description = "`Estimates Start After` should be character") |>
     validate_cols(not_na, ISO, `WEO Subject Code`,
                   description = "no missing values in key variables") |>
     validate_if(is_uniq(ISO, `WEO Subject Code`),

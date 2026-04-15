@@ -12,6 +12,7 @@ aux_ppp <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
+                    verbose = FALSE,
                     ppp_defaults = TRUE) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
@@ -57,7 +58,7 @@ aux_ppp <- function(action = c("update", "load"),
                    detail  = detail)
   }
   else {
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
   }
 
 
@@ -164,6 +165,7 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
 aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
+                           verbose = FALSE,
                            detail  = getOption("pipaux.detail.raw")) {
 
   tag <- branch
@@ -199,7 +201,7 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = FALSE)
 
   ppp <- ppp[country_code %in% cl$country_code]
 

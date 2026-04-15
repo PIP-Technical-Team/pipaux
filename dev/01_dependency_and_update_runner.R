@@ -24,7 +24,7 @@ run_ordered_update_diagnostics <- function(
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   log_save = TRUE,
-  verbose = TRUE
+  verbose = FALSE
 ) {
 
   cat("\n", strrep("=", 70), "\n")
@@ -41,6 +41,8 @@ run_ordered_update_diagnostics <- function(
 
   start_total <- Sys.time()
 
+  log_name <- init_aux_log(overwrite = TRUE)
+
   update_aux_measures(
     measures = measures,
     owner = owner,
@@ -48,8 +50,8 @@ run_ordered_update_diagnostics <- function(
     log_overwrite = TRUE,
     verbose = verbose,
     halt_on_dep_fail = FALSE,
-    log_save = log_save,
-    log_name = NULL
+    log_save = TRUE,
+    log_name = log_name
   )
 
   total_time <- as.numeric(Sys.time() - start_total)

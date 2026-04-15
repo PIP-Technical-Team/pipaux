@@ -13,6 +13,7 @@
 aux_cpi <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw")) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
@@ -53,7 +54,7 @@ aux_cpi <- function(action = c("update", "load"),
   else {
 
     # By def load most recent version
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }

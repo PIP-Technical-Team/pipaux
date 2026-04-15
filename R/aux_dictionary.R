@@ -7,7 +7,9 @@
 #' @export
 aux_dictionary <- function(action  = c("update", "load"),
                            owner   = getOption("pipfun.ghowner"),
-                           tag     = NULL) {
+                           tag     = NULL,
+                           verbose = FALSE,
+                           ...) {
   measure <- "dictionary"
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
@@ -49,7 +51,7 @@ aux_dictionary <- function(action  = c("update", "load"),
     return(invisible(saved))
 
   } else {
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
 
   }
 }

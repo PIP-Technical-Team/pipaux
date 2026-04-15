@@ -11,6 +11,7 @@
 aux_pfw <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
+                    verbose = FALSE,
                     detail  = getOption("pipaux.detail.raw"),
                     ...) {
   measure <- "pfw"
@@ -35,7 +36,7 @@ aux_pfw <- function(action  = c("update", "load"),
 
   } else {
 
-    dt <- pipload::load_aux_data(measure = measure)
+    dt <- pipload::load_aux_data(measure = measure, verbose = verbose)
 
     return(dt)
   }
@@ -62,23 +63,26 @@ aux_pfw_clean <- function(y) {
 
   # change variable names
   old_var <-
-    c("code",
-      "ref_year",
-      "survname",
-      "comparability",
-      "datatype",
-      "rep_year"
+    c(
+    "code",
+    "region",
+    "ref_year",
+    "survname",
+    "comparability",
+    "datatype",
+    "rep_year"
     )
 
-  new_var <-
-    c("country_code",
-      "survey_year",
-      "survey_acronym",
-      "survey_comparability",
-      "welfare_type",
-      "reporting_year"
+    new_var <-
+    c(
+    "country_code",
+    "region_code",
+    "survey_year",
+    "survey_acronym",
+    "survey_comparability",
+    "welfare_type",
+    "reporting_year"
     )
-
 
   setnames(x,
            old = old_var,
@@ -141,7 +145,7 @@ aux_pfw_clean <- function(y) {
 
   # Load countries and filter
 
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = FALSE)
 
   x <- x[country_code %in% cl$country_code]
 
@@ -177,8 +181,17 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
   pfw <- aux_pfw_clean(pfw)
 
   # validate pfw raw data
-  pfw_validate_output(pfw    = pfw,
-                      detail = detail)
+  # pfw_validate_output(pfw    = pfw,
+  #                     detail = detail)
+   # validate pfw output data
+  withCallingHandlers(
+    pfw_validate_output(pfw = pfw, detail = detail),
+    warning = function(w) {
+      if (grepl("restarting interrupted promise evaluation", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 
   # Save dataset
   if (branch == "main") {
@@ -221,7 +234,7 @@ aux_pfw_key <- function(maindir = getOption("pipaux.working_dir")){
                                   cpi_domain_var)]
 
 
-  cpi_temp <- pipload::load_aux_data(measure = "cpi")
+  cpi_temp <- pipload::load_aux_data(measure = "cpi", verbose = FALSE)
 
   cpi_temp <- cpi_temp[, cpi_domain_var :=
                          fifelse(reporting_level == "urban" &
@@ -256,8 +269,10 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
   validate(pfw, name = "PFW raw data validation") |>
     validate_if(is.character(region),
                 description = "`region` should be character") |>
-    validate_cols(in_set(c("Sub-Saharan Africa", "Europe & Central Asia", "Middle East, North Africa, Afghanistan & Pakistan",
-                           "Middle East, North Africa, Afghanistan & Pakistan", "Latin America & Caribbean", "East Asia & Pacific", "South Asia", "North America")),
+    # validate_cols(in_set(c("Sub-Saharan Africa", "Europe & Central Asia", "Middle East, North Africa, Afghanistan & Pakistan",
+    #                        "Middle East, North Africa, Afghanistan & Pakistan", "Latin America & Caribbean", "East Asia & Pacific", "South Asia", "North America")),
+    #               region, description = "`region` values within range") |>
+    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
                   region, description = "`region` values within range") |>
     validate_if(is.character(code),
                 description = "`code` should be character") |>
@@ -449,8 +464,8 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
   report <- data_validation_report()
 
   validate(pfw, name = "PFW output data validation") |>
-    validate_cols(in_set(c( "SSF", "ECS", "MEA", "LCN", "EAS", "SAS", "NAC")),
-                  region_code, description = "`wb_region_code` values within range") |>
+    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
+                  region_code, description = "`region_code` values within range") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>
     validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "OHI", "SAS", "SSA")),
@@ -607,7 +622,7 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
                 description = "`pfw_id` should be character") |>
     validate_cols(not_na, country_code, year, welfare_type,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, welfare_type),
+    validate_if(is_uniq(country_code, year, welfare_type, is_alt_welf),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
