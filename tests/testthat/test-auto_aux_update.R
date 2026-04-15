@@ -16,6 +16,63 @@ dependencies <- list(
   missing_data = c("country_list", "pce", "gdp", "pop", "pfw")
 )
 
+# ── Bug reproduction tests ────────────────────────────────────────────────────
+
+# Bug 1: purrr::map() crashes when a repo lacks the target branch (e.g.,
+# aux_missing_countries has no DEV branch → gh::gh() throws 422).
+# fetch_repo_sha() must absorb the error and return NA_character_.
+test_that("fetch_repo_sha returns NA_character_ when the branch does not exist", {
+  testthat::local_mocked_bindings(
+    gh = function(endpoint, ...) {
+      stop("GitHub API error (422): No commit found for SHA: DEV")
+    },
+    .package = "gh"
+  )
+  result <- fetch_repo_sha(
+    owner = "PIP-Technical-Team",
+    repo  = "aux_missing_countries",
+    branch = "DEV"
+  )
+  expect_true(is.na(result))
+})
+
+# Bug 3: read_signature_file() crashes on measures that have never been saved.
+# After the fix it must return NA_character_ when the file is absent.
+test_that("read_signature_file returns NA_character_ for a missing signature file", {
+  result <- read_signature_file("nonexistent_measure", tempdir(), "DEV")
+  expect_true(is.na(result))
+})
+
+# Bug 2: derived measures (e.g., missing_data) have no raw-data repo, so they
+# never appear in aux_fns even when their dependencies change.
+# expand_with_derived_measures() must add them when a dep is in aux_fns.
+test_that("expand_with_derived_measures adds measures whose dependencies changed", {
+  deps <- list(
+    pfw          = character(),
+    gdp          = c("weo", "country_list"),
+    missing_data = c("country_list", "pce", "gdp", "pop", "pfw")
+  )
+  # pfw changed → missing_data depends on pfw → should be added
+  result <- expand_with_derived_measures(aux_fns = "pfw", dependencies = deps)
+  expect_true("missing_data" %in% result)
+  # gdp does NOT depend on pfw → should not be added
+  expect_false("gdp" %in% result)
+  # the original measure must still be present
+  expect_true("pfw" %in% result)
+})
+
+# Bug 3 (NA comparison): before_hash != after_hash returns NA (not FALSE) when
+# read_signature_file returns NA_character_ for a missing file.
+# Using !isTRUE(before_hash == after_hash) treats NA as "files differ" → safe.
+test_that("NA signature comparison triggers update rather than erroring", {
+  before_hash <- NA_character_
+  after_hash  <- "abc123"
+  # old code: `if (before_hash != after_hash)` returns NA → error inside if()
+  expect_true(isTRUE(is.na(before_hash != after_hash))) # demonstrates the problem
+  # desired behaviour: treat NA as "hashes differ" → update
+  expect_true(!isTRUE(before_hash == after_hash))
+})
+
 
 base64_value_mtcars <- "bXBnLGN5bCxkaXNwLGhwLGRyYXQsd3QscXNlYyx2cyxhbSxnZWFyLGNhcmIKMjEsNiwxNjAsMTEwLDMuOSwyLjYyLDE2LjQ2LDAsMSw0LDQKMjEsNiwxNjAsMTEwLDMuOSwyLjg3NSwxNy4wMiwwLDEsNCw0CjIyLjgsNCwxMDgsOTMsMy44NSwyLjMyLDE4LjYxLDEsMSw0LDEKMjEuNCw2LDI1OCwxMTAsMy4wOCwzLjIxNSwxOS40NCwxLDAsMywxCjE4LjcsOCwzNjAsMTc1LDMuMTUsMy40NCwxNy4wMiwwLDAsMywyCjE4LjEsNiwyMjUsMTA1LDIuNzYsMy40NiwyMC4yMiwxLDAsMywxCjE0LjMsOCwzNjAsMjQ1LDMuMjEsMy41NywxNS44NCwwLDAsMyw0CjI0LjQsNCwxNDYuNyw2MiwzLjY5LDMuMTksMjAsMSwwLDQsMgoyMi44LDQsMTQwLjgsOTUsMy45MiwzLjE1LDIyLjksMSwwLDQsMgoxOS4yLDYsMTY3LjYsMTIzLDMuOTIsMy40NCwxOC4zLDEsMCw0LDQKMTcuOCw2LDE2Ny42LDEyMywzLjkyLDMuNDQsMTguOSwxLDAsNCw0CjE2LjQsOCwyNzUuOCwxODAsMy4wNyw0LjA3LDE3LjQsMCwwLDMsMwoxNy4zLDgsMjc1LjgsMTgwLDMuMDcsMy43MywxNy42LDAsMCwzLDMKMTUuMiw4LDI3NS44LDE4MCwzLjA3LDMuNzgsMTgsMCwwLDMsMwoxMC40LDgsNDcyLDIwNSwyLjkzLDUuMjUsMTcuOTgsMCwwLDMsNAoxMC40LDgsNDYwLDIxNSwzLDUuNDI0LDE3LjgyLDAsMCwzLDQKMTQuNyw4LDQ0MCwyMzAsMy4yMyw1LjM0NSwxNy40MiwwLDAsMyw0CjMyLjQsNCw3OC43LDY2LDQuMDgsMi4yLDE5LjQ3LDEsMSw0LDEKMzAuNCw0LDc1LjcsNTIsNC45MywxLjYxNSwxOC41MiwxLDEsNCwyCjMzLjksNCw3MS4xLDY1LDQuMjIsMS44MzUsMTkuOSwxLDEsNCwxCjIxLjUsNCwxMjAuMSw5NywzLjcsMi40NjUsMjAuMDEsMSwwLDMsMQoxNS41LDgsMzE4LDE1MCwyLjc2LDMuNTIsMTYuODcsMCwwLDMsMgoxNS4yLDgsMzA0LDE1MCwzLjE1LDMuNDM1LDE3LjMsMCwwLDMsMgoxMy4zLDgsMzUwLDI0NSwzLjczLDMuODQsMTUuNDEsMCwwLDMsNAoxOS4yLDgsNDAwLDE3NSwzLjA4LDMuODQ1LDE3LjA1LDAsMCwzLDIKMjcuMyw0LDc5LDY2LDQuMDgsMS45MzUsMTguOSwxLDEsNCwxCjI2LDQsMTIwLjMsOTEsNC40MywyLjE0LDE2LjcsMCwxLDUsMgozMC40LDQsOTUuMSwxMTMsMy43NywxLjUxMywxNi45LDEsMSw1LDIKMTUuOCw4LDM1MSwyNjQsNC4yMiwzLjE3LDE0LjUsMCwxLDUsNAoxOS43LDYsMTQ1LDE3NSwzLjYyLDIuNzcsMTUuNSwwLDEsNSw2CjE1LDgsMzAxLDMzNSwzLjU0LDMuNTcsMTQuNiwwLDEsNSw4CjIxLjQsNCwxMjEsMTA5LDQuMTEsMi43OCwxOC42LDEsMSw0LDI="
 

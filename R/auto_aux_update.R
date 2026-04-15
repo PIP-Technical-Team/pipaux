@@ -54,20 +54,19 @@ auto_aux_update <- function(
   if (!is.null(measure)) {
     all_repos <- all_repos[all_repos %in% glue::glue("aux_{measure}")]
   }
-  # get hashs
-  hash <-
-    purrr::map(
-      all_repos,
-      .f = ~ {
-        gh::gh(
-          "GET /repos/{owner}/{repo}/commits/{branch}",
-          owner = owner,
-          repo = .x,
-          branch = branch
-        )
-      }
-    ) |>
-    purrr::map_chr(~ .x[["sha"]])
+  # Get the latest commit SHA for each repo, skipping repos that do not have
+  # the target branch (e.g. newly created repos or repos with only a main/PROD
+  # branch).  gh::gh() throws a 422 in those cases; fetch_repo_sha() absorbs
+  # the error and returns NA_character_ so one bad repo can't crash the whole
+  # update (Bug 1 fix).
+  hash_results <- purrr::map(
+    all_repos,
+    .f = \(repo) fetch_repo_sha(owner = owner, repo = repo, branch = branch)
+  )
+
+  has_sha   <- !vapply(hash_results, is.na, logical(1))
+  all_repos <- all_repos[has_sha]
+  hash      <- unlist(hash_results[has_sha])
 
   cli::cli_progress_step("Comparing dependencies")
 
@@ -130,6 +129,12 @@ auto_aux_update <- function(
     # Keep only those whose dependencies we know
     intersect(names(dependencies))
 
+  # Also include derived measures (those with no raw-data repo, like
+  # missing_data) whose dependencies overlap with the changed set.  Without
+  # this, pip_missing_data() is never called even when pfw/gdp/pop change
+  # because there is no matching aux_missing_data GitHub repo (Bug 2 fix).
+  aux_fns <- expand_with_derived_measures(aux_fns, dependencies)
+
   # For each auxiliary data to be updated
   cli::cli_alert_info(
     "Updating data for {length(aux_fns)} file{?s}.
@@ -154,7 +159,10 @@ auto_aux_update <- function(
         suppressMessages()
       after_hash <- read_signature_file(aux_file, maindir, branch)
 
-      if (before_hash != after_hash) {
+      # Use !isTRUE(== ) rather than != so that NA values (returned when the
+      # signature file does not yet exist) are treated as "hashes differ" and
+      # trigger the update (Bug 3 fix).
+      if (!isTRUE(before_hash == after_hash)) {
         files_changed <- TRUE
 
         # find rows of of org to be modified
@@ -480,6 +488,54 @@ read_signature_file <- function(aux_file, maindir, branch) {
       aux_file,
       glue::glue("{aux_file}_datasignature.txt")
     )
-  signature_hash <- readr::read_lines(data_signature_path)
-  return(signature_hash)
+  # Return NA when the file does not yet exist (first run for a measure).
+  # The caller uses !isTRUE(before == after) so NA is treated as "differs"
+  # and the update is triggered (Bug 3 fix).
+  if (!fs::file_exists(data_signature_path)) {
+    return(NA_character_)
+  }
+  readr::read_lines(data_signature_path)
+}
+
+# fetch_repo_sha -----------------------------------------------------------
+# Wraps gh::gh() with error handling so that a repo that lacks the target
+# branch (common for newly created aux repos) returns NA_character_ instead
+# of aborting the entire purrr::map() loop (Bug 1 fix).
+fetch_repo_sha <- function(owner, repo, branch) {
+  tryCatch(
+    gh::gh(
+      "GET /repos/{owner}/{repo}/commits/{branch}",
+      owner  = owner,
+      repo   = repo,
+      branch = branch
+    )[["sha"]],
+    error = function(e) {
+      cli::cli_alert_warning(
+        "Skipping {.field {repo}}: branch {.val {branch}} not found. \
+{conditionMessage(e)}"
+      )
+      NA_character_
+    }
+  )
+}
+
+# expand_with_derived_measures --------------------------------------------
+# Given a vector of changed measures (aux_fns) and the full dependency map,
+# returns aux_fns extended with any measure whose dependency list overlaps
+# with the changed set.  This ensures derived measures (e.g. missing_data)
+# that have no corresponding aux_* repo are still updated when their inputs
+# change (Bug 2 fix).
+expand_with_derived_measures <- function(aux_fns, dependencies) {
+  if (length(aux_fns) == 0 || length(dependencies) == 0) {
+    return(aux_fns)
+  }
+  derived <- names(dependencies)[
+    vapply(
+      dependencies,
+      function(deps) length(deps) > 0 && any(deps %in% aux_fns),
+      logical(1)
+    )
+  ]
+  # Exclude measures that are already in aux_fns to avoid duplicates
+  union(aux_fns, setdiff(derived, aux_fns))
 }
