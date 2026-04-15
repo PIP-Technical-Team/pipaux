@@ -64,9 +64,9 @@ auto_aux_update <- function(
     .f = \(repo) fetch_repo_sha(owner = owner, repo = repo, branch = branch)
   )
 
-  has_sha   <- !vapply(hash_results, is.na, logical(1))
+  has_sha <- !vapply(hash_results, is.na, logical(1))
   all_repos <- all_repos[has_sha]
-  hash      <- unlist(hash_results[has_sha])
+  hash <- unlist(hash_results[has_sha])
 
   cli::cli_progress_step("Comparing dependencies")
 
@@ -510,8 +510,8 @@ fetch_repo_sha <- function(owner, repo, branch) {
   tryCatch(
     gh::gh(
       "GET /repos/{owner}/{repo}/commits/{branch}",
-      owner  = owner,
-      repo   = repo,
+      owner = owner,
+      repo = repo,
       branch = branch
     )[["sha"]],
     error = function(e) {

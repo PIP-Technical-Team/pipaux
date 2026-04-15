@@ -30,7 +30,7 @@ test_that("fetch_repo_sha returns NA_character_ when the branch does not exist",
   )
   result <- fetch_repo_sha(
     owner = "PIP-Technical-Team",
-    repo  = "aux_missing_countries",
+    repo = "aux_missing_countries",
     branch = "DEV"
   )
   expect_true(is.na(result))
@@ -48,8 +48,8 @@ test_that("read_signature_file returns NA_character_ for a missing signature fil
 # expand_with_derived_measures() must add them when a dep is in aux_fns.
 test_that("expand_with_derived_measures adds measures whose dependencies changed", {
   deps <- list(
-    pfw          = character(),
-    gdp          = c("weo", "country_list"),
+    pfw = character(),
+    gdp = c("weo", "country_list"),
     missing_data = c("country_list", "pce", "gdp", "pop", "pfw")
   )
   # pfw changed → missing_data depends on pfw → should be added
@@ -66,7 +66,7 @@ test_that("expand_with_derived_measures adds measures whose dependencies changed
 # Using !isTRUE(before_hash == after_hash) treats NA as "files differ" → safe.
 test_that("NA signature comparison triggers update rather than erroring", {
   before_hash <- NA_character_
-  after_hash  <- "abc123"
+  after_hash <- "abc123"
   # old code: `if (before_hash != after_hash)` returns NA → error inside if()
   expect_true(isTRUE(is.na(before_hash != after_hash))) # demonstrates the problem
   # desired behaviour: treat NA as "hashes differ" → update
@@ -80,14 +80,14 @@ test_that("NA signature comparison triggers update rather than erroring", {
 test_that("expand_with_derived_measures result does not break hash back-fill for derived measures", {
   # Simulate new_data: only has an entry for pfw, not for missing_data
   new_data_sim <- data.table::data.table(
-    Repo   = "PIP-Technical-Team/aux_pfw",
-    hash   = "newsha123",
+    Repo = "PIP-Technical-Team/aux_pfw",
+    hash = "newsha123",
     branch = "DEV"
   )
 
   # Derived measure: missing_data has no row in new_data
-  aux_file   <- "missing_data"
-  br         <- "DEV"
+  aux_file <- "missing_data"
+  br <- "DEV"
   aux_row_new <- new_data_sim$Repo |>
     fs::path_file() |>
     sub("aux_", "", x = _) %in%
