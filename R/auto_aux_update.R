@@ -179,7 +179,12 @@ auto_aux_update <- function(
           aux_file &
           new_data$branch == branch
 
-        org_data$hash[aux_row_org] <- new_data$hash[aux_row_new]
+        # Derived measures (e.g. missing_data) have no aux_* repo and
+        # therefore no row in new_data.  Skip the SHA back-fill for those;
+        # only measures with an actual repo entry need updating.
+        if (any(aux_row_new)) {
+          org_data$hash[aux_row_org] <- new_data$hash[aux_row_new]
+        }
       } # end of before_hash condition
     } # end of list_of_funcs loop
   } # end of aux_fns loop
