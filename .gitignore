@@ -11,3 +11,12 @@ docs
 
 /.quarto/
 inst/doc
+
+# Compound GPID managed items (junctions + copied file - do not commit)
+.github/prompts/
+.github/skills/
+.github/agents/
+.github/instructions/
+.github/shared/
+.github/copilot-instructions.md
+
