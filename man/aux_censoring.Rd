@@ -8,6 +8,7 @@ aux_censoring(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
+  verbose = FALSE,
   ...
 )
 }

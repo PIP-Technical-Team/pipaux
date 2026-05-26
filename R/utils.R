@@ -600,3 +600,25 @@ aux_log_last_name <- function() {
   return(.piplogenv$last_aux_log)
 }
 
+#' Summarize auxiliary data update log
+#'
+#' Extracts a `measure` / `status` summary table from a pipaux update log.
+#'
+#' @param log_name character: Name of the log to retrieve. Defaults to the
+#'   last auxiliary update log.
+#'
+#' @return A `data.table` with columns `measure` and `status`
+#'   (`"success"` or `"error"`).
+#'
+#' @keywords internal
+aux_log_summary <- function(log_name = aux_log_last_name()) {
+  log_dt <- data.table::as.data.table(pipfun::log_get(log_name))
+  log_dt[, measure := sapply(logmeta, \(x) x[["measure"]])]
+  log_dt[, step    := sapply(logmeta, \(x) x[["step"]])]
+  log_dt[
+    !is.na(measure) & measure != "NULL",
+    .(status = data.table::fifelse(sum(event == "error") > 0L, "error", "success")),
+    by = measure
+  ]
+}
+

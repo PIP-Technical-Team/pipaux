@@ -7,6 +7,7 @@
 aux_country_list(
   action = c("update", "load"),
   detail = getOption("pipaux.detail.raw"),
+  verbose = FALSE,
   ...
 )
 }

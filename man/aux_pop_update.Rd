@@ -8,6 +8,7 @@ aux_pop_update(
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = branch,
+  verbose = FALSE,
   detail = getOption("pipaux.detail.raw")
 )
 }

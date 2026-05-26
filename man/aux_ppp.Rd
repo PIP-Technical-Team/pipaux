@@ -9,6 +9,7 @@ aux_ppp(
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   detail = getOption("pipaux.detail.raw"),
+  verbose = FALSE,
   ppp_defaults = TRUE
 )
 }

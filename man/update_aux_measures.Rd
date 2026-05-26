@@ -55,7 +55,7 @@ Invisibly returns \code{NULL}.
 Updates one or more auxiliary data measures and their dependencies, in
 dependency order. If \code{measures} is \code{NULL}, all measures available under
 \code{owner} are updated. Resolves dependency order by reading the shared
-dependency manifest via \code{\link[=read_dependencies]{read_dependencies()}}.
+dependency manifest via \code{read_dependencies()}.
 }
 \examples{
 \dontrun{

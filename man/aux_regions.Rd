@@ -7,7 +7,8 @@
 aux_regions(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
-  tag = NULL
+  tag = NULL,
+  verbose = FALSE
 )
 }
 \arguments{

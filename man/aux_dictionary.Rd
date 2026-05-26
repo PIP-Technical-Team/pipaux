@@ -7,7 +7,9 @@
 aux_dictionary(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
-  tag = NULL
+  tag = NULL,
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -18,6 +20,9 @@ aux_dictionary(
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{...}{parameters to be passed to the loading functions depending of the
+extension used}
 }
 \description{
 Update or load a dataset with the indicators master sheet.

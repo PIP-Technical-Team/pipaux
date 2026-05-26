@@ -88,7 +88,7 @@ Update all measures or a subset in dependency-aware order using
 # Update specific measures with logging enabled
 update_aux_measures(
   measures         = c("cpi", "metaregion"),
-  owner            = "RossanaTat",
+  owner            = "RossanaTat", 
   log              = TRUE,
   log_save         = FALSE,       # set TRUE to persist log to disk
   halt_on_dep_fail = FALSE        # continue even if a dependency fails
@@ -119,10 +119,13 @@ update_aux_measures(
 # Option 1: retrieve the last log from the in-memory logging environment
 last_log <- aux_log_last()
 
-# Option 2: filter for update events only (using pipfun directly)
+# Option 2: get a concise measure/status summary table from the last log
+aux_log_summary()
+
+# Option 3: filter for update events only (using pipfun directly)
 pipfun::log_get("pipaux_update_log")[event == "update"]
 
-# Option 3: load a previously saved log from disk (requires log_save = TRUE)
+# Option 4: load a previously saved log from disk (requires log_save = TRUE)
 pipfun::log_load(
   id    = "pipaux_update_log",
   alias = get_from_auxenv("aux_meta_alias")
@@ -131,7 +134,9 @@ pipfun::log_load(
 
 > `aux_log_last()` is an internal helper that returns the most recent log
 > object from the `.piplogenv` environment. `aux_log_last_name()` returns
-> its name as a character string.
+> its name as a character string. `aux_log_summary()` wraps both to return
+> a compact `data.table` with one row per measure and a `status` column
+> (`"success"` or `"error"`), useful for a quick post-run sanity check.
 
 ---
 

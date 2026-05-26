@@ -8,6 +8,7 @@ aux_pop(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
+  verbose = FALSE,
   detail = getOption("pipaux.detail.raw")
 )
 }

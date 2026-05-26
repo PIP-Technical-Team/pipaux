@@ -4,7 +4,6 @@
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pfw
-#' @inheritParams load_raw_indicators
 #' @export
 aux_metadata <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),

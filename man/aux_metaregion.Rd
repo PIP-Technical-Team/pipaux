@@ -7,6 +7,7 @@
 aux_metaregion(
   action = c("update", "load"),
   owner = getOption("pipfun.ghowner"),
+  verbose = FALSE,
   tag = NULL
 )
 }

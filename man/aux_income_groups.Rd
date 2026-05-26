@@ -6,6 +6,7 @@
 \usage{
 aux_income_groups(
   action = c("update", "load"),
+  verbose = FALSE,
   owner = getOption("pipfun.ghowner"),
   detail = getOption("pipaux.detail.raw")
 )

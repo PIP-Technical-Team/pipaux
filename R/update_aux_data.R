@@ -369,7 +369,7 @@ aux_fun <- function(measure,
 #' Updates one or more auxiliary data measures and their dependencies, in
 #' dependency order. If `measures` is `NULL`, all measures available under
 #' `owner` are updated. Resolves dependency order by reading the shared
-#' dependency manifest via [read_dependencies()].
+#' dependency manifest via `read_dependencies()`.
 #'
 #' @param measures Character vector or `NULL`. Names of measures to update
 #'   (e.g., `c("cpi", "ppp")`). If `NULL`, all available measures are updated

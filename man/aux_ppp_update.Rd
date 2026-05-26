@@ -8,6 +8,7 @@ aux_ppp_update(
   owner = getOption("pipfun.ghowner"),
   branch = NULL,
   tag = NULL,
+  verbose = FALSE,
   detail = getOption("pipaux.detail.raw")
 )
 }
