@@ -38,12 +38,9 @@ Auxiliary data feeds into the PIP poverty estimation pipeline.
 | Source | Examples |
 |--------|----------|
 | **Poverty GP** | PFW, CPI, PPP |
-| **WDI** | GDP, Population |
+| **WDI** | GDP (chained with other sources) |
 | **External** | Maddison, WEO |
-| **Manual** | NaN rules |
-
-> The most critical datasets — **PFW**, **CPI**, **PPP** — are managed
-> directly by the Poverty GP.
+| **Team-managed (GitHub)** | Population, NaN (nowcast) |
 
 ---
 
@@ -133,6 +130,44 @@ Decision logic:
 
 > "The smart part is the skip logic — if nothing changed, nothing happens.
 > No unnecessary work, no silent overwrites."
+
+---
+
+---
+
+## Checking Status — Quick Diagnostic Tool
+
+```r
+# Want to know if a measure needs updating?
+# Use check_status() — no need to run the full update
+check_status("maddison", include_reason = TRUE)
+```
+
+```
+── Checking Status for maddison ────────────────────────────────────────
+✔ GitHub branch 20260401_TEST is up to date with DEV.
+
+── Summary ─────────────────────────────────────────────────────────────
+ℹ Update GitHub: FALSE
+ℹ Update Y drive: TRUE
+```
+
+```r
+# Returns a list you can inspect programmatically
+$update_gh
+[1] FALSE
+
+$update_y
+[1] TRUE
+
+$gh_reason
+[1] "GitHub up to date"
+
+$y_reason
+[1] "Aux sidecar missing"
+```
+
+> Used internally by `update_aux_data()` — but also handy as a standalone utility.
 
 ---
 
