@@ -231,10 +231,6 @@ For derived measures that do not read directly from GitHub (e.g.
 the input aux data objects. Change detection therefore propagates
 automatically through the dependency graph.
 
-> **Exception:** `aux_maddison` downloads from an external URL
-> (option `pipaux.madsrc`) and does not carry a `gh` attribute.
-> Change detection for this measure relies solely on `code_hash`.
-
 ---
 
 # Logging
