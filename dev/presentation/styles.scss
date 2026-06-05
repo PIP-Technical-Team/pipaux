@@ -1,0 +1,276 @@
+/*-- scss:defaults --*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;600;700&display=swap');
+
+$presentation-heading-font:  "Sora", sans-serif;
+$font-family-sans-serif:     "Inter", sans-serif;
+$font-family-monospace:      "JetBrains Mono", monospace;
+
+/* Colour palette — PIP navy + teal accents */
+$body-bg:                     #0D1B2A;
+$body-color:                  #CBD5E1;
+$presentation-heading-color:  #7DD3FC;
+$link-color:                  #38BDF8;
+$code-color:                  #67E8F9;
+
+$presentation-font-size-root: 32px;
+$presentation-h1-font-size:   2.4em;
+$presentation-h2-font-size:   1.6em;
+$presentation-h3-font-size:   1.1em;
+$code-block-font-size:        0.72em;
+
+/*-- scss:rules --*/
+
+/* ─── Base overrides ───────────────────────────────── */
+
+.reveal .slide-number {
+  font-family: "Inter", sans-serif;
+  font-size: 0.55em;
+  color: #475569;
+  background: transparent;
+}
+
+.reveal blockquote {
+  border-left: 3px solid #38BDF8;
+  background: rgba(56, 189, 248, 0.08);
+  padding: 0.6em 1em;
+  font-style: normal;
+  color: #BAE6FD;
+  border-radius: 0 4px 4px 0;
+  width: 95%;
+}
+
+.reveal table {
+  font-size: 0.75em;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.reveal table th {
+  background: rgba(56, 189, 248, 0.18);
+  color: #7DD3FC;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5em 0.8em;
+  border-bottom: 2px solid #38BDF8;
+}
+
+.reveal table td {
+  padding: 0.4em 0.8em;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  vertical-align: top;
+}
+
+.reveal table tr:hover td {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+/* ─── Title slide ─────────────────────────────────── */
+
+.reveal .title-slide,
+.reveal #title-slide {
+  text-align: left;
+}
+
+.reveal #title-slide .title {
+  font-size: 2.4em;
+  font-weight: 700;
+  color: #F0F9FF;
+  line-height: 1.1;
+  margin-bottom: 0.15em;
+}
+
+.reveal #title-slide .subtitle {
+  font-size: 1.05em;
+  color: #38BDF8;
+  font-weight: 400;
+  margin-bottom: 1.4em;
+}
+
+.reveal #title-slide .author {
+  font-size: 0.75em;
+  color: #94A3B8;
+}
+
+.reveal #title-slide .date {
+  font-size: 0.65em;
+  color: #64748B;
+}
+
+/* ─── Section break variant ───────────────────────── */
+
+.reveal .slides section.section-slide {
+  background-color: #0B2540;
+}
+
+.reveal .slides section.section-slide h1,
+.reveal .slides section.section-slide h2 {
+  color: #F0F9FF;
+  font-size: 2em;
+}
+
+.reveal .slides section.section-slide p,
+.reveal .slides section.section-slide .subtitle-text {
+  color: #7DD3FC;
+  font-size: 0.95em;
+}
+
+/* ─── Disable vertical centering for specific slides ── */
+
+.reveal .slides section.slide-top {
+  top: 0 !important;
+  transform: translateY(0) !important;
+  margin-top: 0 !important;
+}
+
+/* ─── Callout boxes ───────────────────────────────── */
+
+.callout-tip,
+.callout-note,
+.callout-warning {
+  border-radius: 6px;
+  padding: 0.6em 1em;
+  margin: 0.5em 0;
+  font-size: 0.85em;
+}
+
+.callout-tip    { background: rgba(52, 211, 153, 0.12); border-left: 3px solid #34D399; color: #A7F3D0; }
+.callout-note   { background: rgba(56, 189, 248, 0.10); border-left: 3px solid #38BDF8; color: #BAE6FD; }
+.callout-warning { background: rgba(251, 191, 36, 0.10); border-left: 3px solid #FBBF24; color: #FDE68A; }
+
+/* ─── Highlight chips ─────────────────────────────── */
+
+.chip {
+  display: inline-block;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+  font-size: 0.8em;
+  color: #7DD3FC;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.chip-green {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #6EE7B7;
+}
+
+.chip-amber {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #FDE68A;
+}
+
+/* ─── Mermaid diagrams ────────────────────────────── */
+
+.reveal .mermaid svg {
+  background: transparent !important;
+  max-width: 100%;
+}
+
+/* ─── Utility classes ─────────────────────────────── */
+
+.reveal .center-v {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.reveal .text-muted {
+  color: #64748B;
+  font-size: 0.8em;
+}
+
+.reveal .text-accent {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+.reveal .text-success {
+  color: #34D399;
+}
+
+.reveal .text-warning {
+  color: #FBBF24;
+}
+
+.reveal .text-sm {
+  font-size: 0.78em;
+}
+
+.reveal .mono {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+  color: #67E8F9;
+}
+
+/* ─── Incremental list feel ───────────────────────── */
+
+.reveal ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.reveal ul li::before {
+  content: "›";
+  color: #38BDF8;
+  font-weight: 700;
+  margin-right: 0.5em;
+}
+
+.reveal ol li {
+  margin-bottom: 0.4em;
+}
+
+/* ─── Horizontal rule ─────────────────────────────── */
+
+.reveal hr {
+  border: none;
+  border-top: 1px solid rgba(56, 189, 248, 0.25);
+  margin: 0.6em 0;
+}
+
+/* ─── Code block container ────────────────────────── */
+
+.reveal pre {
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ─── Big number / stat call-out ──────────────────── */
+
+.big-stat {
+  font-size: 3em;
+  font-weight: 700;
+  color: #38BDF8;
+  line-height: 1;
+  display: block;
+}
+
+.big-stat-label {
+  font-size: 0.75em;
+  color: #94A3B8;
+  display: block;
+  margin-top: -0.1em;
+}
+
+/* ─── Step badge ──────────────────────────────────── */
+
+.step-badge {
+  display: inline-block;
+  background: #38BDF8;
+  color: #0D1B2A;
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85em;
+  margin-right: 0.4em;
+  flex-shrink: 0;
+}
