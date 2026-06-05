@@ -12,8 +12,8 @@ format:
     highlight-style: github-dark
     code-line-numbers: true
     fig-align: center
-    width: 1400
-    height: 900
+    width: 1500
+    height: 1000
     margin: 0.08
     center: true
     mermaid:
@@ -60,7 +60,7 @@ Takes [raw data from different sources]{.text-accent}, [cleans, validates, and f
 
 ---
 
-## Objectives
+## Pipeline Objectives
 
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0.4em;">
 
@@ -108,7 +108,23 @@ Takes [raw data from different sources]{.text-accent}, [cleans, validates, and f
 
 ---
 
+# How we get there {.section-slide .center}
+
+::: subtitle-text
+The new pipeline at a glance - high level overview of its structure, components and workflow
+:::
+
+---
+
+## High level Structure {.slide-top background-image="pipeline-at-a-glance.svg" background-size="contain" background-position="center"}
+
+---
+
 ## Dependency Graph {.slide-top background-iframe="dependency-graph.html" background-interactive=true}
+
+---
+
+## Update Engine {.slide-top background-color="#030b18" background-iframe="https://excalidraw.com/?theme=dark#json=XcTTN7f82-W5qiAcySrfB,q3EKrn4Sc8yNFT847mvcMQ" background-interactive=true}
 
 ---
 

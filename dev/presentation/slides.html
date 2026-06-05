@@ -6,12 +6,6 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-0348920b7671f696dc9078d39bff215e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><script src="slides_files/libs/clipboard/clipboard.min.js"></script>
-<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
-<script src="slides_files/libs/quarto-html/popper.min.js"></script>
-<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-0348920b7671f696dc9078d39bff215e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.7.32">
 
@@ -189,8 +183,8 @@ Structured diff reports across releases and within-release vintages.
 </div>
 </div>
 </section>
-<section id="objectives" class="slide level2 center">
-<h2>Objectives</h2>
+<section id="pipeline-objectives" class="slide level2 center">
+<h2>Pipeline Objectives</h2>
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0.4em;">
 <div style="background:rgba(56,189,248,0.07); border:1px solid rgba(56,189,248,0.2); border-left:3px solid #38BDF8; border-radius:8px; padding:10px 14px; display:flex; gap:12px; align-items:flex-start;">
 <span class="step-badge" style="flex-shrink:0;">1</span>
@@ -242,8 +236,24 @@ Structured diff reports across releases and within-release vintages.
 </div>
 </div>
 </section>
+<section class="slide level2 center">
+
+</section></section>
+<section>
+<section id="how-we-get-there" class="title-slide slide level1 section-slide center">
+<h1>How we get there</h1>
+<div class="subtitle-text">
+<p>The new pipeline at a glance - high level overview of its structure, components and workflow</p>
+</div>
+</section>
+<section id="high-level-structure" class="slide level2 slide-top center" data-background-image="pipeline-at-a-glance.svg" data-background-size="contain" data-background-position="center">
+<h2>High level Structure</h2>
+</section>
 <section id="dependency-graph" class="slide level2 slide-top center" data-background-iframe="dependency-graph.html" data-background-interactive="true">
 <h2>Dependency Graph</h2>
+</section>
+<section id="update-engine" class="slide level2 slide-top center" data-background-color="#030b18" data-background-iframe="https://excalidraw.com/?theme=dark#json=XcTTN7f82-W5qiAcySrfB,q3EKrn4Sc8yNFT847mvcMQ" data-background-interactive="true">
+<h2>Update Engine</h2>
 </section>
 <section id="structured-log" class="slide level2 center">
 <h2>Structured Log</h2>
@@ -285,16 +295,6 @@ Structured diff reports across releases and within-release vintages.
       // Full list of configuration options available at:
       // https://revealjs.com/config/
       Reveal.initialize({
-'controlsAuto': true,
-'previewLinksAuto': false,
-'pdfSeparateFragments': false,
-'autoAnimateEasing': "ease",
-'autoAnimateDuration': 1,
-'autoAnimateUnmatched': true,
-'jumpToSlide': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
-'smaller': false,
-
 'controlsAuto': true,
 'previewLinksAuto': false,
 'pdfSeparateFragments': false,
@@ -448,9 +448,9 @@ Structured diff reports across releases and within-release vintages.
         // The "normal" size of the presentation, aspect ratio will be preserved
         // when the presentation is scaled to fit different resolutions. Can be
         // specified using percentage units.
-        width: 1400,
+        width: 1500,
 
-        height: 900,
+        height: 1000,
 
         // Factor of the display size that should remain empty around the content
         margin: 8.0e-2,
@@ -474,7 +474,6 @@ Structured diff reports across releases and within-release vintages.
 
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
-QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
           RevealMath,
           RevealNotes,
