@@ -124,15 +124,19 @@ The new pipeline at a glance - high level overview of its structure, components 
 
 ---
 
-## Update Engine {.slide-top background-color="#030b18" background-iframe="https://excalidraw.com/?theme=dark#json=XcTTN7f82-W5qiAcySrfB,q3EKrn4Sc8yNFT847mvcMQ" background-interactive=true}
+## {.slide-top background-image="status-check.svg" background-size="contain" background-position="center"}
 
 ---
 
-## Structured Log
+## Rebuild {.slide-top background-image="rebuild.svg" background-size="contain" background-position="center"}
+
+---
+
+## Live Pipeline Log {.slide-top}
 
 ```{=html}
-<iframe src="pipeline-log.html" width="100%" height="640px"
-  style="border:none;">
+<iframe src="pipeline-log.html" width="100%" height="840px"
+  style="border:none; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.5); margin-top:0.4em; display:block;">
 </iframe>
 ```
 
@@ -140,6 +144,20 @@ The new pipeline at a glance - high level overview of its structure, components 
 ---
 
 
-::: {.text-muted style="text-align:center; margin-top: 0.5em;"}
-One call. All dependencies. Full provenance. Complete audit trail.
+```{=html}
+<iframe src="final-slide.html" width="100%" height="920px"
+  style="border:none; display:block;">
+</iframe>
+```
+
+---
+
+# Thank You for your attention {.section-slide .center}
+
+::: subtitle-text
+Questions?.
+:::
+
+::: {style="margin-top:1.5em; font-size:0.75em; color:#475569; text-align:center;"}
+`{pipaux}` · PIP Technical Team · June 2026
 :::
