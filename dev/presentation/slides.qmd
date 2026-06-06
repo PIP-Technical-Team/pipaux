@@ -152,12 +152,12 @@ The new pipeline at a glance - high level overview of its structure, components 
 
 ---
 
-# Thank You for your attention {.section-slide .center}
+# Thank you for your attention! {.section-slide .center}
 
 ::: subtitle-text
-Questions?.
+Questions, comments? 
 :::
 
 ::: {style="margin-top:1.5em; font-size:0.75em; color:#475569; text-align:center;"}
-`{pipaux}` · PIP Technical Team · June 2026
+Rossana Tatulli · PIP Technical Team · June 2026
 :::
