@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>pipaux — Dependency Graph</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+    :root {
+      --deep:   #030b18;
+      --border: rgba(100,160,255,0.12);
+      --blue:   #1a8fff;
+      --blue-s: #4ab8ff;
+      --purple: #8b5cf6;
+      --purp-s: #a78bfa;
+      --gold:   #fbbf24;
+      --orange: #f97316;
+      --org-s:  #fdba74;
+      --red:    #ef4444;
+      --text:   #e2e8f0;
+      --text-d: #94a3b8;
+      --text-f: #4a5a72;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--deep);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* subtle grid */
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image:
+        linear-gradient(rgba(26,143,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,143,255,0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events:none; z-index:0;
+    }
+
+    /* ── wrapper ── */
+    #wrapper {
+      position: relative; z-index: 5;
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      padding: 100px 70px 12px;
+    }
+
+    /* ── scene ── */
+    .dep-scene {
+      position: relative;
+      flex: 1;
+      background: rgba(4,10,24,0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    #dep-canvas-svg {
+      position: absolute; top:0; left:0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+
+    /* ── nodes ── */
+    .dep-node-el {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border-radius: 9px;
+      padding: 8px 16px;
+      z-index: 5;
+      cursor: default;
+      transition: all .25s;
+      text-align: center;
+      white-space: nowrap;
+      font-family: 'Space Mono', monospace;
+      font-size: 1.22rem;
+    }
+    .dep-node-el:hover {
+      transform: translate(-50%, -54%);
+      z-index: 10;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+    }
+    .dep-node-el .dn-name { font-weight: 700; letter-spacing: 0.03em; }
+    .dep-node-el .dn-tier { font-size: 0.90rem; opacity: 0.65; margin-top: 2px; }
+
+    .t0 { border:1.5px solid rgba(26,143,255,0.5);  background:rgba(26,143,255,0.12);  color: var(--blue-s); }
+    .t1 { border:1.5px solid rgba(139,92,246,0.5);  background:rgba(139,92,246,0.12);  color: var(--purp-s); }
+    .t2 { border:1.5px solid rgba(251,191,36,0.5);  background:rgba(251,191,36,0.1);   color: var(--gold); }
+    .t3 { border:1.5px solid rgba(249,115,22,0.55); background:rgba(249,115,22,0.12);  color: var(--org-s); }
+    .t4 { border:1.5px solid rgba(239,68,68,0.5);   background:rgba(239,68,68,0.1);    color: var(--red); }
+
+    /* ── legend ── */
+    .dep-legend {
+      display: flex; gap: 18px; flex-wrap: wrap;
+      margin-top: 10px; justify-content: center;
+    }
+    .dep-leg-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: var(--text-d);
+    }
+    .dep-leg-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="wrapper">
+  <div class="dep-scene" id="dep-scene">
+    <svg id="dep-canvas-svg"></svg>
+  </div>
+
+  <div class="dep-legend">
+    <div class="dep-leg-item">
+      <div class="dep-leg-dot" style="background:rgba(26,143,255,0.5);border:1px solid #1a8fff"></div>
+      Tier 0 — Root sources (no deps): cp, metaregion, npl, sna, income_groups, indicators, dictionary, nan, pfw, wdi, maddison, country_list
+    </div>
+    <div class="dep-leg-item">
+      <div class="dep-leg-dot" style="background:rgba(139,92,246,0.5);border:1px solid #8b5cf6"></div>
+      Tier 1 — ppp, pop, cpi, regions, metadata, weo, gdm, countries
+    </div>
+    <div class="dep-leg-item">
+      <div class="dep-leg-dot" style="background:rgba(251,191,36,0.5);border:1px solid #fbbf24"></div>
+      Tier 2 — pce, censoring
+    </div>
+    <div class="dep-leg-item">
+      <div class="dep-leg-dot" style="background:rgba(249,115,22,0.5);border:1px solid #f97316"></div>
+      Tier 3 — gdp (composite, write→GH→read)
+    </div>
+    <div class="dep-leg-item">
+      <div class="dep-leg-dot" style="background:rgba(239,68,68,0.5);border:1px solid #ef4444"></div>
+      Tier 4 — missing_data (deepest, 12 upstream inputs)
+    </div>
+  </div>
+</div>
+
+<script>
+    // ── Node definitions
+    // tier 0, row a — standalone (no upstream deps)
+    const depNodes = [
+      {id:'cp',           label:'cp',           sub:'no deps',           tier:0, px:0.08,  py:0.06},
+      {id:'metaregion',   label:'metaregion',   sub:'no deps',           tier:0, px:0.21,  py:0.06},
+      {id:'npl',          label:'npl',          sub:'no deps',           tier:0, px:0.34,  py:0.06},
+      {id:'sna',          label:'sna',          sub:'no deps',           tier:0, px:0.47,  py:0.06},
+      {id:'income_groups',label:'income_groups',sub:'no deps',           tier:0, px:0.61,  py:0.06},
+      {id:'indicators',   label:'indicators',   sub:'no deps',           tier:0, px:0.75,  py:0.06},
+      // tier 0, row b — feed downstream
+      {id:'dictionary',   label:'dictionary',   sub:'no deps',           tier:0, px:0.08,  py:0.18},
+      {id:'nan',          label:'nan',          sub:'no deps',           tier:0, px:0.21,  py:0.18},
+      {id:'pfw',          label:'pfw',          sub:'no deps',           tier:0, px:0.35,  py:0.18},
+      {id:'wdi',          label:'wdi',          sub:'no deps',           tier:0, px:0.49,  py:0.18},
+      {id:'maddison',     label:'maddison',     sub:'no deps',           tier:0, px:0.63,  py:0.18},
+      {id:'country_list', label:'country_list', sub:'no deps',           tier:0, px:0.78,  py:0.18},
+      // tier 1
+      {id:'ppp',      label:'ppp',      sub:'← country_list',              tier:1, px:0.08,  py:0.34},
+      {id:'pop',      label:'pop',      sub:'← country_list',              tier:1, px:0.22,  py:0.34},
+      {id:'cpi',      label:'cpi',      sub:'← country_list',              tier:1, px:0.36,  py:0.34},
+      {id:'regions',  label:'regions',  sub:'← country_list',              tier:1, px:0.50,  py:0.34},
+      {id:'metadata', label:'metadata', sub:'← pfw',                       tier:1, px:0.64,  py:0.34},
+      {id:'weo',      label:'weo',      sub:'← country_list, pop',         tier:1, px:0.78,  py:0.34},
+      {id:'gdm',      label:'gdm',      sub:'← country_list, pfw',         tier:1, px:0.92,  py:0.34},
+      {id:'countries',label:'countries',sub:'← country_list, pfw',         tier:1, px:0.93,  py:0.22},
+      // tier 2
+      {id:'pce',      label:'pce',      sub:'← wdi, sna, country_list',    tier:2, px:0.30,  py:0.52},
+      {id:'censoring',label:'censoring',sub:'← countries, pfw, regions, country_list', tier:2, px:0.60,  py:0.52},
+      // tier 3
+      {id:'gdp',      label:'gdp',      sub:'← weo, pop, wdi, sna, nan, maddison, country_list', tier:3, px:0.45,  py:0.70},
+      // tier 4
+      {id:'missing_data',label:'missing_data',sub:'← gdp, pce, weo, pop, wdi, sna, nan, maddison, pfw, country_list', tier:4, px:0.45,  py:0.88},
+    ];
+
+    const depEdges = [
+      // country_list → tier 1
+      ['country_list','ppp'], ['country_list','pop'], ['country_list','cpi'],
+      ['country_list','regions'], ['country_list','weo'], ['country_list','gdm'],
+      ['country_list','countries'],
+      // pfw → tier 1
+      ['pfw','metadata'], ['pfw','gdm'], ['pfw','countries'],
+      ['pop','weo'],
+      // → tier 2
+      ['wdi','pce'], ['country_list','pce'], ['sna','pce'],
+      ['countries','censoring'], ['pfw','censoring'], ['country_list','censoring'], ['regions','censoring'],
+      // → gdp (tier 3)
+      ['weo','gdp'], ['pop','gdp'], ['country_list','gdp'], ['maddison','gdp'],
+      ['wdi','gdp'], ['sna','gdp'], ['nan','gdp'],
+      // → missing_data (tier 4)
+      ['country_list','missing_data'], ['pce','missing_data'], ['wdi','missing_data'],
+      ['sna','missing_data'], ['gdp','missing_data'], ['weo','missing_data'],
+      ['pop','missing_data'], ['maddison','missing_data'], ['nan','missing_data'],
+      ['pfw','missing_data'],
+    ];
+
+    const tierColors = ['#1a8fff','#8b5cf6','#fbbf24','#f97316','#ef4444'];
+
+    // Returns the point on the border of a box (centered at cx,cy, half-dims hw×hh)
+    // in the direction toward (tx, ty), with an optional gap buffer
+    function getBorderPoint(cx, cy, tx, ty, hw, hh, gap = 4) {
+      const dx = tx - cx;
+      const dy = ty - cy;
+      if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return { x: cx, y: cy };
+      const scaleX = Math.abs(dx) > 0 ? (hw + gap) / Math.abs(dx) : Infinity;
+      const scaleY = Math.abs(dy) > 0 ? (hh + gap) / Math.abs(dy) : Infinity;
+      const scale  = Math.min(scaleX, scaleY);
+      return { x: cx + dx * scale, y: cy + dy * scale };
+    }
+
+    function drawDepGraph() {
+      const scene = document.getElementById('dep-scene');
+      const svg   = document.getElementById('dep-canvas-svg');
+      if (!scene || !svg) return;
+
+      const W = scene.offsetWidth;
+      const H = scene.offsetHeight;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      // clear
+      scene.querySelectorAll('.dep-node-el').forEach(e => e.remove());
+      svg.innerHTML = '';
+
+      // arrowhead markers per tier
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      tierColors.forEach((col, i) => {
+        const m = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        m.setAttribute('id', 'da' + i);
+        m.setAttribute('markerWidth', '6');
+        m.setAttribute('markerHeight', '6');
+        m.setAttribute('refX', '5');
+        m.setAttribute('refY', '3');
+        m.setAttribute('orient', 'auto');
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', 'M0,0 L0,6 L6,3 z');
+        p.setAttribute('fill', col);
+        m.appendChild(p);
+        defs.appendChild(m);
+      });
+      svg.appendChild(defs);
+
+      // place node divs
+      depNodes.forEach(n => {
+        const el = document.createElement('div');
+        el.className = `dep-node-el t${n.tier}`;
+        el.id = 'depn-' + n.id;
+        el.style.left = (n.px * W) + 'px';
+        el.style.top  = (n.py * H) + 'px';
+        el.innerHTML  = `<div class="dn-name">${n.label}</div><div class="dn-tier">${n.sub}</div>`;
+        scene.appendChild(el);
+      });
+
+      // draw edges after nodes have rendered
+      setTimeout(() => {
+        depEdges.forEach(([from, to]) => {
+          const fe = document.getElementById('depn-' + from);
+          const te = document.getElementById('depn-' + to);
+          if (!fe || !te) return;
+
+          const fR = fe.getBoundingClientRect();
+          const tR = te.getBoundingClientRect();
+          const sR = scene.getBoundingClientRect();
+
+          const ax = fR.left - sR.left + fR.width  / 2;
+          const ay = fR.top  - sR.top  + fR.height / 2;
+          const bx = tR.left - sR.left + tR.width  / 2;
+          const by = tR.top  - sR.top  + tR.height / 2;
+
+          const start = getBorderPoint(ax, ay, bx, by, fR.width/2, fR.height/2);
+          const end   = getBorderPoint(bx, by, ax, ay, tR.width/2, tR.height/2);
+
+          const toNode = depNodes.find(n => n.id === to);
+          const ci = toNode ? toNode.tier : 1;
+          const midY = (start.y + end.y) / 2;
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          const pid  = `de-${from}-${to}`;
+          path.setAttribute('id', pid);
+          path.setAttribute('d', `M${start.x},${start.y} C${start.x},${midY} ${end.x},${midY} ${end.x},${end.y}`);
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', tierColors[ci]);
+          path.setAttribute('stroke-width', '1.2');
+          path.setAttribute('stroke-opacity', '0.4');
+          path.setAttribute('marker-end', `url(#da${ci})`);
+          svg.appendChild(path);
+
+          // animated flow dot
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.setAttribute('r', '2');
+          dot.setAttribute('fill', tierColors[ci]);
+          dot.setAttribute('opacity', '0.7');
+
+          const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+          anim.setAttribute('dur', (1.6 + Math.random() * 2) + 's');
+          anim.setAttribute('repeatCount', 'indefinite');
+          anim.setAttribute('begin', (Math.random() * 4) + 's');
+
+          const mp = document.createElementNS('http://www.w3.org/2000/svg', 'mpath');
+          mp.setAttribute('href', '#' + pid);
+          anim.appendChild(mp);
+          dot.appendChild(anim);
+          svg.appendChild(dot);
+        });
+      }, 60);
+    }
+
+    document.addEventListener('DOMContentLoaded', drawDepGraph);
+    window.addEventListener('resize', drawDepGraph);
+
+  </script>
+
+</body>
+</html>
