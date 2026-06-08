@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pipaux — What It Delivers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --deep:   #030b18;
+  --panel:  rgba(8,20,44,0.92);
+  --border: rgba(100,160,255,0.10);
+  --blue:   #1a8fff;
+  --blue-s: #4ab8ff;
+  --blue-d: rgba(26,143,255,0.13);
+  --purple: #8b5cf6;
+  --purp-s: #a78bfa;
+  --purp-d: rgba(139,92,246,0.13);
+  --green:  #10d9a0;
+  --grn-s:  #6efcd8;
+  --grn-d:  rgba(16,217,160,0.10);
+  --orange: #f97316;
+  --org-s:  #fdba74;
+  --org-d:  rgba(249,115,22,0.10);
+  --gold:   #fbbf24;
+  --gold-d: rgba(251,191,36,0.10);
+  --red:    #ef4444;
+  --red-d:  rgba(239,68,68,0.10);
+  --gray-s: #64748b;
+  --text:   #e2e8f0;
+  --text-d: #94a3b8;
+  --text-f: #4a5a72;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+
+body {
+  background: var(--deep);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.18rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(26,143,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,143,255,0.022) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events:none; z-index:0;
+}
+#stars { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.42; }
+
+.glow-blue   { position:fixed; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, rgba(26,143,255,0.09) 0%, transparent 70%); pointer-events:none; z-index:0; top:20%; left:-80px; }
+.glow-purple { position:fixed; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%); pointer-events:none; z-index:0; top:15%; left:calc(33% - 80px); }
+.glow-orange { position:fixed; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%); pointer-events:none; z-index:0; top:20%; right:-80px; }
+
+.slide {
+  position: relative; z-index: 5;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 32px 12px;
+  max-width: 1560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.slide-header {
+  padding: 14px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+.eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.84rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-f);
+}
+.slide-header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 3.2vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(110deg, var(--blue-s) 0%, var(--purp-s) 50%, var(--grn-s) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hue 8s ease-in-out infinite;
+}
+@keyframes hue { 0%,100%{filter:hue-rotate(0deg)} 50%{filter:hue-rotate(20deg)} }
+
+.columns {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.panel:hover { transform: translateY(-3px); }
+.panel::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:2px;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100%{opacity:0.35} 50%{opacity:1} }
+
+.panel-blue   { --accent: var(--blue-s); }
+.panel-blue::before   { background: linear-gradient(90deg, transparent, var(--blue-s), transparent); }
+.panel-blue .panel-icon   { color: var(--blue-s); }
+.panel-blue .panel-title  { color: var(--blue-s); }
+.panel-blue:hover { box-shadow: 0 12px 48px rgba(26,143,255,0.12); }
+
+.panel-purple  { --accent: var(--purp-s); }
+.panel-purple::before  { background: linear-gradient(90deg, transparent, var(--purp-s), transparent); }
+.panel-purple .panel-icon  { color: var(--purp-s); }
+.panel-purple .panel-title { color: var(--purp-s); }
+.panel-purple:hover { box-shadow: 0 12px 48px rgba(139,92,246,0.12); }
+
+.panel-orange  { --accent: var(--org-s); }
+.panel-orange::before  { background: linear-gradient(90deg, transparent, var(--org-s), transparent); }
+.panel-orange .panel-icon  { color: var(--org-s); }
+.panel-orange .panel-title { color: var(--org-s); }
+.panel-orange:hover { box-shadow: 0 12px 48px rgba(249,115,22,0.12); }
+
+.panel-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.panel-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-f);
+  margin-bottom: 6px;
+}
+.panel-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 1.9vw, 1.65rem);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 10px;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: rgba(5,14,36,0.7);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.item:hover { background: rgba(10,22,52,0.9); }
+.panel-blue .item:hover   { border-color: rgba(74,184,255,0.22); }
+.panel-purple .item:hover { border-color: rgba(167,139,250,0.22); }
+.panel-orange .item:hover { border-color: rgba(253,186,116,0.22); }
+
+.item-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+.item-body { flex: 1; min-width: 0; }
+.item-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.04rem;
+  margin-bottom: 5px;
+}
+.panel-blue   .item-title { color: var(--blue-s); }
+.panel-purple .item-title { color: var(--purp-s); }
+.panel-orange .item-title { color: var(--org-s);  }
+
+/* ── Column 1 larger items ───────────── */
+.panel-blue .item {
+  padding: 24px 26px;
+  gap: 18px;
+}
+.panel-blue .item-icon { font-size: 2.6rem; }
+.panel-blue .item-title { font-size: 1.45rem; margin-bottom: 10px; }
+.panel-blue .tag { font-size: 1.2rem; padding: 8px 16px; }
+
+.item-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  padding: 5px 11px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.tag-blue   { color: var(--blue-s); border-color: rgba(74,184,255,0.3);   background: rgba(26,143,255,0.1); }
+.tag-purple { color: var(--purp-s); border-color: rgba(167,139,250,0.3);  background: rgba(139,92,246,0.1); }
+.tag-green  { color: var(--grn-s);  border-color: rgba(110,252,216,0.3);  background: rgba(16,217,160,0.08); }
+.tag-orange { color: var(--org-s);  border-color: rgba(253,186,116,0.3);  background: rgba(249,115,22,0.08); }
+.tag-gold   { color: var(--gold);   border-color: rgba(251,191,36,0.3);   background: rgba(251,191,36,0.08); }
+.tag-gray   { color: var(--gray-s); border-color: rgba(100,116,139,0.3);  background: rgba(100,116,139,0.07); }
+.tag-red    { color: var(--red);    border-color: rgba(239,68,68,0.3);    background: rgba(239,68,68,0.07); }
+
+.pill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 0.94rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.pill-blue   { background: rgba(26,143,255,0.10); color: var(--blue-s); border-color: rgba(74,184,255,0.22); }
+.pill-purple { background: rgba(139,92,246,0.10); color: var(--purp-s); border-color: rgba(167,139,250,0.22); }
+.pill-green  { background: rgba(16,217,160,0.09); color: var(--grn-s);  border-color: rgba(110,252,216,0.22); }
+.pill-orange { background: rgba(249,115,22,0.09); color: var(--org-s);  border-color: rgba(253,186,116,0.22); }
+.pill-gold   { background: rgba(251,191,36,0.09); color: var(--gold);   border-color: rgba(251,191,36,0.22); }
+.pill-red    { background: rgba(239,68,68,0.09);  color: var(--red);    border-color: rgba(239,68,68,0.22); }
+.pill-gray   { background: rgba(100,116,139,0.10);color: var(--gray-s); border-color: rgba(100,116,139,0.22); }
+.pill-icon   { font-size: 1.15rem; flex-shrink: 0; }
+
+.slide-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 0 0;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.footer-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-f);
+}
+.footer-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+.diff-preview {
+  background: rgba(4,12,30,0.7);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 14px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  margin-top: 8px;
+}
+.diff-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 1.2rem;
+}
+.diff-row:last-child { border-bottom: none; }
+.d-key  { color: var(--text-f); }
+.d-add  { color: var(--grn-s); }
+.d-rem  { color: var(--red); }
+.d-chg  { color: var(--org-s); }
+.d-same { color: var(--gray-s); }
+
+.scan-bar {
+  height: 2px;
+  background: rgba(249,115,22,0.1);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 6px;
+}
+.scan-bar::after {
+  content: '';
+  position: absolute; top: 0; left: -35%; width: 35%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--org-s), transparent);
+  animation: scan 3s ease-in-out infinite;
+}
+@keyframes scan { 0%{left:-35%} 100%{left:115%} }
+
+.log-preview {
+  background: rgba(0,10,6,0.8);
+  border: 1px solid rgba(100,116,139,0.2);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.74rem;
+  line-height: 1.85;
+  margin-top: 6px;
+}
+.ll { display: flex; gap: 6px; }
+.ll-ts  { color: var(--text-f); flex-shrink: 0; }
+.ll-typ {
+  flex-shrink: 0; padding: 0 6px;
+  border-radius: 3px; font-size: 0.68rem;
+}
+.lt-info    { background: rgba(26,143,255,0.15); color: var(--blue-s); }
+.lt-success { background: rgba(16,217,160,0.15); color: var(--grn-s); }
+.lt-update  { background: rgba(139,92,246,0.15); color: var(--purp-s); }
+.lt-error   { background: rgba(239,68,68,0.15);  color: var(--red); }
+.ll-m  { color: var(--purp-s); flex-shrink: 0; }
+.ll-msg{ color: var(--text-f); }
+.log-dot-anim {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); display: inline-block;
+  margin-right: 4px;
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.12} }
+
+.pill-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 0 6px;
+}
+.pill-footer .pill {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="glow-blue"></div>
+<div class="glow-purple"></div>
+<div class="glow-orange"></div>
+
+<div class="slide">
+
+  <div class="columns">
+
+    <!-- COLUMN 1: LOADING -->
+    <div class="panel panel-blue">
+      <div class="panel-icon">📥</div>
+      <div class="panel-label">Tool 1</div>
+      <div class="panel-title">Loading auxiliary data</div>
+      <div class="divider"></div>
+      <div class="item-list">
+
+        <div class="item">
+          <div class="item-icon">📂</div>
+          <div class="item-body">
+            <div class="item-title">Load any measure by name</div>
+            <div class="item-tags">
+              <span class="tag tag-blue">load_aux_data("gdp")</span>
+              <span class="tag tag-blue">load_aux_data("cpi")</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon">🏷</div>
+          <div class="item-body">
+            <div class="item-title">Release-scoped by default</div>
+            <div class="item-tags">
+              <span class="tag tag-gold">YYYYMMDD_PROD</span>
+              <span class="tag tag-blue">YYYYMMDD_TEST</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon">🔗</div>
+          <div class="item-body">
+            <div class="item-title">Loads with provenance intact</div>
+            <div class="item-tags">
+              <span class="tag tag-gold">pk attached</span>
+              <span class="tag tag-blue">SHA attached</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon">🕰</div>
+          <div class="item-body">
+            <div class="item-title">Access any historical version</div>
+            <div class="item-tags">
+              <span class="tag tag-blue">version=-1</span>
+              <span class="tag tag-blue">version=-2</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COLUMN 3: COMPARISON TOOLS -->
+    <div class="panel panel-orange">
+      <div class="panel-icon">🔬</div>
+      <div class="panel-label">Tool 3</div>
+      <div class="panel-title">Comparison tools</div>
+      <div class="divider"></div>
+      <div class="item-list">
+
+        <div class="item">
+          <div class="item-icon">📊</div>
+          <div class="item-body">
+            <div class="item-title">Across releases</div>
+            <div class="item-tags">
+              <span class="tag tag-orange">20260202_PROD vs 20241001_PROD</span>
+            </div>
+            <div class="diff-preview">
+              <div class="diff-row"><span class="d-key">gdp</span><span class="d-chg">~18 values changed</span></div>
+              <div class="diff-row"><span class="d-key">pfw</span><span class="d-add">+4 rows added</span></div>
+              <div class="diff-row"><span class="d-key">cpi</span><span class="d-chg">~3 reporting levels differ</span></div>
+              <div class="diff-row"><span class="d-key">ppp</span><span class="d-same">— unchanged</span></div>
+              <div class="diff-row"><span class="d-key">pop</span><span class="d-rem">-1 row removed</span></div>
+            </div>
+            <div class="scan-bar"></div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon">🔍</div>
+          <div class="item-body">
+            <div class="item-title">Within a release — vintage</div>
+            <div class="item-tags">
+              <span class="tag tag-blue">latest vs version -1</span>
+              <span class="tag tag-green">confirms reproducibility</span>
+            </div>
+            <div class="diff-preview">
+              <div class="diff-row"><span class="d-key">run at 16:45</span><span class="d-same">vs run at 14:02</span></div>
+              <div class="diff-row"><span class="d-key">gdp</span><span class="d-add">+2 rows added</span></div>
+              <div class="diff-row"><span class="d-key">cpi</span><span class="d-same">— unchanged ✓</span></div>
+              <div class="diff-row"><span class="d-key">ppp</span><span class="d-same">— unchanged ✓</span></div>
+            </div>
+            <div class="scan-bar" style="animation-delay:1.4s;"></div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon">🔑</div>
+          <div class="item-body">
+            <div class="item-title">Primary-key anchored</div>
+            <div class="item-tags">
+              <span class="tag tag-gold">diff_values</span>
+              <span class="tag tag-gold">diff_rows</span>
+              <span class="tag tag-orange">change_type: added / removed</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER PILLS -->
+  <div class="pill-footer">
+    <div class="pill pill-blue"><span class="pill-icon">🔗</span>Dependency-aware</div>
+    <div class="pill pill-purple"><span class="pill-icon">🔏</span>Provenance-tracked</div>
+    <div class="pill pill-green"><span class="pill-icon">📦</span>Release-scoped</div>
+    <div class="pill pill-green"><span class="pill-icon">🕰</span>Fully versioned</div>
+    <div class="pill pill-gold"><span class="pill-icon">📋</span>Auditable</div>
+    <div class="pill pill-gold"><span class="pill-icon">✅</span>Dual-validated</div>
+    <div class="pill pill-red"><span class="pill-icon">🔬</span>Comparable</div>
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function initStars() {
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  stars = Array.from({length:110}, () => ({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    r: Math.random()*1.0+0.2, a: Math.random(), da:(Math.random()-.5)*0.007
+  }));
+}
+function drawStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    s.a = Math.max(.05, Math.min(1, s.a+s.da));
+    if(s.a<=.05||s.a>=1) s.da*=-1;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(180,210,255,${s.a})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars(); drawStars();
+window.addEventListener('resize', initStars);
+</script>
+
+</body>
+</html>

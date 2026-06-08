@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Log</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --deep:   #030b18;
+  --blue-s: #4ab8ff;
+  --purp-s: #a78bfa;
+  --green:  #10d9a0;
+  --grn-s:  #6efcd8;
+  --org-s:  #fdba74;
+  --gold:   #fbbf24;
+  --red:    #ef4444;
+  --gray-s: #64748b;
+  --text-d: #94a3b8;
+  --text-f: #4a5a72;
+  --border: rgba(100,160,255,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--deep);
+  color: #e2e8f0;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* subtle grid bg — matches the original body::before */
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(26,143,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,143,255,0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events:none; z-index:0;
+}
+
+.log-terminal {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 780px;
+  background: rgba(0,12,8,0.9);
+  border: 1px solid rgba(16,217,160,0.2);
+  border-radius: 12px;
+  padding: 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.05rem;
+}
+
+.lt-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+  color: var(--grn-s); font-size: 0.62rem;
+}
+
+.log-dot-anim {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+#log-stream {
+  height: 480px;
+  overflow: hidden;
+  position: relative;
+}
+#log-stream::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:40px;
+  background: linear-gradient(transparent, rgba(0,12,8,0.9));
+  pointer-events: none;
+}
+
+/* ── Log line layout — matches original .ll ── */
+.ll {
+  display: flex; gap: 8px; line-height: 1.8;
+}
+.ll-ts   { color: var(--text-f); flex-shrink: 0; }
+.ll-step { flex-shrink: 0; padding: 0 5px; border-radius: 2px; font-size: 0.88rem; }
+.ll-m    { color: var(--purp-s); flex-shrink: 0; }
+.ll-msg  { color: var(--text-f); }
+
+/* ── Step badge colours — exact match to original ── */
+.step-start { background: rgba(26,143,255,0.15);  color: var(--blue-s); }
+.step-upgh  { background: rgba(139,92,246,0.15);  color: var(--purp-s); }
+.step-upy   { background: rgba(16,217,160,0.15);  color: var(--grn-s);  }
+.step-end   { background: rgba(16,217,160,0.2);   color: var(--grn-s);  }
+.step-skip  { background: rgba(100,116,139,0.12); color: var(--gray-s); }
+.step-err   { background: rgba(239,68,68,0.15);   color: var(--red);    }
+.step-dep   { background: rgba(251,191,36,0.12);  color: var(--gold);   }
+
+/* ── Legend row ── */
+.log-event-key {
+  display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px;
+}
+.tag {
+  display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.88rem;
+  border-radius: 4px; padding: 2px 7px; border: 1px solid;
+}
+.tag-blue   { color:var(--blue-s); border-color:rgba(74,184,255,0.3);   background:rgba(26,143,255,0.14); }
+.tag-purple { color:var(--purp-s); border-color:rgba(167,139,250,0.3);  background:rgba(139,92,246,0.14); }
+.tag-green  { color:var(--grn-s);  border-color:rgba(110,252,216,0.3);  background:rgba(16,217,160,0.12); }
+.tag-orange { color:var(--org-s);  border-color:rgba(253,186,116,0.3);  background:rgba(249,115,22,0.12); }
+.tag-gold   { color:var(--gold);   border-color:rgba(251,191,36,0.3);   background:rgba(251,191,36,0.12); }
+.tag-gray   { color:var(--gray-s); border-color:rgba(100,116,139,0.3);  background:rgba(100,116,139,0.08); }
+</style>
+</head>
+<body>
+
+<div class="log-terminal">
+  <div class="lt-header">
+    <div class="log-dot-anim"></div>
+    LIVE PIPELINE LOG
+  </div>
+
+  <div id="log-stream"></div>
+
+  <div class="log-event-key">
+    <span class="tag tag-blue">START</span>
+    <span class="tag tag-purple">BRANCH SYNC</span>
+    <span class="tag tag-green">REBUILD</span>
+    <span class="tag tag-green">COMPLETE</span>
+    <span class="tag tag-gray">SKIPPED</span>
+    <span class="tag tag-gold">DEP WAIT</span>
+  </div>
+</div>
+
+<script>
+// ─── LOG ENTRIES ───────────────────────────────────────────
+const logData = [
+  {ts:'08:00:01', cls:'step-start', step:'START',       m:'country_list', msg:'checking for changes'},
+  {ts:'08:00:02', cls:'step-skip',  step:'SKIPPED',     m:'country_list', msg:'source fingerprint unchanged'},
+  {ts:'08:00:02', cls:'step-start', step:'START',       m:'pfw',          msg:'checking for changes'},
+  {ts:'08:00:03', cls:'step-upgh',  step:'BRANCH SYNC', m:'pfw',          msg:'release branch behind DEV → syncing'},
+  {ts:'08:00:05', cls:'step-upy',   step:'REBUILD',     m:'pfw',          msg:'source fingerprint changed → rebuilding'},
+  {ts:'08:00:07', cls:'step-end',   step:'COMPLETE',    m:'pfw',          msg:'artifact published · provenance recorded'},
+  {ts:'08:00:07', cls:'step-dep',   step:'DEP WAIT',    m:'cpi',          msg:'awaiting country_list (already done)'},
+  {ts:'08:00:08', cls:'step-upy',   step:'REBUILD',     m:'cpi',          msg:'transformation code changed → rebuilding'},
+  {ts:'08:00:10', cls:'step-end',   step:'COMPLETE',    m:'cpi',          msg:'artifact published · provenance recorded'},
+  {ts:'08:00:10', cls:'step-start', step:'START',       m:'maddison',     msg:'external URL · no fingerprint available'},
+  {ts:'08:00:12', cls:'step-skip',  step:'SKIPPED',     m:'maddison',     msg:'transformation code unchanged'},
+  {ts:'08:00:12', cls:'step-start', step:'START',       m:'weo',          msg:'checking for changes'},
+  {ts:'08:00:14', cls:'step-upy',   step:'REBUILD',     m:'weo',          msg:'source fingerprint changed → rebuilding'},
+  {ts:'08:00:15', cls:'step-start', step:'START',       m:'gdp',          msg:'composite · 6 upstream dependencies'},
+  {ts:'08:00:18', cls:'step-upy',   step:'REBUILD',     m:'gdp',          msg:'cascade triggered by weo → special publish flow'},
+  {ts:'08:00:22', cls:'step-end',   step:'COMPLETE',    m:'gdp',          msg:'written to GitHub · fingerprint captured · Y-drive updated'},
+  {ts:'08:00:22', cls:'step-start', step:'START',       m:'missing_data', msg:'no GitHub repo · GH check skipped'},
+  {ts:'08:00:24', cls:'step-upy',   step:'REBUILD',     m:'missing_data', msg:'cascade triggered by gdp'},
+  {ts:'08:00:25', cls:'step-end',   step:'COMPLETE',    m:'missing_data', msg:'artifact published'},
+  {ts:'08:00:25', cls:'step-end',   step:'COMPLETE',    m:'pipeline',     msg:'run complete · log saved · 7 rebuilt · 6 skipped'},
+];
+
+const logStream = document.getElementById('log-stream');
+let li = 0;
+
+function addLogLine() {
+  if (li >= logData.length) { li = 0; logStream.innerHTML = ''; }
+  const d = logData[li++];
+  const div = document.createElement('div');
+  div.className = 'll';
+  div.innerHTML = `<span class="ll-ts">${d.ts}</span><span class="ll-step ${d.cls}">${d.step}</span><span class="ll-m">${d.m}</span><span class="ll-msg">${d.msg}</span>`;
+  logStream.insertBefore(div, logStream.firstChild);
+  if (logStream.children.length > 15) logStream.removeChild(logStream.lastChild);
+}
+
+logData.forEach((_, i) => setTimeout(addLogLine, i * 650));
+setInterval(() => setTimeout(addLogLine, 0), 7000 + Math.random() * 2000);
+</script>
+</body>
+</html>
