@@ -141,11 +141,96 @@ PIP Technical Team
 
   <p class="date">2026-06-01</p>
 </section>
+<section id="introducing-the-new-pip-pipeline" class="slide level2 center">
+<h2>Introducing the New PIP Pipeline</h2>
+<div style="font-size:0.8em; color:#94A3B8; max-width:860px; margin:0 auto 1.2em auto; text-align:center;">
+<p>An interconnected ecosystem of R packages — each covering a distinct pipeline stage, all sharing the same guarantees: release-scoped, versioned, validated, logged, and tracks changes.</p>
+</div>
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px;">
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Release-scoped by design
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Every artifact is tied to a working release — nothing floats outside a versioned context.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px;">{pipfun}</span></p>
+</div>
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Smart, dependency-aware rebuilding
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Steps are never reprocessed without a reason — changes propagate only where needed.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px; margin-right:4px;">{pipfun}</span> <span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{stamp}</span></p>
+</div>
+<div style="background:rgba(129,140,248,0.07); border-left:3px solid #818CF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Versioning &amp; time-travel
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Content-hashed artifacts with full lineage tracking — any version, any point in time.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{stamp}</span></p>
+</div>
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Audit logging &amp; error resilience
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Every step is logged — successes, warnings, failures. The pipeline never fails silently.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px;">{pipfun}</span></p>
+</div>
+<div style="background:rgba(52,211,153,0.07); border-left:3px solid #34D399; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Double-stage validation
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Input and output checks at every stage — errors caught early, never propagated silently.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(52,211,153,0.15); color:#34D399; border-radius:4px; padding:2px 7px; margin-right:4px;">{pipdata}</span> <span style="font-family:monospace; font-size:0.75em; background:rgba(52,211,153,0.15); color:#34D399; border-radius:4px; padding:2px 7px;">{pipaux}</span></p>
+</div>
+<div style="background:rgba(129,140,248,0.07); border-left:3px solid #818CF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">
+Cross-release comparison
+</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">
+Structured diffs across releases and vintages — structural, type-level, and value-level.
+</div>
+<p><span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{myrror}</span></p>
+</div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(56,189,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#38BDF8; font-weight:700;">{pipfun}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Release coordination &amp; logging</span> <span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span></p>
+</div>
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(129,140,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#A5B4FC; font-weight:700;">{stamp}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Versioning &amp; lineage</span> <span style="font-size:0.6em; background:rgba(251,191,36,0.12); color:#FBBF24; border-radius:20px; padding:2px 8px; margin-top:2px;">General purpose</span></p>
+</div>
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#34D399; font-weight:700;">{pipload}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Data, Metadata &amp; Inventories loading</span> <span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span></p>
+</div>
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#34D399; font-weight:700;">{pipdata}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Survey data preparation</span> <span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span></p>
+</div>
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(251,191,36,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#FBBF24; font-weight:700;">{pipaux}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Auxiliary data orchestration</span> <span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span></p>
+</div>
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(129,140,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<p><span style="font-family:monospace; font-size:0.85em; color:#A5B4FC; font-weight:700;">{myrror}</span> <span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Comparison &amp; diff reporting</span> <span style="font-size:0.6em; background:rgba(251,191,36,0.12); color:#FBBF24; border-radius:20px; padding:2px 8px; margin-top:2px;">General purpose</span></p>
+</div>
+</div>
+</section>
+<section class="slide level2 center">
+
+</section>
 <section>
-<section id="the-big-picture" class="title-slide slide level1 section-slide center">
-<h1>The Big Picture</h1>
+<section id="auxiliary-data---the-big-picture" class="title-slide slide level1 section-slide center">
+<h1>Auxiliary Data - The Big Picture</h1>
 <div class="subtitle-text">
-<p>What is the pipeline responsible for? How is it built?</p>
+<p>What is the aux data pipeline responsible for? How is it built?</p>
 </div>
 </section>
 <section id="one-main-orchestrator---pipaux" class="slide level2 center">
@@ -183,8 +268,8 @@ Structured diff reports across releases and within-release vintages.
 </div>
 </div>
 </section>
-<section id="pipeline-objectives" class="slide level2 center">
-<h2>Pipeline Objectives</h2>
+<section id="aux-data-pipeline-objectives" class="slide level2 center">
+<h2>Aux Data Pipeline Objectives</h2>
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0.4em;">
 <div style="background:rgba(56,189,248,0.07); border:1px solid rgba(56,189,248,0.2); border-left:3px solid #38BDF8; border-radius:8px; padding:10px 14px; display:flex; gap:12px; align-items:flex-start;">
 <span class="step-badge" style="flex-shrink:0;">1</span>
@@ -240,10 +325,10 @@ Structured diff reports across releases and within-release vintages.
 
 </section></section>
 <section>
-<section id="how-we-get-there" class="title-slide slide level1 section-slide center">
-<h1>How we get there</h1>
+<section id="how-do-we-get-there" class="title-slide slide level1 section-slide center">
+<h1>How do we get there?</h1>
 <div class="subtitle-text">
-<p>The new pipeline at a glance - high level overview of its structure, components and workflow</p>
+<p>The new aux data pipeline at a glance - high level overview of its structure, components and workflow</p>
 </div>
 </section>
 <section id="high-level-structure" class="slide level2 slide-top center" data-background-image="pipeline-at-a-glance.svg" data-background-size="contain" data-background-position="center">

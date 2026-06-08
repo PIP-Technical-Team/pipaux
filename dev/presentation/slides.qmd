@@ -20,10 +20,101 @@ format:
       theme: dark
 ---
 
-# The Big Picture {.section-slide .center}
+---
+
+## Introducing the New PIP Pipeline 
+::: {style="font-size:0.8em; color:#94A3B8; max-width:860px; margin:0 auto 1.2em auto; text-align:center;"}
+An interconnected ecosystem of R packages — each covering a distinct pipeline stage, all sharing the same guarantees: release-scoped, versioned, validated, logged, and tracks changes.
+:::
+
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px;">
+
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Release-scoped by design</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Every artifact is tied to a working release — nothing floats outside a versioned context.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px;">{pipfun}</span>
+</div>
+
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Smart, dependency-aware rebuilding</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Steps are never reprocessed without a reason — changes propagate only where needed.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px; margin-right:4px;">{pipfun}</span>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{stamp}</span>
+</div>
+
+<div style="background:rgba(129,140,248,0.07); border-left:3px solid #818CF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Versioning & time-travel</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Content-hashed artifacts with full lineage tracking — any version, any point in time.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{stamp}</span>
+</div>
+
+<div style="background:rgba(56,189,248,0.07); border-left:3px solid #38BDF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Audit logging & error resilience</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Every step is logged — successes, warnings, failures. The pipeline never fails silently.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(56,189,248,0.15); color:#38BDF8; border-radius:4px; padding:2px 7px;">{pipfun}</span>
+</div>
+
+<div style="background:rgba(52,211,153,0.07); border-left:3px solid #34D399; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Double-stage validation</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Input and output checks at every stage — errors caught early, never propagated silently.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(52,211,153,0.15); color:#34D399; border-radius:4px; padding:2px 7px; margin-right:4px;">{pipdata}</span>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(52,211,153,0.15); color:#34D399; border-radius:4px; padding:2px 7px;">{pipaux}</span>
+</div>
+
+<div style="background:rgba(129,140,248,0.07); border-left:3px solid #818CF8; border-radius:8px; padding:12px 15px;">
+<div style="font-weight:700; color:#E2E8F0; font-size:0.85em; margin-bottom:4px;">Cross-release comparison</div>
+<div style="font-size:0.72em; color:#94A3B8; margin-bottom:10px;">Structured diffs across releases and vintages — structural, type-level, and value-level.</div>
+<span style="font-family:monospace; font-size:0.75em; background:rgba(129,140,248,0.15); color:#A5B4FC; border-radius:4px; padding:2px 7px;">{myrror}</span>
+</div>
+
+</div>
+
+<div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(56,189,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#38BDF8; font-weight:700;">{pipfun}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Release coordination & logging</span>
+<span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(129,140,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#A5B4FC; font-weight:700;">{stamp}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Versioning & lineage</span>
+<span style="font-size:0.6em; background:rgba(251,191,36,0.12); color:#FBBF24; border-radius:20px; padding:2px 8px; margin-top:2px;">General purpose</span>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#34D399; font-weight:700;">{pipload}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Data, Metadata & Inventories loading</span>
+<span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#34D399; font-weight:700;">{pipdata}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Survey data preparation</span>
+<span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(251,191,36,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#FBBF24; font-weight:700;">{pipaux}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Auxiliary data orchestration</span>
+<span style="font-size:0.6em; background:rgba(56,189,248,0.1); color:#38BDF8; border-radius:20px; padding:2px 8px; margin-top:2px;">PIP</span>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(15,23,42,0.6); border:1px solid rgba(129,140,248,0.25); border-radius:10px; padding:8px 14px; min-width:120px;">
+<span style="font-family:monospace; font-size:0.85em; color:#A5B4FC; font-weight:700;">{myrror}</span>
+<span style="font-size:0.63em; color:#64748B; text-align:center; line-height:1.4;">Comparison & diff reporting</span>
+<span style="font-size:0.6em; background:rgba(251,191,36,0.12); color:#FBBF24; border-radius:20px; padding:2px 8px; margin-top:2px;">General purpose</span>
+</div>
+
+</div>
+
+---
+
+# Auxiliary Data - The Big Picture {.section-slide .center}
 
 ::: subtitle-text
-What is the pipeline responsible for? How is it built?
+What is the aux data pipeline responsible for? How is it built?
 :::
 
 ---
@@ -60,7 +151,7 @@ Takes [raw data from different sources]{.text-accent}, [cleans, validates, and f
 
 ---
 
-## Pipeline Objectives
+## Aux Data Pipeline Objectives
 
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0.4em;">
 
@@ -108,10 +199,10 @@ Takes [raw data from different sources]{.text-accent}, [cleans, validates, and f
 
 ---
 
-# How we get there {.section-slide .center}
+# How do we get there? {.section-slide .center}
 
 ::: subtitle-text
-The new pipeline at a glance - high level overview of its structure, components and workflow
+The new aux data pipeline at a glance - high level overview of its structure, components and workflow
 :::
 
 ---
