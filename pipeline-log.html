@@ -47,13 +47,13 @@ body::before {
 
 .log-terminal {
   position: relative; z-index: 1;
-  width: 100%; max-width: 780px;
+  width: 100%; max-width: 1200px;
   background: rgba(0,12,8,0.9);
   border: 1px solid rgba(16,217,160,0.2);
   border-radius: 12px;
-  padding: 14px;
+  padding: 22px;
   font-family: 'Space Mono', monospace;
-  font-size: 1.05rem;
+  font-size: 1.55rem;
 }
 
 .lt-header {
@@ -70,7 +70,7 @@ body::before {
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
 
 #log-stream {
-  height: 480px;
+  height: 680px;
   overflow: hidden;
   position: relative;
 }
@@ -85,7 +85,7 @@ body::before {
   display: flex; gap: 8px; line-height: 1.8;
 }
 .ll-ts   { color: var(--text-f); flex-shrink: 0; }
-.ll-step { flex-shrink: 0; padding: 0 5px; border-radius: 2px; font-size: 0.88rem; }
+.ll-step { flex-shrink: 0; padding: 0 6px; border-radius: 2px; font-size: 1.1rem; }
 .ll-m    { color: var(--purp-s); flex-shrink: 0; }
 .ll-msg  { color: var(--text-f); }
 
@@ -103,8 +103,8 @@ body::before {
   display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px;
 }
 .tag {
-  display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.88rem;
-  border-radius: 4px; padding: 2px 7px; border: 1px solid;
+  display: inline-block; font-family: 'Space Mono', monospace; font-size: 1.1rem;
+  border-radius: 4px; padding: 3px 9px; border: 1px solid;
 }
 .tag-blue   { color:var(--blue-s); border-color:rgba(74,184,255,0.3);   background:rgba(26,143,255,0.14); }
 .tag-purple { color:var(--purp-s); border-color:rgba(167,139,250,0.3);  background:rgba(139,92,246,0.14); }
