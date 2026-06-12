@@ -155,8 +155,12 @@ auto_aux_update <- function(
 
       before_hash <- read_signature_file(aux_file, maindir, branch)
       # Run the pip_.* function
-      match.fun(fn)(maindir = maindir, branch = branch) |>
-        suppressMessages()
+      run_aux_update_with_retry(
+        update_fn = match.fun(fn),
+        fn_name = fn,
+        maindir = maindir,
+        branch = branch
+      )
       after_hash <- read_signature_file(aux_file, maindir, branch)
 
       # Use !isTRUE(== ) rather than != so that NA values (returned when the
@@ -194,32 +198,7 @@ auto_aux_update <- function(
     aux_file_last_updated(maindir, names(dependencies), branch)
 
   if (length(aux_fns) > 0 && files_changed) {
-    # Write the latest auxiliary file and corresponding hash to csv
-    # Always save at the end.
-    # sha - hash object of current csv file in Data/git_metadata.csv
-    # content - base64 of changed data
-    out <- gh::gh(
-      "GET /repos/{owner}/{repo}/contents/{file_path}",
-      owner = "PIP-Technical-Team",
-      repo = "pipaux",
-      file_path = "Data/git_metadata.csv",
-      .params = list(ref = "metadata")
-    )
-    # There is no way to update only the lines which has changed using Github API
-    # We need to update the entire file every time. Refer - https://stackoverflow.com/a/21315234/3962914
-    res <- gh::gh(
-      "PUT /repos/{owner}/{repo}/contents/{path}",
-      owner = "PIP-Technical-Team",
-      repo = "pipaux",
-      path = "Data/git_metadata.csv",
-      .params = list(
-        branch = "metadata",
-        message = "updating csv file",
-        sha = out$sha,
-        content = convert_df_to_base64(org_data)
-      ),
-      .token = creds$password
-    )
+    update_git_metadata_with_retry(org_data = org_data, token = creds$password)
   }
   cli::cli_h2("File updated status.")
   knitr::kable(last_updated_time)
@@ -522,6 +501,104 @@ fetch_repo_sha <- function(owner, repo, branch) {
       NA_character_
     }
   )
+}
+
+is_github_sha_conflict_error <- function(e) {
+  message <- conditionMessage(e)
+
+  grepl("GitHub API error \\(409\\)", message) &&
+    grepl("does not match", message)
+}
+
+run_aux_update_with_retry <- function(
+  update_fn,
+  fn_name,
+  maindir,
+  branch,
+  max_attempts = 3L,
+  wait_seconds = 1
+) {
+  attempt <- 1L
+
+  repeat {
+    err <- NULL
+    out <- tryCatch(
+      suppressMessages(update_fn(maindir = maindir, branch = branch)),
+      error = function(e) {
+        err <<- e
+        NULL
+      }
+    )
+
+    if (is.null(err)) {
+      return(invisible(out))
+    }
+
+    should_retry <- is_github_sha_conflict_error(err) && attempt < max_attempts
+
+    if (!should_retry) {
+      stop(err)
+    }
+
+    cli::cli_alert_warning(
+      "SHA conflict while running {.field {fn_name}}. Retrying ({attempt}/{max_attempts})..."
+    )
+    Sys.sleep(wait_seconds * attempt)
+    attempt <- attempt + 1L
+  }
+}
+
+update_git_metadata_with_retry <- function(
+  org_data,
+  token,
+  max_attempts = 3L,
+  wait_seconds = 1
+) {
+  attempt <- 1L
+
+  repeat {
+    out <- gh::gh(
+      "GET /repos/{owner}/{repo}/contents/{file_path}",
+      owner = "PIP-Technical-Team",
+      repo = "pipaux",
+      file_path = "Data/git_metadata.csv",
+      .params = list(ref = "metadata")
+    )
+
+    result <- tryCatch(
+      gh::gh(
+        "PUT /repos/{owner}/{repo}/contents/{path}",
+        owner = "PIP-Technical-Team",
+        repo = "pipaux",
+        path = "Data/git_metadata.csv",
+        .params = list(
+          branch = "metadata",
+          message = "updating csv file",
+          sha = out$sha,
+          content = convert_df_to_base64(org_data)
+        ),
+        .token = token
+      ),
+      error = identity
+    )
+
+    if (!inherits(result, "error")) {
+      return(invisible(result))
+    }
+
+    should_retry <- is_github_sha_conflict_error(result) &&
+      attempt < max_attempts
+
+    if (!should_retry) {
+      stop(result)
+    }
+
+    cli::cli_alert_warning(
+      "SHA conflict while updating {.file Data/git_metadata.csv}. Retrying ({attempt}/{max_attempts})..."
+    )
+    Sys.sleep(wait_seconds * attempt)
+    attempt <- attempt + 1L
+  }
 }
 
 # expand_with_derived_measures --------------------------------------------
