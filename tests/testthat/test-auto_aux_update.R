@@ -267,3 +267,96 @@ test_that("read_git_metadata falls back to packaged metadata", {
   expect_equal(out$Repo, "PIP-Technical-Team/aux_ppp")
   expect_equal(out$hash, "abc123")
 })
+
+test_that("is_github_sha_conflict_error detects stale SHA errors", {
+  conflict_error <- simpleError(
+    "GitHub API error (409): gdp.csv does not match abcdef"
+  )
+  non_conflict_error <- simpleError("GitHub API error (422): branch missing")
+
+  expect_true(is_github_sha_conflict_error(conflict_error))
+  expect_false(is_github_sha_conflict_error(non_conflict_error))
+})
+
+test_that("run_aux_update_with_retry retries on SHA conflict and succeeds", {
+  attempts <- 0L
+
+  flaky_update <- function(maindir, branch) {
+    attempts <<- attempts + 1L
+
+    if (attempts == 1L) {
+      stop("GitHub API error (409): gdp.csv does not match abcdef")
+    }
+
+    invisible(TRUE)
+  }
+
+  expect_no_error(
+    run_aux_update_with_retry(
+      update_fn = flaky_update,
+      fn_name = "pip_gdp",
+      maindir = tempdir(),
+      branch = "DEV",
+      max_attempts = 2L,
+      wait_seconds = 0
+    )
+  )
+  expect_equal(attempts, 2L)
+})
+
+test_that("run_aux_update_with_retry does not retry non-409 errors", {
+  attempts <- 0L
+
+  failing_update <- function(maindir, branch) {
+    attempts <<- attempts + 1L
+    stop("GitHub API error (422): branch missing")
+  }
+
+  expect_error(
+    run_aux_update_with_retry(
+      update_fn = failing_update,
+      fn_name = "pip_gdp",
+      maindir = tempdir(),
+      branch = "DEV",
+      max_attempts = 3L,
+      wait_seconds = 0
+    ),
+    "422"
+  )
+  expect_equal(attempts, 1L)
+})
+
+test_that("update_git_metadata_with_retry retries after SHA conflict", {
+  call_count <- 0L
+
+  testthat::local_mocked_bindings(
+    gh = function(endpoint, ...) {
+      if (grepl("GET /repos", endpoint)) {
+        return(list(sha = paste0("sha", call_count + 1L)))
+      }
+
+      call_count <<- call_count + 1L
+
+      if (call_count == 1L) {
+        stop("GitHub API error (409): git_metadata.csv does not match deadbeef")
+      }
+
+      list(content = list(sha = "updated"))
+    },
+    .package = "gh"
+  )
+
+  expect_no_error(
+    update_git_metadata_with_retry(
+      org_data = data.table::data.table(
+        Repo = "PIP-Technical-Team/aux_gdp",
+        hash = "abc",
+        branch = "DEV"
+      ),
+      token = "fake-token",
+      max_attempts = 2L,
+      wait_seconds = 0
+    )
+  )
+  expect_equal(call_count, 2L)
+})
