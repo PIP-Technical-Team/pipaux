@@ -155,7 +155,7 @@ get_aux_changes <- function(measure = "cpi",
   new_df <- tryCatch({
     pipload::load_aux_data(measure = measure, verbose = verbose)
   }, error = function(e) {
-    cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
+    if (verbose) cli::cli_alert_danger("Failed to load data for {.strong {measure}} in current release {.strong {release}}")
     stop(e)
   })
 
@@ -167,13 +167,13 @@ get_aux_changes <- function(measure = "cpi",
     qs2::qs_read(file = id_path)
     #pipload::pip_read(id = id_path, format = "qs2", verbose = verbose)
   }, error = function(e) {
-    cli::cli_alert_warning(
+    if (verbose) cli::cli_alert_warning(
       "Failed to load OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
     return(NULL)
   })
 
   if (is.null(old_df)) {
-    cli::cli_alert_warning(
+    if (verbose) cli::cli_alert_warning(
       "Empty OLD data for {.strong {measure}} in release {.strong {old_release}}. Comparison will be skipped.")
     return(invisible(NULL))
   }
@@ -181,14 +181,14 @@ get_aux_changes <- function(measure = "cpi",
   key_cols <- stamp::st_get_pk(new_df)
   
   if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
-    cli::cli_abort("Key variables could not be retrieved from data attributes.")
+    if (verbose) cli::cli_abort("Key variables could not be retrieved from data attributes.")
   }
   if (!all(key_cols %in% names(old_df))) {
-    cli::cli_abort("Some key columns are missing in the old dataset: {setdiff(key_cols, names(old_df))}")
+    if (verbose) cli::cli_abort("Some key columns are missing in the old dataset: {setdiff(key_cols, names(old_df))}")
   }
 
   if (verbose) {
-    cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
+    if (verbose) cli::cli_alert_info("Keys used for comparison: {.var {key_cols}}")
   }
 
   # common_cols <- intersect(names(new_df), names(old_df))
@@ -320,7 +320,7 @@ compare_vintage_versions <- function(measure,
 
   # Load the most recent version
   new_df <- tryCatch({
-    pipload::load_aux_data(measure = measure)
+    pipload::load_aux_data(measure = measure, verbose = verbose)
   },
   error = function(e) {
     cli::cli_alert_danger("Failed to load latest version of {.strong {measure}}.")
@@ -360,7 +360,7 @@ compare_vintage_versions <- function(measure,
   versions_table <- tryCatch({
     stamp::st_versions(path = paste0(measure, ".qs2"), alias = "aux")
   }, error = function(e) {
-    cli::cli_alert_danger("Failed to retrieve version metadata for {.strong {measure}}: {e$message}")
+    if (verbose) cli::cli_alert_danger("Failed to retrieve version metadata for {.strong {measure}}: {e$message}")
     NULL
   })
 
@@ -384,7 +384,7 @@ compare_vintage_versions <- function(measure,
   if (nrow(versions_table) > abs(version)) {
     old_version_id <- versions_table$version_id[abs(version) + 1]
   } else {
-    cli::cli_alert_warning(
+    if (verbose) cli::cli_alert_warning(
       "Cannot retrieve old version ID. Ensure enough versions exist."
     )
     old_version_id <- NA_character_
@@ -401,14 +401,14 @@ compare_vintage_versions <- function(measure,
   key_cols <- stamp::st_get_pk(new_df)
 
   if (length(key_cols) == 0) {
-    cli::cli_abort("No key columns found in data attributes.")
+    if (verbose) cli::cli_abort("No key columns found in data attributes.")
   }
 
   # Ensure key columns exist in both datasets
   missing_keys <- setdiff(key_cols, names(old_df))
 
   if (length(missing_keys) > 0) {
-    cli::cli_abort(
+    if (verbose) cli::cli_abort(
       "Old version of {.strong {measure}} is missing key columns: {paste(missing_keys, collapse=', ')}"
     )
   }
@@ -436,7 +436,7 @@ compare_vintage_versions <- function(measure,
       }
     )
   }, error = function(e) {
-    cli::cli_alert_danger(
+    if (verbose) cli::cli_alert_danger(
       "myrror comparison failed for measure {.strong {measure}}: {e$message}"
     )
     NULL
@@ -466,11 +466,11 @@ compare_vintage_versions <- function(measure,
 
   # Report results
   if (!is.null(diff_vals) || !is.null(diff_rows)) {
-    cli::cli_alert_success(
+    if (verbose) cli::cli_alert_success(
       "Vintage comparison complete for {.strong {measure}}. Differences detected."
     )
   } else {
-    cli::cli_alert_success(
+    if (verbose) cli::cli_alert_success(
       "Vintage comparison complete for {.strong {measure}}. No differences found."
     )
   }
