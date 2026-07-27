@@ -6,6 +6,10 @@ Authors@R: c(
                    family = "Castaneda",
                    role = c("aut", "cre"),
                    email = "acastanedaa@worldbank.org"),
+            person(given = "Rossana",
+                    family = "Tatulli",
+                    role = c("aut"),
+                    email = "rtatulli@worldbank.org"),
             person(given = "Tony",
                    family = "Fujs",
                    role = c("aut"),
@@ -37,19 +41,17 @@ Suggests:
 Imports: 
     stamp,
     haven,
-    digest,
     fst,
     readr,
     data.table,
     purrr,
     fs,
     magrittr,
-    readxl,
     dplyr,
     cli,
     pipload (>= 0.1.4.9002),
     yaml,
-    qs,
+    qs2,
     glue,
     pipfun (>=  0.0.2),
     lifecycle,
@@ -60,8 +62,8 @@ Imports:
     rlang
 VignetteBuilder: knitr
 Remotes: 
-    github::PIP-Technical-Team/pipload@DEV_v2,
-    github::PIP-Technical-Team/pipfun@DEV_v2,
+    github::PIP-Technical-Team/pipload@PROD,
+    github::PIP-Technical-Team/pipfun@PROD,
     github::PIP-Technical-Team/myrror
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3

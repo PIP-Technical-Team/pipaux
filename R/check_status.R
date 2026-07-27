@@ -17,7 +17,9 @@
 #' @keywords internal
 #'
 #' @examples
+#' \dontrun{
 #' check_github_status("cpi", "aux_cpi", "myuser", "20250101_TEST")
+#' }
 check_github_status <- function(measure,
                                 repo,
                                 owner,
