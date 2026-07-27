@@ -491,6 +491,189 @@ compare_vintage_versions <- function(measure,
   return(invisible(result))
 }
 
+#' Compare two auxiliary data versions by explicit version IDs
+#'
+#' Loads two specific versions of the same auxiliary measure using explicit
+#' version IDs and compares them using the same `myrror`-based logic
+#' used by vintage comparisons.
+#'
+#' @param measure Character. The name of the auxiliary measure to compare
+#'   (e.g., `"cpi"`, `"gdp"`).
+#' @param new_version_id Character scalar. Version ID (hash) to use as the
+#'   newer/reference dataset.
+#' @param old_version_id Character scalar. Version ID (hash) to use as the
+#'   older/comparison dataset.
+#' @param verbose Logical. If `TRUE`, displays informative messages in the
+#'   console. Default is `FALSE`.
+#'
+#' @return Invisibly returns a named list containing:
+#'   \describe{
+#'     \item{diff_values}{A data table of value-level differences across matched
+#'       rows and columns. Columns with `.x` suffix refer to `new_version_id`;
+#'       `.y` suffix refers to `old_version_id`. `NULL` if no differences found.}
+#'     \item{diff_rows}{A data table of rows added or removed between versions,
+#'       with `change_type` column (`"added"` = in `new_version_id` only,
+#'       `"removed"` = in `old_version_id` only). `NULL` if no row differences found.}
+#'   }
+#'
+#'   The list also has attributes:
+#'   \describe{
+#'     \item{key_cols}{Character vector of primary key columns used for comparison.}
+#'     \item{measure}{Character string of the measure name.}
+#'     \item{new_version_id}{Character string of the newer version ID.}
+#'     \item{old_version_id}{Character string of the older version ID.}
+#'     \item{new_path}{Character string path to the newer version snapshot directory.}
+#'     \item{old_path}{Character string path to the older version snapshot directory.}
+#'     \item{release}{Character string of the current release identifier.}
+#'   }
+#'
+#' @seealso [compare_vintage_versions()], [pipload::load_aux_data()],
+#'   [myrror::myrror()]
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' compare_aux_version_ids(
+#'   measure = "cpi",
+#'   new_version_id = "v_01J9ABCDEF123",
+#'   old_version_id = "v_01J8UVWXYZ456"
+#' )
+#' }
+compare_aux_version_ids <- function(measure,
+                                    new_version_id,
+                                    old_version_id,
+                                    verbose = FALSE) {
+
+  stopifnot(is.character(measure), length(measure) == 1)
+
+  if (!is.character(new_version_id) || length(new_version_id) != 1 ||
+      is.na(new_version_id) || !nzchar(new_version_id)) {
+    cli::cli_abort("`new_version_id` must be a non-empty character scalar.")
+  }
+
+  if (!is.character(old_version_id) || length(old_version_id) != 1 ||
+      is.na(old_version_id) || !nzchar(old_version_id)) {
+    cli::cli_abort("`old_version_id` must be a non-empty character scalar.")
+  }
+
+  wrk_release <- get_from_auxenv("wrk_release")
+  release <- paste0(wrk_release$release, "_", wrk_release$identity)
+
+  new_df <- tryCatch({
+    pipload::load_aux_data(
+      measure = measure,
+      version = new_version_id,
+      verbose = verbose
+    )
+  }, error = function(e) {
+    cli::cli_alert_danger(
+      "Failed to load {.strong {measure}} for new version {.strong {new_version_id}}."
+    )
+    stop(e)
+  })
+
+  old_df <- tryCatch({
+    pipload::load_aux_data(
+      measure = measure,
+      version = old_version_id,
+      verbose = verbose
+    )
+  }, error = function(e) {
+    cli::cli_alert_danger(
+      "Failed to load {.strong {measure}} for old version {.strong {old_version_id}}."
+    )
+    stop(e)
+  })
+
+  aux_data_path <- get_from_auxenv("aux_data_path")
+  versions_dir <- fs::path(aux_data_path, paste0(measure, ".qs2"), "versions")
+  new_path <- fs::path(versions_dir, new_version_id)
+  old_path <- fs::path(versions_dir, old_version_id)
+
+  key_cols <- stamp::st_get_pk(new_df)
+
+  if (is.null(key_cols) || !is.character(key_cols) || length(key_cols) == 0) {
+    cli::cli_abort("Key variables could not be retrieved from data attributes.")
+  }
+
+  missing_keys <- setdiff(key_cols, names(old_df))
+
+  if (length(missing_keys) > 0) {
+    cli::cli_abort(
+      "Old version of {.strong {measure}} is missing key columns: {paste(missing_keys, collapse=', ')}"
+    )
+  }
+
+  data.table::setorderv(new_df, cols = key_cols)
+  data.table::setorderv(old_df, cols = key_cols)
+
+  myr <- tryCatch({
+    withCallingHandlers(
+      myrror::myrror(
+        dfx = new_df,
+        dfy = old_df,
+        by = key_cols,
+        compare_type = FALSE,
+        compare_values = TRUE,
+        extract_diff_values = TRUE,
+        interactive = FALSE,
+        verbose = verbose
+      ),
+      warning = function(w) {
+        if (grepl("Overidentified match/join", conditionMessage(w))) {
+          invokeRestart("muffleWarning")
+        }
+      }
+    )
+  }, error = function(e) {
+    cli::cli_alert_danger(
+      "myrror comparison failed for measure {.strong {measure}}: {e$message}"
+    )
+    NULL
+  })
+
+  if (is.null(myr)) {
+    diff_vals <- NULL
+    diff_rows <- NULL
+  } else {
+    diff_vals <- myrror::extract_diff_table(
+      myrror_object = myr,
+      by = key_cols,
+      output = "simple",
+      interactive = FALSE
+    )
+    diff_rows <- myrror::extract_diff_rows(
+      myrror_object = myr,
+      by = key_cols,
+      output = "simple",
+      verbose = verbose
+    )
+  }
+
+  if (is.null(diff_rows) || nrow(diff_rows) == 0) {
+    diff_rows <- NULL
+  }
+
+  if (!is.null(diff_rows)) {
+    diff_rows[, change_type := fifelse(df == "dfx", "added", "removed")]
+  }
+
+  result <- list(
+    diff_values = diff_vals,
+    diff_rows = diff_rows
+  )
+
+  setattr(result, "key_cols", key_cols)
+  setattr(result, "measure", measure)
+  setattr(result, "new_path", new_path)
+  setattr(result, "old_path", old_path)
+  setattr(result, "new_version_id", new_version_id)
+  setattr(result, "old_version_id", old_version_id)
+  setattr(result, "release", release)
+
+  return(invisible(result))
+}
+
 #' Compare vintage versions across multiple auxiliary data measures
 #'
 #' Applies vintage version comparison across multiple auxiliary data measures.
