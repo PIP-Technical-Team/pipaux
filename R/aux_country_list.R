@@ -11,6 +11,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_countries
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 #' @return logical if `action = "update"` or data.table if `action = "load"`
 aux_country_list <- function(action       = c("update", "load"),

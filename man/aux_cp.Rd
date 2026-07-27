@@ -21,6 +21,8 @@ aux_cp(
 
 \item{tag}{character: specific release to be used in the update.}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \description{

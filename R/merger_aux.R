@@ -1,21 +1,13 @@
 #' Merge auxiliary datasets
 #'
 #' @param aux_data1 auxiliary data one
-#' @param aux_data1 auxiliary data two
+#' @param aux_data2 auxiliary data two
 #' @param merge_type merge/ join type, the default is left join, options (left, right, full, using, master, inner)
 #' @param commn_vars option to keep or retain common variables, default is TRUE
+#' @param ... Additional arguments passed to joyn functions.
 #'
 #' @return data.table with key information
 #' @export
-#'
-#' @examples
-#' pfw <- pipload::load_aux_data("pfw")
-#' ppp <- pipload::load_aux_data("ppp")
-#' pfw_ppp <- merger_aux(pfw, ppp)
-#'
-#' cpi <- pipload::load_aux_data("cpi")
-#' pfw_cpi <- merger_aux(cpi, pfw, merge_type = "right", commn_vars = FALSE)
-#' cpi_pfw <- merger_aux(cpi, pfw)
 #'
 merger_aux <- function(aux_data1,
                        aux_data2,

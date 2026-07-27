@@ -4,6 +4,7 @@
 #'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_sna <- function(action          = c("update", "load"),
                     owner           = getOption("pipfun.ghowner"),
@@ -152,6 +153,8 @@ sna_fy_validate_raw <- function(sna_fy, detail = getOption("pipaux.detail.raw"))
 #' @inheritParams aux_gdp
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param maindir character: Main directory for the package.
+#' @param from character: Source to load data from.
 #' @export
 fake_aux_sna <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),

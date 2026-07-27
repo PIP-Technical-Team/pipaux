@@ -124,7 +124,9 @@ check_github_status <- function(measure,
 #' @keywords internal
 #'
 #' @examples
+#' \dontrun{
 #' check_y_drive_status("cpi")
+#' }
 check_y_drive_status <- function(measure,
                                  verbose = TRUE) {
   
@@ -298,7 +300,9 @@ check_y_drive_status <- function(measure,
 #' @keywords internal
 #'
 #' @examples
+#' \dontrun{
 #' check_status("cpi")
+#' }
 check_status <- function(measure,
                          repo    = paste0("aux_", measure),
                          owner   = getOption("pipfun.ghowner"),
@@ -395,7 +399,9 @@ check_status <- function(measure,
 #' @seealso [check_status()]
 #'
 #' @examples
+#' \dontrun{
 #' get_fs_status("cpi")
+#' }
 get_fs_status <- function(measure,
                           repo    = paste0("aux_", measure),
                           owner   = getOption("pipfun.ghowner"),

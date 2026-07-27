@@ -20,6 +20,8 @@ memory.}
 \code{getOption("pipfun.ghowner")}}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
 }
 \description{
 Update or load a dataset with regions.

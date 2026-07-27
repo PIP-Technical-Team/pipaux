@@ -4,6 +4,7 @@
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_pfw
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_metadata <- function(action  = c("update", "load"),
                          owner   = getOption("pipfun.ghowner"),
@@ -44,6 +45,7 @@ aux_metadata <- function(action  = c("update", "load"),
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
 #' @inheritParams aux_metadata
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @return logical. TRUE if saved correctly. FALSE if error happened
 #' @export
 aux_metadata_update <- function(owner   = getOption("pipfun.ghowner"),

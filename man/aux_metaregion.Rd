@@ -19,6 +19,8 @@ memory.}
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{tag}{character: specific release to be used in the update.}
 }
 \description{

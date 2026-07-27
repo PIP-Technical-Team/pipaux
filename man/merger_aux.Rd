@@ -13,25 +13,19 @@ merger_aux(
 )
 }
 \arguments{
-\item{aux_data1}{auxiliary data two}
+\item{aux_data1}{auxiliary data one}
+
+\item{aux_data2}{auxiliary data two}
 
 \item{merge_type}{merge/ join type, the default is left join, options (left, right, full, using, master, inner)}
 
 \item{commn_vars}{option to keep or retain common variables, default is TRUE}
+
+\item{...}{Additional arguments passed to joyn functions.}
 }
 \value{
 data.table with key information
 }
 \description{
 Merge auxiliary datasets
-}
-\examples{
-pfw <- pipload::load_aux_data("pfw")
-ppp <- pipload::load_aux_data("ppp")
-pfw_ppp <- merger_aux(pfw, ppp)
-
-cpi <- pipload::load_aux_data("cpi")
-pfw_cpi <- merger_aux(cpi, pfw, merge_type = "right", commn_vars = FALSE)
-cpi_pfw <- merger_aux(cpi, pfw)
-
 }

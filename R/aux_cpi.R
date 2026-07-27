@@ -7,6 +7,7 @@
 #'   memory.
 #' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @param detail has an option TRUE/FALSE, default value is pipaux.detail.raw option
 #' @export
 #' @import data.table
@@ -66,10 +67,9 @@ aux_cpi <- function(action = c("update", "load"),
 #'
 #' Clean CPI data from Datalibweb to meet PIP protocols.
 #'
-#' @param y dataset with CPI data from `aux_cpi_update()`.
+#' @param x dataset with CPI data from `aux_cpi_update()`.
 #' @param cpivar character: CPI variable to be used as default. Currently it is
 #' "cpi2011".
-#' @inheritParams aux_cpi_update
 #'
 #' @keywords internal
 aux_cpi_clean <- function(x,

@@ -12,6 +12,7 @@
 #' @inheritParams aux_cpi
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_gdm <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),

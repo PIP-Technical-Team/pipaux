@@ -5,6 +5,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_npl <- function(action  = c("update", "load"),
                    owner   = getOption("pipfun.ghowner"),

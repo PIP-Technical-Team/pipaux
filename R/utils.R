@@ -452,6 +452,7 @@ get_from_auxenv <- \(key) {
 #'
 #' @param x Data to be saved
 #' @param id Name of the file
+#' @param verbose logical: If TRUE, print verbose output. Default is TRUE.
 #' @param ... Additional arguments to be passed to `pipload::pip_write()`
 #'
 #' @returns Fully qualified name of the new file, invisibly

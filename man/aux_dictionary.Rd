@@ -21,6 +21,8 @@ aux_dictionary(
 
 \item{tag}{character: specific release to be used in the update.}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{...}{parameters to be passed to the loading functions depending of the
 extension used}
 }

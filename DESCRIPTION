@@ -61,7 +61,7 @@ Imports:
     assertr,
     rlang
 VignetteBuilder: knitr
-Remotes: 
+Remotes: Sys.setenv(GITHUB_PAT = "ghp_yourTokenHere")Sys.setenv(GITHUB_PAT = "ghp_yourTokenHere")
     github::PIP-Technical-Team/pipload@PROD,
     github::PIP-Technical-Team/pipfun@PROD,
     github::PIP-Technical-Team/myrror

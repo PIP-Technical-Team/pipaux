@@ -11,6 +11,8 @@ pip_aux_save(x, id, verbose = TRUE, ...)
 
 \item{id}{Name of the file}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is TRUE.}
+
 \item{...}{Additional arguments to be passed to \code{pipload::pip_write()}}
 }
 \value{

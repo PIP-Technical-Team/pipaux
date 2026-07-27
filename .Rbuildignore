@@ -13,3 +13,9 @@ tmp/
 ^codecov\.yml$
 ^data-raw$
 ^vignettes/articles$
+^Data$
+^README\.html$
+^compound-gpid\.md$
+^dev$
+^pipaux$
+^\.stamp$
