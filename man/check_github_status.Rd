@@ -28,6 +28,8 @@ A named list with:
 Checks if the release branch for a measure is present and up to date with DEV on GitHub.
 }
 \examples{
+\dontrun{
 check_github_status("cpi", "aux_cpi", "myuser", "20250101_TEST")
+}
 }
 \keyword{internal}

@@ -25,6 +25,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Rossana Tatulli \email{rtatulli@worldbank.org}
   \item Tony Fujs \email{tfujs@worldbank.org}
   \item Aleksander Eilertsen \email{aeilertsen@worldbank.org}
 }
