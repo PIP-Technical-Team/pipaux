@@ -40,6 +40,8 @@ updates are needed. If a GitHub update is required, the Y-drive is also
 flagged for update (policy: GitHub update implies Y-drive update).
 }
 \examples{
+\dontrun{
 check_status("cpi")
+}
 }
 \keyword{internal}

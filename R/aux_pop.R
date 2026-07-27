@@ -5,6 +5,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_pop <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
@@ -43,7 +44,7 @@ aux_pop <- function(action = c("update", "load"),
 #'
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param branch character: branch name to load data from GH. If NULL, it will be set to the current release branch.
-#' @param detail has an option TRUE/FALSE, default value is FALSE
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @inheritParams aux_pop
 aux_pop_update <-  function(owner   = getOption("pipfun.ghowner"),
                             branch  = NULL,

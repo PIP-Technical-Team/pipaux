@@ -6,6 +6,7 @@
 #' @param ppp_defaults logical: whether to set default PPP
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),

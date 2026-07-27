@@ -24,6 +24,8 @@ GitHub (via SHA comparison) and with the current generator function code
 (via code hash comparison).
 }
 \examples{
+\dontrun{
 check_y_drive_status("cpi")
+}
 }
 \keyword{internal}

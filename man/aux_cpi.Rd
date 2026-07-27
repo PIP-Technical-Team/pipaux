@@ -22,6 +22,8 @@ memory.}
 
 \item{tag}{character: specific release to be used in the update.}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{detail}{has an option TRUE/FALSE, default value is pipaux.detail.raw option}
 }
 \description{

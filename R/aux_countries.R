@@ -4,6 +4,7 @@
 #'
 #' @inheritParams aux_censoring
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_countries <- function(action  = c("update", "load"),
                           owner   = getOption("pipfun.ghowner"),

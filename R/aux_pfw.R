@@ -5,6 +5,7 @@
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @param action character: Either "load" or "update". Default is "update". If
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @inheritParams pipfun::load_from_gh
 #' @export
 #' @import data.table

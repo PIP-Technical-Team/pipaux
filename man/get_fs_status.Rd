@@ -31,7 +31,9 @@ A non-verbose wrapper around \code{\link[=check_status]{check_status()}}. Return
 with \code{verbose = FALSE}.
 }
 \examples{
+\dontrun{
 get_fs_status("cpi")
+}
 }
 \seealso{
 \code{\link[=check_status]{check_status()}}

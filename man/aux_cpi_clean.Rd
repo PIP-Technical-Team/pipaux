@@ -7,10 +7,10 @@
 aux_cpi_clean(x, cpivar = getOption("pipaux.cpivar"))
 }
 \arguments{
+\item{x}{dataset with CPI data from \code{aux_cpi_update()}.}
+
 \item{cpivar}{character: CPI variable to be used as default. Currently it is
 "cpi2011".}
-
-\item{y}{dataset with CPI data from \code{aux_cpi_update()}.}
 }
 \description{
 Clean CPI data from Datalibweb to meet PIP protocols.

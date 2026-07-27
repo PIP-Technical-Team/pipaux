@@ -11,6 +11,7 @@
 #'
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @param ... Additional arguments passed to [pip_aux_save()] when `action = "update"`.
 #' @export
 aux_censoring  <- function(action  = c("update", "load"),

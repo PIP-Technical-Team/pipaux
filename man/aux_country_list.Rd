@@ -17,6 +17,8 @@ aux_country_list(
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{...}{Additional arguments passed to \code{\link[=pip_aux_save]{pip_aux_save()}} when \code{action = "update"}.}
 }
 \value{

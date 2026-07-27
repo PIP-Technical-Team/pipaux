@@ -24,6 +24,8 @@ aux_ppp(
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{ppp_defaults}{logical: whether to set default PPP}
 }
 \description{

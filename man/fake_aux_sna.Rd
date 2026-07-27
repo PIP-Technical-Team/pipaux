@@ -20,10 +20,14 @@ fake_aux_sna(
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 
+\item{maindir}{character: Main directory for the package.}
+
 \item{branch}{character: either "DEV" or "PROD". Refers to the branch that
 will be used to update either the development server or production.}
 
 \item{tag}{character: specific release to be used in the update.}
+
+\item{from}{character: Source to load data from.}
 }
 \description{
 Fake PIP SNA function

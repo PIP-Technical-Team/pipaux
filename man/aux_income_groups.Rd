@@ -16,6 +16,8 @@ aux_income_groups(
 "update" data will be updated on the system. If "load" data is loaded in
 memory.}
 
+\item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
+
 \item{owner}{character: Github repo owner. Default is
 \code{getOption("pipfun.ghowner")}}
 

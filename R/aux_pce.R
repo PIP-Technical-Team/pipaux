@@ -6,6 +6,7 @@
 #' @inheritParams aux_gdp
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @export
 aux_pce <- function(action  = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),

@@ -2,6 +2,7 @@
 #'
 #' @inheritParams aux_cpi
 #' @inheritParams pipfun::load_from_gh
+#' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #'
 #' @return if `action = "update"` returns logical. If `action = "load"` returns
 #'   a data.table
