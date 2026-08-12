@@ -428,6 +428,16 @@ save_aux_to_gh <- function(df,
                        ext       = "csv",
                        ...) {
 
+  # Create the branch from DEV if it does not yet exist
+  if (!pipfun::confirm_branch_exists(branch = branch, owner = owner, repo = repo)) {
+    pipfun::create_new_branch(
+      owner      = owner,
+      repo       = repo,
+      ref_branch = "DEV",
+      new_branch = branch
+    )
+  }
+
   pipfun::save_to_gh(df = df,
                      repo = repo,
                      owner = owner,
