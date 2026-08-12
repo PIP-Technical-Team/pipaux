@@ -249,6 +249,36 @@ test_that("pfw_validate_output() errors when data is NULL", {
 
 # aux_pfw() / aux_pfw_update() --------------------------------------------
 
+test_that("aux_pfw_clean() updates region_code from country_list", {
+  raw <- data.table::data.table(
+    code = "AAA",
+    region = "BAD_REGION",
+    ref_year = 2019,
+    survname = "SURV_A",
+    comparability = 1,
+    datatype = "C",
+    rep_year = 2019,
+    survey_coverage = "N",
+    surveyid_year = 2019,
+    oth_welfare1_type = ""
+  )
+
+  testthat::local_mocked_bindings(
+    load_aux_data = function(measure, verbose = FALSE) {
+      if (identical(measure, "country_list")) {
+        return(data.table::data.table(country_code = "AAA", region_code = "SSA"))
+      }
+      data.table::data.table()
+    },
+    .package = "pipload"
+  )
+
+  out <- aux_pfw_clean(raw)
+
+  expect_identical(out$country_code, "AAA")
+  expect_identical(out$region_code, "SSA")
+})
+
 test_that("aux_pfw() requires GitHub and filesystem access", {
   skip("requires GitHub and filesystem access")
 })

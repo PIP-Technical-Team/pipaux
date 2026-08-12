@@ -150,6 +150,18 @@ aux_pfw_clean <- function(y) {
 
   x <- x[country_code %in% cl$country_code]
 
+  cl_uni <- unique(cl[, .(country_code, region_code)])
+
+  x <- joyn::joyn(
+    x,
+    cl_uni,
+    by = "country_code",
+    match_type = "m:1",
+    keep = "left",
+    update_values = TRUE,
+    reportvar = FALSE
+  )
+
   x <- unique(x) # remove duplicates
   return(x)
 }
