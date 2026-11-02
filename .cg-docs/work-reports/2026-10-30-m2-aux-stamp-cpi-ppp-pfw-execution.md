@@ -69,3 +69,10 @@
 - Exported the exact supporting commit into an E-drive source archive, installed it with the existing stamp/pipload pins in an isolated E library, verified the installed pipfun remote metadata, and reran all five focused files: 222 assertions pass (84 parent plus 138 child), zero test failures/errors/warnings, five existing external-service skips. The archive extractor's pax-header warning is packaging-only, not a failing test.
 - Independent metadata review (`ses_e6232defcffeG10vqttcQg80ZF`) found no P0-P3 issues. It inspected the supporting published patch and main pins; runtime execution was performed by the main agent.
 - The user authorized a pipaux PROD merge only after corrected exact-head CI passes; that outcome is tracked in orchestration run `20261102T191337Z-pipaux`, not presumed by this pre-push record.
+
+### Documentation Root Correction
+
+- GitHub run `41514056928` at `6f026fe` got past the dependency solve, then failed package lazy loading: `[ENOENT] Failed to search directory '/pip_ingestion_pipeline/pc_data/cache/clean_survey_data'`. `R/zzz.R` initializes legacy globals at load time, so the CI runner needs a cache-directory fixture even though the site needs no survey data.
+- Added job-scoped `PIP_ROOT_DIR` under `runner.temp` and a pre-installation step creating one empty `20200101_2017_01_01_TEST` directory in that documentation root. A nonempty directory listing avoids the existing `max(empty)` initialization warning; the fixture contains no survey files or numerical outputs.
+- Existing dependency setup arguments, site-build command, and non-PR deployment guard are unchanged. No package runtime functions, checks, examples or tests were disabled.
+- Local YAML parsing/step-order validation and package initialization with the analogous isolated E-drive fixture pass with warnings promoted to errors. Reviewer `ses_e6232defcffeG10vqttcQg80ZF` reports no P0-P3 findings in the workflow addition. Final exact-head CI is still required before merging.

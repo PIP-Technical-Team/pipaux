@@ -134,3 +134,11 @@ solve succeeds (126 packages), and 222 focused assertions pass with that exact
 dependency installed. Review found no P0-P3 issues. No workflow, dependency
 coverage, version bound or check was weakened. CI/merge outcome is recorded in
 the orchestration handoff for run `20261102T191337Z-pipaux`.
+
+The next CI run confirmed dependency resolution succeeds, then exposed legacy
+namespace initialization requiring a survey-cache directory. The workflow now
+provides a runner-temporary documentation root with one empty TEST vintage
+directory before dependency installation. It contains no survey data. YAML/
+ordering and warning-free initialization were checked locally; independent
+review found no P0-P3 issues. Existing dependency, build and deployment checks
+remain intact; exact corrected-head CI is still the merge precondition.
