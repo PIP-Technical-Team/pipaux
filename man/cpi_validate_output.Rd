@@ -7,11 +7,16 @@
 cpi_validate_output(cpi, detail = getOption("pipaux.detail.output"))
 }
 \arguments{
-\item{cpi}{clean cpi data, output via \code{aux_cpi_clean}}
+\item{cpi}{clean cpi data (wide pre-melt or persisted long schema)}
 
 \item{detail}{has an option TRUE/FALSE, default value is FALSE}
 }
 \description{
-Validate clean cpi data
+Validates either the pre-melt wide cleaned CPI schema (with \code{year} and
+\code{reporting_level} renamed from \code{aux_cpi_clean()} output) or the persisted
+long CPI schema keyed by \code{country_code}, \code{year}, \code{survey_acronym},
+\code{reporting_level}, and \code{cpi_year}. Schema selection is automatic based on the
+presence of \code{cpi_year} and \code{cpi_value} and absence of wide \code{cpi2011}/\code{cpi2017}
+columns.
 }
 \keyword{internal}

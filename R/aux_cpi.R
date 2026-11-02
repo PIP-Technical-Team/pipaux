@@ -9,13 +9,18 @@
 #' @inheritParams pipfun::load_from_gh
 #' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @param detail has an option TRUE/FALSE, default value is pipaux.detail.raw option
+#' @param ... Additional arguments passed to `pip_aux_save()` when `action = "update"`.
+#' @return For `action = "load"`, the loaded `data.table`. For `action = "update"`,
+#'   invisibly returns the save-result list from `pip_aux_save()` containing
+#'   `path`, `version_id`, and `skipped`.
 #' @export
 #' @import data.table
 aux_cpi <- function(action = c("update", "load"),
                     owner   = getOption("pipfun.ghowner"),
                     tag     = NULL,
                     verbose = FALSE,
-                    detail  = getOption("pipaux.detail.raw")) {
+                    detail  = getOption("pipaux.detail.raw"),
+                    ...) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -50,7 +55,9 @@ aux_cpi <- function(action = c("update", "load"),
     aux_cpi_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose,
+                   ...)
   }
   else {
 
@@ -125,7 +132,7 @@ aux_cpi_clean <- function(x,
   x <- unique(x) # remove duplicates
 
   # Remove any non-WDI countries
-  cl <- pipload::load_aux_data(measure = "country_list")
+  cl <- pipload::load_aux_data(measure = "country_list", verbose = FALSE)
 
   x <- x[country_code %in% cl$country_code]
 
@@ -141,8 +148,9 @@ aux_cpi_clean <- function(x,
 aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
                            detail  = getOption("pipaux.detail.raw"),
                            branch  = NULL,
-                           tag = tag
-                           ) {
+                           tag     = branch,
+                           verbose = FALSE,
+                           ...) {
 
   measure <- "cpi"
 
@@ -182,15 +190,15 @@ aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
   #   ____________________________________________________________________________
   #   Metadata                                                         ####
 
-  key_cols <- c("country_code", "cpi_year",
-                "reporting_level", "year",
-                "survey_acronym")
+  key_cols <- c("country_code", "year",
+                "survey_acronym", "reporting_level",
+                "cpi_year")
 
 
   #   ____________________________________________________________________________
   #   Saving                                                                ####
 
-  # validate cpi and clean data before saving it
+  # validate wide cpi output data before reshaping
   cpi_validate_output(cpi,
                       detail = detail)
 
@@ -228,19 +236,28 @@ aux_cpi_update <- function(owner   = getOption("pipfun.ghowner"),
   setcolorder(cpi,
               c("country_code", "year", "cpi_year", "cpi_value"))
 
-  setorderv(cpi, key_cols)
+  # Validate persisted long schema and primary key before saving
+  cpi_validate_output(cpi,
+                      detail = detail)
+
+  setattr(cpi, "aux_name", "cpi")
+  setattr(cpi, "aux_key", key_cols)
+  setattr(cpi, "gh", gh)
+  setkeyv(cpi, key_cols)
 
   #   ____________________________________________________________________________
   #   Return                                                                ####
 
   saved <- pip_aux_save(
-  x        = cpi,
-  id       = measure,
-  pk       = key_cols,
-  metadata = list(gh = gh),
-  code     = aux_cpi_update,
-  code_label = "aux_cpi_update"
-)
+    x          = cpi,
+    id         = measure,
+    pk         = key_cols,
+    metadata   = list(gh = gh),
+    code       = aux_cpi_update,
+    code_label = "aux_cpi_update",
+    verbose    = verbose,
+    ...
+  )
 
   return(invisible(saved))
 }
@@ -428,12 +445,18 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
 
 #' Validate clean cpi data
 #'
-#' @param cpi clean cpi data, output via `aux_cpi_clean`
+#' Validates either the pre-melt wide cleaned CPI schema (with `year` and
+#' `reporting_level` renamed from `aux_cpi_clean()` output) or the persisted
+#' long CPI schema keyed by `country_code`, `year`, `survey_acronym`,
+#' `reporting_level`, and `cpi_year`. Schema selection is automatic based on the
+#' presence of `cpi_year` and `cpi_value` and absence of wide `cpi2011`/`cpi2017`
+#' columns.
+#'
+#' @param cpi clean cpi data (wide pre-melt or persisted long schema)
 #' @param detail has an option TRUE/FALSE, default value is FALSE
 #' @import data.validator
 #' @importFrom assertr in_set not_na is_uniq
 #' @keywords internal
-#'
 #' @export
 cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output")){
 
@@ -441,66 +464,93 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
 
   report <- data_validation_report()
 
-  validate(cpi, name = "CPI output data validation") |>
-    validate_if(is.character(country_code),
-                description = "`country_code` should be character") |>
-    validate_if(is.integer(year),
-                description = "`year` should be integer") |>
-    validate_if(is.numeric(survey_year),
-                description = "`survey_year` should be numeric") |>
-    validate_if(is.numeric(cpi),
-                description = "`cpi` should be numeric") |>
-    validate_if(is.numeric(ccf),
-                description = "`ccf` should be numeric") |>
-    validate_if(is.character(survey_acronym),
-                description = "`survey_acronym` should be character") |>
-    validate_if(is.numeric(change_cpi2011),
-                description = "`change_cpi2011` should be numeric") |>
-    validate_cols(in_set(c(0, 1)), change_cpi2011,
-                  description = "`change_cpi2011` values within range") |>
-    # validate_if(is.character(cpi_domain),
-    #             description = "`cpi_domain` should be character") |>
-    # validate_cols(in_set(c("National", "Urban/Rural")), cpi_domain,
-    #               description = "`cpi_domian` values within range") |>
-    validate_if(is.numeric(cpi_domain_value),
-                description = "`cpi_domain_value` should be numeric") |>
-    validate_cols(in_set(c(0, 1)), cpi_domain_value,
-                  description = "`cpi_domain_value` values within range") |>
-    validate_if(is.numeric(cpi2017_unadj),
-                description = "`cpi2017_unadj` should be numeric") |>
-    validate_if(is.numeric(cpi2011_unadj),
-                description = "`cpi2011_unadj` should be numeric") |>
-    validate_if(is.numeric(cpi2011),
-                description = "`cpi2011` should be numeric") |>
-    validate_if(is.numeric(cpi2017),
-                description = "`cpi2017` should be numeric") |>
-    validate_cols(is.logical, cpi2005,
-                  description = "`cpi2005` should be logical") |>
-    validate_if(is.character(reporting_level),
-                description = "`reporting_level` should be character") |>
-    validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
-                  description = "`reporting_level` values within range") |>
-    validate_if(is.character(cpi_id),
-                description = "`cpi_id` should be character") |>
-    validate_cols(not_na, country_code, year, survey_acronym, reporting_level,
-                  description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, survey_acronym,
-                        reporting_level),
-                description = "no duplicate records in key variables") |>
-    validate_if(is_uniq(country_code, year, survey_acronym,
-                        reporting_level),
-                description = "no duplicate cpi values") |>
-    add_results(report)
+  is_long_schema <- all(c("cpi_year", "cpi_value") %in% names(cpi)) &&
+    !any(c("cpi2011", "cpi2017") %in% names(cpi))
 
-  num_var_list1 <- grep("cpi2011_", colnames(cpi))
-  num_var_list2 <- grep("cpi2017_", colnames(cpi))
-  num_var_list <- c(num_var_list1, num_var_list2)
-
-  for (i in 1:length(num_var_list)) {
-    validate(cpi, name = "CPI validation") |>
-      validate_cols(is.numeric, num_var_list[i],
-                    description = "variables (with numeric var name) should be numeric") |>
+  if (is_long_schema) {
+    validate(cpi, name = "CPI persisted long output data validation") |>
+      validate_if(is.character(country_code),
+                  description = "`country_code` should be character") |>
+      validate_if(is.integer(year),
+                  description = "`year` should be integer") |>
+      validate_if(is.integer(cpi_year),
+                  description = "`cpi_year` should be integer") |>
+      validate_if(is.numeric(cpi_value),
+                  description = "`cpi_value` should be numeric") |>
+      validate_if(is.numeric(survey_year),
+                  description = "`survey_year` should be numeric") |>
+      validate_if(is.numeric(ccf),
+                  description = "`ccf` should be numeric") |>
+      validate_if(is.character(survey_acronym),
+                  description = "`survey_acronym` should be character") |>
+      validate_if(is.character(reporting_level),
+                  description = "`reporting_level` should be character") |>
+      validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
+                    description = "`reporting_level` values within range") |>
+      validate_cols(not_na, country_code, year, survey_acronym, reporting_level, cpi_year,
+                    description = "no missing values in key variables") |>
+      validate_if(is_uniq(country_code, year, survey_acronym,
+                          reporting_level, cpi_year),
+                  description = "no duplicate records in key variables") |>
       add_results(report)
+  } else {
+    validate(cpi, name = "CPI output data validation") |>
+      validate_if(is.character(country_code),
+                  description = "`country_code` should be character") |>
+      validate_if(is.integer(year),
+                  description = "`year` should be integer") |>
+      validate_if(is.numeric(survey_year),
+                  description = "`survey_year` should be numeric") |>
+      validate_if(is.numeric(cpi),
+                  description = "`cpi` should be numeric") |>
+      validate_if(is.numeric(ccf),
+                  description = "`ccf` should be numeric") |>
+      validate_if(is.character(survey_acronym),
+                  description = "`survey_acronym` should be character") |>
+      validate_if(is.numeric(change_cpi2011),
+                  description = "`change_cpi2011` should be numeric") |>
+      validate_cols(in_set(c(0, 1)), change_cpi2011,
+                    description = "`change_cpi2011` values within range") |>
+      validate_if(is.numeric(cpi_domain_value),
+                  description = "`cpi_domain_value` should be numeric") |>
+      validate_cols(in_set(c(0, 1)), cpi_domain_value,
+                    description = "`cpi_domain_value` values within range") |>
+      validate_if(is.numeric(cpi2017_unadj),
+                  description = "`cpi2017_unadj` should be numeric") |>
+      validate_if(is.numeric(cpi2011_unadj),
+                  description = "`cpi2011_unadj` should be numeric") |>
+      validate_if(is.numeric(cpi2011),
+                  description = "`cpi2011` should be numeric") |>
+      validate_if(is.numeric(cpi2017),
+                  description = "`cpi2017` should be numeric") |>
+      validate_cols(is.logical, cpi2005,
+                    description = "`cpi2005` should be logical") |>
+      validate_if(is.character(reporting_level),
+                  description = "`reporting_level` should be character") |>
+      validate_cols(in_set(c("national", "rural", "urban")), reporting_level,
+                    description = "`reporting_level` values within range") |>
+      validate_if(is.character(cpi_id),
+                  description = "`cpi_id` should be character") |>
+      validate_cols(not_na, country_code, year, survey_acronym, reporting_level,
+                    description = "no missing values in key variables") |>
+      validate_if(is_uniq(country_code, year, survey_acronym,
+                          reporting_level),
+                  description = "no duplicate records in key variables") |>
+      validate_if(is_uniq(country_code, year, survey_acronym,
+                          reporting_level),
+                  description = "no duplicate cpi values") |>
+      add_results(report)
+
+    num_var_list1 <- grep("cpi2011_", colnames(cpi))
+    num_var_list2 <- grep("cpi2017_", colnames(cpi))
+    num_var_list <- c(num_var_list1, num_var_list2)
+
+    for (i in seq_along(num_var_list)) {
+      validate(cpi, name = "CPI validation") |>
+        validate_cols(is.numeric, num_var_list[i],
+                      description = "variables (with numeric var name) should be numeric") |>
+        add_results(report)
+    }
   }
 
   validation_record <- get_results(report, unnest = FALSE) |>

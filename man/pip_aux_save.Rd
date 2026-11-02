@@ -16,7 +16,9 @@ pip_aux_save(x, id, verbose = TRUE, ...)
 \item{...}{Additional arguments to be passed to \code{pipload::pip_write()}}
 }
 \value{
-Fully qualified name of the new file, invisibly
+Invisibly returns the save result list from \code{pipload::pip_write()} /
+  \code{stamp::st_save()} with \code{path}, \code{version_id}, and \code{skipped} (resolving the
+  retained \code{version_id} when a save is skipped under content-based versioning).
 }
 \description{
 Save data to auxiliary data path

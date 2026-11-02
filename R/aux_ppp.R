@@ -7,6 +7,10 @@
 #' @inheritParams aux_pfw
 #' @inheritParams pipfun::load_from_gh
 #' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
+#' @param ... Additional arguments passed to `pip_aux_save()` when `action = "update"`.
+#' @return For `action = "load"`, the loaded `data.table`. For `action = "update"`,
+#'   invisibly returns the save-result list from `pip_aux_save()` containing
+#'   `path`, `version_id`, and `skipped`.
 #' @export
 #' @import data.table
 aux_ppp <- function(action = c("update", "load"),
@@ -14,7 +18,8 @@ aux_ppp <- function(action = c("update", "load"),
                     tag     = NULL,
                     detail  = getOption("pipaux.detail.raw"),
                     verbose = FALSE,
-                    ppp_defaults = TRUE) {
+                    ppp_defaults = TRUE,
+                    ...) {
 
   wrk_release <- get_from_auxenv(key = "wrk_release")
 
@@ -56,7 +61,9 @@ aux_ppp <- function(action = c("update", "load"),
     aux_ppp_update(owner   = owner,
                    branch  = branch,
                    tag     = tag,
-                   detail  = detail)
+                   detail  = detail,
+                   verbose = verbose,
+                   ...)
   }
   else {
     pipload::load_aux_data(measure = measure, verbose = verbose)
@@ -72,6 +79,9 @@ aux_ppp <- function(action = c("update", "load"),
 #'
 #' @keywords internal
 aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
+  if (is.null(default_year)) {
+    default_year <- 2017
+  }
   x <- data.table::as.data.table(y)
 
   y <- melt(x,
@@ -116,15 +126,15 @@ aux_ppp_clean <- function(y, default_year = getOption("pipaux.pppyear")) {
     by = .(code, ppp_year)
   ][
     # Find max adaptation version of the max release
-    d1 == TRUE,
-    d2 := adaptation_version == max(adaptation_version),
+    ,
+    d2 := d1 & (adaptation_version == max(adaptation_version[d1])),
     by = .(code, ppp_year)
   ][
     ,
     # get intersection
     `:=`(
-      ppp_default         = (d1 == TRUE & d2 == TRUE & ppp_year == (default_year)),
-      ppp_default_by_year = (d1 == TRUE & d2 == TRUE),
+      ppp_default         = (d1 & d2 & ppp_year == default_year),
+      ppp_default_by_year = (d1 & d2),
       country_code        = code
     )
   ][
@@ -167,7 +177,8 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            verbose = FALSE,
-                           detail  = getOption("pipaux.detail.raw")) {
+                           detail  = getOption("pipaux.detail.raw"),
+                           ...) {
 
   tag <- branch
 
@@ -237,8 +248,7 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
   ppp_validate_output(ppp = ppp,
                       detail = detail)
 
-
-  if (branch == "main") {
+  if (identical(branch, "main")) {
     branch <- ""
   }
 
@@ -249,26 +259,25 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
 
 
   # Keys identifying the data
-  key_cols <- c("country_code", "reporting_level", "ppp_year", "adaptation_version", "release_version")
+  key_cols <- c("country_code", "reporting_level", "ppp_year", "release_version", "adaptation_version")
   setattr(ppp, "aux_key", key_cols)
 
-  setorderv(ppp,
-           c("country_code", "reporting_level", "ppp_year"))
-
-
+  setkeyv(ppp, key_cols)
 
 
   # _____________________ #####
   # Saving ####
 
 
-  saved <-  pip_aux_save(
-    x        = ppp,
-    id       = measure,
-    pk       = key_cols,
-    metadata = list(gh = gh),
-    code     = aux_ppp_update,
-    code_label = "aux_ppp_update"
+  saved <- pip_aux_save(
+    x          = ppp,
+    id         = measure,
+    pk         = key_cols,
+    metadata   = list(gh = gh),
+    code       = aux_ppp_update,
+    code_label = "aux_ppp_update",
+    verbose    = verbose,
+    ...
   )
 
 
@@ -289,11 +298,19 @@ aux_ppp_update <- function(owner   = getOption("pipfun.ghowner"),
   # # Define key columns for ppp_vintage
   key_cols_vintage <- c("ppp_year", "ppp_rv", "ppp_av")
   setattr(ppp_vintage, "aux_key", key_cols_vintage)
-  pip_aux_save(
-    x        = ppp_vintage,
-    id       = "ppp_vintage",
-    pk       = key_cols_vintage
+  setkeyv(ppp_vintage, key_cols_vintage)
+
+  dots <- list(...)
+  vintage_args <- list(
+    x       = ppp_vintage,
+    id      = "ppp_vintage",
+    pk      = key_cols_vintage,
+    verbose = verbose
   )
+  if (!is.null(dots$alias)) {
+    vintage_args$alias <- dots$alias
+  }
+  do.call(pip_aux_save, vintage_args)
 
   return(invisible(saved))
 }

@@ -155,6 +155,50 @@ test_that("cpi_validate_output() errors when data is NULL", {
   expect_error(cpi_validate_output(cpi = NULL, detail = FALSE))
 })
 
+# helper: valid persisted long cpi data -----------------------------------
+
+make_cpi_long_output <- function(...) {
+  dt <- data.table::data.table(
+    country_code    = c("AAA", "AAA", "BBB", "BBB"),
+    year            = c(2010L, 2010L, 2011L, 2011L),
+    cpi_year        = c(2011L, 2017L, 2011L, 2017L),
+    cpi_value       = c(1.0, 1.1, 1.0, 1.2),
+    survey_year     = c(2010.0, 2010.0, 2011.0, 2011.0),
+    ccf             = c(1.0, 1.0, 1.0, 1.0),
+    survey_acronym  = c("Survey A", "Survey A", "Survey B", "Survey B"),
+    reporting_level = c("national", "national", "urban", "urban")
+  )
+  modifyList(dt, list(...))
+}
+
+test_that("cpi_validate_output() accepts valid persisted long schema", {
+  expect_no_error(cpi_validate_output(cpi = make_cpi_long_output(), detail = FALSE))
+})
+
+test_that("cpi_validate_output() errors on duplicate persisted long key values", {
+  bad <- make_cpi_long_output(
+    country_code    = c("AAA", "AAA", "BBB", "BBB"),
+    year            = c(2010L, 2010L, 2011L, 2011L),
+    cpi_year        = c(2017L, 2017L, 2011L, 2017L),
+    survey_acronym  = c("Survey A", "Survey A", "Survey B", "Survey B"),
+    reporting_level = c("national", "national", "urban", "urban")
+  )
+  expect_error(cpi_validate_output(cpi = bad, detail = FALSE))
+})
+
+test_that("cpi_validate_output() errors when persisted long cpi_year is NA or non-integer", {
+  bad_na <- make_cpi_long_output(cpi_year = c(2011L, NA_integer_, 2011L, 2017L))
+  expect_error(cpi_validate_output(cpi = bad_na, detail = FALSE))
+
+  bad_type <- make_cpi_long_output(cpi_year = c(2011.5, 2017.5, 2011.5, 2017.5))
+  expect_error(cpi_validate_output(cpi = bad_type, detail = FALSE))
+})
+
+test_that("cpi_validate_output() errors when persisted long cpi_value is not numeric", {
+  bad <- make_cpi_long_output(cpi_value = c("a", "b", "c", "d"))
+  expect_error(cpi_validate_output(cpi = bad, detail = FALSE))
+})
+
 # aux_cpi_clean() / aux_cpi() / aux_cpi_update() --------------------------
 
 test_that("aux_cpi_clean() requires pipload filesystem access", {

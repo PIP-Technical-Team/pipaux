@@ -10,7 +10,8 @@ aux_ppp(
   tag = NULL,
   detail = getOption("pipaux.detail.raw"),
   verbose = FALSE,
-  ppp_defaults = TRUE
+  ppp_defaults = TRUE,
+  ...
 )
 }
 \arguments{
@@ -27,6 +28,13 @@ aux_ppp(
 \item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
 
 \item{ppp_defaults}{logical: whether to set default PPP}
+
+\item{...}{Additional arguments passed to \code{pip_aux_save()} when \code{action = "update"}.}
+}
+\value{
+For \code{action = "load"}, the loaded \code{data.table}. For \code{action = "update"},
+  invisibly returns the save-result list from \code{pip_aux_save()} containing
+  \code{path}, \code{version_id}, and \code{skipped}.
 }
 \description{
 Load or update PPP data.

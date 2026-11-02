@@ -46,8 +46,78 @@ test_that("save_aux_to_gh() requires GitHub access", {
 
 # pip_aux_save() ----------------------------------------------------------
 
-test_that("pip_aux_save() requires pipload filesystem access", {
-  skip("requires pipload filesystem access")
+test_that("pip_aux_save() saves data.table and list artifacts and resolves retained version_id on skip", {
+  tmp_base <- Sys.getenv("TMPDIR", unset = "")
+  if (!nzchar(tmp_base)) {
+    tmp_base <- Sys.getenv("TMP", unset = tempdir())
+  }
+  if (grepl("^[Cc]:", tmp_base) && dir.exists("E:/PovcalNet/01.personal/wb384996/PIP/pipaux/.tmp")) {
+    tmp_base <- "E:/PovcalNet/01.personal/wb384996/PIP/pipaux/.tmp"
+  }
+  if (grepl("^[Cc]:", tmp_base)) {
+    cli::cli_abort("Refusing to write temporary test artifacts to C: drive ({.path {tmp_base}}).")
+  }
+  tmp_root <- fs::path(tmp_base, paste0("pipaux-utils-test-", Sys.getpid(), "-", sample.int(1e6, 1)))
+  fs::dir_create(tmp_root, recurse = TRUE)
+
+  stores <- list(stamp:::.stamp_aliases, stamp:::.stamp_state, stamp:::.stamp_opts)
+  old_stores <- lapply(stores, as.list, all.names = TRUE)
+  old_alias <- get_from_auxenv("aux_alias")
+  old_path  <- get_from_auxenv("aux_data_path")
+
+  on.exit({
+    for (i in seq_along(stores)) {
+      rm(list = ls(stores[[i]], all.names = TRUE), envir = stores[[i]])
+      list2env(old_stores[[i]], envir = stores[[i]])
+    }
+    rlang::env_poke(.pipaux, "aux_alias", old_alias)
+    rlang::env_poke(.pipaux, "aux_data_path", old_path)
+    if (fs::dir_exists(tmp_root)) {
+      fs::dir_delete(tmp_root)
+    }
+  }, add = TRUE)
+
+  stamp::st_opts_reset()
+  stamp::st_opts(versioning = "content", code_hash = TRUE)
+  alias_name <- "pipaux_utils_test"
+  stamp::st_init(tmp_root, alias = alias_name, verbose = FALSE)
+  rlang::env_poke(.pipaux, "aux_alias", alias_name)
+  rlang::env_poke(.pipaux, "aux_data_path", tmp_root)
+
+  dt <- data.table::data.table(country_code = c("AAA", "BBB"), val = c(1.0, 2.0))
+  data.table::setattr(dt, "gh", list(gh_raw_sha = "sha1"))
+
+  res1 <- pip_aux_save(dt, id = "dt_test", pk = "country_code", verbose = FALSE)
+  expect_type(res1, "list")
+  expect_false(res1$skipped)
+  expect_true(is.character(res1$version_id) && nzchar(res1$version_id))
+  # Caller's in-memory object keeps its gh attribute
+  expect_identical(attr(dt, "gh")$gh_raw_sha, "sha1")
+
+  # Re-saving identical content with a changed gh attribute skips and returns retained version_id
+  data.table::setattr(dt, "gh", list(gh_raw_sha = "sha2"))
+  res2 <- pip_aux_save(dt, id = "dt_test", pk = "country_code", verbose = FALSE)
+  expect_true(res2$skipped)
+  expect_identical(res2$version_id, res1$version_id)
+
+  # Fallback path: when pipload::pip_write omits version_id on a skipped save, pip_aux_save resolves it from st_versions
+  testthat::with_mocked_bindings(
+    pip_write = function(...) {
+      list(path = "dt_test.qs2", skipped = TRUE, reason = "no_change_policy", version_id = NULL)
+    },
+    .package = "pipload",
+    {
+      res_fb <- pip_aux_save(dt, id = "dt_test", pk = "country_code", verbose = FALSE)
+      expect_true(res_fb$skipped)
+      expect_identical(res_fb$version_id, res1$version_id)
+    }
+  )
+
+  # Non-tabular list compatibility (e.g. aux_cp / aux_censoring)
+  lst <- list(countries = data.table::data.table(a = 1L), regions = data.table::data.table(b = 2L))
+  res_lst <- pip_aux_save(lst, id = "list_test", verbose = FALSE)
+  expect_false(res_lst$skipped)
+  expect_true(is.character(res_lst$version_id) && nzchar(res_lst$version_id))
 })
 
 # last_item() -------------------------------------------------------------

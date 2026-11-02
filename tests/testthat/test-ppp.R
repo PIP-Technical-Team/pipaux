@@ -2,25 +2,30 @@
 
 make_ppp_raw <- function(...) {
   dt <- data.table::data.table(
-    CountryName       = c("Country A", "Country B"),
-    code              = c("AAA", "BBB"),
-    CoverageType      = c("National", "Urban"),
-    ppp_2005_v1_v1    = c(1.5, 2.5),
-    ppp_2011_v1_v1    = c(1.6, 2.6),
-    ppp_2011_v2_v1    = c(1.7, 2.7),
-    ppp_2011_v1_v2    = c(1.8, 2.8),
-    ppp_2011_v2_v2    = c(1.9, 2.9),
-    ppp_2017_v1_v1    = c(2.0, 3.0),
-    ppp_2017_v1_v2    = c(2.1, 3.1),
-    source_ppp_2011   = c(1.0, 2.0),
-    source_ppp_2005   = c(0.9, 1.9),
-    datalevel         = c(0, 1),
-    ppp_domain        = c(1, 2),
-    ppp_domain_value  = c(1, 2),
-    oldicp2005        = c(1.1, 2.1),
-    oldicp2011        = c(1.2, 2.2),
-    Seriesname        = c("Series A", "Series B"),
-    note_may192020    = c("note1", "note2")
+    CountryName      = c("Country A", "Country B"),
+    country_name     = c("Country A", "Country B"),
+    code             = c("AAA", "BBB"),
+    CoverageType     = c("National", "Urban"),
+    ppp_2005_v1_v1   = c(1.0, 2.0),
+    ppp_2011_v1_v1   = c(1.1, 2.1),
+    ppp_2011_v1_v2   = c(1.2, 2.2),
+    ppp_2011_v2_v1   = c(1.3, 2.3),
+    ppp_2011_v2_v2   = c(1.35, 2.35),
+    ppp_2017_v1_v1   = c(1.4, 2.4),
+    ppp_2017_v1_v2   = c(1.5, 2.5),
+    ppp_2021_v1_v1   = c(1.6, 2.6),
+    ppp_2021_v1_v2   = c(1.7, 2.7),
+    source_ppp_2011  = c(1, 1),
+    source_ppp_2005  = c(1, 1),
+    Time             = c("2011", "2017"),
+    datalevel        = c(0, 1),
+    ppp_domain       = c(1, 2),
+    ppp_domain_value = c(1, 2),
+    ppp_domain_var   = c("var1", "var2"),
+    oldicp2005       = c(1.0, 2.0),
+    oldicp2011       = c(1.1, 2.1),
+    Seriesname       = c("Series A", "Series B"),
+    note_may192020   = c("", "")
   )
   modifyList(dt, list(...))
 }
@@ -154,6 +159,41 @@ test_that("aux_ppp_clean() ppp_default is logical", {
 test_that("aux_ppp_clean() ppp_year is numeric", {
   result <- aux_ppp_clean(make_ppp_raw(), default_year = 2011)
   expect_type(result$ppp_year, "double")
+})
+
+test_that("aux_ppp_clean() updates ppp_default and ppp_default_by_year deterministically when a vintage is added", {
+  raw_base <- make_ppp_raw(datalevel = c(2, 1))
+  res_base <- aux_ppp_clean(raw_base, default_year = 2017)
+
+  base_2017_aaa <- res_base[country_code == "AAA" & ppp_year == 2017]
+  expect_identical(
+    base_2017_aaa[ppp_default_by_year == TRUE, paste(release_version, adaptation_version, sep = "_")],
+    "v1_v2"
+  )
+  expect_identical(
+    base_2017_aaa[ppp_default == TRUE, paste(release_version, adaptation_version, sep = "_")],
+    "v1_v2"
+  )
+  expect_false(anyNA(res_base$ppp_default))
+  expect_false(anyNA(res_base$ppp_default_by_year))
+
+  # Add a newer release vintage for 2017 (v2_v1)
+  raw_new <- data.table::copy(raw_base)
+  raw_new[, ppp_2017_v2_v1 := c(2.25, 3.25)]
+  res_new <- aux_ppp_clean(raw_new, default_year = 2017)
+
+  new_2017_aaa <- res_new[country_code == "AAA" & ppp_year == 2017]
+  expect_identical(
+    new_2017_aaa[ppp_default_by_year == TRUE, paste(release_version, adaptation_version, sep = "_")],
+    "v2_v1"
+  )
+  expect_identical(
+    new_2017_aaa[ppp_default == TRUE, paste(release_version, adaptation_version, sep = "_")],
+    "v2_v1"
+  )
+  expect_false(
+    new_2017_aaa[release_version == "v1" & adaptation_version == "v2", ppp_default_by_year]
+  )
 })
 
 # aux_ppp() / aux_ppp_update() --------------------------------------------
