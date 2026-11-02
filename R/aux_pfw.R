@@ -453,7 +453,7 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
                 description = "`pfw_id` should be character") |>
     validate_cols(not_na, code, year, survname,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(code, year, survname),
+    validate_if(assertr::is_uniq(code, year, survname),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
@@ -642,7 +642,7 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
                 description = "`is_alt_welf` should be logical") |>
     validate_cols(not_na, country_code, year, surveyid_year, welfare_type, is_alt_welf,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, surveyid_year, welfare_type, is_alt_welf),
+    validate_if(assertr::is_uniq(country_code, surveyid_year, welfare_type, is_alt_welf),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

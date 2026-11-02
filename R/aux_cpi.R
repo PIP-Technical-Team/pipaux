@@ -430,7 +430,7 @@ cpi_validate_raw <- function(cpi, detail = getOption("pipaux.detail.raw")){
                 description = "`cpi_id` should be character") |>
     validate_cols(not_na, code, year, survname, cpi_data_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(code, year,  survname, cpi_data_level),
+    validate_if(assertr::is_uniq(code, year, survname, cpi_data_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
@@ -489,7 +489,7 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                     description = "`reporting_level` values within range") |>
       validate_cols(not_na, country_code, year, survey_acronym, reporting_level, cpi_year,
                     description = "no missing values in key variables") |>
-      validate_if(is_uniq(country_code, year, survey_acronym,
+      validate_if(assertr::is_uniq(country_code, year, survey_acronym,
                           reporting_level, cpi_year),
                   description = "no duplicate records in key variables") |>
       add_results(report)
@@ -533,10 +533,10 @@ cpi_validate_output <- function(cpi, detail = getOption("pipaux.detail.output"))
                   description = "`cpi_id` should be character") |>
       validate_cols(not_na, country_code, year, survey_acronym, reporting_level,
                     description = "no missing values in key variables") |>
-      validate_if(is_uniq(country_code, year, survey_acronym,
+      validate_if(assertr::is_uniq(country_code, year, survey_acronym,
                           reporting_level),
                   description = "no duplicate records in key variables") |>
-      validate_if(is_uniq(country_code, year, survey_acronym,
+      validate_if(assertr::is_uniq(country_code, year, survey_acronym,
                           reporting_level),
                   description = "no duplicate cpi values") |>
       add_results(report)

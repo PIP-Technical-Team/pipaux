@@ -1,3 +1,15 @@
+source("helper-stamp-process.R", local = TRUE)
+
+if (Sys.getenv("PIPAUX_STAMP_TEST_CHILD") != "test-utils.R") {
+  test_that("utility storage tests leave caller stamp state unchanged", {
+    before <- list(stamp::st_alias_list(), stamp::st_alias_get(), stamp::st_opts_get())
+    expect_true(run_isolated_stamp_test("test-utils.R"))
+    expect_identical(
+      list(stamp::st_alias_list(), stamp::st_alias_get(), stamp::st_opts_get()), before
+    )
+  })
+} else {
+
 # get_from_auxenv() -------------------------------------------------------
 
 test_that("get_from_auxenv() returns NULL for missing key", {
@@ -60,16 +72,10 @@ test_that("pip_aux_save() saves data.table and list artifacts and resolves retai
   tmp_root <- fs::path(tmp_base, paste0("pipaux-utils-test-", Sys.getpid(), "-", sample.int(1e6, 1)))
   fs::dir_create(tmp_root, recurse = TRUE)
 
-  stores <- list(stamp:::.stamp_aliases, stamp:::.stamp_state, stamp:::.stamp_opts)
-  old_stores <- lapply(stores, as.list, all.names = TRUE)
   old_alias <- get_from_auxenv("aux_alias")
   old_path  <- get_from_auxenv("aux_data_path")
 
   on.exit({
-    for (i in seq_along(stores)) {
-      rm(list = ls(stores[[i]], all.names = TRUE), envir = stores[[i]])
-      list2env(old_stores[[i]], envir = stores[[i]])
-    }
     rlang::env_poke(.pipaux, "aux_alias", old_alias)
     rlang::env_poke(.pipaux, "aux_data_path", old_path)
     if (fs::dir_exists(tmp_root)) {
@@ -79,7 +85,7 @@ test_that("pip_aux_save() saves data.table and list artifacts and resolves retai
 
   stamp::st_opts_reset()
   stamp::st_opts(versioning = "content", code_hash = TRUE)
-  alias_name <- "pipaux_utils_test"
+  alias_name <- basename(tmp_root)
   stamp::st_init(tmp_root, alias = alias_name, verbose = FALSE)
   rlang::env_poke(.pipaux, "aux_alias", alias_name)
   rlang::env_poke(.pipaux, "aux_data_path", tmp_root)
@@ -236,4 +242,6 @@ test_that("chain() errors on non-numeric inputs", {
   expect_error(chain("a", c(1, 2, 3)))
   expect_error(chain(c(1, 2, 3), "a"))
 })
+
+}
 

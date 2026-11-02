@@ -356,7 +356,7 @@ ppp_validate_output <- function(ppp, detail = getOption("pipaux.detail.output"))
     validate_cols(not_na, country_code, ppp_year, reporting_level,
                   adaptation_version, release_version,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, ppp_year,
+    validate_if(assertr::is_uniq(country_code, ppp_year,
                         reporting_level, adaptation_version, release_version),
                 description = "no duplicate records in key variables") |>
     add_results(report)
@@ -436,7 +436,7 @@ ppp_validate_raw <- function(ppp, detail = getOption("pipaux.detail.raw")){
     #             description = "`note_ppp_2017_v1_v2` should be character") |>
     validate_cols(not_na, code, CoverageType, datalevel,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(code, CoverageType, datalevel),
+    validate_if(assertr::is_uniq(code, CoverageType, datalevel),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

@@ -30,6 +30,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     testthat (>= 3.0.0),
+    callr,
+    pkgload,
     knitr,
     rmarkdown,
     covr,
@@ -39,7 +41,7 @@ Suggests:
     httr,
     wbstats
 Imports: 
-    stamp,
+    stamp (>= 0.1.0),
     haven,
     fst,
     readr,
@@ -49,7 +51,7 @@ Imports:
     magrittr,
     dplyr,
     cli,
-    pipload (>= 0.1.4.9002),
+    pipload (>= 1.0.0),
     yaml,
     qs2,
     glue,
@@ -62,7 +64,8 @@ Imports:
     rlang
 VignetteBuilder: knitr
 Remotes: 
-    github::PIP-Technical-Team/pipload@PROD,
+    github::randrescastaneda/stamp@4a1fa5d92313aa223296fae0e29cf3446a314aea,
+    github::PIP-Technical-Team/pipload@4ef0d90a974cb6ff0725da69373bde421dd04ad5,
     github::PIP-Technical-Team/pipfun@PROD,
     github::PIP-Technical-Team/myrror
 URL: https://pip-technical-team.github.io/pipaux/

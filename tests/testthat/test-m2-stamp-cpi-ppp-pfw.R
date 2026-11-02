@@ -1,5 +1,17 @@
 # Focused M2 Phase 2 Step 4 (L-aux / V7) verification for CPI, PPP, and PFW
 
+source("helper-stamp-process.R", local = TRUE)
+
+if (Sys.getenv("PIPAUX_STAMP_TEST_CHILD") != "test-m2-stamp-cpi-ppp-pfw.R") {
+  test_that("M2 storage tests leave caller stamp state unchanged", {
+    before <- list(stamp::st_alias_list(), stamp::st_alias_get(), stamp::st_opts_get())
+    expect_true(run_isolated_stamp_test("test-m2-stamp-cpi-ppp-pfw.R"))
+    expect_identical(
+      list(stamp::st_alias_list(), stamp::st_alias_get(), stamp::st_opts_get()), before
+    )
+  })
+} else {
+
 with_isolated_aux_stamp <- function(code) {
   tmp_base <- Sys.getenv("TMPDIR", unset = "")
   if (!nzchar(tmp_base)) {
@@ -18,17 +30,11 @@ with_isolated_aux_stamp <- function(code) {
   )
   fs::dir_create(tmp_root, recurse = TRUE)
 
-  stores <- list(stamp:::.stamp_aliases, stamp:::.stamp_state, stamp:::.stamp_opts)
-  old_stores <- lapply(stores, as.list, all.names = TRUE)
   old_alias <- get_from_auxenv("aux_alias")
   old_path  <- get_from_auxenv("aux_data_path")
   old_wrk   <- get_from_auxenv("wrk_release")
 
   on.exit({
-    for (i in seq_along(stores)) {
-      rm(list = ls(stores[[i]], all.names = TRUE), envir = stores[[i]])
-      list2env(old_stores[[i]], envir = stores[[i]])
-    }
     rlang::env_poke(.pipaux, "aux_alias", old_alias)
     rlang::env_poke(.pipaux, "aux_data_path", old_path)
     rlang::env_poke(.pipaux, "wrk_release", old_wrk)
@@ -44,7 +50,7 @@ with_isolated_aux_stamp <- function(code) {
     verify_on_load = TRUE
   )
 
-  alias_name <- "pipaux_m2_test"
+  alias_name <- basename(tmp_root)
   stamp::st_init(tmp_root, alias = alias_name, verbose = FALSE)
 
   rlang::env_poke(.pipaux, "aux_alias", alias_name)
@@ -455,3 +461,5 @@ test_that("L-aux (3): re-saving unchanged CPI/PPP/PFW (even with changed raw Git
     )
   })
 })
+
+}

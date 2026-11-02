@@ -100,3 +100,24 @@ In `pipaux` (`PROD` at `27c5a3c`), the three M2 skeleton auxiliary series (`cpi`
 
 - Updating `sidecar$gh` in place on skipped saves without creating a new `stamp` snapshot (only relevant if `check_y_drive_status()` is used instead of `stamp` lineage in a future milestone).
 - Expanding `pip_aux_save()` key/schema reconciliation to non-skeleton auxiliary measures (`gdp`, `pop`, `pce`, `gdm`, `wdi`).
+
+## Authorized Follow-up (2026-11-02)
+
+The original two phases are complete. The user separately authorized dependency
+alignment and the remaining P3 test-isolation correction, not a PROD merge or
+production/shared-library update. Additional files in scope are `DESCRIPTION`
+and focused test infrastructure. Build the smallest end-to-end change, use
+installed tools, add no speculative safeguards, and keep every process/temp,
+cache, library and test output on E:. Do not change other measures, umbrella
+milestones, or Decided design items. The prior feature-branch commit/push
+authorization applies to these corrections; a PROD merge or production
+installation still requires separate explicit authorization.
+
+- [x] Declare stamp >= 0.1.0 and pipload >= 1.0.0, selecting the full tested GitHub SHAs in `Remotes` rather than unverified default branches.
+- [x] Replace private stamp environment snapshot/mutation in utility and L-aux tests with clean process isolation; retain the same assertions and caller state on success/error.
+- [x] Correct the installed-package validator failure found during verification by qualifying the eight skeleton `is_uniq()` expressions as `assertr::is_uniq()`; do not change other measures.
+- [x] Install the declared local source pins into an isolated E: library, run the five focused files with zero failures/warnings, verify old stamp is rejected, and independently review/correct the changes.
+
+Later: production runtime rollout and a separately authorized PR/PROD merge;
+live-data and broader M2 integration remain separate. No new CI or compatibility
+fallback is needed for this correction.
