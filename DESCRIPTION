@@ -66,7 +66,7 @@ VignetteBuilder: knitr
 Remotes: 
     github::randrescastaneda/stamp@4a1fa5d92313aa223296fae0e29cf3446a314aea,
     github::PIP-Technical-Team/pipload@4ef0d90a974cb6ff0725da69373bde421dd04ad5,
-    github::PIP-Technical-Team/pipfun@PROD,
+    github::PIP-Technical-Team/pipfun@aa6dfe888600820a525b43419268d531b6f2fb82,
     github::PIP-Technical-Team/myrror
 URL: https://pip-technical-team.github.io/pipaux/
 Config/testthat/edition: 3

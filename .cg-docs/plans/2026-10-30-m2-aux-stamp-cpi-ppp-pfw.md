@@ -13,7 +13,7 @@ completed-phases: [1, 2]
 - **Branch:** `feat/m2-aux-stamp-cpi-ppp-pfw` (from `PROD` at `27c5a3c8eab8ddcabb032d620af6a1f76e62f444`)
 - **Deviation Policy:** `deviate: auto`
 - **Umbrella Reference:** `E:/PovcalNet/01.personal/wb384996/PIP/pipsystem/.cg-docs/plans/2026-10-10-m2-walking-skeleton.md` (`1186b70`, Phase 2 Step 4, lines 290-303; Contracts E1-E3 lines 167-169, 185; `notes/pipaux.md` A1-A4)
-- **Dependency Pins:** `stamp` 0.1.0 at `4a1fa5d` (`ready_cran`); `pipload` at `4ef0d90` (`feat/m2-stamp-adapter`)
+- **Dependency Pins:** `stamp` 0.1.0 at `4a1fa5d` (`ready_cran`); `pipload` at `4ef0d90` (`feat/m2-stamp-adapter`); `pipfun` 1.0.1 at `aa6dfe8` (`fix/m2-stamp-pin`, metadata-only alignment).
 
 ## Context & Problem Statement
 
@@ -121,3 +121,16 @@ installation still requires separate explicit authorization.
 Later: production runtime rollout and a separately authorized PR/PROD merge;
 live-data and broader M2 integration remain separate. No new CI or compatibility
 fallback is needed for this correction.
+
+## Pkgdown Follow-up (2026-11-02)
+
+The user authorized the pkgdown correction and a pipaux PR 119 merge only after
+successful exact-head checks. A separate approval covers the supporting pipfun
+branch/commit/push, not a pipfun PROD merge. The initial pak solve conflicts on
+pipfun PROD's unpinned older stamp remote. The metadata-only pipfun commit
+`aa6dfe888600820a525b43419268d531b6f2fb82` aligns it with stamp `4a1fa5d`;
+pipaux now selects that immutable pipfun source. The unchanged full dependency
+solve succeeds (126 packages), and 222 focused assertions pass with that exact
+dependency installed. Review found no P0-P3 issues. No workflow, dependency
+coverage, version bound or check was weakened. CI/merge outcome is recorded in
+the orchestration handoff for run `20261102T191337Z-pipaux`.

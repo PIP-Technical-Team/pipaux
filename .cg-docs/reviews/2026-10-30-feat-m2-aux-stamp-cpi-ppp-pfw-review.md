@@ -46,3 +46,10 @@
 - Source and installed focused suites execute all 218 original assertions plus 4 new parent wrapper/state assertions (84 parent, 138 child), with zero failures/errors/warnings and five existing external-service skips. Child assertion counts are printed separately. Two repeated discovery runs and an intentional child-error experiment demonstrate process isolation and failure propagation.
 - Reviews: architecture/reproducibility (`ses_e631b8ec8ffemkxWD52CaGTdnD`) and testing/code quality (`ses_e631b8ec7ffe6ln9Z056JW5gtV`) found no actionable issues. Final `/cg-review mode:verify` with the testing/code-quality reviewer confirmed all three corrections `[RESOLVED]` and reviewed code/evidence consistency. Runtime execution was performed by the main agent, not the reviewers.
 - Remaining release-stage work is separate: a PR/merge approval for `PROD`, installation of the declared dependencies in the intended runtime, and any required live-data/full-package/CI evidence. None was represented as completed by these focused checks, and no PROD merge was performed.
+
+## Pkgdown Fix Review (2026-11-02)
+
+- The later user approval authorizes PR 119's merge only after successful checks, plus a metadata-only supporting pipfun branch/push (not a pipfun PROD merge).
+- Supporting pipfun commit `aa6dfe888600820a525b43419268d531b6f2fb82` changes one DESCRIPTION remote to stamp `4a1fa5d`, removing the conflict with the older default stamp source. The only functional pipaux change in this correction is selecting that pipfun SHA in DESCRIPTION; stamp and pipload pins remain unchanged.
+- Reviewer `ses_e6232defcffeG10vqttcQg80ZF` confirmed the metadata correction is consistent, with no P0-P3 findings. The same full pak dependency solve now succeeds (126 packages), and the focused 222 assertions pass with the exact supporting source installed.
+- No checks, dependency coverage, workflow steps or version bounds were weakened. Exact corrected-head GitHub CI is still required before the conditional merge; this review does not substitute for that gate.
