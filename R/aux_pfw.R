@@ -7,6 +7,9 @@
 #' "update" data will be updated on the system. If "load" data is loaded in memory.
 #' @param verbose logical: If TRUE, print verbose output. Default is FALSE.
 #' @inheritParams pipfun::load_from_gh
+#' @return For `action = "load"`, the loaded `data.table`. For `action = "update"`,
+#'   invisibly returns the save-result list from `pip_aux_save()` containing
+#'   `path`, `version_id`, and `skipped`.
 #' @export
 #' @import data.table
 aux_pfw <- function(action  = c("update", "load"),
@@ -33,7 +36,8 @@ aux_pfw <- function(action  = c("update", "load"),
                    branch  = branch,
                    tag     = tag,
                    detail  = detail,
-                  ...)
+                   verbose = verbose,
+                   ...)
 
   } else {
 
@@ -175,7 +179,8 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
                            branch  = NULL,
                            tag     = NULL,
                            detail  = getOption("pipaux.detail.raw"),
-                          ...) {
+                           verbose = FALSE,
+                           ...) {
 
   measure <- "pfw"
   tag <- branch
@@ -193,10 +198,7 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
   # Clean data
   pfw <- aux_pfw_clean(pfw)
 
-  # validate pfw raw data
-  # pfw_validate_output(pfw    = pfw,
-  #                     detail = detail)
-   # validate pfw output data
+  # validate pfw output data
   withCallingHandlers(
     pfw_validate_output(pfw = pfw, detail = detail),
     warning = function(w) {
@@ -207,24 +209,27 @@ aux_pfw_update <- function(owner   = getOption("pipfun.ghowner"),
   )
 
   # Save dataset
-  if (branch == "main") {
+  if (identical(branch, "main")) {
     branch <- ""
   }
   setattr(pfw, "aux_name", "pfw")
 
-  key_cols <-  c("country_code", "surveyid_year", "welfare_type")
+  key_cols <- c("country_code", "surveyid_year", "welfare_type", "is_alt_welf")
 
   setattr(pfw,
           "aux_key",
-         key_cols)
+          key_cols)
+  setattr(pfw, "gh", gh)
+  setkeyv(pfw, key_cols)
 
   saved <- pip_aux_save(
-    x        = pfw,
-    id       = measure,
-    pk       = key_cols,
-    metadata = list(gh = gh),
-    code     = aux_pfw_update,
+    x          = pfw,
+    id         = measure,
+    pk         = key_cols,
+    metadata   = list(gh = gh),
+    code       = aux_pfw_update,
     code_label = "aux_pfw_update",
+    verbose    = verbose,
     ...
   )
 
@@ -448,7 +453,7 @@ pfw_validate_raw <- function(pfw, detail = getOption("pipaux.detail.raw")){
                 description = "`pfw_id` should be character") |>
     validate_cols(not_na, code, year, survname,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(code, year, survname),
+    validate_if(assertr::is_uniq(code, year, survname),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
@@ -633,9 +638,11 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
                   description = "`pop_domain` values within range") |>
     validate_if(is.character(pfw_id),
                 description = "`pfw_id` should be character") |>
-    validate_cols(not_na, country_code, year, welfare_type,
+    validate_if(is.logical(is_alt_welf),
+                description = "`is_alt_welf` should be logical") |>
+    validate_cols(not_na, country_code, year, surveyid_year, welfare_type, is_alt_welf,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, welfare_type, is_alt_welf),
+    validate_if(assertr::is_uniq(country_code, surveyid_year, welfare_type, is_alt_welf),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

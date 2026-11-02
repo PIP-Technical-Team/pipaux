@@ -465,26 +465,105 @@ get_from_auxenv <- \(key) {
 #' @param verbose logical: If TRUE, print verbose output. Default is TRUE.
 #' @param ... Additional arguments to be passed to `pipload::pip_write()`
 #'
-#' @returns Fully qualified name of the new file, invisibly
+#' @returns Invisibly returns the save result list from `pipload::pip_write()` /
+#'   `stamp::st_save()` with `path`, `version_id`, and `skipped` (resolving the
+#'   retained `version_id` when a save is skipped under content-based versioning).
 #'
 pip_aux_save <- \(x,
                   id,
                   verbose = TRUE,
                   ...) {
 
-  # alias to pass into pipload::pip_write
-  alias <- get_from_auxenv("aux_alias")
+  dots <- list(...)
+  alias <- dots$alias
+  if (is.null(alias)) {
+    alias <- get_from_auxenv("aux_alias")
+  }
+  dots$alias <- NULL
+
+  gh_attr <- attr(x, "gh", exact = TRUE)
+  if (is.null(dots$metadata)) {
+    dots$metadata <- list()
+  } else if (!is.list(dots$metadata)) {
+    cli::cli_abort("{.arg metadata} must be a list.")
+  }
+  if (!is.null(gh_attr) && is.null(dots$metadata$gh)) {
+    dots$metadata$gh <- gh_attr
+  }
+
+  if (data.table::is.data.table(x)) {
+    x_to_save <- data.table::copy(x)
+    data.table::setattr(x_to_save, "gh", NULL)
+    if (is.null(attr(x_to_save, "aux_name", exact = TRUE))) {
+      data.table::setattr(x_to_save, "aux_name", as.character(id))
+    }
+    if (!is.null(dots$pk) && is.character(dots$pk) && length(dots$pk) > 0L) {
+      if (is.null(attr(x_to_save, "aux_key", exact = TRUE))) {
+        data.table::setattr(x_to_save, "aux_key", dots$pk)
+      }
+      if (all(dots$pk %in% names(x_to_save))) {
+        data.table::setkeyv(x_to_save, dots$pk)
+      }
+    }
+  } else if (is.data.frame(x)) {
+    x_to_save <- x
+    attr(x_to_save, "gh") <- NULL
+    if (is.null(attr(x_to_save, "aux_name", exact = TRUE))) {
+      attr(x_to_save, "aux_name") <- as.character(id)
+    }
+    if (!is.null(dots$pk) && is.null(attr(x_to_save, "aux_key", exact = TRUE))) {
+      attr(x_to_save, "aux_key") <- dots$pk
+    }
+  } else {
+    x_to_save <- x
+    if (!is.null(attr(x_to_save, "gh", exact = TRUE))) {
+      attr(x_to_save, "gh") <- NULL
+    }
+  }
 
   # Save to the aux_data_path using pipload::pip_write
-  pipload::pip_write(
-    x        = x,
-    id = id,
-    alias = alias,
-    verbose = verbose,
-    ...
+  res <- do.call(
+    pipload::pip_write,
+    c(
+      list(
+        x       = x_to_save,
+        id      = id,
+        alias   = alias,
+        verbose = verbose
+      ),
+      dots
+    )
   )
 
-  invisible(TRUE)
+  if (!is.list(res)) {
+    cli::cli_abort(
+      "Failed to save auxiliary artifact {.val {id}}: unexpected return from {.fn pipload::pip_write}."
+    )
+  }
+
+  res$skipped <- isTRUE(res$skipped)
+
+  if (res$skipped &&
+      (!is.character(res$version_id) || length(res$version_id) != 1L ||
+       is.na(res$version_id) || !nzchar(res$version_id))) {
+    target_id <- res$path
+    if (is.null(target_id) || !nzchar(as.character(target_id))) {
+      target_id <- id
+    }
+    vr <- stamp::st_versions(as.character(target_id), alias = alias)
+    if (NROW(vr) > 0L && "version_id" %in% names(vr)) {
+      res$version_id <- as.character(vr$version_id[[1L]])
+    }
+  }
+
+  if (!is.character(res$version_id) || length(res$version_id) != 1L ||
+      is.na(res$version_id) || !nzchar(res$version_id)) {
+    cli::cli_abort(
+      "Failed to save auxiliary artifact {.val {id}}: missing valid {.field version_id}."
+    )
+  }
+
+  invisible(res)
 }
 
 read_dependencies <- function(gh_user, owner) {

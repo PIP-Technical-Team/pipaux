@@ -2,12 +2,12 @@
 
 make_pfw_raw <- function(...) {
   dt <- data.table::data.table(
-    region             = c("Sub-Saharan Africa", "East Asia & Pacific"),
+    region             = c("SSA", "EAP"),
     code               = c("AAA", "BBB"),
     reg_pcn            = c("SSA", "EAP"),
     ctryname           = c("Country A", "Country B"),
     year               = c(2010, 2011),
-    surveyid_year      = c(2010, 2011),
+    surveyid_year      = c(2010L, 2011L),
     timewp             = c(1.0, 2.0),
     fieldwork          = c(2010.0, 2011.0),
     survname           = c("Survey A", "Survey B"),
@@ -68,12 +68,12 @@ make_pfw_raw <- function(...) {
 
 make_pfw_output <- function(...) {
   dt <- data.table::data.table(
-    region_code        = c("SSF", "EAS"),
+    region_code        = c("SSA", "EAP"),
     country_code       = c("AAA", "BBB"),
     reg_pcn            = c("SSA", "EAP"),
     ctryname           = c("Country A", "Country B"),
     year               = c(2010, 2011),
-    surveyid_year      = c(2010, 2011),
+    surveyid_year      = c(2010L, 2011L),
     timewp             = c(1.0, 2.0),
     fieldwork          = c(2010.0, 2011.0),
     survey_acronym     = c("Survey A", "Survey B"),
@@ -125,16 +125,20 @@ make_pfw_output <- function(...) {
     gdp_domain         = c(1, 2),
     pce_domain         = c(1, 2),
     pop_domain         = c(1, 2),
-    pfw_id             = c("id1", "id2")
+    pfw_id             = c("id1", "id2"),
+    is_alt_welf        = c(FALSE, FALSE)
   )
   modifyList(dt, list(...))
 }
 
 # pfw_validate_raw() ------------------------------------------------------
 
+test_that("pfw_validate_raw() accepts valid raw pfw data", {
+  expect_no_error(pfw_validate_raw(pfw = make_pfw_raw(), detail = FALSE))
+})
 
 test_that("pfw_validate_raw() errors when region has invalid value", {
-  bad <- make_pfw_raw(region = c("Sub-Saharan Africa", "INVALID"))
+  bad <- make_pfw_raw(region = c("SSA", "INVALID"))
   expect_error(pfw_validate_raw(pfw = bad, detail = FALSE))
 })
 
@@ -198,9 +202,12 @@ test_that("pfw_validate_raw() errors when data is NULL", {
 
 # pfw_validate_output() ---------------------------------------------------
 
+test_that("pfw_validate_output() accepts valid output pfw data", {
+  expect_no_error(pfw_validate_output(pfw = make_pfw_output(), detail = FALSE))
+})
 
 test_that("pfw_validate_output() errors when region_code has invalid value", {
-  bad <- make_pfw_output(region_code = c("SSF", "INVALID"))
+  bad <- make_pfw_output(region_code = c("SSA", "INVALID"))
   expect_error(pfw_validate_output(pfw = bad, detail = FALSE))
 })
 
@@ -236,11 +243,32 @@ test_that("pfw_validate_output() errors when year is NA", {
 
 test_that("pfw_validate_output() errors on duplicate key values", {
   bad <- make_pfw_output(
-    country_code = c("AAA", "AAA"),
-    year         = c(2010, 2010),
-    welfare_type = c("consumption", "consumption")
+    country_code  = c("AAA", "AAA"),
+    year          = c(2010, 2010),
+    surveyid_year = c(2010L, 2010L),
+    welfare_type  = c("consumption", "consumption"),
+    is_alt_welf   = c(FALSE, FALSE)
   )
   expect_error(pfw_validate_output(pfw = bad, detail = FALSE))
+})
+
+test_that("pfw_validate_output() allows same survey when is_alt_welf differs", {
+  ok <- make_pfw_output(
+    country_code  = c("AAA", "AAA"),
+    year          = c(2010, 2010),
+    surveyid_year = c(2010L, 2010L),
+    welfare_type  = c("consumption", "consumption"),
+    is_alt_welf   = c(FALSE, TRUE)
+  )
+  expect_no_error(pfw_validate_output(pfw = ok, detail = FALSE))
+})
+
+test_that("pfw_validate_output() errors when surveyid_year or is_alt_welf is NA", {
+  bad_year <- make_pfw_output(surveyid_year = c(2010L, NA_integer_))
+  expect_error(pfw_validate_output(pfw = bad_year, detail = FALSE))
+
+  bad_alt <- make_pfw_output(is_alt_welf = c(FALSE, NA))
+  expect_error(pfw_validate_output(pfw = bad_alt, detail = FALSE))
 })
 
 test_that("pfw_validate_output() errors when data is NULL", {
@@ -277,6 +305,31 @@ test_that("aux_pfw_clean() updates region_code from country_list", {
 
   expect_identical(out$country_code, "AAA")
   expect_identical(out$region_code, "SSA")
+})
+
+test_that("aux_pfw_clean() preserves main and alternative welfare rows with distinct is_alt_welf", {
+  raw <- make_pfw_raw(oth_welfare1_type = c("I", ""))
+
+  testthat::local_mocked_bindings(
+    load_aux_data = function(measure, verbose = FALSE) {
+      if (identical(measure, "country_list")) {
+        return(data.table::data.table(
+          country_code = c("AAA", "BBB"),
+          region_code  = c("SSA", "EAP")
+        ))
+      }
+      data.table::data.table()
+    },
+    .package = "pipload"
+  )
+
+  out <- aux_pfw_clean(raw)
+  expect_equal(nrow(out), 3L)
+  aaa_rows <- out[country_code == "AAA"]
+  expect_equal(nrow(aaa_rows), 2L)
+  expect_setequal(aaa_rows$is_alt_welf, c(FALSE, TRUE))
+  expect_setequal(aaa_rows$welfare_type, c("consumption", "income"))
+  expect_no_error(pfw_validate_output(out, detail = FALSE))
 })
 
 test_that("aux_pfw() requires GitHub and filesystem access", {

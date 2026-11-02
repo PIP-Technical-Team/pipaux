@@ -9,7 +9,8 @@ aux_cpi(
   owner = getOption("pipfun.ghowner"),
   tag = NULL,
   verbose = FALSE,
-  detail = getOption("pipaux.detail.raw")
+  detail = getOption("pipaux.detail.raw"),
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,13 @@ memory.}
 \item{verbose}{logical: If TRUE, print verbose output. Default is FALSE.}
 
 \item{detail}{has an option TRUE/FALSE, default value is pipaux.detail.raw option}
+
+\item{...}{Additional arguments passed to \code{pip_aux_save()} when \code{action = "update"}.}
+}
+\value{
+For \code{action = "load"}, the loaded \code{data.table}. For \code{action = "update"},
+  invisibly returns the save-result list from \code{pip_aux_save()} containing
+  \code{path}, \code{version_id}, and \code{skipped}.
 }
 \description{
 Load or update PIP CPI data.

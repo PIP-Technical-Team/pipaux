@@ -29,6 +29,11 @@ aux_pfw(
 \item{...}{parameters to be passed to the loading functions depending of the
 extension used}
 }
+\value{
+For \code{action = "load"}, the loaded \code{data.table}. For \code{action = "update"},
+  invisibly returns the save-result list from \code{pip_aux_save()} containing
+  \code{path}, \code{version_id}, and \code{skipped}.
+}
 \description{
 Load or update PIP Price Framework data.
 }

@@ -31,6 +31,13 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Prepare isolated documentation root
+        # Package installation initializes legacy globals; no survey data are needed.
+        run: |
+          PIP_ROOT_DIR="$RUNNER_TEMP/pipaux-docs"
+          echo "PIP_ROOT_DIR=$PIP_ROOT_DIR" >> "$GITHUB_ENV"
+          mkdir -p "$PIP_ROOT_DIR/pip_ingestion_pipeline/pc_data/cache/clean_survey_data/20200101_2017_01_01_TEST"
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
