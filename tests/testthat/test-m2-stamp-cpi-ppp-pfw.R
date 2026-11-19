@@ -74,7 +74,7 @@ with_isolated_aux_stamp <- function(code) {
   # Seed minimal country_list in the isolated stamp root for aux_*_clean()
   cl <- data.table::data.table(
     country_code = c("AAA", "BBB"),
-    region_code  = c("SSA", "EAP")
+    region_code  = c("LCN", "EAS")
   )
   pip_aux_save(cl, id = "country_list", pk = "country_code", verbose = FALSE)
 

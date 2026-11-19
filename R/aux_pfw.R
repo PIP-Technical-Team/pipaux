@@ -482,7 +482,10 @@ pfw_validate_output <- function(pfw, detail = getOption("pipaux.detail.output"))
   report <- data_validation_report()
 
   validate(pfw, name = "PFW output data validation") |>
-    validate_cols(in_set(c("EAP", "ECA", "LAC", "MNA", "NAC", "SAR", "SSA")),
+    # region_code is joined from country_list; reg_pcn keeps its raw codes.
+    validate_if(is.character(region_code),
+                description = "`region_code` should be character") |>
+    validate_cols(in_set(c("SSF", "LCN", "MEA", "ECS", "EAS", "SAS", "NAC")),
                   region_code, description = "`region_code` values within range") |>
     validate_if(is.character(country_code),
                 description = "`country_code` should be character") |>

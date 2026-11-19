@@ -309,7 +309,7 @@ popmain_validate_raw <- function(pop_main, detail = getOption("pipaux.detail.raw
                 description = "`pop` should be numeric") |>
     validate_cols(not_na, country_code, year, pop_data_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, pop_data_level),
+    validate_if(assertr::is_uniq(country_code, year, pop_data_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
@@ -409,7 +409,7 @@ pop_validate_output <- function(pop, detail = getOption("pipaux.detail.output"))
     #               pop_domain, description = "`pop_domain` values within range") |>
     validate_cols(not_na, country_code, year, reporting_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, reporting_level),
+    validate_if(assertr::is_uniq(country_code, year, reporting_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 
@@ -450,7 +450,7 @@ spop_validate_raw <- function(spop, detail = getOption("pipaux.detail.output")){
                 description = "`pop` should be numeric") |>
     validate_cols(not_na, country_code, year, pop_data_level,
                   description = "no missing values in key variables") |>
-    validate_if(is_uniq(country_code, year, pop_data_level),
+    validate_if(assertr::is_uniq(country_code, year, pop_data_level),
                 description = "no duplicate records in key variables") |>
     add_results(report)
 

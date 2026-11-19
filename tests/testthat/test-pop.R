@@ -55,6 +55,13 @@ make_pop_output <- function(...) {
 
 # popmain_validate_raw() --------------------------------------------------
 
+test_that("popmain_validate_raw() accepts distinct composite keys", {
+  valid <- make_popmain_raw(
+    country_code = c("AAA", "AAA"),
+    pop_data_level = c(0, 0)
+  )
+  expect_no_error(popmain_validate_raw(pop_main = valid, detail = FALSE))
+})
 
 test_that("popmain_validate_raw() errors when pop_data_level has invalid value", {
   bad <- make_popmain_raw(pop_data_level = c(0, 99))
@@ -82,7 +89,10 @@ test_that("popmain_validate_raw() errors on duplicate key values", {
     year           = c(2010, 2010),
     pop_data_level = c(0, 0)
   )
-  expect_error(popmain_validate_raw(pop_main = bad, detail = FALSE))
+  expect_error(
+    popmain_validate_raw(pop_main = bad, detail = FALSE),
+    "no duplicate records in key variables"
+  )
 })
 
 test_that("popmain_validate_raw() errors when data is NULL", {
@@ -131,6 +141,14 @@ test_that("pop_validate_raw() errors when data is NULL", {
 
 # spop_validate_raw() -----------------------------------------------------
 
+test_that("spop_validate_raw() accepts distinct composite keys", {
+  valid <- make_spop_raw(
+    country_code = c("AAA", "AAA"),
+    pop_data_level = c(0, 0)
+  )
+  expect_no_error(spop_validate_raw(spop = valid, detail = FALSE))
+})
+
 test_that("spop_validate_raw() errors when pop_data_level has invalid value", {
   bad <- make_spop_raw(pop_data_level = c(0, 99))
   expect_error(spop_validate_raw(spop = bad, detail = FALSE))
@@ -152,7 +170,10 @@ test_that("spop_validate_raw() errors on duplicate key values", {
     year           = c(2010, 2010),
     pop_data_level = c(0, 0)
   )
-  expect_error(spop_validate_raw(spop = bad, detail = FALSE))
+  expect_error(
+    spop_validate_raw(spop = bad, detail = FALSE),
+    "no duplicate records in key variables"
+  )
 })
 
 test_that("spop_validate_raw() errors when data is NULL", {
@@ -160,6 +181,14 @@ test_that("spop_validate_raw() errors when data is NULL", {
 })
 
 # pop_validate_output() ---------------------------------------------------
+
+test_that("pop_validate_output() accepts distinct composite keys", {
+  valid <- make_pop_output(
+    country_code = c("AAA", "AAA"),
+    reporting_level = c("national", "national")
+  )
+  expect_no_error(pop_validate_output(pop = valid, detail = FALSE))
+})
 
 test_that("pop_validate_output() errors when reporting_level has invalid value", {
   bad <- make_pop_output(reporting_level = c("national", "invalid"))
@@ -192,7 +221,10 @@ test_that("pop_validate_output() errors on duplicate key values", {
     year            = c(2010, 2010),
     reporting_level = c("national", "national")
   )
-  expect_error(pop_validate_output(pop = bad, detail = FALSE))
+  expect_error(
+    pop_validate_output(pop = bad, detail = FALSE),
+    "no duplicate records in key variables"
+  )
 })
 
 test_that("pop_validate_output() errors when data is NULL", {

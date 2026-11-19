@@ -68,7 +68,7 @@ make_pfw_raw <- function(...) {
 
 make_pfw_output <- function(...) {
   dt <- data.table::data.table(
-    region_code        = c("SSA", "EAP"),
+    region_code        = c("LCN", "EAS"),
     country_code       = c("AAA", "BBB"),
     reg_pcn            = c("SSA", "EAP"),
     ctryname           = c("Country A", "Country B"),
@@ -202,13 +202,24 @@ test_that("pfw_validate_raw() errors when data is NULL", {
 
 # pfw_validate_output() ---------------------------------------------------
 
-test_that("pfw_validate_output() accepts valid output pfw data", {
+test_that("pfw_validate_output() accepts joined country-list region codes", {
   expect_no_error(pfw_validate_output(pfw = make_pfw_output(), detail = FALSE))
 })
 
 test_that("pfw_validate_output() errors when region_code has invalid value", {
-  bad <- make_pfw_output(region_code = c("SSA", "INVALID"))
-  expect_error(pfw_validate_output(pfw = bad, detail = FALSE))
+  bad <- make_pfw_output(region_code = c("LCN", "INVALID"))
+  expect_error(
+    pfw_validate_output(pfw = bad, detail = FALSE),
+    "`?region_code`? values within range"
+  )
+})
+
+test_that("pfw_validate_output() rejects a raw-only region code", {
+  bad <- make_pfw_output(region_code = c("NAC", "EAP"))
+  expect_error(
+    pfw_validate_output(pfw = bad, detail = FALSE),
+    "`?region_code`? values within range"
+  )
 })
 
 test_that("pfw_validate_output() errors when welfare_type has invalid value", {
@@ -315,7 +326,7 @@ test_that("aux_pfw_clean() preserves main and alternative welfare rows with dist
       if (identical(measure, "country_list")) {
         return(data.table::data.table(
           country_code = c("AAA", "BBB"),
-          region_code  = c("SSA", "EAP")
+          region_code  = c("LCN", "EAS")
         ))
       }
       data.table::data.table()
